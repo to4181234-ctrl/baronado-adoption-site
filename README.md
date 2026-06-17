@@ -82,3 +82,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=Supabase anon public key
 - 관리자 페이지: `https://배포주소.vercel.app/admin`
 
 관리자 페이지에서 강아지 정보를 추가하면 이용자 페이지에 바로 표시됩니다.
+
+
+## 최근 수정
+
+- 상단 가게명을 텍스트 대신 `public/baronado-logo.png` 로고 이미지로 교체
+- 강아지 상세 사진 배열을 더 안전하게 처리하도록 수정

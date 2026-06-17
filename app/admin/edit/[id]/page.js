@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchDog, updateDog } from '../../../../lib/dogs';
+import SiteHeader from '../../../../components/SiteHeader';
 
 export default function EditDogPage() {
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function EditDogPage() {
 
   return (
     <main className="site-shell">
-      <header className="top-bar"><span className="text-logo">바로나도</span></header>
+      <SiteHeader />
       <section className="container narrow">
         <Link className="back-link" href="/admin">뒤로 가기</Link>
 
