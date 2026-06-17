@@ -30,6 +30,20 @@ export default function EditDogPage() {
     setForm((prev) => ({ ...prev, images: (prev.images ?? []).filter((image) => image !== url) }));
   };
 
+  const onFileChange = (event) => {
+    const selected = Array.from(event.target.files ?? []);
+    setFiles((prev) => {
+      const currentImageCount = form?.images?.length ?? 0;
+      const remaining = Math.max(0, 3 - currentImageCount);
+      return [...prev, ...selected].slice(0, remaining);
+    });
+    event.target.value = '';
+  };
+
+  const removeSelectedFile = (index) => {
+    setFiles((prev) => prev.filter((_, fileIndex) => fileIndex !== index));
+  };
+
   const onSubmit = async (event) => {
     event.preventDefault();
     setError('');
@@ -58,15 +72,15 @@ export default function EditDogPage() {
             <div className="upload-row">
               <label className="upload-box">
                 대표 사진<br />클릭해서<br />업로드하세요
-                <input type="file" accept="image/*" multiple onChange={(event) => setFiles(Array.from(event.target.files ?? []))} hidden />
+                <input type="file" accept="image/*" multiple onChange={onFileChange} hidden />
               </label>
               <label className="upload-box">
                 추가 사진
-                <input type="file" accept="image/*" multiple onChange={(event) => setFiles(Array.from(event.target.files ?? []))} hidden />
+                <input type="file" accept="image/*" multiple onChange={onFileChange} hidden />
               </label>
               <label className="upload-box">
                 추가 사진
-                <input type="file" accept="image/*" multiple onChange={(event) => setFiles(Array.from(event.target.files ?? []))} hidden />
+                <input type="file" accept="image/*" multiple onChange={onFileChange} hidden />
               </label>
             </div>
 
@@ -78,9 +92,10 @@ export default function EditDogPage() {
                     <button type="button" onClick={() => removeImage(url)}>×</button>
                   </div>
                 ))}
-                {files.map((file) => (
-                  <div className="preview" key={file.name}>
+                {files.map((file, index) => (
+                  <div className="preview" key={`${file.name}-${index}`}>
                     <img src={URL.createObjectURL(file)} alt="새 사진 미리보기" />
+                    <button type="button" onClick={() => removeSelectedFile(index)}>×</button>
                   </div>
                 ))}
               </div>

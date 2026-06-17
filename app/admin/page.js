@@ -88,8 +88,8 @@ export default function AdminPage() {
           <div className="modal-card">
             <p>삭제하시겠습니까?</p>
             <div className="modal-actions">
-              <button className="btn danger" onClick={confirmDelete}>삭제</button>
-              <button className="btn secondary" onClick={() => setTarget(null)}>취소</button>
+              <button className="btn danger" onClick={confirmDelete}>예</button>
+              <button className="btn secondary" onClick={() => setTarget(null)}>아니오</button>
             </div>
           </div>
         </div>

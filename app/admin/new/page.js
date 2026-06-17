@@ -18,7 +18,13 @@ export default function NewDogPage() {
   };
 
   const onFileChange = (event) => {
-    setFiles(Array.from(event.target.files ?? []));
+    const selected = Array.from(event.target.files ?? []);
+    setFiles((prev) => [...prev, ...selected].slice(0, 3));
+    event.target.value = '';
+  };
+
+  const removeSelectedFile = (index) => {
+    setFiles((prev) => prev.filter((_, fileIndex) => fileIndex !== index));
   };
 
   const onSubmit = async (event) => {
@@ -56,7 +62,17 @@ export default function NewDogPage() {
           </div>
 
           {files.length > 0 && (
-            <div className="small-note">선택된 사진 {files.length}장. 첫 번째 사진이 대표 이미지로 표시돼요.</div>
+            <>
+              <div className="preview-grid">
+                {files.map((file, index) => (
+                  <div className="preview" key={`${file.name}-${index}`}>
+                    <img src={URL.createObjectURL(file)} alt="선택한 사진 미리보기" />
+                    <button type="button" onClick={() => removeSelectedFile(index)}>×</button>
+                  </div>
+                ))}
+              </div>
+              <div className="small-note">선택된 사진 {files.length}장. 첫 번째 사진이 대표 이미지로 표시돼요.</div>
+            </>
           )}
 
           <label>

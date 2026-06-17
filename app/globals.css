@@ -83,6 +83,9 @@ textarea.field { min-height: 220px; resize: vertical; line-height: 1.6; }
 .error { background: #fff1ef; border-color: #f4b4a8; color: #9c2c1d; }
 .modal-card { width: min(360px, calc(100vw - 40px)); background: #fff; padding: 34px 28px 24px; box-shadow: var(--shadow); text-align: center; }
 .modal-card p { margin: 0 0 24px; font-weight: 800; }
+.modal-card .btn { position: static; width: auto; height: auto; border-radius: 0; font-size: 13px; background: var(--yellow); color: var(--brown); }
+.modal-card .btn.danger { background: var(--danger); color: #fff; }
+.modal-card .btn.secondary { background: var(--cream); color: var(--brown); }
 .modal-actions { display: flex; justify-content: center; gap: 10px; }
 .small-note { font-size: 12px; color: var(--muted); line-height: 1.5; }
 
