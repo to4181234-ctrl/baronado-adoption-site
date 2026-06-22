@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, createDog, getEmptyDog, normalizeCategory } from '../../../lib/dogs';
 import SiteHeader from '../../../components/SiteHeader';
 
-export default function NewDogPage() {
+function NewDogForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialCategory = normalizeCategory(searchParams.get('category'));
@@ -137,5 +137,14 @@ export default function NewDogPage() {
         </form>
       </section>
     </main>
+  );
+}
+
+
+export default function NewDogPage() {
+  return (
+    <Suspense fallback={<main className="site-shell"><SiteHeader /><section className="container narrow"><div className="empty-state compact">페이지를 불러오는 중이에요.</div></section></main>}>
+      <NewDogForm />
+    </Suspense>
   );
 }
