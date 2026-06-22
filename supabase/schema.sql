@@ -1,4 +1,4 @@
--- 바로나도 입양 사이트 Supabase 초기 세팅 SQL
+-- 바로나도 입양 사이트 Supabase 초기/업데이트 세팅 SQL
 -- Supabase > SQL Editor > New query 에 붙여넣고 Run 하면 됩니다.
 
 create extension if not exists "pgcrypto";
@@ -13,6 +13,9 @@ create table if not exists public.dogs (
   images text[] not null default '{}',
   created_at timestamptz not null default now()
 );
+
+alter table public.dogs add column if not exists category text not null default 'adoption';
+alter table public.dogs add column if not exists adopted boolean not null default false;
 
 alter table public.dogs enable row level security;
 

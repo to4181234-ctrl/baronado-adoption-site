@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { fetchDog } from '../../../lib/dogs';
+import { CATEGORY_RESIDENT, fetchDog } from '../../../lib/dogs';
 import SiteHeader from '../../../components/SiteHeader';
 
 function PawIcon() {
@@ -30,15 +30,15 @@ export default function DogDetailPage() {
 
   const images = dog?.images ?? [];
   const hasImages = images.length > 0;
+  const backHref = dog?.category === CATEGORY_RESIDENT ? '/residents' : '/';
 
   const move = (direction) => {
     if (!hasImages) return;
     setIndex((prev) => (prev + direction + images.length) % images.length);
   };
 
-  const openImage = (imageIndex) => {
+  const openImage = () => {
     if (!hasImages) return;
-    setIndex(imageIndex);
     setModalOpen(true);
   };
 
@@ -67,8 +67,8 @@ export default function DogDetailPage() {
   return (
     <main className="site-shell">
       <SiteHeader />
-      <section className="container narrow">
-        <Link className="back-link" href="/">뒤로 가기</Link>
+      <section className="container detail-container">
+        <Link className="back-link" href={backHref}>뒤로 가기</Link>
 
         {loading && <div className="empty-state compact">게시글을 불러오는 중이에요.</div>}
         {error && <div className="message error">{error}</div>}
@@ -84,24 +84,20 @@ export default function DogDetailPage() {
               <button
                 type="button"
                 className="gallery-main"
-                onClick={() => openImage(index)}
+                onClick={openImage}
                 aria-label="사진 크게 보기"
                 disabled={!hasImages}
               >
                 {hasImages ? <img src={images[index]} alt={`${dog.name} 사진 ${index + 1}`} /> : <PawIcon />}
+                {dog.adopted && <span className="adopted-badge detail">입양 완료</span>}
                 {hasImages && <span className="zoom-hint">사진 크게 보기</span>}
               </button>
+
               {images.length > 1 && (
-                <div className="dots">
-                  {images.map((_, dotIndex) => (
-                    <button
-                      key={dotIndex}
-                      className={`dot ${dotIndex === index ? 'active' : ''}`}
-                      aria-label={`${dotIndex + 1}번째 사진 크게 보기`}
-                      onClick={(event) => { event.stopPropagation(); openImage(dotIndex); }}
-                    />
-                  ))}
-                </div>
+                <>
+                  <button type="button" className="gallery-arrow gallery-prev" onClick={(event) => { event.stopPropagation(); move(-1); }} aria-label="이전 사진">‹</button>
+                  <button type="button" className="gallery-arrow gallery-next" onClick={(event) => { event.stopPropagation(); move(1); }} aria-label="다음 사진">›</button>
+                </>
               )}
             </div>
 
@@ -118,14 +114,7 @@ export default function DogDetailPage() {
         <div className="image-modal viewer-modal" onClick={() => setModalOpen(false)}>
           <button className="modal-close" aria-label="닫기">×</button>
           {images.length > 1 && (
-            <button
-              type="button"
-              className="modal-nav modal-prev"
-              aria-label="이전 사진"
-              onClick={(event) => { event.stopPropagation(); move(-1); }}
-            >
-              ‹
-            </button>
+            <button type="button" className="modal-nav modal-prev" aria-label="이전 사진" onClick={(event) => { event.stopPropagation(); move(-1); }}>‹</button>
           )}
           <img
             src={images[index]}
@@ -135,27 +124,7 @@ export default function DogDetailPage() {
             onPointerUp={onModalPointerUp}
           />
           {images.length > 1 && (
-            <button
-              type="button"
-              className="modal-nav modal-next"
-              aria-label="다음 사진"
-              onClick={(event) => { event.stopPropagation(); move(1); }}
-            >
-              ›
-            </button>
-          )}
-          {images.length > 1 && (
-            <div className="modal-dots" onClick={(event) => event.stopPropagation()}>
-              {images.map((_, dotIndex) => (
-                <button
-                  type="button"
-                  key={dotIndex}
-                  className={`dot ${dotIndex === index ? 'active' : ''}`}
-                  aria-label={`${dotIndex + 1}번째 사진 보기`}
-                  onClick={() => setIndex(dotIndex)}
-                />
-              ))}
-            </div>
+            <button type="button" className="modal-nav modal-next" aria-label="다음 사진" onClick={(event) => { event.stopPropagation(); move(1); }}>›</button>
           )}
         </div>
       )}

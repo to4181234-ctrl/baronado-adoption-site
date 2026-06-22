@@ -1,17 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { createDog, getEmptyDog } from '../../../lib/dogs';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, createDog, getEmptyDog, normalizeCategory } from '../../../lib/dogs';
 import SiteHeader from '../../../components/SiteHeader';
 
 export default function NewDogPage() {
   const router = useRouter();
-  const [form, setForm] = useState(getEmptyDog());
+  const searchParams = useSearchParams();
+  const initialCategory = normalizeCategory(searchParams.get('category'));
+  const [form, setForm] = useState(getEmptyDog(initialCategory));
   const [files, setFiles] = useState([]);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setForm((prev) => ({ ...prev, category: initialCategory }));
+  }, [initialCategory]);
 
   const onChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -33,8 +39,8 @@ export default function NewDogPage() {
     setError('');
     setSaving(true);
     try {
-      await createDog(form, files);
-      router.push('/admin');
+      const saved = await createDog(form, files);
+      router.push(`/admin?category=${saved.category}`);
     } catch (err) {
       setError(err.message);
       setSaving(false);
@@ -44,8 +50,12 @@ export default function NewDogPage() {
   return (
     <main className="site-shell">
       <SiteHeader />
-      <section className="container narrow">
-        <Link className="back-link" href="/admin">뒤로 가기</Link>
+      <section className="container narrow form-container">
+        <Link className="back-link" href={`/admin?category=${form.category}`}>뒤로 가기</Link>
+        <div className="page-head stacked-head">
+          <h1>{CATEGORY_LABELS[form.category]} 등록</h1>
+        </div>
+
         <form className="form" onSubmit={onSubmit}>
           <div className="upload-row">
             <label className="upload-box">
@@ -76,9 +86,15 @@ export default function NewDogPage() {
             </>
           )}
 
-          <label>
-            <span className="label">*사진 등록 최대 3장</span>
-          </label>
+          <span className="label">*사진 등록 최대 3장</span>
+
+          <fieldset className="field-group">
+            <legend className="label">게시 위치</legend>
+            <div className="radio-group wrap">
+              <label><input type="radio" name="category" value={CATEGORY_ADOPTION} checked={form.category === CATEGORY_ADOPTION} onChange={onChange} /> 가족을 찾아요</label>
+              <label><input type="radio" name="category" value={CATEGORY_RESIDENT} checked={form.category === CATEGORY_RESIDENT} onChange={onChange} /> 상주견 소개</label>
+            </div>
+          </fieldset>
 
           <label>
             <span className="label">이름</span>
@@ -96,10 +112,17 @@ export default function NewDogPage() {
             <label><input type="radio" name="gender" value="여자" checked={form.gender === '여자'} onChange={onChange} /> 여</label>
           </div>
 
-          <div className="radio-group">
-            <span className="label">중성화</span>
-            <label><input type="checkbox" name="neutered" checked={form.neutered} onChange={onChange} /> O</label>
-          </div>
+          <label className="check-row">
+            <span>중성화</span>
+            <input type="checkbox" name="neutered" checked={form.neutered} onChange={onChange} />
+            <strong>O</strong>
+          </label>
+
+          <label className="check-row">
+            <span>입양 완료</span>
+            <input type="checkbox" name="adopted" checked={form.adopted} onChange={onChange} />
+            <strong>O</strong>
+          </label>
 
           <label>
             <span className="label">설명글</span>

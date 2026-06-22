@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { deleteDog, fetchDogs } from '../../lib/dogs';
+import { useSearchParams } from 'next/navigation';
+import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, deleteDog, fetchDogs, normalizeCategory } from '../../lib/dogs';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import SiteHeader from '../../components/SiteHeader';
 
@@ -11,6 +12,8 @@ function PawIcon() {
 }
 
 export default function AdminPage() {
+  const searchParams = useSearchParams();
+  const currentCategory = normalizeCategory(searchParams.get('category'));
   const [dogs, setDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -22,14 +25,15 @@ export default function AdminPage() {
       setLoading(false);
       return;
     }
+    setError('');
     setLoading(true);
-    fetchDogs()
+    fetchDogs(currentCategory)
       .then(setDogs)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, []);
+  useEffect(load, [currentCategory]);
 
   const confirmDelete = async () => {
     if (!target) return;
@@ -47,10 +51,15 @@ export default function AdminPage() {
   return (
     <main className="site-shell">
       <SiteHeader />
-      <section className="container">
-        <div className="page-head">
-          <h1>가족을 찾아요</h1>
-          <Link href="/admin/new" className="btn">추가하기</Link>
+      <section className="container admin-container">
+        <div className="admin-tabs">
+          <Link className={`tab ${currentCategory === CATEGORY_ADOPTION ? 'active' : ''}`} href="/admin?category=adoption">가족을 찾아요</Link>
+          <Link className={`tab ${currentCategory === CATEGORY_RESIDENT ? 'active' : ''}`} href="/admin?category=resident">상주견 소개</Link>
+        </div>
+
+        <div className="page-head admin-head">
+          <h1>{CATEGORY_LABELS[currentCategory]}</h1>
+          <Link href={`/admin/new?category=${currentCategory}`} className="btn">추가하기</Link>
         </div>
 
         {!isSupabaseConfigured && <div className="message error">Supabase 환경변수가 아직 연결되지 않았어요.</div>}
@@ -67,6 +76,7 @@ export default function AdminPage() {
               <article className="dog-card admin-card" key={dog.id}>
                 <div className="dog-thumb">
                   {dog.images?.[0] ? <img src={dog.images[0]} alt={`${dog.name} 사진`} /> : <PawIcon />}
+                  {dog.adopted && <div className="adopted-badge">입양 완료</div>}
                 </div>
                 <div className="dog-info">
                   <h2 className="dog-name">{dog.name}</h2>
