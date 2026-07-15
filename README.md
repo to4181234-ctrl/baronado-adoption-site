@@ -47,3 +47,8 @@ Supabase → SQL Editor → New query → schema.sql 내용 붙여넣기 → Run
 NEXT_PUBLIC_SUPABASE_URL=Supabase Project URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=Supabase anon public key
 ```
+
+## 최근 수정
+
+- 입양 완료되지 않은 게시글을 먼저 보여주고, 입양 완료 게시글은 리스트 하단에 표시되도록 정렬을 변경했습니다.
+- 각 그룹 안에서는 최신 등록순으로 표시됩니다.
