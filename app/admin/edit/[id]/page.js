@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, fetchDog, normalizeCategory, updateDog } from '../../../../lib/dogs';
+import AdminGuard from '../../../../components/AdminGuard';
 import SiteHeader from '../../../../components/SiteHeader';
 import DogImagePicker from '../../../../components/DogImagePicker';
 import { PROFILE_FIELDS, getDogProfile } from '../../../../lib/dogProfile';
 
-export default function EditDogPage() {
+function EditDogForm() {
   const router = useRouter();
   const params = useParams();
   const [form, setForm] = useState(null);
@@ -152,4 +153,8 @@ export default function EditDogPage() {
       )}
     </main>
   );
+}
+
+export default function EditDogPage() {
+  return <AdminGuard><EditDogForm /></AdminGuard>;
 }
