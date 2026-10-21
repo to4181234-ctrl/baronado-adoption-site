@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, deleteDog, fetchDogs, normalizeCategory } from '../../lib/dogs';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
+import AdminGuard from '../../components/AdminGuard';
 import SiteHeader from '../../components/SiteHeader';
 
 function PawIcon() {
@@ -122,7 +123,7 @@ function AdminContent() {
 export default function AdminPage() {
   return (
     <Suspense fallback={<main className="site-shell"><SiteHeader /><section className="container"><div className="empty-state compact">게시글을 불러오는 중이에요.</div></section></main>}>
-      <AdminContent />
+      <AdminGuard><AdminContent /></AdminGuard>
     </Suspense>
   );
 }
