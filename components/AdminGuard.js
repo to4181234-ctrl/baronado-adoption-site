@@ -40,13 +40,7 @@ export default function AdminGuard({ children }) {
     };
 
     checkAdmin();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      checkAdmin();
-    });
-    return () => {
-      active = false;
-      subscription.unsubscribe();
-    };
+    return () => { active = false; };
   }, []);
 
   const signIn = async (event) => {
