@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, createDog, getEmptyDog, normalizeCategory } from '../../../lib/dogs';
 import SiteHeader from '../../../components/SiteHeader';
+import ProfileFields from '../../../components/ProfileFields';
 
 function NewDogForm() {
   const router = useRouter();
@@ -105,6 +106,8 @@ function NewDogForm() {
             <span className="label">*나이</span>
             <input className="field" name="age" value={form.age} onChange={onChange} placeholder="1살 추정" />
           </label>
+
+          <ProfileFields form={form} onChange={onChange} />
 
           <div className="radio-group">
             <span className="label">*성별</span>

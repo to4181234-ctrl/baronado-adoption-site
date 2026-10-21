@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { CATEGORY_RESIDENT, fetchDog } from '../../../lib/dogs';
+import { getAgeInfo, getShelterUrl } from '../../../lib/profile';
 import SiteHeader from '../../../components/SiteHeader';
 
 function PawIcon() {
@@ -103,7 +104,17 @@ export default function DogDetailPage() {
 
             <div className="detail-body">
               <h1 className="dog-name">{dog.name}</h1>
-              <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {dog.age}</p>
+              <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {getAgeInfo(dog).display}</p>
+              {(getAgeInfo(dog).reference || dog.shelter_name || getShelterUrl(dog.shelter_url)) && (
+                <div className="profile-facts">
+                  {getAgeInfo(dog).reference && <p><strong>나이 안내 기준</strong>{getAgeInfo(dog).reference}</p>}
+                  {(dog.shelter_name || getShelterUrl(dog.shelter_url)) && (
+                    <p><strong>출신 보호소</strong>{dog.shelter_name || '보호소 홈페이지'}{' '}
+                      {getShelterUrl(dog.shelter_url) && <a href={getShelterUrl(dog.shelter_url)} target="_blank" rel="noopener noreferrer">홈페이지 방문 ↗</a>}
+                    </p>
+                  )}
+                </div>
+              )}
               <p className="desc">{dog.description || '아직 소개글이 등록되지 않았어요.'}</p>
             </div>
           </article>

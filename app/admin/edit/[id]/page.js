@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, fetchDog, normalizeCategory, updateDog } from '../../../../lib/dogs';
 import SiteHeader from '../../../../components/SiteHeader';
+import ProfileFields from '../../../../components/ProfileFields';
 
 export default function EditDogPage() {
   const router = useRouter();
@@ -130,6 +131,8 @@ export default function EditDogPage() {
                 <span className="label">*나이</span>
                 <input className="field" name="age" value={form.age ?? ''} onChange={onChange} />
               </label>
+
+              <ProfileFields form={form} onChange={onChange} />
 
               <div className="radio-group">
                 <span className="label">*성별</span>
