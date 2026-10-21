@@ -107,6 +107,7 @@ export default function DogDetailPage() {
               <h1 className="dog-name">{dog.name}</h1>
               <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {dog.age}</p>
               {dog.category !== CATEGORY_RESIDENT && dog.arrived_at && <p className="arrival-date">바로나도에 온 날 · {formatDogDate(dog.arrived_at)}</p>}
+              {dog.category !== CATEGORY_RESIDENT && dog.adopted && dog.adopted_at && <p className="arrival-date">입양 간 날짜 · {formatDogDate(dog.adopted_at)}</p>}
               {dog.category === CATEGORY_RESIDENT
                 ? <p className="desc">{dog.description || '아직 소개글이 등록되지 않았어요.'}</p>
                 : <div className="profile-detail">
