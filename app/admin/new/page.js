@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, createDog, getEmptyDog, normalizeCategory } from '../../../lib/dogs';
 import SiteHeader from '../../../components/SiteHeader';
+import DogImagePicker from '../../../components/DogImagePicker';
+import { PROFILE_FIELDS } from '../../../lib/dogProfile';
 
 function NewDogForm() {
   const router = useRouter();
@@ -12,6 +14,7 @@ function NewDogForm() {
   const initialCategory = normalizeCategory(searchParams.get('category'));
   const [form, setForm] = useState(getEmptyDog(initialCategory));
   const [files, setFiles] = useState([]);
+  const [existing, setExisting] = useState([]);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -57,36 +60,7 @@ function NewDogForm() {
         </div>
 
         <form className="form" onSubmit={onSubmit}>
-          <div className="upload-row">
-            <label className="upload-box">
-              대표 사진<br />클릭해서<br />업로드하세요
-              <input type="file" accept="image/*" multiple onChange={onFileChange} hidden />
-            </label>
-            <label className="upload-box">
-              추가 사진
-              <input type="file" accept="image/*" multiple onChange={onFileChange} hidden />
-            </label>
-            <label className="upload-box">
-              추가 사진
-              <input type="file" accept="image/*" multiple onChange={onFileChange} hidden />
-            </label>
-          </div>
-
-          {files.length > 0 && (
-            <>
-              <div className="preview-grid">
-                {files.map((file, index) => (
-                  <div className="preview" key={`${file.name}-${index}`}>
-                    <img src={URL.createObjectURL(file)} alt="선택한 사진 미리보기" />
-                    <button type="button" onClick={() => removeSelectedFile(index)}>×</button>
-                  </div>
-                ))}
-              </div>
-              <div className="small-note">선택된 사진 {files.length}장. 첫 번째 사진이 대표 이미지로 표시돼요.</div>
-            </>
-          )}
-
-          <span className="label">*사진 등록 최대 3장</span>
+          <DogImagePicker existing={existing} files={files} setFiles={setFiles} setExisting={setExisting} />
 
           <fieldset className="field-group">
             <legend className="label">게시 위치</legend>
@@ -118,16 +92,27 @@ function NewDogForm() {
             <strong>O</strong>
           </label>
 
+          {form.category === CATEGORY_ADOPTION && <label><span className="label">바로나도에 온 날</span><input type="date" className="field" name="arrived_at" value={form.arrived_at || ''} onChange={onChange}/></label>}
+
           <label className="check-row">
             <span>입양 완료</span>
             <input type="checkbox" name="adopted" checked={form.adopted} onChange={onChange} />
             <strong>O</strong>
           </label>
 
-          <label>
+          {form.category === CATEGORY_ADOPTION && form.adopted && <label><span className="label">입양 간 날짜</span><input className="field" type="date" name="adopted_at" value={form.adopted_at || ''} onChange={onChange}/></label>}
+          {form.category === CATEGORY_ADOPTION && <fieldset className="profile-editor">
+            <legend>상세 소개 질문</legend>
+            <label className="check-row"><input type="checkbox" checked={PROFILE_FIELDS.every(field => Object.hasOwn(form.profile || {},field.key))} onChange={event => setForm(prev => ({...prev,profile:event.target.checked?Object.fromEntries(PROFILE_FIELDS.map(field=>[field.key,prev.profile?.[field.key]||''])):{}}))}/> 전체 선택</label>
+            {PROFILE_FIELDS.map(field => <div key={field.key} className="profile-field">
+              <label className="check-row"><input type="checkbox" checked={Object.hasOwn(form.profile||{},field.key)} onChange={event=>setForm(prev=>{const profile={...prev.profile};if(event.target.checked)profile[field.key]='';else delete profile[field.key];return {...prev,profile};})}/>{field.label}</label>
+              {Object.hasOwn(form.profile||{},field.key) && <textarea className="field" rows={3} value={form.profile[field.key]} onChange={event=>setForm(prev=>({...prev,profile:{...prev.profile,[field.key]:event.target.value}}))} placeholder={field.label+' 내용을 입력하세요.'}/>}
+            </div>)}
+          </fieldset>}
+          {form.category === CATEGORY_RESIDENT && <label>
             <span className="label">설명글</span>
             <textarea className="field" name="description" value={form.description} onChange={onChange} placeholder="아이의 성격, 구조 배경, 특이사항 등을 적어주세요." />
-          </label>
+          </label>}
 
           {error && <div className="message error">{error}</div>}
 
