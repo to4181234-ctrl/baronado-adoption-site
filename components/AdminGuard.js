@@ -6,6 +6,7 @@ import DogLoading from './DogLoading';
 
 export default function AdminGuard({ children }) {
   const [status, setStatus] = useState('loading');
+  const [setupProblems, setSetupProblems] = useState([]);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -19,6 +20,7 @@ export default function AdminGuard({ children }) {
       })
       .then(data => {
         if (!active) return;
+        setSetupProblems(Array.isArray(data.setupProblems) ? data.setupProblems : []);
         setStatus(!data.configured ? 'unconfigured' : data.authenticated ? 'authorized' : 'signed-out');
       })
       .catch(() => {
@@ -83,7 +85,12 @@ export default function AdminGuard({ children }) {
       <div className="admin-login-panel">
         <h1>관리자 페이지</h1>
         {status === 'loading' && <DogLoading />}
-        {status === 'unconfigured' && <p className="message error">관리자 비밀번호와 서버 키가 아직 설정되지 않았습니다.</p>}
+        {status === 'unconfigured' && <div className="message error" role="alert">
+          <p>관리자 서버 설정을 확인해야 합니다.</p>
+          {setupProblems.length > 0 ? <ul>{setupProblems.map(item => <li key={item}>{item}</li>)}</ul>
+            : <p>관리자 비밀번호(12자 이상), 세션 보안키(32자 이상), Supabase 서버 키를 확인해주세요.</p>}
+          <p>Vercel에서 환경 변수를 수정한 뒤 미리보기 배포를 다시 실행해야 적용됩니다.</p>
+        </div>}
         {status === 'unavailable' && <p className="message error">관리자 인증 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.</p>}
         {status === 'signed-out' && (
           <form className="form" onSubmit={login}>
