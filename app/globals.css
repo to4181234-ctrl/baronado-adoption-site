@@ -218,3 +218,11 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
   .photo-grid { gap:7px; }
   .profile-section p { font-size:15px; }
 }
+
+/* Shared-password administrator sign-in */
+.admin-login-panel { border:1px solid var(--line); padding:26px; background:#fff; display:grid; gap:24px; }
+.admin-login-panel h1 { font-size:24px; }
+.admin-login-panel .form .btn { margin-top:4px; }
+.admin-session-bar { display:flex; align-items:center; justify-content:flex-end; gap:14px; min-height:36px; padding:5px max(18px,calc((100% - 760px)/2)); background:var(--cream); color:var(--brown); font-size:12px; font-weight:700; }
+.admin-session-bar button { background:transparent; border:0; color:var(--brown); text-decoration:underline; font-size:12px; font-weight:700; }
+@media (max-width:620px) { .admin-login-panel { padding:20px; } }

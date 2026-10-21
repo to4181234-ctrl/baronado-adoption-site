@@ -1,98 +1,105 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 import SiteHeader from './SiteHeader';
 import DogLoading from './DogLoading';
 
 export default function AdminGuard({ children }) {
   const [status, setStatus] = useState('loading');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [sending, setSending] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!supabase) {
-      setStatus('unconfigured');
-      return;
-    }
-
     let active = true;
-    const checkAdmin = async () => {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (!active) return;
-      if (authError || !user) {
-        setStatus('signed-out');
-        return;
-      }
-      const { data, error } = await supabase
-        .from('site_admins')
-        .select('user_id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (!active) return;
-      if (error) {
-        setMessage('관리자 권한을 확인하지 못했습니다. 설정을 확인해주세요.');
-        setStatus('error');
-        return;
-      }
-      setStatus(data ? 'authorized' : 'forbidden');
-    };
-
-    checkAdmin();
+    fetch('/api/admin/session', { cache: 'no-store', credentials: 'same-origin' })
+      .then(async response => {
+        if (!response.ok) throw new Error('관리자 연결 상태를 확인할 수 없습니다.');
+        return response.json();
+      })
+      .then(data => {
+        if (!active) return;
+        setStatus(!data.configured ? 'unconfigured' : data.authenticated ? 'authorized' : 'signed-out');
+      })
+      .catch(() => {
+        if (active) setStatus('unavailable');
+      });
     return () => { active = false; };
   }, []);
 
-  const signIn = async (event) => {
+  const login = async event => {
     event.preventDefault();
-    if (!supabase) return;
-    setSending(true);
-    setMessage('');
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: {
-        shouldCreateUser: true,
-        emailRedirectTo: window.location.origin + '/admin'
-      }
-    });
-    setSending(false);
-    setMessage(error ? '이메일 발송에 실패했습니다. 이메일 주소와 인증 설정을 확인해주세요.' : '메일로 보낸 로그인 링크를 확인해주세요.');
+    setBusy(true);
+    setError('');
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || '로그인에 실패했습니다.');
+      setPassword('');
+      setStatus('authorized');
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const signOut = async () => {
-    await supabase?.auth.signOut();
-    setStatus('signed-out');
-    setMessage('');
+  const logout = async () => {
+    setBusy(true);
+    try {
+      const response = await fetch('/api/admin/logout', {
+        method: 'POST', credentials: 'same-origin', cache: 'no-store'
+      });
+      if (!response.ok) throw new Error('로그아웃에 실패했습니다.');
+      setStatus('signed-out');
+      setPassword('');
+      setError('');
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
   };
 
-  if (status === 'authorized') return <>{children}</>;
+  if (status === 'authorized') {
+    return <>
+      <div className="admin-session-bar">
+        <span>관리자 모드</span>
+        <button type="button" onClick={logout} disabled={busy}>로그아웃</button>
+      </div>
+      {children}
+    </>;
+  }
 
-  return (
-    <main className="site-shell">
-      <SiteHeader />
-      <section className="container narrow form-container">
-        <div className="page-head"><h1>관리자 로그인</h1></div>
+  return <main className="site-shell">
+    <SiteHeader />
+    <section className="container narrow form-container">
+      <div className="admin-login-panel">
+        <h1>관리자 페이지</h1>
         {status === 'loading' && <DogLoading />}
-        {status === 'unconfigured' && <p className="message error">Supabase 연결 설정이 필요합니다.</p>}
+        {status === 'unconfigured' && <p className="message error">관리자 비밀번호와 서버 키가 아직 설정되지 않았습니다.</p>}
+        {status === 'unavailable' && <p className="message error">관리자 인증 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.</p>}
         {status === 'signed-out' && (
-          <form className="form" onSubmit={signIn}>
-            <p className="small-note">관리자에게 허용된 계정으로 이메일 인증 후 이용할 수 있습니다.</p>
+          <form className="form" onSubmit={login}>
+            <p className="small-note">공통 비밀번호를 입력하면 게시글을 관리할 수 있습니다.</p>
             <label>
-              <span className="label">이메일 주소</span>
-              <input className="field" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="email@example.com"/>
+              <span className="label">관리자 비밀번호</span>
+              <input className="field" type="password" autoComplete="current-password"
+                required minLength={12} maxLength={256}
+                value={password} onChange={event => setPassword(event.target.value)}
+                placeholder="공통 비밀번호" />
             </label>
-            <button className="btn full" type="submit" disabled={sending}>{sending ? '발송 중...' : '로그인 링크 보내기'}</button>
+            {error && <p className="message error" role="alert">{error}</p>}
+            <button className="btn full" type="submit" disabled={busy}>{busy ? '확인 중...' : '관리자 페이지 열기'}</button>
           </form>
         )}
-        {status === 'forbidden' && (
-          <div className="form">
-            <p className="message error">로그인한 계정에 관리자 권한이 없습니다. 사이트 관리자의 승인이 필요합니다.</p>
-            <button className="btn secondary" type="button" onClick={signOut}>다른 계정으로 로그인</button>
-          </div>
-        )}
-        {status === 'error' && <div className="message error">{message}</div>}
-        {message && status === 'signed-out' && <p className="small-note" role="status">{message}</p>}
-      </section>
-    </main>
-  );
+      </div>
+    </section>
+  </main>;
 }

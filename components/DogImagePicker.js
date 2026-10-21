@@ -17,9 +17,9 @@ export default function DogImagePicker({ existing = [], files, setFiles, setExis
   const total = existing.length + files.length;
   const add = (event) => {
     const selection = Array.from(event.target.files || []);
-    const eligible = selection.filter(file => file.type.startsWith('image/') && file.size <= 10 * 1024 * 1024);
+    const eligible = selection.filter(file => ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'].includes(file.type) && file.size > 0 && file.size <= 10 * 1024 * 1024);
     const room = max - total;
-    setError(eligible.length < selection.length ? '이미지는 파일당 10MB 이하만 업로드할 수 있습니다.' : selection.length > room ? '사진은 최대 3장까지 등록할 수 있습니다.' : '');
+    setError(eligible.length < selection.length ? 'JPG, PNG, WEBP, GIF, AVIF 이미지만 파일당 10MB 이하로 업로드할 수 있습니다.' : selection.length > room ? '사진은 최대 3장까지 등록할 수 있습니다.' : '');
     setFiles(prev => [...prev, ...eligible.slice(0, Math.max(room, 0))]);
     event.target.value = '';
   };
