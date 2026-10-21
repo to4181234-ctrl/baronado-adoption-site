@@ -88,7 +88,7 @@ export default function AdminGuard({ children }) {
         {status === 'unconfigured' && <div className="message error" role="alert">
           <p>관리자 서버 설정을 확인해야 합니다.</p>
           {setupProblems.length > 0 ? <ul>{setupProblems.map(item => <li key={item}>{item}</li>)}</ul>
-            : <p>관리자 비밀번호(12자 이상), 세션 보안키(32자 이상), Supabase 서버 키를 확인해주세요.</p>}
+            : <p>관리자 비밀번호(4자 이상), 세션 보안키(32자 이상), Supabase 서버 키를 확인해주세요.</p>}
           <p>Vercel에서 환경 변수를 수정한 뒤 미리보기 배포를 다시 실행해야 적용됩니다.</p>
         </div>}
         {status === 'unavailable' && <p className="message error">관리자 인증 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.</p>}
@@ -98,7 +98,7 @@ export default function AdminGuard({ children }) {
             <label>
               <span className="label">관리자 비밀번호</span>
               <input className="field" type="password" autoComplete="current-password"
-                required minLength={12} maxLength={256}
+                required minLength={4} maxLength={256}
                 value={password} onChange={event => setPassword(event.target.value)}
                 placeholder="공통 비밀번호" />
             </label>
