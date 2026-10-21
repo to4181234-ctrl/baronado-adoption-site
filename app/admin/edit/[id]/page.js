@@ -128,7 +128,7 @@ export default function EditDogPage() {
                   <label className="check-row"><input type="checkbox" checked={Object.hasOwn(form.profile||{},field.key)} onChange={event=>setForm(prev=>{const profile={...prev.profile};if(event.target.checked)profile[field.key]='';else delete profile[field.key];return {...prev,profile};})}/>{field.label}</label>
                   {Object.hasOwn(form.profile||{},field.key) && <textarea className="field" rows={3} value={form.profile[field.key]} onChange={event=>setForm(prev=>({...prev,profile:{...prev.profile,[field.key]:event.target.value}}))}/>}
                 </div>)}
-              </fieldset>
+              </fieldset>}
               {form.category === CATEGORY_RESIDENT && <label>
                 <span className="label">설명글</span>
                 <textarea className="field" name="description" value={form.description ?? ''} onChange={onChange} />
