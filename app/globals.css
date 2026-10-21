@@ -226,3 +226,13 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .admin-session-bar { display:flex; align-items:center; justify-content:flex-end; gap:14px; min-height:36px; padding:5px max(18px,calc((100% - 760px)/2)); background:var(--cream); color:var(--brown); font-size:12px; font-weight:700; }
 .admin-session-bar button { background:transparent; border:0; color:var(--brown); text-decoration:underline; font-size:12px; font-weight:700; }
 @media (max-width:620px) { .admin-login-panel { padding:20px; } }
+
+/* Adoption status filters and sorting controls */
+.listing-controls { display:flex; flex-wrap:wrap; align-items:center; column-gap:12px; row-gap:8px; margin:0 0 20px; }
+.listing-controls .sort-tabs { margin:0; }
+.filter-divider { flex:0 0 1px; height:24px; background:var(--line); }
+@media (max-width:620px) {
+  .listing-controls { column-gap:8px; }
+  .listing-controls .sort-tab { padding:8px 11px; font-size:12px; }
+  .filter-divider { display:none; }
+}
