@@ -35,7 +35,8 @@ export default function DogListPage({ title, category }) {
   const [dogs, setDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [sort, setSort] = useState('all');
+  const [sort, setSort] = useState('default');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -48,6 +49,19 @@ export default function DogListPage({ title, category }) {
       .finally(() => setLoading(false));
   }, [category]);
 
+  const visibleDogs = (category === 'adoption'
+    ? dogs.filter((dog) => statusFilter === 'adopted'
+      ? dog.adopted
+      : statusFilter === 'available'
+        ? !dog.adopted
+        : true)
+    : dogs
+  ).slice().sort((a, b) => sort === 'new'
+    ? new Date(b.created_at) - new Date(a.created_at)
+    : sort === 'old'
+      ? new Date(a.created_at) - new Date(b.created_at)
+      : Number(a.adopted) - Number(b.adopted) || new Date(b.created_at) - new Date(a.created_at));
+
   return (
     <main className="site-shell">
       <SiteHeader />
@@ -56,7 +70,27 @@ export default function DogListPage({ title, category }) {
           <h1>{title}</h1>
         </div>
 
-        {category === 'adoption' && <div className="sort-tabs" role="group" aria-label="게시글 정렬">{[['all','전체보기'],['new','최신 등록'],['old','오래된 순']].map(([value,label]) => <button key={value} type="button" className={'sort-tab '+(sort === value ? 'active':'')} aria-pressed={sort === value} onClick={() => setSort(value)}>{label}</button>)}</div>}
+        {category === 'adoption' && (
+          <div className="listing-controls">
+            <div className="sort-tabs" role="group" aria-label="입양 상태별 보기">
+              {[['all', '전체보기'], ['adopted', '입양 완료'], ['available', '입양 전']].map(([value, label]) => (
+                <button key={value} type="button"
+                  className={'sort-tab ' + (statusFilter === value ? 'active' : '')}
+                  aria-pressed={statusFilter === value}
+                  onClick={() => setStatusFilter(value)}>{label}</button>
+              ))}
+            </div>
+            <span className="filter-divider" aria-hidden="true" />
+            <div className="sort-tabs" role="group" aria-label="게시글 정렬">
+              {[['new', '최신 등록'], ['old', '오래된 순']].map(([value, label]) => (
+                <button key={value} type="button"
+                  className={'sort-tab ' + (sort === value ? 'active' : '')}
+                  aria-pressed={sort === value}
+                  onClick={() => setSort((current) => current === value ? 'default' : value)}>{label}</button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {!isSupabaseConfigured && (
           <div className="message error">Supabase 환경변수가 아직 연결되지 않았어요. 배포 전 Vercel 환경변수를 입력해주세요.</div>
@@ -65,13 +99,15 @@ export default function DogListPage({ title, category }) {
         {loading && <DogLoading />}
         {error && <div className="message error">{error}</div>}
 
-        {!loading && !error && dogs.length === 0 && (
-          <div className="empty-state">아직 업로드된 게시글이 없어요</div>
+        {!loading && !error && visibleDogs.length === 0 && (
+          <div className="empty-state">
+            {dogs.length === 0 ? '아직 업로드된 게시글이 없어요' : '해당 조건에 맞는 게시글이 없어요.'}
+          </div>
         )}
 
-        {!loading && dogs.length > 0 && (
+        {!loading && !error && visibleDogs.length > 0 && (
           <div className="dog-list">
-            {[...dogs].sort((a,b) => sort === 'new' ? new Date(b.created_at)-new Date(a.created_at) : sort === 'old' ? new Date(a.created_at)-new Date(b.created_at) : Number(a.adopted)-Number(b.adopted) || new Date(b.created_at)-new Date(a.created_at)).map((dog) => <DogCard key={dog.id} dog={dog} />)}
+            {visibleDogs.map((dog) => <DogCard key={dog.id} dog={dog} />)}
           </div>
         )}
       </section>
