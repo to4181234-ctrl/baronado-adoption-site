@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { CATEGORY_RESIDENT, fetchDog } from '../../../lib/dogs';
 import SiteHeader from '../../../components/SiteHeader';
+import DogLoading from '../../../components/DogLoading';
+import { formatDogDate, getDogProfile, PROFILE_FIELDS } from '../../../lib/dogProfile';
 
 function PawIcon() {
   return <svg className="paw" viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M20.3 27.1c4.1 0 7.4 4.3 7.4 9.6s-3.3 9.6-7.4 9.6-7.4-4.3-7.4-9.6 3.3-9.6 7.4-9.6Zm23.4 0c4.1 0 7.4 4.3 7.4 9.6s-3.3 9.6-7.4 9.6-7.4-4.3-7.4-9.6 3.3-9.6 7.4-9.6ZM15.9 17.7c3 0 5.4 3.1 5.4 6.9s-2.4 6.9-5.4 6.9-5.4-3.1-5.4-6.9 2.4-6.9 5.4-6.9Zm32.2 0c3 0 5.4 3.1 5.4 6.9s-2.4 6.9-5.4 6.9-5.4-3.1-5.4-6.9 2.4-6.9 5.4-6.9ZM32 11.2c3.2 0 5.8 3.4 5.8 7.6s-2.6 7.6-5.8 7.6-5.8-3.4-5.8-7.6 2.6-7.6 5.8-7.6Zm0 29.1c7 0 14.1 5.8 14.1 11.5 0 4.1-3.6 5.3-7.8 4.3-2.1-.5-4.1-1.4-6.3-1.4s-4.2.9-6.3 1.4c-4.2 1-7.8-.2-7.8-4.3 0-5.7 7.1-11.5 14.1-11.5Z"/></svg>;
@@ -70,7 +72,7 @@ export default function DogDetailPage() {
       <section className="container detail-container">
         <Link className="back-link" href={backHref}>뒤로 가기</Link>
 
-        {loading && <div className="empty-state compact">게시글을 불러오는 중이에요.</div>}
+        {loading && <DogLoading />}
         {error && <div className="message error">{error}</div>}
 
         {dog && (
@@ -88,8 +90,8 @@ export default function DogDetailPage() {
                 aria-label="사진 크게 보기"
                 disabled={!hasImages}
               >
-                {hasImages ? <img src={images[index]} alt={`${dog.name} 사진 ${index + 1}`} /> : <PawIcon />}
-                {dog.adopted && <span className="adopted-badge detail">입양 완료</span>}
+                {hasImages ? <img key={images[index]} className="gallery-photo" src={images[index]} alt={`${dog.name} 사진 ${index + 1}`} /> : <PawIcon />}
+                {dog.adopted && <span className="adopted-badge detail"><strong>입양 완료</strong>{dog.adopted_at && <small>{formatDogDate(dog.adopted_at)}</small>}</span>}
                 {hasImages && <span className="zoom-hint">사진 크게 보기</span>}
               </button>
 
@@ -104,7 +106,15 @@ export default function DogDetailPage() {
             <div className="detail-body">
               <h1 className="dog-name">{dog.name}</h1>
               <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {dog.age}</p>
-              <p className="desc">{dog.description || '아직 소개글이 등록되지 않았어요.'}</p>
+              {dog.category !== CATEGORY_RESIDENT && dog.arrived_at && <p className="arrival-date">바로나도에 온 날 · {formatDogDate(dog.arrived_at)}</p>}
+              {dog.category === CATEGORY_RESIDENT
+                ? <p className="desc">{dog.description || '아직 소개글이 등록되지 않았어요.'}</p>
+                : <div className="profile-detail">
+                    {PROFILE_FIELDS.filter(field => getDogProfile(dog)[field.key]).map(field =>
+                      <section className="profile-section" key={field.key}><h2>{field.label}</h2><p>{getDogProfile(dog)[field.key]}</p></section>
+                    )}
+                    {!PROFILE_FIELDS.some(field => getDogProfile(dog)[field.key]) && <p className="desc">{dog.description || '아직 소개글이 등록되지 않았어요.'}</p>}
+                  </div>}
             </div>
           </article>
         )}
@@ -117,6 +127,7 @@ export default function DogDetailPage() {
             <button type="button" className="modal-nav modal-prev" aria-label="이전 사진" onClick={(event) => { event.stopPropagation(); move(-1); }}>‹</button>
           )}
           <img
+            key={images[index]}
             src={images[index]}
             alt={`${dog.name} 크게 보기 ${index + 1}`}
             onClick={(event) => event.stopPropagation()}
