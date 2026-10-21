@@ -24,6 +24,7 @@ function DogCard({ dog }) {
         <h2 className="dog-name">{dog.name}</h2>
         <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {dog.age}</p>
         {dog.category === 'adoption' && dog.arrived_at && <p className="arrival-date">바로나도에 온 날 · {formatDogDate(dog.arrived_at)}</p>}
+        {dog.category === 'adoption' && dog.adopted && dog.adopted_at && <p className="arrival-date">입양 간 날짜 · {formatDogDate(dog.adopted_at)}</p>}
         <p className="desc">{dog.category === 'resident' ? dog.description : profileSummary(dog)}</p>
         <Link className="btn" href={`/dogs/${dog.id}`}>자세히 보기</Link>
       </div>
