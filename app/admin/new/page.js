@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, createDog, getEmptyDog, normalizeCategory } from '../../../lib/dogs';
+import AdminGuard from '../../../components/AdminGuard';
 import SiteHeader from '../../../components/SiteHeader';
 import DogImagePicker from '../../../components/DogImagePicker';
 import { PROFILE_FIELDS } from '../../../lib/dogProfile';
@@ -129,7 +130,7 @@ function NewDogForm() {
 export default function NewDogPage() {
   return (
     <Suspense fallback={<main className="site-shell"><SiteHeader /><section className="container narrow"><div className="empty-state compact">페이지를 불러오는 중이에요.</div></section></main>}>
-      <NewDogForm />
+      <AdminGuard><NewDogForm /></AdminGuard>
     </Suspense>
   );
 }
