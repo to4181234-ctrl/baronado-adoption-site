@@ -107,14 +107,11 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .form-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
 .small-note { font-size: 12px; color: var(--muted); line-height: 1.5; }
 
-.list-controls { display: flex; align-items: stretch; gap: 12px; margin: -4px 0 18px; }
-.control-group { flex: 1; min-width: 0; padding: 11px 13px 13px; border: 1px solid var(--line); background: #fffcf5; }
-.control-heading { display: block; margin-bottom: 9px; color: var(--muted); font-size: 12px; font-weight: 900; }
-.control-options { display: flex; flex-wrap: wrap; gap: 7px; }
-.filter-chip { min-height: 36px; padding: 0 13px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--brown); font-size: 13px; font-weight: 800; }
-.filter-chip.active { background: var(--yellow); border-color: var(--yellow-dark); }
-.filter-chip.active::before { content: '✓'; margin-right: 5px; }
-.filter-chip:focus-visible { outline: 2px solid var(--brown); outline-offset: 2px; }
+.list-controls { display: flex; align-items: center; gap: 10px; margin: -4px 0 18px; }
+.list-select-wrap { position: relative; width: 190px; min-width: 0; }
+.list-select-wrap::after { content: ''; position: absolute; right: 17px; top: 15px; width: 7px; height: 7px; border-right: 2px solid var(--brown); border-bottom: 2px solid var(--brown); transform: rotate(45deg); pointer-events: none; }
+.list-select-wrap select { appearance: none; width: 100%; height: 42px; padding: 0 36px 0 16px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--brown); font-size: 14px; font-weight: 800; cursor: pointer; }
+.list-select-wrap select:focus-visible { outline: 2px solid var(--brown); outline-offset: 2px; }
 
 .profile-fields { display: grid; gap: 12px; border: 1px solid var(--line); padding: 18px; margin: 2px 0; min-width: 0; }
 .profile-fields legend { color: var(--brown); font-weight: 950; font-size: 17px; padding: 0 5px; }
@@ -174,9 +171,7 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .modal-next { right: 22px; }
 
 @media (max-width: 620px) {
-  .list-controls { flex-direction: column; gap: 8px; }
-  .control-group { width: 100%; }
-  .control-options .filter-chip { flex: 1; white-space: nowrap; }
+  .list-select-wrap { flex: 1; width: auto; }
   .profile-field-grid { grid-template-columns: 1fr; }
   .top-bar { min-height: 54px; }
   .top-inner { min-height: 54px; padding: 0 14px; gap: 12px; }

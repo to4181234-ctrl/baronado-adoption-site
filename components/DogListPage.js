@@ -71,28 +71,19 @@ export default function DogListPage({ title, category }) {
 
         <div className="list-controls" aria-label="목록 보기 설정">
           {category === CATEGORY_ADOPTION && (
-            <div className="control-group" role="group" aria-label="입양 상태">
-              <span className="control-heading" aria-hidden="true">입양 상태</span>
-              <div className="control-options">
-                {[
-                  ['all', '전체보기'], ['waiting', '입양 전'], ['adopted', '입양 완료']
-                ].map(([value, label]) => (
-                  <button key={value} type="button" className={`filter-chip ${statusFilter === value ? 'active' : ''}`}
-                    aria-pressed={statusFilter === value} onClick={() => setStatusFilter(value)}>{label}</button>
-                ))}
-              </div>
+            <div className="list-select-wrap">
+              <select aria-label="입양 상태" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                <option value="all">전체보기</option>
+                <option value="waiting">입양 전</option>
+                <option value="adopted">입양 완료</option>
+              </select>
             </div>
           )}
-          <div className="control-group" role="group" aria-label="등록 순서">
-            <span className="control-heading" aria-hidden="true">등록 순서</span>
-            <div className="control-options">
-              {[
-                ['newest', '최신 등록'], ['oldest', '오래된 순']
-              ].map(([value, label]) => (
-                <button key={value} type="button" className={`filter-chip ${sortOrder === value ? 'active' : ''}`}
-                  aria-pressed={sortOrder === value} onClick={() => setSortOrder(value)}>{label}</button>
-              ))}
-            </div>
+          <div className="list-select-wrap">
+            <select aria-label="등록 순서" value={sortOrder} onChange={(event) => setSortOrder(event.target.value)}>
+              <option value="newest">최신 등록</option>
+              <option value="oldest">오래된 순</option>
+            </select>
           </div>
         </div>
 
