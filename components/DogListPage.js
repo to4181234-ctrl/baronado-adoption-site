@@ -6,6 +6,7 @@ import { fetchDogs } from '../lib/dogs';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
 import SiteHeader from './SiteHeader';
 import DogLoading from './DogLoading';
+import DogActions from './DogActions';
 import { formatDogDate, getAgeInfo, profileSummary } from '../lib/dogProfile';
 
 function PawIcon() {
@@ -26,7 +27,7 @@ function DogCard({ dog }) {
         {dog.category === 'adoption' && dog.arrived_at && <p className="arrival-date">바로나도에 온 날 · {formatDogDate(dog.arrived_at)}</p>}
         {dog.category === 'adoption' && dog.adopted && dog.adopted_at && <p className="arrival-date">입양 간 날짜 · {formatDogDate(dog.adopted_at)}</p>}
         <p className="desc">{dog.category === 'resident' ? dog.description : profileSummary(dog)}</p>
-        <span className="btn">자세히 보기</span>
+        <span className="dog-story-link"><span>{dog.name}의 이야기 보기</span><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></span>
       </div>
     </Link>
   );
@@ -109,6 +110,7 @@ export default function DogListPage({ title, category }) {
           </div>
         )}
       </section>
+      <DogActions allowInquiry={category === 'adoption'} />
     </main>
   );
 }
