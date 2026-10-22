@@ -16,11 +16,7 @@ export default function DogActions({ dog = null, allowInquiry = false, hidden = 
 
   const share = async () => {
     recordShareClick(dog ? 'dog' : allowInquiry ? 'home' : 'residents', dog?.id);
-    const data = {
-      title: dog ? `${dog.name} · 바로나도` : '바로나도 · 가족을 찾아요',
-      text: dog ? `${dog.name}의 소개를 함께 봐주세요.` : '바로나도에서 새로운 가족을 기다리는 친구들을 만나보세요.',
-      url: window.location.href
-    };
+    const data = { url: window.location.href };
     try {
       if (navigator.share) {
         await navigator.share(data);

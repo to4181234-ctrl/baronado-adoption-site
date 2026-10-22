@@ -3,14 +3,21 @@
 import { useEffect, useState } from 'react';
 import { CATEGORY_RESIDENT } from '../lib/dogs';
 import { formatDogDate, getAgeInfo, getDogProfile, getShelterUrl, isResidentBirthday, PROFILE_FIELDS } from '../lib/dogProfile';
+import VaccinationDetails from './VaccinationDetails';
 
-export default function AdminPreview({ form, items, onClose }) {
+export default function AdminPreview({ form, items, videoItems = [], onClose }) {
   const [photos, setPhotos] = useState([]);
+  const [videos, setVideos] = useState([]);
   useEffect(() => {
     const urls = items.map(item => item.file ? URL.createObjectURL(item.file) : item.url);
     setPhotos(urls);
     return () => items.forEach((item, index) => { if (item.file) URL.revokeObjectURL(urls[index]); });
   }, [items]);
+  useEffect(() => {
+    const urls = videoItems.map(item => item.file ? URL.createObjectURL(item.file) : item.url);
+    setVideos(urls);
+    return () => videoItems.forEach((item, index) => { if (item.file) URL.revokeObjectURL(urls[index]); });
+  }, [videoItems]);
   useEffect(() => {
     const onKey = event => { if (event.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
@@ -40,11 +47,15 @@ export default function AdminPreview({ form, items, onClose }) {
           {!resident && form.adopted && form.adopted_at && <p className="arrival-date">입양 간 날짜 · {formatDogDate(form.adopted_at)}</p>}
           {resident ? <p className="preview-prose">{form.description || '아직 소개글이 등록되지 않았어요.'}</p> : <div className="profile-detail">
             {profile.introduction && <p className="preview-prose">{profile.introduction}</p>}
-            {PROFILE_FIELDS.filter(field => profile[field.key]).map(field => <section className="profile-section" key={field.key}><h2>{field.label}</h2><p>{profile[field.key]}</p></section>)}
+            {PROFILE_FIELDS.map(field => field.key === 'vaccinations'
+              ? <VaccinationDetails key="vaccinations" profile={profile} />
+              : profile[field.key] ? <section className="profile-section" key={field.key}><h2>{field.label}</h2><p>{profile[field.key]}</p></section> : null)}
             {Array.isArray(profile.extra_questions) && profile.extra_questions.filter(item => item.question && item.answer).map((item,index) => <section className="profile-section" key={index}><h2>{item.question}</h2><p>{item.answer}</p></section>)}
             {profile.shelter_name && <section className="profile-section"><h2>어느 보호소에서 왔나요?</h2><p>{profile.shelter_name}</p>{getShelterUrl(profile.shelter_url) && <span className="shelter-link">보호소 홈페이지 ↗</span>}</section>}
             {!profile.introduction && !PROFILE_FIELDS.some(field => profile[field.key]) && <p className="preview-prose">{form.description || '아직 소개글이 등록되지 않았어요.'}</p>}
           </div>}
+          {resident && <VaccinationDetails profile={profile} />}
+          {videos.length > 0 && <section className="dog-videos"><h2>동영상</h2>{videos.map((url, index) => <video key={index} controls preload="none" playsInline src={url} aria-label={`${form.name || '강아지'} 동영상 ${index + 1}`} />)}</section>}
         </div>
       </article>
     </div>

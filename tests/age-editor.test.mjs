@@ -13,6 +13,13 @@ test('exact birthdays advance one calendar month, then carry to the next year', 
   assert.equal(getAgeInfo(dog, today('2027-10-22')).detailDisplay, '2살');
 });
 
+test('the admin picker reflects the current calculated age for exact birthdays', () => {
+  const dog = { age: '0살', profile: { age_kind: 'exact', age_years: 0, age_months: 0, birth_date: '2020-01-01', age_auto_update: true } };
+  const values = getAgeEditorValues(dog);
+  assert.ok(values.age_years >= 6);
+  assert.ok(values.age_months >= 0 && values.age_months < 12);
+});
+
 test('estimated age starts at arrival and static age does not change', () => {
   const dog = { age: '1살 추정', arrived_at: '2026-02-28', profile: { age_kind: 'estimated', age_years: 1, age_months: 0, age_auto_update: true } };
   assert.equal(getAgeInfo(dog, today('2026-03-27')).listDisplay, '1살 추정');
@@ -38,4 +45,14 @@ test('new age fields validate and keep resident profile data', () => {
   assert.throws(() => dogPayload({ ...form, profile: { ...form.profile, birth_date: '' } }), /생년월일/);
   const estimated = { ...form, category: 'adoption', profile: { age_kind: 'estimated', age_years: 1, age_months: 0, age_auto_update: true } };
   assert.throws(() => dogPayload(estimated), /바로나도에 온 날/);
+});
+
+test('completed adoptions keep their age at the adoption date', () => {
+  const dog = { category: 'adoption', adopted: true, adopted_at: '2026-09-22', arrived_at: '2026-08-22', age: '1살 추정',
+    profile: { age_kind: 'estimated', age_years: 1, age_months: 0, age_auto_update: true } };
+  assert.equal(getAgeInfo(dog, today('2028-10-22')).detailDisplay, '1살 1개월 추정');
+  const noDate = { ...dog, adopted_at: null, profile: { ...dog.profile, age_stopped_at: '2026-10-22' } };
+  assert.equal(getAgeInfo(noDate, today('2028-10-22')).detailDisplay, '1살 2개월 추정');
+  const payload = dogPayload({ ...dog, images: [] });
+  assert.equal(payload.profile.age_stopped_at, '2026-09-22');
 });

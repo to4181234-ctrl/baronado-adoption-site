@@ -7,9 +7,12 @@ import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, fetchDog, normal
 import AdminGuard from '../../../../components/AdminGuard';
 import SiteHeader from '../../../../components/SiteHeader';
 import DogImagePicker from '../../../../components/DogImagePicker';
-import { PROFILE_FIELDS, getDogProfile } from '../../../../lib/dogProfile';
+import { getDogProfile } from '../../../../lib/dogProfile';
 import AdoptionExtras from '../../../../components/AdoptionExtras';
 import AgeEditor from '../../../../components/AgeEditor';
+import VaccinationEditor from '../../../../components/VaccinationEditor';
+import DogVideoPicker from '../../../../components/DogVideoPicker';
+import ProfileQuestionEditor from '../../../../components/ProfileQuestionEditor';
 import AdminPreview from '../../../../components/AdminPreview';
 import useAdminDraftProtection from '../../../../components/useAdminDraftProtection';
 import { draftSnapshot } from '../../../../lib/adminDraft';
@@ -19,6 +22,7 @@ function EditDogForm() {
   const params = useParams();
   const [form, setForm] = useState(null);
   const [photoItems, setPhotoItems] = useState([]);
+  const [videoItems, setVideoItems] = useState([]);
   const [baseline, setBaseline] = useState('');
   const [preview, setPreview] = useState(false);
   const [error, setError] = useState('');
@@ -29,16 +33,18 @@ function EditDogForm() {
     if (!params?.id) return;
     fetchDog(params.id)
       .then((dog) => {
-        const nextForm = { ...dog, profile: dog.category === CATEGORY_ADOPTION ? getDogProfile(dog) : {} };
+        const nextForm = { ...dog, profile: dog.category === CATEGORY_ADOPTION ? { ...getDogProfile(dog), ...dog.profile } : (dog.profile || {}) };
         const nextPhotos = (dog.images || []).map(url => ({ id: url, url }));
+        const nextVideos = (nextForm.profile.videos || []).map(url => ({ id: url, url }));
         setForm(nextForm);
         setPhotoItems(nextPhotos);
-        setBaseline(draftSnapshot(nextForm, nextPhotos));
+        setVideoItems(nextVideos);
+        setBaseline(draftSnapshot(nextForm, nextPhotos, nextVideos));
       })
       .catch(() => setError('게시글을 찾을 수 없어요.'));
   }, [params?.id]);
 
-  const dirty = Boolean(form && baseline && draftSnapshot(form, photoItems) !== baseline);
+  const dirty = Boolean(form && baseline && draftSnapshot(form, photoItems, videoItems) !== baseline);
   useAdminDraftProtection(dirty && !done);
 
   const onChange = (event) => {
@@ -51,11 +57,13 @@ function EditDogForm() {
     setError('');
     setSaving(true);
     try {
-      const saved = await updateDog(params.id, form, photoItems);
+      const saved = await updateDog(params.id, form, photoItems, videoItems);
       const savedPhotos = (saved.images || []).map(url => ({ id: url, url }));
+      const savedVideos = (saved.profile?.videos || []).map(url => ({ id: url, url }));
       setForm(saved);
       setPhotoItems(savedPhotos);
-      setBaseline(draftSnapshot(saved, savedPhotos));
+      setVideoItems(savedVideos);
+      setBaseline(draftSnapshot(saved, savedPhotos, savedVideos));
       setDone(true);
     } catch (err) {
       setError(err.message);
@@ -83,6 +91,7 @@ function EditDogForm() {
 
             <form className="form" onSubmit={onSubmit}>
               <DogImagePicker items={photoItems} setItems={setPhotoItems} />
+              <DogVideoPicker items={videoItems} setItems={setVideoItems} />
 
               <fieldset className="field-group">
                 <legend className="label">게시 위치</legend>
@@ -119,15 +128,9 @@ function EditDogForm() {
               </label>
 
               {form.category === CATEGORY_ADOPTION && form.adopted && <label><span className="label">입양 간 날짜</span><input className="field" type="date" name="adopted_at" value={form.adopted_at || ''} onChange={onChange}/></label>}
+              <VaccinationEditor form={form} setForm={setForm} />
               {form.category === CATEGORY_ADOPTION && <AdoptionExtras form={form} setForm={setForm} />}
-              {form.category === CATEGORY_ADOPTION && <fieldset className="profile-editor">
-                <legend>상세 소개 질문</legend>
-                <label className="check-row"><input type="checkbox" checked={PROFILE_FIELDS.every(field => Object.hasOwn(form.profile||{},field.key))} onChange={event=>setForm(prev=>({...prev,profile:event.target.checked?{...prev.profile,...Object.fromEntries(PROFILE_FIELDS.map(field=>[field.key,prev.profile?.[field.key]||'']))}:Object.fromEntries(Object.entries(prev.profile||{}).filter(([key])=>!PROFILE_FIELDS.some(field=>field.key===key)))}))}/> 전체 선택</label>
-                {PROFILE_FIELDS.map(field=><div className="profile-field" key={field.key}>
-                  <label className="check-row"><input type="checkbox" checked={Object.hasOwn(form.profile||{},field.key)} onChange={event=>setForm(prev=>{const profile={...prev.profile};if(event.target.checked)profile[field.key]='';else delete profile[field.key];return {...prev,profile};})}/>{field.label}</label>
-                  {Object.hasOwn(form.profile||{},field.key) && <textarea className="field" rows={3} value={form.profile[field.key]} onChange={event=>setForm(prev=>({...prev,profile:{...prev.profile,[field.key]:event.target.value}}))}/>}
-                </div>)}
-              </fieldset>}
+              {form.category === CATEGORY_ADOPTION && <ProfileQuestionEditor form={form} setForm={setForm} />}
               {form.category === CATEGORY_RESIDENT && <label>
                 <span className="label">설명글</span>
                 <textarea className="field" name="description" value={form.description ?? ''} onChange={onChange} />
@@ -142,7 +145,7 @@ function EditDogForm() {
         )}
       </section>
 
-      {preview && form && <AdminPreview form={form} items={photoItems} onClose={() => setPreview(false)} />}
+      {preview && form && <AdminPreview form={form} items={photoItems} videoItems={videoItems} onClose={() => setPreview(false)} />}
 
       {done && (
         <div className="image-modal">

@@ -10,6 +10,8 @@ import ExpandableText from '../../../components/ExpandableText';
 import DogActions from '../../../components/DogActions';
 import { recordVisit } from '../../../lib/siteAnalytics';
 import { formatDogDate, getAgeInfo, getDogProfile, getShelterUrl, isResidentBirthday, PROFILE_FIELDS } from '../../../lib/dogProfile';
+import { dogVideoUrls } from '../../../lib/dogVideo';
+import VaccinationDetails from '../../../components/VaccinationDetails';
 
 function PawIcon() {
   return <svg className="paw" viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M20.3 27.1c4.1 0 7.4 4.3 7.4 9.6s-3.3 9.6-7.4 9.6-7.4-4.3-7.4-9.6 3.3-9.6 7.4-9.6Zm23.4 0c4.1 0 7.4 4.3 7.4 9.6s-3.3 9.6-7.4 9.6-7.4-4.3-7.4-9.6 3.3-9.6 7.4-9.6ZM15.9 17.7c3 0 5.4 3.1 5.4 6.9s-2.4 6.9-5.4 6.9-5.4-3.1-5.4-6.9 2.4-6.9 5.4-6.9Zm32.2 0c3 0 5.4 3.1 5.4 6.9s-2.4 6.9-5.4 6.9-5.4-3.1-5.4-6.9 2.4-6.9 5.4-6.9ZM32 11.2c3.2 0 5.8 3.4 5.8 7.6s-2.6 7.6-5.8 7.6-5.8-3.4-5.8-7.6 2.6-7.6 5.8-7.6Zm0 29.1c7 0 14.1 5.8 14.1 11.5 0 4.1-3.6 5.3-7.8 4.3-2.1-.5-4.1-1.4-6.3-1.4s-4.2.9-6.3 1.4c-4.2 1-7.8-.2-7.8-4.3 0-5.7 7.1-11.5 14.1-11.5Z"/></svg>;
@@ -125,8 +127,9 @@ export default function DogDetailPage() {
                 ? <ExpandableText key={dog.id} text={dog.description || '아직 소개글이 등록되지 않았어요.'} className="desc" />
                 : <div className="profile-detail">
                     {getDogProfile(dog).introduction && <ExpandableText key={`${dog.id}-intro`} text={getDogProfile(dog).introduction} className="desc" />}
-                    {PROFILE_FIELDS.filter(field => getDogProfile(dog)[field.key]).map(field =>
-                      <section className="profile-section" key={`${dog.id}-${field.key}`}><h2>{field.label}</h2><ExpandableText text={getDogProfile(dog)[field.key]} /></section>
+                    {PROFILE_FIELDS.map(field => field.key === 'vaccinations'
+                      ? <VaccinationDetails key={`${dog.id}-vaccinations`} profile={getDogProfile(dog)} />
+                      : getDogProfile(dog)[field.key] ? <section className="profile-section" key={`${dog.id}-${field.key}`}><h2>{field.label}</h2><ExpandableText text={getDogProfile(dog)[field.key]} /></section> : null
                     )}
                     {Array.isArray(getDogProfile(dog).extra_questions) && getDogProfile(dog).extra_questions.filter(entry => entry.question && entry.answer).map((entry, questionIndex) =>
                       <section className="profile-section" key={`${dog.id}-question-${questionIndex}`}><h2>{entry.question}</h2><ExpandableText text={entry.answer} /></section>
@@ -134,6 +137,12 @@ export default function DogDetailPage() {
                     {getDogProfile(dog).shelter_name && <section className="profile-section"><h2>어느 보호소에서 왔나요?</h2><p>{getDogProfile(dog).shelter_name}</p>{getShelterUrl(getDogProfile(dog).shelter_url) && <a className="shelter-link" href={getShelterUrl(getDogProfile(dog).shelter_url)} target="_blank" rel="noopener noreferrer">보호소 홈페이지 ↗</a>}</section>}
                     {!getDogProfile(dog).introduction && !PROFILE_FIELDS.some(field => getDogProfile(dog)[field.key]) && <ExpandableText key={`${dog.id}-fallback`} text={dog.description || '아직 소개글이 등록되지 않았어요.'} className="desc" />}
                   </div>}
+              {dog.category === CATEGORY_RESIDENT && <VaccinationDetails profile={dog.profile} />}
+              {dogVideoUrls(dog.profile, process.env.NEXT_PUBLIC_SUPABASE_URL).length > 0 && <section className="dog-videos" aria-label="강아지 동영상">
+                <h2>동영상</h2>
+                {dogVideoUrls(dog.profile, process.env.NEXT_PUBLIC_SUPABASE_URL).map((url, videoIndex) =>
+                  <video key={url} controls preload="none" playsInline src={url} aria-label={`${dog.name} 동영상 ${videoIndex + 1}`} />)}
+              </section>}
             </div>
           </article>
         )}

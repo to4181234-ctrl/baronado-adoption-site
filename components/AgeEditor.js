@@ -45,7 +45,7 @@ export default function AgeEditor({ form, setForm }) {
     <p className="small-note age-explanation">
       {exact
         ? '자동 계산을 켜면 생년월일부터 오늘까지 지난 개월 수로 계산합니다. 매월 생일과 같은 날에 1개월씩 늘고, 12개월이 되면 1살이 됩니다. 끄면 위에서 선택한 나이가 그대로 표시됩니다.'
-        : '자동 계산을 켜면 바로나도에 온 날에 위에서 선택한 추정 나이였다고 보고, 그날부터 한 달마다 1개월씩 더합니다. 끄면 선택한 추정 나이가 그대로 표시됩니다. 자동 계산에는 바로나도에 온 날짜가 필요합니다.'}
+        : '자동 계산을 켜면 바로나도에 온 날에 위에서 선택한 추정 나이였다고 보고, 그날부터 한 달마다 1개월씩 더합니다. 끄면 선택한 추정 나이가 그대로 표시됩니다. 자동 계산에는 바로나도에 온 날짜가 필요합니다.'} 입양 완료 시 나이 증가가 멈춥니다.
     </p>
     {exact && values.age_auto_update && !values.birth_date && <p className="small-note age-error">자동 계산을 사용하려면 생년월일을 입력해주세요.</p>}
     {!exact && values.age_auto_update && !form.arrived_at && <p className="small-note age-error">자동 계산을 사용하려면 아래 ‘바로나도에 온 날’을 입력해주세요.</p>}
