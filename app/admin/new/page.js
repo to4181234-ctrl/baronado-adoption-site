@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, createDog, getEmptyDog, normalizeCategory } from '../../../lib/dogs';
 import SiteHeader from '../../../components/SiteHeader';
 import ProfileFields from '../../../components/ProfileFields';
+import StoryFields from '../../../components/StoryFields';
+import { storyForDog } from '../../../lib/dog-story';
 
 function NewDogForm() {
   const router = useRouter();
@@ -24,6 +26,7 @@ function NewDogForm() {
     const { name, value, type, checked } = event.target;
     setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
+  const onStoryChange = (update) => setForm((previous) => ({ ...previous, story: update(storyForDog(previous)) }));
 
   const onFileChange = (event) => {
     const selected = Array.from(event.target.files ?? []);
@@ -127,10 +130,7 @@ function NewDogForm() {
             <strong>O</strong>
           </label>
 
-          <label>
-            <span className="label">설명글</span>
-            <textarea className="field" name="description" value={form.description} onChange={onChange} placeholder="아이의 성격, 구조 배경, 특이사항 등을 적어주세요." />
-          </label>
+          <StoryFields form={form} onStoryChange={onStoryChange} />
 
           {error && <div className="message error">{error}</div>}
 

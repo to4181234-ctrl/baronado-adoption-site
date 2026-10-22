@@ -21,7 +21,7 @@ test('turning the calculation off keeps the written age and reference note', () 
 });
 
 test('existing posts without age fields keep the old display', () => {
-  assert.deepEqual(getAgeInfo({ age: '8~9살 추정' }), { display: '8~9살 추정', reference: '' });
+  assert.deepEqual(getAgeInfo({ age: '8~9살 추정' }), { display: '8~9살 추정', listDisplay: '8~9살 추정', reference: '' });
 });
 
 test('only web URLs become shelter links', () => {

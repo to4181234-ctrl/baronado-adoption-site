@@ -31,8 +31,7 @@
 
 ## Supabase 업데이트
 
-이번 버전부터 `category`, `adopted` 컬럼이 추가됩니다.  
-기존 프로젝트에 덮어쓰기 업로드한 뒤 Supabase에서 아래 파일 내용을 다시 실행하세요.
+새 프로젝트를 처음 만들 때는 전체 스키마 파일을 사용합니다.
 
 ```txt
 supabase/schema.sql
@@ -43,6 +42,8 @@ supabase/schema.sql
 ```txt
 Supabase → SQL Editor → New query → schema.sql 내용 붙여넣기 → Run
 ```
+
+기존 운영 프로젝트에는 전체 스키마를 재실행하지 말고 `supabase/add-profile-fields.sql`의 컬럼 추가 구문만 적용하세요. 기존 정책과 데이터가 유지됩니다.
 
 ## Vercel 환경변수
 
@@ -58,8 +59,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=Supabase anon public key
 
 ## 검토 중인 기능 적용 순서
 
-이 브랜치의 새 관리자 필드(`age_reference_date`, `age_reference_years`, `age_auto_update`, `shelter_name`, `shelter_url`)는 운영 데이터베이스에 아직 추가하지 않았습니다. 운영 반영 전 `supabase/schema.sql`의 새 `alter table ... add column if not exists` 구문 5개를 검토하고 실행해야 저장할 수 있습니다. 기존 게시물은 필드가 비어 있어 종전 나이 문구와 화면을 유지합니다.
+이 브랜치의 나이·보호소·구조화된 소개 필드는 운영 데이터베이스에 아직 추가하지 않았습니다. 운영 반영 전에 `supabase/add-profile-fields.sql`의 추가 구문 6개를 적용해야 저장할 수 있습니다. 기존 행과 원문 `description`은 그대로 유지합니다.
 
 자동 나이는 기준일 당시의 **추정 만 나이(정수)**를 바탕으로 기준일을 기념일처럼 계산합니다. 예를 들어 기준일에 2살로 안내받았으면 그날은 `약 2살 0일 추정`, 다음날은 `약 2살 1일 추정`으로 표시합니다. 기준일 및 당시 안내 나이는 상세 화면에 별도로 남습니다. 추정 범위나 개월 수 등 숫자 한 개로 표현하기 어려운 경우에는 자동 업데이트를 끄고 기존 나이 문구를 사용하세요.
+
+목록에는 `약 2살 추정`처럼 연 단위까지만 표시하고, 경과 일수는 상세에서만 표시합니다. 관리자에서는 견종부터 잘 어울리는 가족까지 고정 질문 10개와 추가 질문·답변을 편집할 수 있습니다. 기존 공개 게시글의 원문과 일치하는 경우에만 `lib/curated-stories.js`의 항목별 교정본을 보여주며, 편집 후에는 `story` JSON에 저장합니다.
 
 현재 저장소의 관리자 쓰기 정책은 익명 사용자도 허용합니다. 실제 운영 반영 전에 관리자 인증과 쓰기 권한을 점검해야 합니다. 이 브랜치의 제작과 비공개 프로토타입 검증은 운영 데이터베이스를 변경하지 않습니다.

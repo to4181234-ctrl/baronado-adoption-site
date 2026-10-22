@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { fetchDogs } from '../lib/dogs';
 import { CATEGORY_ADOPTION } from '../lib/dogs';
 import { getAgeInfo } from '../lib/profile';
+import { storySummary } from '../lib/dog-story';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
 import SiteHeader from './SiteHeader';
 import BrandLoader from './BrandLoader';
@@ -23,8 +24,8 @@ function DogCard({ dog }) {
       </div>
       <div className="dog-info">
         <h2 className="dog-name">{dog.name}</h2>
-        <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {getAgeInfo(dog).display}</p>
-        <p className="desc">{dog.description || '아직 소개글이 등록되지 않았어요.'}</p>
+        <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {getAgeInfo(dog).listDisplay}</p>
+        <p className="desc">{storySummary(dog)}</p>
         <Link className="btn" href={`/dogs/${dog.id}`}>자세히 보기</Link>
       </div>
     </article>
@@ -68,24 +69,31 @@ export default function DogListPage({ title, category }) {
           <h1>{title}</h1>
         </div>
 
-        <div className="list-controls">
+        <div className="list-controls" aria-label="목록 보기 설정">
           {category === CATEGORY_ADOPTION && (
-            <div className="status-filters" role="group" aria-label="입양 상태로 보기">
-              {[
-                ['all', '전체보기'], ['waiting', '입양 전'], ['adopted', '입양 완료']
-              ].map(([value, label]) => (
-                <button key={value} type="button" className={`filter-chip ${statusFilter === value ? 'active' : ''}`}
-                  aria-pressed={statusFilter === value} onClick={() => setStatusFilter(value)}>{label}</button>
-              ))}
+            <div className="control-group" role="group" aria-label="입양 상태">
+              <span className="control-heading" aria-hidden="true">입양 상태</span>
+              <div className="control-options">
+                {[
+                  ['all', '전체보기'], ['waiting', '입양 전'], ['adopted', '입양 완료']
+                ].map(([value, label]) => (
+                  <button key={value} type="button" className={`filter-chip ${statusFilter === value ? 'active' : ''}`}
+                    aria-pressed={statusFilter === value} onClick={() => setStatusFilter(value)}>{label}</button>
+                ))}
+              </div>
             </div>
           )}
-          <label className="sort-control">
-            <span>정렬</span>
-            <select value={sortOrder} onChange={(event) => setSortOrder(event.target.value)}>
-              <option value="newest">최신순</option>
-              <option value="oldest">오래된 순</option>
-            </select>
-          </label>
+          <div className="control-group" role="group" aria-label="등록 순서">
+            <span className="control-heading" aria-hidden="true">등록 순서</span>
+            <div className="control-options">
+              {[
+                ['newest', '최신 등록'], ['oldest', '오래된 순']
+              ].map(([value, label]) => (
+                <button key={value} type="button" className={`filter-chip ${sortOrder === value ? 'active' : ''}`}
+                  aria-pressed={sortOrder === value} onClick={() => setSortOrder(value)}>{label}</button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {!isSupabaseConfigured && (

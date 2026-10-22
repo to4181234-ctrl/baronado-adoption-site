@@ -20,7 +20,7 @@ export default function ProfileFields({ form, onChange }) {
           <input type="checkbox" name="age_auto_update" checked={Boolean(form.age_auto_update)} onChange={onChange} />
           <strong>날짜가 지날 때마다 추정 나이 자동 업데이트</strong>
         </label>
-        <p className="small-note">켜면 상세와 목록에 ‘약 2살 3일 추정’처럼 표시하며, 기준일의 안내 나이도 상세에 함께 남습니다.</p>
+        <p className="small-note">켜면 목록에는 ‘약 2살 추정’, 상세에는 ‘약 2살 3일 추정’처럼 표시하며, 기준일의 안내 나이도 상세에 함께 남습니다.</p>
       </fieldset>
 
       <fieldset className="profile-fields">
