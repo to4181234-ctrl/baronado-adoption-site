@@ -14,7 +14,7 @@ export default function AdoptionExtras({ form, setForm }) {
       <label><span className="label">안내받은 날짜</span>
         <input className="field" type="date" disabled={noReferenceDate} value={noReferenceDate ? '' : profile.age_reference_date || ''} onChange={event => setProfile({ age_reference_date: event.target.value, age_reference_date_none: false })} />
       </label>
-      <label><span className="label">추정 나이 (만 나이)</span>
+      <label><span className="label">추정 나이</span>
         <input className="field" type="number" min="0" max="30" step="1" value={profile.age_reference_years ?? ''} onChange={event => setProfile({ age_reference_years: event.target.value })} />
       </label>
       <label className="check-row"><input type="checkbox" checked={Boolean(profile.age_auto_update)} onChange={event => setProfile({ age_auto_update: event.target.checked })} /> 날짜에 따라 추정 나이 자동 업데이트</label>

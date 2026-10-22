@@ -204,9 +204,16 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .photo-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:12px 0; }
 .photo-tile { position:relative; background:var(--cream); aspect-ratio:1; min-width:0; }
 .photo-tile img { width:100%; height:100%; object-fit:cover; }
+.photo-empty { display:flex; align-items:center; justify-content:center; padding:8px; border:1px dashed #cbbb91; cursor:pointer; text-align:center; color:var(--brown); font-size:13px; }
+.photo-empty:focus-within, .photo-empty:hover { border-color:var(--brown); background:#fbf4de; }
 .photo-primary { position:absolute; left:6px; top:6px; background:var(--yellow); color:var(--brown); padding:3px 6px; font-size:11px; font-weight:800; }
 .photo-delete { position:absolute; right:5px; bottom:5px; border:0; background:rgba(30,20,13,.85); color:white; font-size:11px; padding:5px 8px; border-radius:3px; }
 .photo-recrop { position:absolute; left:5px; bottom:5px; border:0; background:rgba(255,255,255,.94); color:var(--brown); font-size:11px; font-weight:800; padding:5px 8px; border-radius:3px; }
+.photo-edit-backdrop { z-index:90; }
+.photo-edit-dialog { width:min(350px,100%); display:grid; gap:10px; padding:22px; background:#fff; box-shadow:var(--shadow); }
+.photo-edit-dialog h2 { margin:0 0 6px; font-size:21px; color:var(--brown); }
+.photo-edit-dialog .btn { display:flex; align-items:center; justify-content:center; width:100%; min-height:46px; margin:0; font-size:15px; cursor:pointer; }
+.photo-edit-cancel { border:0; padding:10px; background:transparent; color:var(--muted); font-weight:800; }
 .crop-backdrop { z-index:100; }
 .crop-dialog { width:min(410px,100%); max-height:calc(100dvh - 24px); overflow:auto; background:#fff; padding:18px; box-shadow:var(--shadow); }
 .crop-dialog h2 { margin:0 0 6px; color:var(--brown); font-size:21px; }
@@ -214,6 +221,8 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .crop-frame { width:min(100%,320px); aspect-ratio:1; position:relative; overflow:hidden; margin:auto; background:var(--cream); touch-action:none; cursor:grab; }
 .crop-frame:active { cursor:grabbing; }
 .crop-frame img { position:absolute; transform:translate(-50%,-50%); max-width:none; pointer-events:none; user-select:none; }
+.crop-frame .crop-source-preview { inset:0; width:100%; height:100%; transform:none; object-fit:contain; opacity:.7; }
+.crop-loading { position:absolute; left:50%; bottom:12px; transform:translateX(-50%); z-index:2; padding:6px 10px; border-radius:4px; background:rgba(255,255,255,.9); color:var(--brown); font-size:12px; font-weight:800; white-space:nowrap; }
 .crop-zoom { display:flex; align-items:center; gap:12px; margin:18px 0 10px; color:var(--brown); font-size:13px; font-weight:800; }
 .crop-zoom input { flex:1; min-width:0; accent-color:var(--brown); }
 .crop-zoom span:last-child { min-width:38px; text-align:right; }
