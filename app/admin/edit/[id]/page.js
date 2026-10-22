@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, fetchDog, normalizeCategory, updateDog } from '../../../../lib/dogs';
 import SiteHeader from '../../../../components/SiteHeader';
+import ProfileFields from '../../../../components/ProfileFields';
+import StoryFields from '../../../../components/StoryFields';
+import { storyForDog } from '../../../../lib/dog-story';
 
 export default function EditDogPage() {
   const router = useRouter();
@@ -26,6 +29,7 @@ export default function EditDogPage() {
     const { name, value, type, checked } = event.target;
     setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
+  const onStoryChange = (update) => setForm((previous) => ({ ...previous, story: update(storyForDog(previous)) }));
 
   const removeImage = (url) => {
     setForm((prev) => ({ ...prev, images: (prev.images ?? []).filter((image) => image !== url) }));
@@ -131,6 +135,8 @@ export default function EditDogPage() {
                 <input className="field" name="age" value={form.age ?? ''} onChange={onChange} />
               </label>
 
+              <ProfileFields form={form} onChange={onChange} />
+
               <div className="radio-group">
                 <span className="label">*성별</span>
                 <label><input type="radio" name="gender" value="남자" checked={form.gender === '남자'} onChange={onChange} /> 남</label>
@@ -149,10 +155,7 @@ export default function EditDogPage() {
                 <strong>O</strong>
               </label>
 
-              <label>
-                <span className="label">설명글</span>
-                <textarea className="field" name="description" value={form.description ?? ''} onChange={onChange} />
-              </label>
+              <StoryFields form={form} onStoryChange={onStoryChange} />
 
               <div className="form-footer">
                 <button className="btn full" disabled={saving}>{saving ? '수정 중...' : '수정하기'}</button>

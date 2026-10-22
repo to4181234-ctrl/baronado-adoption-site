@@ -3,8 +3,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { fetchDogs } from '../lib/dogs';
+import { CATEGORY_ADOPTION } from '../lib/dogs';
+import { getAgeInfo } from '../lib/profile';
+import { storySummary } from '../lib/dog-story';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
 import SiteHeader from './SiteHeader';
+import BrandLoader from './BrandLoader';
 
 function PawIcon() {
   return <svg className="paw" viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M20.3 27.1c4.1 0 7.4 4.3 7.4 9.6s-3.3 9.6-7.4 9.6-7.4-4.3-7.4-9.6 3.3-9.6 7.4-9.6Zm23.4 0c4.1 0 7.4 4.3 7.4 9.6s-3.3 9.6-7.4 9.6-7.4-4.3-7.4-9.6 3.3-9.6 7.4-9.6ZM15.9 17.7c3 0 5.4 3.1 5.4 6.9s-2.4 6.9-5.4 6.9-5.4-3.1-5.4-6.9 2.4-6.9 5.4-6.9Zm32.2 0c3 0 5.4 3.1 5.4 6.9s-2.4 6.9-5.4 6.9-5.4-3.1-5.4-6.9 2.4-6.9 5.4-6.9ZM32 11.2c3.2 0 5.8 3.4 5.8 7.6s-2.6 7.6-5.8 7.6-5.8-3.4-5.8-7.6 2.6-7.6 5.8-7.6Zm0 29.1c7 0 14.1 5.8 14.1 11.5 0 4.1-3.6 5.3-7.8 4.3-2.1-.5-4.1-1.4-6.3-1.4s-4.2.9-6.3 1.4c-4.2 1-7.8-.2-7.8-4.3 0-5.7 7.1-11.5 14.1-11.5Z"/></svg>;
@@ -20,8 +24,8 @@ function DogCard({ dog }) {
       </div>
       <div className="dog-info">
         <h2 className="dog-name">{dog.name}</h2>
-        <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {dog.age}</p>
-        <p className="desc">{dog.description || '아직 소개글이 등록되지 않았어요.'}</p>
+        <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {getAgeInfo(dog).listDisplay}</p>
+        <p className="desc">{storySummary(dog)}</p>
         <Link className="btn" href={`/dogs/${dog.id}`}>자세히 보기</Link>
       </div>
     </article>
@@ -36,18 +40,22 @@ export default function DogListPage({ title, category }) {
   const [sortOrder, setSortOrder] = useState('newest');
 
   useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError('');
     if (!isSupabaseConfigured) {
       setLoading(false);
       return;
     }
-    fetchDogs(category)
-      .then(setDogs)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    Promise.all([fetchDogs(category), new Promise((resolve) => setTimeout(resolve, 750))])
+      .then(([rows]) => { if (active) setDogs(rows); })
+      .catch((err) => { if (active) setError(err.message); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, [category]);
 
   const visibleDogs = dogs
-    .filter((dog) => category !== 'adoption' || statusFilter === 'all'
+    .filter((dog) => category !== CATEGORY_ADOPTION || statusFilter === 'all'
       || (statusFilter === 'waiting' ? !dog.adopted : dog.adopted))
     .sort((a, b) => (statusFilter === 'all' ? Number(a.adopted) - Number(b.adopted) : 0)
       || (sortOrder === 'newest' ? -1 : 1) * ((a.created_at || '').localeCompare(b.created_at || ''))
@@ -61,8 +69,8 @@ export default function DogListPage({ title, category }) {
           <h1>{title}</h1>
         </div>
 
-        <div className="list-controls">
-          {category === 'adoption' && (
+        <div className="list-controls" aria-label="목록 보기 설정">
+          {category === CATEGORY_ADOPTION && (
             <div className="list-select-wrap">
               <select aria-label="입양 상태" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
                 <option value="all">전체보기</option>
@@ -83,7 +91,7 @@ export default function DogListPage({ title, category }) {
           <div className="message error">Supabase 환경변수가 아직 연결되지 않았어요. 배포 전 Vercel 환경변수를 입력해주세요.</div>
         )}
 
-        {loading && <div className="empty-state">게시글을 불러오는 중이에요.</div>}
+        {loading && (category === CATEGORY_ADOPTION ? <BrandLoader /> : <div className="empty-state">게시글을 불러오는 중이에요.</div>)}
         {error && <div className="message error">{error}</div>}
 
         {!loading && !error && dogs.length === 0 && (
