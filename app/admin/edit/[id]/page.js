@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { CATEGORY_ADOPTION, CATEGORY_LABELS, CATEGORY_RESIDENT, fetchDog, normalizeCategory, updateDog } from '../../../../lib/dogs';
+import AdminGuard from '../../../../components/AdminGuard';
 import SiteHeader from '../../../../components/SiteHeader';
-import ProfileFields from '../../../../components/ProfileFields';
-import StoryFields from '../../../../components/StoryFields';
-import { storyForDog } from '../../../../lib/dog-story';
+import DogImagePicker from '../../../../components/DogImagePicker';
+import { PROFILE_FIELDS, getDogProfile } from '../../../../lib/dogProfile';
+import AdoptionExtras from '../../../../components/AdoptionExtras';
 
-export default function EditDogPage() {
+function EditDogForm() {
   const router = useRouter();
   const params = useParams();
   const [form, setForm] = useState(null);
@@ -21,7 +22,7 @@ export default function EditDogPage() {
   useEffect(() => {
     if (!params?.id) return;
     fetchDog(params.id)
-      .then((dog) => setForm(dog))
+      .then((dog) => setForm({ ...dog, profile: dog.category === CATEGORY_ADOPTION ? getDogProfile(dog) : {} }))
       .catch(() => setError('게시글을 찾을 수 없어요.'));
   }, [params?.id]);
 
@@ -29,7 +30,6 @@ export default function EditDogPage() {
     const { name, value, type, checked } = event.target;
     setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
-  const onStoryChange = (update) => setForm((previous) => ({ ...previous, story: update(storyForDog(previous)) }));
 
   const removeImage = (url) => {
     setForm((prev) => ({ ...prev, images: (prev.images ?? []).filter((image) => image !== url) }));
@@ -83,39 +83,7 @@ export default function EditDogPage() {
             </div>
 
             <form className="form" onSubmit={onSubmit}>
-              <div className="upload-row">
-                <label className="upload-box">
-                  대표 사진<br />클릭해서<br />업로드하세요
-                  <input type="file" accept="image/*" multiple onChange={onFileChange} hidden />
-                </label>
-                <label className="upload-box">
-                  추가 사진
-                  <input type="file" accept="image/*" multiple onChange={onFileChange} hidden />
-                </label>
-                <label className="upload-box">
-                  추가 사진
-                  <input type="file" accept="image/*" multiple onChange={onFileChange} hidden />
-                </label>
-              </div>
-
-              {(form.images?.length > 0 || files.length > 0) && (
-                <div className="preview-grid">
-                  {form.images?.map((url) => (
-                    <div className="preview" key={url}>
-                      <img src={url} alt="등록된 사진" />
-                      <button type="button" onClick={() => removeImage(url)}>×</button>
-                    </div>
-                  ))}
-                  {files.map((file, index) => (
-                    <div className="preview" key={`${file.name}-${index}`}>
-                      <img src={URL.createObjectURL(file)} alt="새 사진 미리보기" />
-                      <button type="button" onClick={() => removeSelectedFile(index)}>×</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <span className="label">*사진 등록 최대 3장</span>
+              <DogImagePicker existing={form.images ?? []} files={files} setFiles={setFiles} setExisting={(updater) => setForm(prev => ({ ...prev, images: typeof updater === "function" ? updater(prev.images ?? []) : updater }))} />
 
               <fieldset className="field-group">
                 <legend className="label">게시 위치</legend>
@@ -135,8 +103,6 @@ export default function EditDogPage() {
                 <input className="field" name="age" value={form.age ?? ''} onChange={onChange} />
               </label>
 
-              <ProfileFields form={form} onChange={onChange} />
-
               <div className="radio-group">
                 <span className="label">*성별</span>
                 <label><input type="radio" name="gender" value="남자" checked={form.gender === '남자'} onChange={onChange} /> 남</label>
@@ -149,13 +115,27 @@ export default function EditDogPage() {
                 <strong>O</strong>
               </label>
 
+              {form.category === CATEGORY_ADOPTION && <label><span className="label">바로나도에 온 날</span><input type="date" className="field" name="arrived_at" value={form.arrived_at || ''} onChange={onChange}/></label>}
               <label className="check-row">
                 <span>입양 완료</span>
                 <input type="checkbox" name="adopted" checked={Boolean(form.adopted)} onChange={onChange} />
                 <strong>O</strong>
               </label>
 
-              <StoryFields form={form} onStoryChange={onStoryChange} />
+              {form.category === CATEGORY_ADOPTION && form.adopted && <label><span className="label">입양 간 날짜</span><input className="field" type="date" name="adopted_at" value={form.adopted_at || ''} onChange={onChange}/></label>}
+              {form.category === CATEGORY_ADOPTION && <AdoptionExtras form={form} setForm={setForm} />}
+              {form.category === CATEGORY_ADOPTION && <fieldset className="profile-editor">
+                <legend>상세 소개 질문</legend>
+                <label className="check-row"><input type="checkbox" checked={PROFILE_FIELDS.every(field => Object.hasOwn(form.profile||{},field.key))} onChange={event=>setForm(prev=>({...prev,profile:event.target.checked?{...prev.profile,...Object.fromEntries(PROFILE_FIELDS.map(field=>[field.key,prev.profile?.[field.key]||'']))}:Object.fromEntries(Object.entries(prev.profile||{}).filter(([key])=>!PROFILE_FIELDS.some(field=>field.key===key)))}))}/> 전체 선택</label>
+                {PROFILE_FIELDS.map(field=><div className="profile-field" key={field.key}>
+                  <label className="check-row"><input type="checkbox" checked={Object.hasOwn(form.profile||{},field.key)} onChange={event=>setForm(prev=>{const profile={...prev.profile};if(event.target.checked)profile[field.key]='';else delete profile[field.key];return {...prev,profile};})}/>{field.label}</label>
+                  {Object.hasOwn(form.profile||{},field.key) && <textarea className="field" rows={3} value={form.profile[field.key]} onChange={event=>setForm(prev=>({...prev,profile:{...prev.profile,[field.key]:event.target.value}}))}/>}
+                </div>)}
+              </fieldset>}
+              {form.category === CATEGORY_RESIDENT && <label>
+                <span className="label">설명글</span>
+                <textarea className="field" name="description" value={form.description ?? ''} onChange={onChange} />
+              </label>}
 
               <div className="form-footer">
                 <button className="btn full" disabled={saving}>{saving ? '수정 중...' : '수정하기'}</button>
@@ -175,4 +155,8 @@ export default function EditDogPage() {
       )}
     </main>
   );
+}
+
+export default function EditDogPage() {
+  return <AdminGuard><EditDogForm /></AdminGuard>;
 }

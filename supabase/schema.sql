@@ -1,3 +1,6 @@
+-- SECURITY: Public SELECT is allowed. INSERT/UPDATE/DELETE are performed ONLY
+-- by authenticated Next.js API routes using server-only Supabase service role.
+-- Never set anon write policies on public.dogs or storage.objects.
 -- 바로나도 입양 사이트 Supabase 초기/업데이트 세팅 SQL
 -- Supabase > SQL Editor > New query 에 붙여넣고 Run 하면 됩니다.
 
@@ -16,12 +19,9 @@ create table if not exists public.dogs (
 
 alter table public.dogs add column if not exists category text not null default 'adoption';
 alter table public.dogs add column if not exists adopted boolean not null default false;
-alter table public.dogs add column if not exists age_reference_date date;
-alter table public.dogs add column if not exists age_reference_years smallint;
-alter table public.dogs add column if not exists age_auto_update boolean not null default false;
-alter table public.dogs add column if not exists shelter_name text not null default '';
-alter table public.dogs add column if not exists shelter_url text not null default '';
-alter table public.dogs add column if not exists story jsonb;
+alter table public.dogs add column if not exists arrived_at date;
+alter table public.dogs add column if not exists adopted_at date;
+alter table public.dogs add column if not exists profile jsonb not null default '{}'::jsonb;
 
 alter table public.dogs enable row level security;
 
@@ -35,21 +35,8 @@ on public.dogs for select
 to anon, authenticated
 using (true);
 
-create policy "public dogs insert"
-on public.dogs for insert
-to anon, authenticated
-with check (true);
 
-create policy "public dogs update"
-on public.dogs for update
-to anon, authenticated
-using (true)
-with check (true);
 
-create policy "public dogs delete"
-on public.dogs for delete
-to anon, authenticated
-using (true);
 
 insert into storage.buckets (id, name, public)
 values ('dog-images', 'dog-images', true)
@@ -65,18 +52,5 @@ on storage.objects for select
 to anon, authenticated
 using (bucket_id = 'dog-images');
 
-create policy "public dog images insert"
-on storage.objects for insert
-to anon, authenticated
-with check (bucket_id = 'dog-images');
 
-create policy "public dog images update"
-on storage.objects for update
-to anon, authenticated
-using (bucket_id = 'dog-images')
-with check (bucket_id = 'dog-images');
 
-create policy "public dog images delete"
-on storage.objects for delete
-to anon, authenticated
-using (bucket_id = 'dog-images');

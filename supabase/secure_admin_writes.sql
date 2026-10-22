@@ -1,0 +1,4 @@
+-- LEGACY FILE. The previous Supabase email-account authorization approach
+-- has been replaced with a shared-password, server-side administrator API.
+-- Use supabase/shared_admin_security.sql instead.
+-- Do not restore anonymous write policies or add individual admin accounts.

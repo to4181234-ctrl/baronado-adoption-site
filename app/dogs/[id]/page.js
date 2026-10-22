@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { CATEGORY_RESIDENT, fetchDog } from '../../../lib/dogs';
-import { getAgeInfo, getShelterUrl } from '../../../lib/profile';
-import { STORY_FIELDS, storyForDog } from '../../../lib/dog-story';
 import SiteHeader from '../../../components/SiteHeader';
+import DogLoading from '../../../components/DogLoading';
+import { formatDogDate, getAgeInfo, getDogProfile, getShelterUrl, PROFILE_FIELDS } from '../../../lib/dogProfile';
 
 function PawIcon() {
   return <svg className="paw" viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M20.3 27.1c4.1 0 7.4 4.3 7.4 9.6s-3.3 9.6-7.4 9.6-7.4-4.3-7.4-9.6 3.3-9.6 7.4-9.6Zm23.4 0c4.1 0 7.4 4.3 7.4 9.6s-3.3 9.6-7.4 9.6-7.4-4.3-7.4-9.6 3.3-9.6 7.4-9.6ZM15.9 17.7c3 0 5.4 3.1 5.4 6.9s-2.4 6.9-5.4 6.9-5.4-3.1-5.4-6.9 2.4-6.9 5.4-6.9Zm32.2 0c3 0 5.4 3.1 5.4 6.9s-2.4 6.9-5.4 6.9-5.4-3.1-5.4-6.9 2.4-6.9 5.4-6.9ZM32 11.2c3.2 0 5.8 3.4 5.8 7.6s-2.6 7.6-5.8 7.6-5.8-3.4-5.8-7.6 2.6-7.6 5.8-7.6Zm0 29.1c7 0 14.1 5.8 14.1 11.5 0 4.1-3.6 5.3-7.8 4.3-2.1-.5-4.1-1.4-6.3-1.4s-4.2.9-6.3 1.4c-4.2 1-7.8-.2-7.8-4.3 0-5.7 7.1-11.5 14.1-11.5Z"/></svg>;
@@ -33,7 +33,6 @@ export default function DogDetailPage() {
   const images = dog?.images ?? [];
   const hasImages = images.length > 0;
   const backHref = dog?.category === CATEGORY_RESIDENT ? '/residents' : '/';
-  const story = storyForDog(dog);
 
   const move = (direction) => {
     if (!hasImages) return;
@@ -73,7 +72,7 @@ export default function DogDetailPage() {
       <section className="container detail-container">
         <Link className="back-link" href={backHref}>뒤로 가기</Link>
 
-        {loading && <div className="empty-state compact">게시글을 불러오는 중이에요.</div>}
+        {loading && <DogLoading />}
         {error && <div className="message error">{error}</div>}
 
         {dog && (
@@ -91,8 +90,8 @@ export default function DogDetailPage() {
                 aria-label="사진 크게 보기"
                 disabled={!hasImages}
               >
-                {hasImages ? <img src={images[index]} alt={`${dog.name} 사진 ${index + 1}`} /> : <PawIcon />}
-                {dog.adopted && <span className="adopted-badge detail">입양 완료</span>}
+                {hasImages ? <img key={images[index]} className="gallery-photo" src={images[index]} alt={`${dog.name} 사진 ${index + 1}`} /> : <PawIcon />}
+                {dog.adopted && <span className="adopted-badge detail"><strong>입양 완료</strong>{dog.adopted_at && <small>{formatDogDate(dog.adopted_at)}</small>}</span>}
                 {hasImages && <span className="zoom-hint">사진 크게 보기</span>}
               </button>
 
@@ -106,33 +105,23 @@ export default function DogDetailPage() {
 
             <div className="detail-body">
               <h1 className="dog-name">{dog.name}</h1>
-              <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {getAgeInfo(dog).display}</p>
-              {(getAgeInfo(dog).reference || dog.shelter_name || getShelterUrl(dog.shelter_url)) && (
-                <div className="profile-facts">
-                  {getAgeInfo(dog).reference && <p><strong>나이 안내 기준</strong>{getAgeInfo(dog).reference}</p>}
-                  {(dog.shelter_name || getShelterUrl(dog.shelter_url)) && (
-                    <p><strong>출신 보호소</strong>{dog.shelter_name || '보호소 홈페이지'}{' '}
-                      {getShelterUrl(dog.shelter_url) && <a href={getShelterUrl(dog.shelter_url)} target="_blank" rel="noopener noreferrer">홈페이지 방문 ↗</a>}
-                    </p>
-                  )}
-                </div>
-              )}
-              {story.introduction && <p className="desc story-intro">{story.introduction}</p>}
-              <div className="story-answers">
-                {STORY_FIELDS.map(([key, label]) => story.answers[key] ? (
-                  <section className="story-answer" key={key}>
-                    <h2>{label}</h2>
-                    <p>{story.answers[key]}</p>
-                  </section>
-                ) : null)}
-                {story.extra_questions.filter(({ question, answer }) => question && answer).map(({ question, answer }, index) => (
-                  <section className="story-answer" key={`${question}-${index}`}>
-                    <h2>{question}</h2>
-                    <p>{answer}</p>
-                  </section>
-                ))}
-              </div>
-              {!story.introduction && !STORY_FIELDS.some(([key]) => story.answers[key]) && story.extra_questions.length === 0 && <p className="desc">아직 소개글이 등록되지 않았어요.</p>}
+              <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {getAgeInfo(dog).detailDisplay}</p>
+              {dog.category !== CATEGORY_RESIDENT && getAgeInfo(dog).referenceDisplay && <p className="arrival-date">{getAgeInfo(dog).referenceDisplay}</p>}
+              {dog.category !== CATEGORY_RESIDENT && dog.arrived_at && <p className="arrival-date">바로나도에 온 날 · {formatDogDate(dog.arrived_at)}</p>}
+              {dog.category !== CATEGORY_RESIDENT && dog.adopted && dog.adopted_at && <p className="arrival-date">입양 간 날짜 · {formatDogDate(dog.adopted_at)}</p>}
+              {dog.category === CATEGORY_RESIDENT
+                ? <p className="desc">{dog.description || '아직 소개글이 등록되지 않았어요.'}</p>
+                : <div className="profile-detail">
+                    {getDogProfile(dog).introduction && <p className="desc">{getDogProfile(dog).introduction}</p>}
+                    {PROFILE_FIELDS.filter(field => getDogProfile(dog)[field.key]).map(field =>
+                      <section className="profile-section" key={field.key}><h2>{field.label}</h2><p>{getDogProfile(dog)[field.key]}</p></section>
+                    )}
+                    {Array.isArray(getDogProfile(dog).extra_questions) && getDogProfile(dog).extra_questions.filter(entry => entry.question && entry.answer).map((entry, questionIndex) =>
+                      <section className="profile-section" key={`question-${questionIndex}`}><h2>{entry.question}</h2><p>{entry.answer}</p></section>
+                    )}
+                    {getDogProfile(dog).shelter_name && <section className="profile-section"><h2>어느 보호소에서 왔나요?</h2><p>{getDogProfile(dog).shelter_name}</p>{getShelterUrl(getDogProfile(dog).shelter_url) && <a className="shelter-link" href={getShelterUrl(getDogProfile(dog).shelter_url)} target="_blank" rel="noopener noreferrer">보호소 홈페이지 ↗</a>}</section>}
+                    {!PROFILE_FIELDS.some(field => getDogProfile(dog)[field.key]) && <p className="desc">{dog.description || '아직 소개글이 등록되지 않았어요.'}</p>}
+                  </div>}
             </div>
           </article>
         )}
@@ -145,6 +134,7 @@ export default function DogDetailPage() {
             <button type="button" className="modal-nav modal-prev" aria-label="이전 사진" onClick={(event) => { event.stopPropagation(); move(-1); }}>‹</button>
           )}
           <img
+            key={images[index]}
             src={images[index]}
             alt={`${dog.name} 크게 보기 ${index + 1}`}
             onClick={(event) => event.stopPropagation()}
