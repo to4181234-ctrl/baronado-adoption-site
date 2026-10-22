@@ -66,8 +66,8 @@ h1 { margin: 0; font-size: 28px; line-height: 1.15; letter-spacing: -0.06em; col
 .gallery-main { aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; width: 100%; border: 0; padding: 0; margin: 0; background: transparent; position: relative; cursor: zoom-in; color: inherit; }
 .gallery-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .gallery-main:disabled { cursor: default; }
-.zoom-hint { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); background: rgba(255,255,255,.88); color: var(--brown); font-size: 13px; font-weight: 800; padding: 9px 14px; box-shadow: var(--shadow); opacity: 0; transition: opacity .18s ease; pointer-events: none; white-space: nowrap; }
-.gallery-main:hover .zoom-hint { opacity: 1; }
+.zoom-hint { position:absolute; right:10px; bottom:10px; width:33px; height:33px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,.25); border-radius:10px; background:rgba(37,28,20,.28); color:#fff; opacity:.72; transition:opacity .18s ease, background .18s ease; pointer-events:none; backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); }
+.gallery-main:hover .zoom-hint, .gallery-main:focus-visible .zoom-hint { opacity:1; background:rgba(37,28,20,.45); }
 .gallery-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 42px; height: 54px; border: 0; background: rgba(255,255,255,.5); color: #fff; font-size: 42px; line-height: 1; display: flex; align-items: center; justify-content: center; z-index: 4; text-shadow: 0 2px 10px rgba(0,0,0,.32); }
 .gallery-prev { left: 0; }
 .gallery-next { right: 0; }
@@ -148,7 +148,7 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
   .detail-body .dog-name { font-size: 36px; margin-bottom: 14px; }
   .detail-body .meta { font-size: 21px; line-height: 1.45; margin-bottom: 20px; }
   .detail-body .desc { font-size: 18px; line-height: 1.75; }
-  .zoom-hint { opacity: 1; bottom: 12px; font-size: 12px; padding: 8px 12px; }
+  .zoom-hint { width:31px; height:31px; bottom:9px; right:9px; opacity:.77; }
   .gallery-arrow { width: 40px; height: 52px; font-size: 38px; }
   .modal-nav { width: 42px; height: 42px; font-size: 32px; }
   .modal-prev { left: 12px; }
