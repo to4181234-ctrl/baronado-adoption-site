@@ -7,6 +7,7 @@ import { CATEGORY_RESIDENT, fetchDog } from '../../../lib/dogs';
 import SiteHeader from '../../../components/SiteHeader';
 import DogLoading from '../../../components/DogLoading';
 import ExpandableText from '../../../components/ExpandableText';
+import DogActions from '../../../components/DogActions';
 import { formatDogDate, getAgeInfo, getDogProfile, getShelterUrl, PROFILE_FIELDS } from '../../../lib/dogProfile';
 
 function PawIcon() {
@@ -73,7 +74,7 @@ export default function DogDetailPage() {
   return (
     <main className="site-shell">
       <SiteHeader />
-      <section className="container detail-container">
+      <section className="container detail-container has-detail-actions">
         <Link className="back-link" href={backHref}>뒤로 가기</Link>
 
         {loading && <DogLoading />}
@@ -132,6 +133,8 @@ export default function DogDetailPage() {
           </article>
         )}
       </section>
+
+      {dog && <DogActions dog={dog} hidden={modalOpen} />}
 
       {modalOpen && hasImages && (
         <div className="image-modal viewer-modal" onClick={() => setModalOpen(false)}>

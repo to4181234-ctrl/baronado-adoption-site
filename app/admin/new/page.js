@@ -9,20 +9,26 @@ import SiteHeader from '../../../components/SiteHeader';
 import DogImagePicker from '../../../components/DogImagePicker';
 import { PROFILE_FIELDS } from '../../../lib/dogProfile';
 import AdoptionExtras from '../../../components/AdoptionExtras';
+import AdminPreview from '../../../components/AdminPreview';
+import useAdminDraftProtection from '../../../components/useAdminDraftProtection';
+import { draftSnapshot } from '../../../lib/adminDraft';
 
 function NewDogForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialCategory = normalizeCategory(searchParams.get('category'));
   const [form, setForm] = useState(getEmptyDog(initialCategory));
-  const [files, setFiles] = useState([]);
-  const [existing, setExisting] = useState([]);
+  const [photoItems, setPhotoItems] = useState([]);
+  const [baseline, setBaseline] = useState(() => draftSnapshot(getEmptyDog(initialCategory), []));
+  const [preview, setPreview] = useState(false);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setForm((prev) => ({ ...prev, category: initialCategory }));
   }, [initialCategory]);
+
+  useAdminDraftProtection(draftSnapshot(form, photoItems) !== baseline);
 
   const onChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -34,8 +40,9 @@ function NewDogForm() {
     setError('');
     setSaving(true);
     try {
-      const saved = await createDog(form, files);
-      router.push(`/admin?category=${saved.category}`);
+      const saved = await createDog(form, photoItems);
+      setBaseline(draftSnapshot(form, photoItems));
+      router.replace(`/admin?category=${saved.category}`);
     } catch (err) {
       setError(err.message);
       setSaving(false);
@@ -52,7 +59,7 @@ function NewDogForm() {
         </div>
 
         <form className="form" onSubmit={onSubmit}>
-          <DogImagePicker existing={existing} files={files} setFiles={setFiles} setExisting={setExisting} />
+          <DogImagePicker items={photoItems} setItems={setPhotoItems} />
 
           <fieldset className="field-group">
             <legend className="label">게시 위치</legend>
@@ -110,10 +117,12 @@ function NewDogForm() {
           {error && <div className="message error">{error}</div>}
 
           <div className="form-footer">
+            <button className="btn secondary" type="button" onClick={() => setPreview(true)}>저장 전 미리보기</button>
             <button className="btn full" disabled={saving}>{saving ? '저장 중...' : '등록하기'}</button>
           </div>
         </form>
       </section>
+      {preview && <AdminPreview form={form} items={photoItems} onClose={() => setPreview(false)} />}
     </main>
   );
 }

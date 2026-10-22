@@ -9,13 +9,17 @@ import SiteHeader from '../../../../components/SiteHeader';
 import DogImagePicker from '../../../../components/DogImagePicker';
 import { PROFILE_FIELDS, getDogProfile } from '../../../../lib/dogProfile';
 import AdoptionExtras from '../../../../components/AdoptionExtras';
+import AdminPreview from '../../../../components/AdminPreview';
+import useAdminDraftProtection from '../../../../components/useAdminDraftProtection';
+import { draftSnapshot } from '../../../../lib/adminDraft';
 
 function EditDogForm() {
   const router = useRouter();
   const params = useParams();
   const [form, setForm] = useState(null);
-  const [files, setFiles] = useState([]);
-  const [replacements, setReplacements] = useState({});
+  const [photoItems, setPhotoItems] = useState([]);
+  const [baseline, setBaseline] = useState('');
+  const [preview, setPreview] = useState(false);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
@@ -23,9 +27,18 @@ function EditDogForm() {
   useEffect(() => {
     if (!params?.id) return;
     fetchDog(params.id)
-      .then((dog) => setForm({ ...dog, profile: dog.category === CATEGORY_ADOPTION ? getDogProfile(dog) : {} }))
+      .then((dog) => {
+        const nextForm = { ...dog, profile: dog.category === CATEGORY_ADOPTION ? getDogProfile(dog) : {} };
+        const nextPhotos = (dog.images || []).map(url => ({ id: url, url }));
+        setForm(nextForm);
+        setPhotoItems(nextPhotos);
+        setBaseline(draftSnapshot(nextForm, nextPhotos));
+      })
       .catch(() => setError('게시글을 찾을 수 없어요.'));
   }, [params?.id]);
+
+  const dirty = Boolean(form && baseline && draftSnapshot(form, photoItems) !== baseline);
+  useAdminDraftProtection(dirty && !done);
 
   const onChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -37,10 +50,11 @@ function EditDogForm() {
     setError('');
     setSaving(true);
     try {
-      const saved = await updateDog(params.id, form, files, replacements);
+      const saved = await updateDog(params.id, form, photoItems);
+      const savedPhotos = (saved.images || []).map(url => ({ id: url, url }));
       setForm(saved);
-      setFiles([]);
-      setReplacements({});
+      setPhotoItems(savedPhotos);
+      setBaseline(draftSnapshot(saved, savedPhotos));
       setDone(true);
     } catch (err) {
       setError(err.message);
@@ -67,7 +81,7 @@ function EditDogForm() {
             </div>
 
             <form className="form" onSubmit={onSubmit}>
-              <DogImagePicker existing={form.images ?? []} files={files} setFiles={setFiles} replacements={replacements} setReplacements={setReplacements} setExisting={(updater) => setForm(prev => ({ ...prev, images: typeof updater === "function" ? updater(prev.images ?? []) : updater }))} />
+              <DogImagePicker items={photoItems} setItems={setPhotoItems} />
 
               <fieldset className="field-group">
                 <legend className="label">게시 위치</legend>
@@ -122,6 +136,7 @@ function EditDogForm() {
               </label>}
 
               <div className="form-footer">
+                <button className="btn secondary" type="button" onClick={() => setPreview(true)}>저장 전 미리보기</button>
                 <button className="btn full" disabled={saving}>{saving ? '수정 중...' : '수정하기'}</button>
               </div>
             </form>
@@ -129,11 +144,13 @@ function EditDogForm() {
         )}
       </section>
 
+      {preview && form && <AdminPreview form={form} items={photoItems} onClose={() => setPreview(false)} />}
+
       {done && (
         <div className="image-modal">
           <div className="modal-card">
             <p>수정이 완료되었습니다</p>
-            <button className="btn" onClick={() => router.push(`/admin?category=${backCategory}`)}>OK</button>
+            <button className="btn" onClick={() => router.replace(`/admin?category=${backCategory}`)}>OK</button>
           </div>
         </div>
       )}

@@ -121,64 +121,70 @@ function SquareCrop({ file, url, onApply, onCancel }) {
   </div>;
 }
 
-function NewPhoto({ file, onRemove, isPrimary }) {
-  const url = useMemo(() => URL.createObjectURL(file), [file]);
-  useEffect(() => () => URL.revokeObjectURL(url), [url]);
-  return <div className="photo-tile">
-    <img src={url} alt={file.name} />
-    {isPrimary && <span className="photo-primary">대표</span>}
-    <button className="photo-delete" type="button" onClick={onRemove}>삭제</button>
-  </div>;
-}
-
-export default function DogImagePicker({ existing = [], files, setFiles, setExisting, replacements = {}, setReplacements, max = 3 }) {
+export default function DogImagePicker({ items, setItems, max = 3 }) {
   const [error, setError] = useState('');
   const [pending, setPending] = useState([]);
-  const [editingUrl, setEditingUrl] = useState('');
-  const total = existing.length + files.length;
-  const queueFile = (event, replaceUrl = '') => {
+  const [editingId, setEditingId] = useState('');
+  const editingItem = items.find(item => item.id === editingId);
+  const queueFile = (event, replaceId = '') => {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
     if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'].includes(file.type) || file.size <= 0 || file.size > 10 * 1024 * 1024) {
       setError('JPG, PNG, WEBP, GIF, AVIF 이미지만 파일당 10MB 이하로 선택할 수 있습니다.');
+      setEditingId('');
       return;
     }
-    if (!replaceUrl && total + pending.length >= max) return;
+    if (!replaceId && items.length + pending.filter(item => !item.replaceId).length >= max) return;
     setError('');
-    setEditingUrl('');
-    setPending(prev => [...prev, { id: crypto.randomUUID(), file, url: replaceUrl }]);
+    setEditingId('');
+    setPending(prev => [...prev, { id: crypto.randomUUID(), file, replaceId }]);
   };
+  const move = (index, direction) => setItems(previous => {
+    const next = [...previous];
+    const target = index + direction;
+    if (target < 0 || target >= next.length) return previous;
+    [next[index], next[target]] = [next[target], next[index]];
+    return next;
+  });
   return <div className="image-picker">
     {error && <p className="message error">{error}</p>}
     <div className="photo-grid" aria-label="사진 등록 (최대 3장)">
       {Array.from({ length: max }, (_, index) => {
-        const url = existing[index];
-        const file = files[index - existing.length];
-        if (url) return <div className="photo-tile" key={url}>
-        <PhotoPreview file={replacements[url]} url={url} alt={'기존 사진 '+(index+1)}/>
-        {index === 0 && <span className="photo-primary">대표</span>}
-        {setReplacements && <button className="photo-recrop" type="button" onClick={() => setEditingUrl(url)}>수정</button>}
-        <button className="photo-delete" type="button" onClick={() => { setExisting(prev => prev.filter(item => item !== url)); setReplacements?.(prev => { const next = { ...prev }; delete next[url]; return next; }); }}>삭제</button>
+        const item = items[index];
+        if (item) return <div className="photo-tile" key={item.id}>
+          <div className="photo-image-wrap">
+            <PhotoPreview file={item.file} url={item.url} alt={`${index + 1}번째 사진`} />
+            {index === 0 && <span className="photo-primary">대표</span>}
+            <button className="photo-recrop" type="button" onClick={() => setEditingId(item.id)}>수정</button>
+            <button className="photo-delete" type="button" onClick={() => setItems(prev => prev.filter(photo => photo.id !== item.id))}>삭제</button>
+          </div>
+          <div className="photo-order-controls">
+            <button type="button" disabled={index === 0} onClick={() => move(index, -1)} aria-label={`${index + 1}번째 사진 앞으로 이동`}>← 앞</button>
+            <button type="button" disabled={index === items.length - 1} onClick={() => move(index, 1)} aria-label={`${index + 1}번째 사진 뒤로 이동`}>뒤 →</button>
+          </div>
         </div>;
-        if (file) return <NewPhoto key={file.name+file.lastModified+'-'+index} file={file} isPrimary={index===0} onRemove={() => setFiles(prev=>prev.filter((_,i)=>i!==index-existing.length))}/>;
         return <label className="photo-tile photo-empty" key={'empty-'+index}>
           <strong>+ 사진 추가</strong>
-          <input type="file" accept="image/*" onChange={queueFile} disabled={total + pending.length >= max} hidden />
+          <input type="file" accept="image/*" onChange={queueFile} disabled={items.length + pending.length >= max} hidden />
         </label>;
       })}
     </div>
-    <p className="small-note">첫 번째 사진이 대표 이미지입니다. 사진은 등록 전에 1:1 정사각형으로 자릅니다. 수정한 사진은 게시글을 저장하면 반영됩니다.</p>
-    {editingUrl && <div className="image-modal photo-edit-backdrop" onClick={() => setEditingUrl('')}>
+    <p className="small-note">화살표로 사진 순서를 바꿀 수 있어요. 첫 번째 사진이 대표 이미지입니다. 변경은 게시글을 저장하면 반영됩니다.</p>
+    {editingItem && <div className="image-modal photo-edit-backdrop" onClick={() => setEditingId('')}>
       <div className="photo-edit-dialog" role="dialog" aria-modal="true" aria-label="사진 수정" onClick={event => event.stopPropagation()}>
         <h2>사진 수정</h2>
-        <button className="btn secondary" type="button" onClick={() => { setPending(prev => [...prev, { id: crypto.randomUUID(), url: editingUrl }]); setEditingUrl(''); }}>현재 사진 다시 자르기</button>
-        <label className="btn photo-replace-pick">다른 사진으로 교체<input type="file" accept="image/*" onChange={event => queueFile(event, editingUrl)} hidden /></label>
-        <button className="photo-edit-cancel" type="button" onClick={() => setEditingUrl('')}>취소</button>
+        <button className="btn secondary" type="button" onClick={() => { setPending(prev => [...prev, { id: crypto.randomUUID(), url: editingItem.url, file: editingItem.url ? null : editingItem.file, replaceId: editingItem.id }]); setEditingId(''); }}>현재 사진 다시 자르기</button>
+        <label className="btn photo-replace-pick">다른 사진으로 교체<input type="file" accept="image/*" onChange={event => queueFile(event, editingItem.id)} hidden /></label>
+        <button className="photo-edit-cancel" type="button" onClick={() => setEditingId('')}>취소</button>
       </div>
     </div>}
     {pending[0] && <SquareCrop key={pending[0].id} file={pending[0].file} url={pending[0].url}
-      onApply={cropped => { if (pending[0].url) setReplacements(prev => ({ ...prev, [pending[0].url]: cropped })); else setFiles(prev => [...prev, cropped]); setPending(prev => prev.slice(1)); }}
+      onApply={cropped => {
+        if (pending[0].replaceId) setItems(prev => prev.map(item => item.id === pending[0].replaceId ? { ...item, file: cropped } : item));
+        else setItems(prev => [...prev, { id: crypto.randomUUID(), file: cropped }]);
+        setPending(prev => prev.slice(1));
+      }}
       onCancel={() => setPending(prev => prev.slice(1))} />}
   </div>;
 }
