@@ -32,6 +32,8 @@ export default function DogListPage({ title, category }) {
   const [dogs, setDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('newest');
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -44,12 +46,37 @@ export default function DogListPage({ title, category }) {
       .finally(() => setLoading(false));
   }, [category]);
 
+  const visibleDogs = dogs
+    .filter((dog) => category !== 'adoption' || statusFilter === 'all'
+      || (statusFilter === 'waiting' ? !dog.adopted : dog.adopted))
+    .sort((a, b) => (statusFilter === 'all' ? Number(a.adopted) - Number(b.adopted) : 0)
+      || (sortOrder === 'newest' ? -1 : 1) * ((a.created_at || '').localeCompare(b.created_at || ''))
+      || a.id.localeCompare(b.id));
+
   return (
     <main className="site-shell">
       <SiteHeader />
       <section className="container list-container">
         <div className="page-head">
           <h1>{title}</h1>
+        </div>
+
+        <div className="list-controls">
+          {category === 'adoption' && (
+            <div className="list-select-wrap">
+              <select aria-label="입양 상태" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                <option value="all">전체보기</option>
+                <option value="waiting">입양 전</option>
+                <option value="adopted">입양 완료</option>
+              </select>
+            </div>
+          )}
+          <div className="list-select-wrap">
+            <select aria-label="등록 순서" value={sortOrder} onChange={(event) => setSortOrder(event.target.value)}>
+              <option value="newest">최신 등록</option>
+              <option value="oldest">오래된 순</option>
+            </select>
+          </div>
         </div>
 
         {!isSupabaseConfigured && (
@@ -63,9 +90,13 @@ export default function DogListPage({ title, category }) {
           <div className="empty-state">아직 업로드된 게시글이 없어요</div>
         )}
 
-        {!loading && dogs.length > 0 && (
+        {!loading && !error && dogs.length > 0 && visibleDogs.length === 0 && (
+          <div className="empty-state">선택한 조건에 맞는 친구가 없어요.</div>
+        )}
+
+        {!loading && !error && visibleDogs.length > 0 && (
           <div className="dog-list">
-            {dogs.map((dog) => <DogCard key={dog.id} dog={dog} />)}
+            {visibleDogs.map((dog) => <DogCard key={dog.id} dog={dog} />)}
           </div>
         )}
       </section>
