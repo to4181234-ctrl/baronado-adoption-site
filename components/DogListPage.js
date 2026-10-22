@@ -7,6 +7,7 @@ import { isSupabaseConfigured } from '../lib/supabaseClient';
 import SiteHeader from './SiteHeader';
 import DogLoading from './DogLoading';
 import DogActions from './DogActions';
+import { recordVisit } from '../lib/siteAnalytics';
 import { formatDogDate, getAgeInfo, profileSummary } from '../lib/dogProfile';
 
 function PawIcon() {
@@ -39,6 +40,10 @@ export default function DogListPage({ title, category }) {
   const [error, setError] = useState('');
   const [sort, setSort] = useState('default');
   const [statusFilter, setStatusFilter] = useState('all');
+
+  useEffect(() => {
+    recordVisit(category === 'resident' ? 'residents' : 'home');
+  }, [category]);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
