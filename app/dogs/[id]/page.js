@@ -9,8 +9,8 @@ import DogLoading from '../../../components/DogLoading';
 import ExpandableText from '../../../components/ExpandableText';
 import DogActions from '../../../components/DogActions';
 import { recordVisit } from '../../../lib/siteAnalytics';
-import { formatDogDate, getAgeInfo, getDogProfile, getShelterUrl, isResidentBirthday, PROFILE_FIELDS } from '../../../lib/dogProfile';
-import { dogVideoUrls } from '../../../lib/dogVideo';
+import { formatDogDate, getAgeInfo, getDogBirthDate, getDogProfile, getShelterUrl, isDogBirthday, PROFILE_FIELDS } from '../../../lib/dogProfile';
+import { dogVideoUrls, orderedDogMedia } from '../../../lib/dogVideo';
 import VaccinationDetails from '../../../components/VaccinationDetails';
 
 function PawIcon() {
@@ -40,18 +40,19 @@ export default function DogDetailPage() {
     if (dog?.id) recordVisit('dog', dog.id);
   }, [dog?.id]);
 
-  const images = dog?.images ?? [];
-  const hasImages = images.length > 0;
+  const media = dog ? orderedDogMedia(dog.images || [], dogVideoUrls(dog.profile, process.env.NEXT_PUBLIC_SUPABASE_URL)) : [];
+  const current = media[index];
+  const hasMedia = media.length > 0;
   const backHref = dog?.category === CATEGORY_RESIDENT ? '/residents' : '/';
 
   const move = (direction) => {
-    if (!hasImages) return;
-    setIndex((prev) => (prev + direction + images.length) % images.length);
+    if (!hasMedia) return;
+    setIndex((prev) => (prev + direction + media.length) % media.length);
   };
 
   const openImage = () => {
     if (didSwipe.current) { didSwipe.current = false; return; }
-    if (!hasImages) return;
+    if (current?.type !== 'photo') return;
     setModalOpen(true);
   };
 
@@ -93,33 +94,30 @@ export default function DogDetailPage() {
               className="gallery"
               onPointerDown={onPointerDown}
               onPointerUp={onPointerUp}
-              title={hasImages ? '사진 크게 보기' : undefined}
+              title={current?.type === 'photo' ? '사진 크게 보기' : undefined}
             >
-              <button
-                type="button"
-                className="gallery-main"
-                onClick={openImage}
-                aria-label="사진 크게 보기"
-                disabled={!hasImages}
-              >
-                {hasImages ? <img src={images[index]} alt={`${dog.name} 사진 ${index + 1}`} /> : <PawIcon />}
-                {dog.adopted && <span className="adopted-badge detail"><strong>입양 완료</strong>{dog.adopted_at && <small>{formatDogDate(dog.adopted_at)}</small>}</span>}
-                {hasImages && <span className="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.8" cy="10.8" r="6.7" /><path d="m16 16 4.5 4.5M8 10.8h5.6m-2.8-2.8v5.6" /></svg></span>}
-              </button>
+              {current?.type === 'video'
+                ? <div className="gallery-main gallery-video-frame"><video key={current.url} src={current.url} controls preload="none" playsInline aria-label={`${dog.name} 동영상 ${index + 1 - (dog.images || []).length}`} /></div>
+                : <button type="button" className="gallery-main" onClick={openImage} aria-label="사진 크게 보기" disabled={!hasMedia}>
+                    {current ? <img src={current.url} alt={`${dog.name} 사진 ${index + 1}`} /> : <PawIcon />}
+                    {current && <span className="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.8" cy="10.8" r="6.7" /><path d="m16 16 4.5 4.5M8 10.8h5.6m-2.8-2.8v5.6" /></svg></span>}
+                  </button>}
+              {dog.adopted && <span className="adopted-badge detail"><strong>입양 완료</strong>{dog.adopted_at && <small>{formatDogDate(dog.adopted_at)}</small>}</span>}
 
-              {images.length > 1 && <span className="photo-count" aria-live="polite">{index + 1} / {images.length}</span>}
+              {media.length > 1 && <span className="photo-count" aria-live="polite">{current?.type === 'video' ? '동영상' : '사진'} {index + 1} / {media.length}</span>}
 
-              {images.length > 1 && (
+              {media.length > 1 && (
                 <>
-                  <button type="button" className="gallery-arrow gallery-prev" onClick={(event) => { event.stopPropagation(); move(-1); }} aria-label="이전 사진">‹</button>
-                  <button type="button" className="gallery-arrow gallery-next" onClick={(event) => { event.stopPropagation(); move(1); }} aria-label="다음 사진">›</button>
+                  <button type="button" className="gallery-arrow gallery-prev" onClick={(event) => { event.stopPropagation(); move(-1); }} aria-label="이전 미디어">‹</button>
+                  <button type="button" className="gallery-arrow gallery-next" onClick={(event) => { event.stopPropagation(); move(1); }} aria-label="다음 미디어">›</button>
                 </>
               )}
             </div>
 
             <div className="detail-body">
-              <h1 className="dog-name">{dog.name}{isResidentBirthday(dog) && <span className="birthday-icon" role="img" aria-label="생일 축하"> 🎉</span>}</h1>
+              <h1 className="dog-name">{dog.name}{isDogBirthday(dog) && <span className="birthday-icon" role="img" aria-label="생일 축하"> 🎉</span>}</h1>
               <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {getAgeInfo(dog).detailDisplay}</p>
+              {getDogBirthDate(dog) && <p className="arrival-date">생년월일 · {formatDogDate(getDogBirthDate(dog))}</p>}
               {dog.category !== CATEGORY_RESIDENT && getAgeInfo(dog).referenceDisplay && <p className="arrival-date">{getAgeInfo(dog).referenceDisplay}</p>}
               {dog.category !== CATEGORY_RESIDENT && dog.arrived_at && <p className="arrival-date">바로나도에 온 날 · {formatDogDate(dog.arrived_at)}</p>}
               {dog.category !== CATEGORY_RESIDENT && dog.adopted && dog.adopted_at && <p className="arrival-date">입양 간 날짜 · {formatDogDate(dog.adopted_at)}</p>}
@@ -138,11 +136,6 @@ export default function DogDetailPage() {
                     {!getDogProfile(dog).introduction && !PROFILE_FIELDS.some(field => getDogProfile(dog)[field.key]) && <ExpandableText key={`${dog.id}-fallback`} text={dog.description || '아직 소개글이 등록되지 않았어요.'} className="desc" />}
                   </div>}
               {dog.category === CATEGORY_RESIDENT && <VaccinationDetails profile={dog.profile} />}
-              {dogVideoUrls(dog.profile, process.env.NEXT_PUBLIC_SUPABASE_URL).length > 0 && <section className="dog-videos" aria-label="강아지 동영상">
-                <h2>동영상</h2>
-                {dogVideoUrls(dog.profile, process.env.NEXT_PUBLIC_SUPABASE_URL).map((url, videoIndex) =>
-                  <video key={url} controls preload="none" playsInline src={url} aria-label={`${dog.name} 동영상 ${videoIndex + 1}`} />)}
-              </section>}
             </div>
           </article>
         )}
@@ -150,22 +143,18 @@ export default function DogDetailPage() {
 
       {dog && <DogActions dog={dog} hidden={modalOpen} />}
 
-      {modalOpen && hasImages && (
+      {modalOpen && hasMedia && (
         <div className="image-modal viewer-modal" onClick={() => setModalOpen(false)}>
           <button className="modal-close" aria-label="닫기">×</button>
-          {images.length > 1 && (
-            <button type="button" className="modal-nav modal-prev" aria-label="이전 사진" onClick={(event) => { event.stopPropagation(); move(-1); }}>‹</button>
+          {media.length > 1 && (
+            <button type="button" className="modal-nav modal-prev" aria-label="이전 미디어" onClick={(event) => { event.stopPropagation(); move(-1); }}>‹</button>
           )}
-          <img
-            src={images[index]}
-            alt={`${dog.name} 크게 보기 ${index + 1}`}
-            onClick={(event) => event.stopPropagation()}
-            onPointerDown={onModalPointerDown}
-            onPointerUp={onModalPointerUp}
-          />
-          {images.length > 1 && <span className="photo-count modal-count" aria-live="polite">{index + 1} / {images.length}</span>}
-          {images.length > 1 && (
-            <button type="button" className="modal-nav modal-next" aria-label="다음 사진" onClick={(event) => { event.stopPropagation(); move(1); }}>›</button>
+          {current?.type === 'video'
+            ? <video key={current.url} src={current.url} controls preload="none" playsInline onClick={event => event.stopPropagation()} aria-label={`${dog.name} 동영상`} />
+            : <img src={current?.url} alt={`${dog.name} 크게 보기 ${index + 1}`} onClick={(event) => event.stopPropagation()} onPointerDown={onModalPointerDown} onPointerUp={onModalPointerUp} />}
+          {media.length > 1 && <span className="photo-count modal-count" aria-live="polite">{current?.type === 'video' ? '동영상' : '사진'} {index + 1} / {media.length}</span>}
+          {media.length > 1 && (
+            <button type="button" className="modal-nav modal-next" aria-label="다음 미디어" onClick={(event) => { event.stopPropagation(); move(1); }}>›</button>
           )}
         </div>
       )}

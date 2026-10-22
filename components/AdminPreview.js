@@ -1,13 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CATEGORY_RESIDENT } from '../lib/dogs';
-import { formatDogDate, getAgeInfo, getDogProfile, getShelterUrl, isResidentBirthday, PROFILE_FIELDS } from '../lib/dogProfile';
+import { formatDogDate, getAgeInfo, getDogBirthDate, getDogProfile, getShelterUrl, isDogBirthday, PROFILE_FIELDS } from '../lib/dogProfile';
 import VaccinationDetails from './VaccinationDetails';
+import { orderedDogMedia } from '../lib/dogVideo';
 
 export default function AdminPreview({ form, items, videoItems = [], onClose }) {
   const [photos, setPhotos] = useState([]);
   const [videos, setVideos] = useState([]);
+  const [mediaIndex, setMediaIndex] = useState(0);
+  const touchStartX = useRef(null);
   useEffect(() => {
     const urls = items.map(item => item.file ? URL.createObjectURL(item.file) : item.url);
     setPhotos(urls);
@@ -27,21 +30,34 @@ export default function AdminPreview({ form, items, videoItems = [], onClose }) 
   const profile = getDogProfile(form);
   const resident = form.category === CATEGORY_RESIDENT;
   const age = getAgeInfo(form);
+  const media = orderedDogMedia(photos, videos);
+  const current = media[mediaIndex] || media[0];
+  const move = direction => setMediaIndex(prev => (prev + direction + media.length) % media.length);
   return <div className="admin-preview-backdrop" role="dialog" aria-modal="true" aria-label="저장 전 이용자 페이지 미리보기">
     <div className="admin-preview-shell">
       <div className="admin-preview-bar"><strong>저장 전 미리보기</strong><button type="button" onClick={onClose} aria-label="미리보기 닫기">닫기 ×</button></div>
       <p className="small-note">현재 입력한 내용입니다. 게시글을 저장해야 이용자 페이지에 반영됩니다.</p>
       <article className="detail-card preview-detail">
         <div className="preview-photo-area">
-          <div className="gallery preview-main-photo">
-            {photos[0] ? <img src={photos[0]} alt={`${form.name || '강아지'} 대표 사진`} /> : <span>등록된 사진이 없어요</span>}
+          <div className="gallery preview-main-photo" onPointerDown={event => { touchStartX.current = event.clientX; }} onPointerUp={event => {
+            if (touchStartX.current !== null && Math.abs(event.clientX - touchStartX.current) > 35 && media.length > 1) move(event.clientX < touchStartX.current ? 1 : -1);
+            touchStartX.current = null;
+          }}>
+            {current?.type === 'photo' ? <img src={current.url} alt={`${form.name || '강아지'} 사진`} />
+              : current?.type === 'video' ? <video key={current.url} src={current.url} controls preload="none" playsInline aria-label={`${form.name || '강아지'} 동영상`} />
+                : <span>등록된 사진과 동영상이 없어요</span>}
             {form.adopted && <span className="adopted-badge detail">입양 완료</span>}
+            {media.length > 1 && <>
+              <span className="photo-count" aria-live="polite">{current?.type === 'video' ? '동영상' : '사진'} {(mediaIndex % media.length) + 1} / {media.length}</span>
+              <button type="button" className="gallery-arrow gallery-prev" onClick={() => move(-1)} aria-label="이전 미디어">‹</button>
+              <button type="button" className="gallery-arrow gallery-next" onClick={() => move(1)} aria-label="다음 미디어">›</button>
+            </>}
           </div>
-          {photos.length > 1 && <div className="preview-thumbnails">{photos.map((url, index) => <img key={index} src={url} alt={`${index + 1}번째 사진`} />)}</div>}
         </div>
         <div className="detail-body">
-          <h1 className="dog-name">{form.name || '이름 미정'}{isResidentBirthday(form) && <span className="birthday-icon" role="img" aria-label="생일 축하"> 🎉</span>}</h1>
+          <h1 className="dog-name">{form.name || '이름 미정'}{isDogBirthday(form) && <span className="birthday-icon" role="img" aria-label="생일 축하"> 🎉</span>}</h1>
           <p className="meta">{form.gender} ㅣ 중성화 {form.neutered ? 'O' : 'X'} ㅣ {age.detailDisplay}</p>
+          {getDogBirthDate(form) && <p className="arrival-date">생년월일 · {formatDogDate(getDogBirthDate(form))}</p>}
           {!resident && age.referenceDisplay && <p className="arrival-date">{age.referenceDisplay}</p>}
           {!resident && form.arrived_at && <p className="arrival-date">바로나도에 온 날 · {formatDogDate(form.arrived_at)}</p>}
           {!resident && form.adopted && form.adopted_at && <p className="arrival-date">입양 간 날짜 · {formatDogDate(form.adopted_at)}</p>}
@@ -55,7 +71,6 @@ export default function AdminPreview({ form, items, videoItems = [], onClose }) 
             {!profile.introduction && !PROFILE_FIELDS.some(field => profile[field.key]) && <p className="preview-prose">{form.description || '아직 소개글이 등록되지 않았어요.'}</p>}
           </div>}
           {resident && <VaccinationDetails profile={profile} />}
-          {videos.length > 0 && <section className="dog-videos"><h2>동영상</h2>{videos.map((url, index) => <video key={index} controls preload="none" playsInline src={url} aria-label={`${form.name || '강아지'} 동영상 ${index + 1}`} />)}</section>}
         </div>
       </article>
     </div>

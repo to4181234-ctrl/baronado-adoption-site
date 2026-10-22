@@ -32,7 +32,7 @@ test('uses the arrival date when no received date exists and keeps the old age w
   const updated = getAgeInfo(dog, new Date(2026, 9, 23));
   assert.equal(updated.listDisplay, '약 3살 추정');
   assert.equal(updated.detailDisplay, '약 3살 1일 추정');
-  assert.match(updated.referenceDisplay, /바로나도에 온 날 2025\.10\.22 기준/);
+  assert.equal(updated.referenceDisplay, '');
   dog.profile.age_auto_update = false;
   assert.equal(getAgeInfo(dog, new Date(2026, 9, 23)).listDisplay, '2살 추정');
 });

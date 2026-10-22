@@ -191,8 +191,12 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .gallery-arrow { background:rgba(255,255,255,.85); color:var(--brown); text-shadow:none; }
 .gallery-arrow:hover, .modal-nav:hover { background:var(--yellow); }
 .gallery { touch-action:pan-y; }
+.gallery-video-frame { cursor:default; aspect-ratio:1; }
+.gallery-video-frame video { display:block; width:100%; height:100%; max-height:72vh; background:#211b18; object-fit:contain; }
 .viewer-modal img { max-width:calc(100vw - 96px); max-height:calc(100dvh - 80px); width:auto; height:auto; object-fit:contain; }
+.viewer-modal video { max-width:calc(100vw - 96px); max-height:calc(100dvh - 80px); width:auto; background:#211b18; }
 .profile-detail { display:grid; gap:20px; }
+.detail-body .profile-detail .desc { font-size:15px; line-height:1.75; }
 .profile-section { border-bottom:1px solid var(--line); padding-bottom:15px; }
 .profile-section h2 { margin:0 0 8px; font-size:15px; color:var(--brown); font-weight:850; }
 .profile-section p { margin:0; color:#554538; font-size:15px; line-height:1.75; white-space:pre-wrap; word-break:keep-all; }
@@ -213,6 +217,7 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .vaccination-editor > .small-note { margin:0; }
 .vaccination-group { display:grid; gap:10px; border-top:1px solid var(--line); padding-top:14px; }
 .vaccination-group > strong { color:var(--brown); font-size:14px; }
+.vaccination-all { font-weight:800; color:var(--brown); }
 .vaccination-legacy { background:var(--cream); padding:12px; white-space:pre-wrap; }
 .video-picker { min-width:0; }
 .video-picker > .label { margin:0 0 10px; }
@@ -222,9 +227,6 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .video-tile .btn { margin:0; }
 .video-add { min-height:150px; display:flex; justify-content:center; align-items:center; border:1px dashed #cbbb91; background:var(--cream); color:var(--brown); font-weight:800; cursor:pointer; text-align:center; padding:12px; }
 .video-picker .small-note { margin:10px 0 0; }
-.dog-videos { display:grid; gap:12px; margin-top:22px; }
-.dog-videos h2 { color:var(--brown); font-size:17px; margin:0; }
-.dog-videos video { display:block; width:100%; max-height:65vh; background:#211b18; border-radius:8px; }
 .profile-field { display:grid; gap:5px; }
 .profile-field .field { min-height:88px; }
 .upload-pick { padding:20px; display:flex; align-items:center; flex-direction:column; gap:4px; border:1px dashed #cbbb91; background:var(--cream); cursor:pointer; }
@@ -448,10 +450,11 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .preview-photo-area { min-width:0; }
 .preview-main-photo { width:100%; aspect-ratio:1; display:flex; align-items:center; justify-content:center; color:var(--muted); }
 .preview-main-photo img { width:100%; height:100%; object-fit:cover; }
+.preview-main-photo video { display:block; width:100%; height:100%; object-fit:contain; background:#211b18; }
 .preview-thumbnails { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:6px; }
 .preview-thumbnails img { width:100%; aspect-ratio:1; object-fit:cover; }
 .preview-detail .detail-body { max-height:none; overflow:visible; }
-.preview-prose { margin:0; white-space:pre-wrap; color:#554538; line-height:1.75; }
+.preview-prose { margin:0; white-space:pre-wrap; color:#554538; font-size:15px; line-height:1.75; }
 @media (max-width:620px) {
   .admin-preview-backdrop { padding:8px; }
   .admin-preview-shell { padding:14px; }

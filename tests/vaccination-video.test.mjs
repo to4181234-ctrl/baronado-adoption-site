@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { dogPayload, validateVideoRequest } from '../lib/server/adminData.js';
 import { getDogProfile } from '../lib/dogProfile.js';
-import { publicDogVideo } from '../lib/dogVideo.js';
-import { vaccinationLabels } from '../lib/vaccinations.js';
+import { publicDogVideo, orderedDogMedia } from '../lib/dogVideo.js';
+import { BASIC_VACCINATION_KEYS, vaccinationLabels } from '../lib/vaccinations.js';
 
 const base = 'https://example.supabase.co';
 const video = `${base}/storage/v1/object/public/dog-images/dogs/videos/123e4567-e89b-42d3-a456-426614174000.mp4`;
@@ -16,6 +16,17 @@ test('only confirmed vaccines are exposed as labels and legacy prose is retained
   assert.equal(saved.profile.vaccinations, profile.vaccinations);
   assert.deepEqual(saved.profile.vaccinations_checked, ['rabies', 'parvovirus']);
   assert.throws(() => dogPayload({ category: 'adoption', images: [], profile: { vaccinations_checked: ['unknown'] } }), /접종/);
+});
+
+test('all five basic vaccines display one summary while optional items remain visible', () => {
+  assert.equal(BASIC_VACCINATION_KEYS.length, 5);
+  assert.deepEqual(vaccinationLabels({ vaccinations_checked: [...BASIC_VACCINATION_KEYS, 'influenza'] }), ['기본접종 5종 모두 완료', '개 인플루엔자']);
+  assert.equal(vaccinationLabels({ vaccinations_checked: BASIC_VACCINATION_KEYS.slice(1) }).includes('기본접종 5종 모두 완료'), false);
+});
+
+test('gallery places every photo before videos, including video-only profiles', () => {
+  assert.deepEqual(orderedDogMedia(['photo-1', 'photo-2'], ['video-1']).map(item => item.type), ['photo', 'photo', 'video']);
+  assert.deepEqual(orderedDogMedia([], ['video-1']), [{ type: 'video', url: 'video-1' }]);
 });
 
 test('video upload validates type, size and public storage URL', () => {
