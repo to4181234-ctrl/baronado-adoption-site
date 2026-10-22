@@ -16,6 +16,12 @@ create table if not exists public.dogs (
 
 alter table public.dogs add column if not exists category text not null default 'adoption';
 alter table public.dogs add column if not exists adopted boolean not null default false;
+alter table public.dogs add column if not exists age_reference_date date;
+alter table public.dogs add column if not exists age_reference_years smallint;
+alter table public.dogs add column if not exists age_auto_update boolean not null default false;
+alter table public.dogs add column if not exists shelter_name text not null default '';
+alter table public.dogs add column if not exists shelter_url text not null default '';
+alter table public.dogs add column if not exists story jsonb;
 
 alter table public.dogs enable row level security;
 

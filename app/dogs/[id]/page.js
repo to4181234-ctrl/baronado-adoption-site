@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { CATEGORY_RESIDENT, fetchDog } from '../../../lib/dogs';
+import { getAgeInfo, getShelterUrl } from '../../../lib/profile';
+import { STORY_FIELDS, storyForDog } from '../../../lib/dog-story';
 import SiteHeader from '../../../components/SiteHeader';
 
 function PawIcon() {
@@ -31,6 +33,7 @@ export default function DogDetailPage() {
   const images = dog?.images ?? [];
   const hasImages = images.length > 0;
   const backHref = dog?.category === CATEGORY_RESIDENT ? '/residents' : '/';
+  const story = storyForDog(dog);
 
   const move = (direction) => {
     if (!hasImages) return;
@@ -103,8 +106,33 @@ export default function DogDetailPage() {
 
             <div className="detail-body">
               <h1 className="dog-name">{dog.name}</h1>
-              <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {dog.age}</p>
-              <p className="desc">{dog.description || '아직 소개글이 등록되지 않았어요.'}</p>
+              <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {getAgeInfo(dog).display}</p>
+              {(getAgeInfo(dog).reference || dog.shelter_name || getShelterUrl(dog.shelter_url)) && (
+                <div className="profile-facts">
+                  {getAgeInfo(dog).reference && <p><strong>나이 안내 기준</strong>{getAgeInfo(dog).reference}</p>}
+                  {(dog.shelter_name || getShelterUrl(dog.shelter_url)) && (
+                    <p><strong>출신 보호소</strong>{dog.shelter_name || '보호소 홈페이지'}{' '}
+                      {getShelterUrl(dog.shelter_url) && <a href={getShelterUrl(dog.shelter_url)} target="_blank" rel="noopener noreferrer">홈페이지 방문 ↗</a>}
+                    </p>
+                  )}
+                </div>
+              )}
+              {story.introduction && <p className="desc story-intro">{story.introduction}</p>}
+              <div className="story-answers">
+                {STORY_FIELDS.map(([key, label]) => story.answers[key] ? (
+                  <section className="story-answer" key={key}>
+                    <h2>{label}</h2>
+                    <p>{story.answers[key]}</p>
+                  </section>
+                ) : null)}
+                {story.extra_questions.filter(({ question, answer }) => question && answer).map(({ question, answer }, index) => (
+                  <section className="story-answer" key={`${question}-${index}`}>
+                    <h2>{question}</h2>
+                    <p>{answer}</p>
+                  </section>
+                ))}
+              </div>
+              {!story.introduction && !STORY_FIELDS.some(([key]) => story.answers[key]) && story.extra_questions.length === 0 && <p className="desc">아직 소개글이 등록되지 않았어요.</p>}
             </div>
           </article>
         )}
