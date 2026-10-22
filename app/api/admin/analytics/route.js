@@ -29,8 +29,24 @@ export async function GET(request) {
     ? null : new Date(midnightKst - daysBack * 86400000).toISOString();
 
   try {
-    const { data, error } = await adminDatabase().rpc('admin_site_analytics', { p_start: start });
-    if (error) throw error;
+    const admin = adminDatabase();
+    const [summary, status] = await Promise.all([
+      admin.rpc('admin_site_analytics', { p_start: start }),
+      admin.from('dogs').select('id, adopted')
+    ]);
+    if (summary.error) throw summary.error;
+    if (status.error) throw status.error;
+
+    // Keep the recorded views/shares for every dog in the "All" category,
+    // but let the dashboard hide adopted dogs when "Looking for family" is selected.
+    const adoptedById = new Map((status.data || []).map(dog => [dog.id, Boolean(dog.adopted)]));
+    const data = {
+      ...summary.data,
+      dogs: (summary.data?.dogs || []).map(dog => ({
+        ...dog,
+        adopted: adoptedById.get(dog.id) ?? false
+      }))
+    };
     return apiResponse({ period, today, startedAt: start, data });
   } catch (error) {
     console.error('Admin analytics summary failed:', error?.code || 'unexpected');
