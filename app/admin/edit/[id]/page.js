@@ -15,6 +15,7 @@ function EditDogForm() {
   const params = useParams();
   const [form, setForm] = useState(null);
   const [files, setFiles] = useState([]);
+  const [replacements, setReplacements] = useState({});
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
@@ -31,32 +32,15 @@ function EditDogForm() {
     setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
-  const removeImage = (url) => {
-    setForm((prev) => ({ ...prev, images: (prev.images ?? []).filter((image) => image !== url) }));
-  };
-
-  const onFileChange = (event) => {
-    const selected = Array.from(event.target.files ?? []);
-    setFiles((prev) => {
-      const currentImageCount = form?.images?.length ?? 0;
-      const remaining = Math.max(0, 3 - currentImageCount);
-      return [...prev, ...selected].slice(0, remaining);
-    });
-    event.target.value = '';
-  };
-
-  const removeSelectedFile = (index) => {
-    setFiles((prev) => prev.filter((_, fileIndex) => fileIndex !== index));
-  };
-
   const onSubmit = async (event) => {
     event.preventDefault();
     setError('');
     setSaving(true);
     try {
-      const saved = await updateDog(params.id, form, files);
+      const saved = await updateDog(params.id, form, files, replacements);
       setForm(saved);
       setFiles([]);
+      setReplacements({});
       setDone(true);
     } catch (err) {
       setError(err.message);
@@ -83,7 +67,7 @@ function EditDogForm() {
             </div>
 
             <form className="form" onSubmit={onSubmit}>
-              <DogImagePicker existing={form.images ?? []} files={files} setFiles={setFiles} setExisting={(updater) => setForm(prev => ({ ...prev, images: typeof updater === "function" ? updater(prev.images ?? []) : updater }))} />
+              <DogImagePicker existing={form.images ?? []} files={files} setFiles={setFiles} replacements={replacements} setReplacements={setReplacements} setExisting={(updater) => setForm(prev => ({ ...prev, images: typeof updater === "function" ? updater(prev.images ?? []) : updater }))} />
 
               <fieldset className="field-group">
                 <legend className="label">게시 위치</legend>

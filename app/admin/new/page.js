@@ -29,16 +29,6 @@ function NewDogForm() {
     setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
-  const onFileChange = (event) => {
-    const selected = Array.from(event.target.files ?? []);
-    setFiles((prev) => [...prev, ...selected].slice(0, 3));
-    event.target.value = '';
-  };
-
-  const removeSelectedFile = (index) => {
-    setFiles((prev) => prev.filter((_, fileIndex) => fileIndex !== index));
-  };
-
   const onSubmit = async (event) => {
     event.preventDefault();
     setError('');
