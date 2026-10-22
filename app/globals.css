@@ -198,6 +198,18 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .profile-section p { margin:0; color:#554538; font-size:15px; line-height:1.75; white-space:pre-wrap; word-break:keep-all; }
 .profile-editor { border:1px solid var(--line); padding:14px; display:grid; gap:14px; }
 .profile-editor legend { font-weight:850; color:var(--brown); padding:0 6px; }
+.form-container .form .age-editor { display:grid; gap:14px; padding:0; border:0; min-width:0; }
+.form-container .form .age-editor > legend { padding:0; margin-bottom:8px; }
+.form-container .form .age-editor .radio-group { display:flex; flex-wrap:wrap; gap:10px 20px; }
+.form-container .form .age-editor .radio-group label { display:inline-flex; gap:7px; align-items:center; }
+.form-container .form .age-editor > label { display:grid; gap:7px; min-width:0; }
+.form-container .form .age-editor > .check-row { display:flex; }
+.age-pickers { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; min-width:0; }
+.age-pickers label { display:grid; gap:7px; min-width:0; }
+.age-pickers select { appearance:auto; padding-right:8px; }
+.age-explanation { margin:0; }
+.age-error { margin:0; color:#b44032; font-weight:700; }
+.birthday-icon { display:inline-block; font-size:.72em; vertical-align:middle; margin-left:.16em; letter-spacing:0; }
 .profile-field { display:grid; gap:5px; }
 .profile-field .field { min-height:88px; }
 .upload-pick { padding:20px; display:flex; align-items:center; flex-direction:column; gap:4px; border:1px dashed #cbbb91; background:var(--cream); cursor:pointer; }

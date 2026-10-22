@@ -9,6 +9,7 @@ import SiteHeader from '../../../components/SiteHeader';
 import DogImagePicker from '../../../components/DogImagePicker';
 import { PROFILE_FIELDS } from '../../../lib/dogProfile';
 import AdoptionExtras from '../../../components/AdoptionExtras';
+import AgeEditor from '../../../components/AgeEditor';
 import AdminPreview from '../../../components/AdminPreview';
 import useAdminDraftProtection from '../../../components/useAdminDraftProtection';
 import { draftSnapshot } from '../../../lib/adminDraft';
@@ -74,10 +75,7 @@ function NewDogForm() {
             <input className="field" name="name" value={form.name} onChange={onChange} placeholder="이름" />
           </label>
 
-          <label>
-            <span className="label">*나이</span>
-            <input className="field" name="age" value={form.age} onChange={onChange} placeholder="1살 추정" />
-          </label>
+          <AgeEditor form={form} setForm={setForm} />
 
           <div className="radio-group">
             <span className="label">*성별</span>

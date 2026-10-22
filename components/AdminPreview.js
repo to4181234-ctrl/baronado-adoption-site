@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { CATEGORY_RESIDENT } from '../lib/dogs';
-import { formatDogDate, getAgeInfo, getDogProfile, getShelterUrl, PROFILE_FIELDS } from '../lib/dogProfile';
+import { formatDogDate, getAgeInfo, getDogProfile, getShelterUrl, isResidentBirthday, PROFILE_FIELDS } from '../lib/dogProfile';
 
 export default function AdminPreview({ form, items, onClose }) {
   const [photos, setPhotos] = useState([]);
@@ -33,7 +33,7 @@ export default function AdminPreview({ form, items, onClose }) {
           {photos.length > 1 && <div className="preview-thumbnails">{photos.map((url, index) => <img key={index} src={url} alt={`${index + 1}번째 사진`} />)}</div>}
         </div>
         <div className="detail-body">
-          <h1 className="dog-name">{form.name || '이름 미정'}</h1>
+          <h1 className="dog-name">{form.name || '이름 미정'}{isResidentBirthday(form) && <span className="birthday-icon" role="img" aria-label="생일 축하"> 🎉</span>}</h1>
           <p className="meta">{form.gender} ㅣ 중성화 {form.neutered ? 'O' : 'X'} ㅣ {age.detailDisplay}</p>
           {!resident && age.referenceDisplay && <p className="arrival-date">{age.referenceDisplay}</p>}
           {!resident && form.arrived_at && <p className="arrival-date">바로나도에 온 날 · {formatDogDate(form.arrived_at)}</p>}
