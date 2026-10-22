@@ -14,21 +14,22 @@ const PERIODS = [
 const METRICS = [
   { key: 'visitors', label: '방문자 수', color: '#8c6143' },
   { key: 'views', label: '상세글 조회', color: '#c59e36' },
-  { key: 'shares', label: '공유 버튼 클릭', color: '#6b8778' }
+  { key: 'shares', label: '공유 버튼 클릭', color: '#6b8778' },
+  { key: 'inquiries', label: '문의 버튼 클릭', color: '#9c6680' }
 ];
 const number = value => Number(value || 0).toLocaleString('ko-KR');
 
 function chartData(data, period, today) {
   if (period === 'all') {
     const items = Array.isArray(data.monthly) ? data.monthly : [];
-    return items.length ? items.slice(-12) : [{ day: today.slice(0, 7), visitors: 0, views: 0, shares: 0 }];
+    return items.length ? items.slice(-12) : [{ day: today.slice(0, 7), visitors: 0, views: 0, shares: 0, inquiries: 0 }];
   }
   const mapped = new Map((data.daily || []).map(item => [String(item.day), item]));
   const length = period === 'today' ? 1 : period === '7d' ? 7 : 30;
   const todayUtc = Date.parse(today + 'T00:00:00Z');
   return Array.from({ length }, (_, index) => {
     const date = new Date(todayUtc - (length - 1 - index) * 86400000).toISOString().slice(0, 10);
-    return mapped.get(date) || { day: date, visitors: 0, views: 0, shares: 0 };
+    return mapped.get(date) || { day: date, visitors: 0, views: 0, shares: 0, inquiries: 0 };
   });
 }
 
@@ -103,17 +104,18 @@ function DogRanking({ dogs }) {
         onClick={() => setCategory(option.value)}>{option.label}</button>)}
     </div>
     <p className="stats-small-note">{category === 'adoption' ? '입양 전 강아지만 표시합니다. 입양 완료 강아지는 ‘전체’에서 확인할 수 있습니다.' : category === 'all' ? '입양 완료 강아지를 포함한 모든 강아지의 기록입니다.' : '상주견의 조회·공유 기록입니다.'}</p>
-    <div className="stats-dog-table" role="table" aria-label="강아지별 조회수와 공유 버튼 클릭 수">
+    <div className="stats-dog-table" role="table" aria-label="강아지별 조회수, 공유 및 문의 버튼 클릭 수">
       <div className="stats-dog-row heading" role="row">
-        <span role="columnheader">강아지</span><span role="columnheader">상세글 조회</span><span role="columnheader">공유 클릭</span>
+        <span role="columnheader">강아지</span><span role="columnheader">상세글 조회</span><span role="columnheader">공유 클릭</span><span role="columnheader">문의 클릭</span>
       </div>
       {filtered.map(dog => <div className="stats-dog-row" role="row" key={dog.id}>
         <div className="stats-dog-name" role="cell">
           <Link href={'/dogs/' + dog.id}>{dog.name} <span aria-hidden="true">↗</span></Link>
           <div className="stats-rank-track" aria-hidden="true"><div style={{ width: (Number(dog.views || 0) / peak * 100) + '%' }} /></div>
         </div>
-        <strong role="cell">{number(dog.views)}회</strong>
-        <strong role="cell">{number(dog.shares)}회</strong>
+        <strong role="cell" data-label="조회">{number(dog.views)}회</strong>
+        <strong role="cell" data-label="공유">{number(dog.shares)}회</strong>
+        <strong role="cell" data-label="문의">{number(dog.inquiries)}회</strong>
       </div>)}
       {filtered.length === 0 && <p className="stats-empty">등록된 강아지가 없습니다.</p>}
     </div>
@@ -166,7 +168,8 @@ function AnalyticsContent() {
           {[
             { title: '방문자 수', value: stats.visitors, description: '중복 방문을 제외한 추정 인원' },
             { title: '강아지 상세글 조회', value: stats.detailViews, description: '상세 페이지를 연 횟수' },
-            { title: '공유 버튼 클릭', value: stats.shares, description: '실제 공유 완료와는 다릅니다' }
+            { title: '공유 버튼 클릭', value: stats.shares, description: '실제 공유 완료와는 다릅니다' },
+            { title: '문의 버튼 클릭', value: stats.inquiries, description: '실제 통화 횟수와는 다릅니다' }
           ].map(item => <div className="stats-summary-card" key={item.title}>
             <p>{item.title}</p><strong>{number(item.value)}<small>{item.title === '방문자 수' ? '명' : '회'}</small></strong>
             <span>{item.description}</span>
@@ -177,6 +180,7 @@ function AnalyticsContent() {
         <section className="stats-help" aria-label="통계 숫자 안내">
           <h2>통계 숫자 안내</h2>
           <p><strong>공유 버튼 클릭 수</strong>는 공유 버튼을 누른 횟수입니다. 카카오톡 등으로 <strong>실제로 공유를 완료한 횟수가 아닙니다.</strong> 메인 화면에서 누른 공유 버튼도 전체 클릭 수에 포함되지만, 강아지별 통계에는 해당 강아지 소개글에서 누른 횟수만 표시됩니다.</p>
+          <p><strong>문의 버튼 클릭 수</strong>는 전화번호 선택창을 연 횟수입니다. 실제 전화 연결이나 입양 신청 건수는 아닙니다. 메인 화면에서 누른 문의도 전체에 포함되지만, 강아지별 통계에는 해당 강아지 소개글에서 누른 횟수만 표시됩니다.</p>
           <p><strong>방문자 수</strong>는 같은 브라우저의 중복 방문을 제외해 계산한 추정치입니다. 다른 기기나 브라우저로 접속하면 별도로 집계될 수 있습니다.</p>
           <p><strong>조회수</strong>는 같은 방문자가 같은 페이지를 1분 안에 반복해서 열면 중복 집계하지 않습니다.</p>
           <p>통계 설치 이후 기록만 표시하며, 관리자 페이지를 이용한 기록은 집계하지 않습니다. 방문자의 이름, 전화번호, IP 주소는 통계에 저장하지 않습니다.</p>

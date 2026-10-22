@@ -17,8 +17,9 @@ export async function POST(request) {
   }
   try {
     const { eventType, page, dogId, visitorId } = await readJson(request, 420);
-    if (!['page_view', 'share_click'].includes(eventType)
+    if (!['page_view', 'share_click', 'inquiry_click'].includes(eventType)
       || !['home', 'residents', 'dog'].includes(page)
+      || (eventType === 'inquiry_click' && page === 'residents')
       || typeof visitorId !== 'string'
       || !/^[a-f0-9-]{32,36}$/i.test(visitorId)
       || (page === 'dog' && !UUID.test(dogId || ''))

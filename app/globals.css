@@ -446,7 +446,7 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .stats-period:focus-visible, .stats-metric-option:focus-visible { outline:2px solid var(--brown); outline-offset:3px; }
 .stats-loading { padding:35px 12px; text-align:center; color:var(--muted); font-weight:700; }
 .stats-content { display:grid; gap:20px; }
-.stats-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.stats-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
 .stats-summary-card { display:flex; flex-direction:column; gap:8px; min-height:142px; background:var(--cream); border:1px solid #eadfc9; border-radius:13px; padding:19px 17px; }
 .stats-summary-card p { margin:0; font-size:13px; font-weight:850; color:var(--brown); }
 .stats-summary-card > strong { font-size:34px; font-weight:950; letter-spacing:-.06em; line-height:1.1; color:var(--brown); font-variant-numeric:tabular-nums; }
@@ -464,7 +464,7 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .stats-chart svg { display:block; width:100%; height:auto; max-height:270px; overflow:visible; }
 .stats-small-note { margin:11px 0 0; font-size:12px; line-height:1.6; color:var(--muted); }
 .stats-dog-table { display:grid; min-width:0; }
-.stats-dog-row { display:grid; grid-template-columns:minmax(0,1fr) 116px 116px; gap:10px; align-items:center; min-height:68px; border-bottom:1px solid var(--line); }
+.stats-dog-row { display:grid; grid-template-columns:minmax(0,1fr) 110px 100px 100px; gap:10px; align-items:center; min-height:68px; border-bottom:1px solid var(--line); }
 .stats-dog-row.heading { min-height:37px; font-weight:800; color:var(--muted); font-size:12px; }
 .stats-dog-row.heading span:not(:first-child) { text-align:right; }
 .stats-dog-row > strong { text-align:right; font-size:15px; font-variant-numeric:tabular-nums; color:var(--brown); }
@@ -486,7 +486,7 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
   .stats-page-heading h1 { font-size:27px; }
   .stats-periods { gap:6px; }
   .stats-period { padding:8px 10px; font-size:12px; }
-  .stats-summary { gap:7px; }
+  .stats-summary { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
   .stats-summary-card { min-height:115px; padding:13px 8px; border-radius:9px; gap:7px; }
   .stats-summary-card p { font-size:11px; line-height:1.35; word-break:keep-all; }
   .stats-summary-card > strong { font-size:clamp(21px,5vw,29px); }
@@ -495,9 +495,11 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
   .stats-panel { padding:17px 12px; }
   .stats-section-title h2 { font-size:18px; }
   .stats-metric-option { padding:7px 9px; font-size:11px; }
-  .stats-dog-row { grid-template-columns:minmax(0,1fr) 83px 77px; gap:6px; min-height:60px; }
-  .stats-dog-row.heading { font-size:10px; }
-  .stats-dog-row > strong { font-size:12px; }
+  .stats-dog-row:not(.heading) { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; min-height:85px; padding:7px 0 12px; }
+  .stats-dog-row.heading { display:none; }
+  .stats-dog-name { grid-column:1/-1; padding:5px 0 0; }
+  .stats-dog-row > strong { display:flex; flex-direction:column; gap:2px; text-align:left; font-size:12px; }
+  .stats-dog-row > strong::before { content:attr(data-label); color:var(--muted); font-size:10px; font-weight:650; }
   .stats-dog-name a { font-size:13px; }
   .stats-rank-track { margin-top:7px; }
   .stats-help { padding:17px 14px; }

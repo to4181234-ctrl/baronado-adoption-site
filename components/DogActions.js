@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { recordShareClick } from '../lib/siteAnalytics';
+import { recordShareClick, recordInquiryClick } from '../lib/siteAnalytics';
 
 function ActionIcon({ kind }) {
   if (kind === 'share') return <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 15V3m-5 5 5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" /></svg>;
@@ -44,12 +44,17 @@ export default function DogActions({ dog = null, allowInquiry = false, hidden = 
     window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
   };
 
+  const openInquiry = () => {
+    recordInquiryClick(dog ? 'dog' : 'home', dog?.id);
+    setContactOpen(true);
+  };
+
   return <>
     {!hidden && <div className="floating-action-bar" role="group" aria-label="페이지 바로가기">
       <button type="button" className="floating-action-btn" onClick={share} title="현재 페이지 공유" aria-label="현재 페이지 공유">
         <ActionIcon kind="share" /><span>공유</span>
       </button>
-      {canInquire && <button type="button" className="floating-action-btn inquiry" onClick={() => setContactOpen(true)} title="입양 문의 전화" aria-label="입양 문의 전화">
+      {canInquire && <button type="button" className="floating-action-btn inquiry" onClick={openInquiry} title="입양 문의 전화" aria-label="입양 문의 전화">
         <ActionIcon kind="phone" /><span>문의</span>
       </button>}
       <button type="button" className="floating-action-btn" onClick={scrollToTop} title="맨 위로 이동" aria-label="맨 위로 이동">
