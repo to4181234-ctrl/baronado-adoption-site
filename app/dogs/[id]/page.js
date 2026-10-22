@@ -8,6 +8,7 @@ import SiteHeader from '../../../components/SiteHeader';
 import DogLoading from '../../../components/DogLoading';
 import ExpandableText from '../../../components/ExpandableText';
 import DogActions from '../../../components/DogActions';
+import { recordVisit } from '../../../lib/siteAnalytics';
 import { formatDogDate, getAgeInfo, getDogProfile, getShelterUrl, PROFILE_FIELDS } from '../../../lib/dogProfile';
 
 function PawIcon() {
@@ -32,6 +33,10 @@ export default function DogDetailPage() {
       .catch(() => setError('게시글을 찾을 수 없어요.'))
       .finally(() => setLoading(false));
   }, [params?.id]);
+
+  useEffect(() => {
+    if (dog?.id) recordVisit('dog', dog.id);
+  }, [dog?.id]);
 
   const images = dog?.images ?? [];
   const hasImages = images.length > 0;

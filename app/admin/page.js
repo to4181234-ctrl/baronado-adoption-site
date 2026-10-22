@@ -56,6 +56,7 @@ function AdminContent() {
         <div className="admin-tabs">
           <Link className={`tab ${currentCategory === CATEGORY_ADOPTION ? 'active' : ''}`} href="/admin?category=adoption">가족을 찾아요</Link>
           <Link className={`tab ${currentCategory === CATEGORY_RESIDENT ? 'active' : ''}`} href="/admin?category=resident">상주견 소개</Link>
+          <Link className="tab" href="/admin/analytics">방문 통계</Link>
         </div>
 
         <div className="page-head admin-head">
