@@ -335,7 +335,7 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .list-container, .has-detail-actions { padding-bottom:calc(182px + env(safe-area-inset-bottom)); }
 .floating-action-bar {
   position:fixed; z-index:35;
-  right:max(12px, calc((100vw - 1000px)/2));
+  right:max(12px, calc(50vw - 500px));
   bottom:calc(16px + env(safe-area-inset-bottom));
   display:flex; flex-direction:column; gap:7px;
 }
