@@ -39,7 +39,7 @@ export default function DogActions({ dog = null, allowInquiry = false, hidden = 
 
   const scrollToTop = () => {
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: 0, behavior: reduceMotion ? 'instant' : 'smooth' });
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
   };
 
   return <>
