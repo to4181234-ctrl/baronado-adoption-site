@@ -85,7 +85,10 @@ function TrendChart({ data, period, today }) {
 
 function DogRanking({ dogs }) {
   const [category, setCategory] = useState('all');
-  const filtered = dogs.filter(dog => category === 'all' || dog.category === category);
+  const filtered = dogs.filter(dog =>
+    category === 'all'
+      || (category === 'adoption' ? dog.category === 'adoption' && !dog.adopted : dog.category === 'resident')
+  );
   const peak = Math.max(1, ...filtered.map(dog => Number(dog.views || 0)));
   return <section className="stats-panel">
     <div className="stats-section-title"><h2>강아지별 관심도</h2><span>상세글 조회 순서</span></div>
@@ -99,6 +102,7 @@ function DogRanking({ dogs }) {
         aria-pressed={category === option.value}
         onClick={() => setCategory(option.value)}>{option.label}</button>)}
     </div>
+    <p className="stats-small-note">{category === 'adoption' ? '입양 전 강아지만 표시합니다. 입양 완료 강아지는 ‘전체’에서 확인할 수 있습니다.' : category === 'all' ? '입양 완료 강아지를 포함한 모든 강아지의 기록입니다.' : '상주견의 조회·공유 기록입니다.'}</p>
     <div className="stats-dog-table" role="table" aria-label="강아지별 조회수와 공유 버튼 클릭 수">
       <div className="stats-dog-row heading" role="row">
         <span role="columnheader">강아지</span><span role="columnheader">상세글 조회</span><span role="columnheader">공유 클릭</span>
