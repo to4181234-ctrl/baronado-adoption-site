@@ -15,7 +15,7 @@ function PawIcon() {
 function DogCard({ dog }) {
   const firstImage = dog.images?.[0];
   return (
-    <article className="dog-card">
+    <Link className="dog-card dog-card-link" href={`/dogs/${dog.id}`} aria-label={`${dog.name} 상세 보기`}>
       <div className="dog-thumb">
         {firstImage ? <img src={firstImage} alt={`${dog.name} 사진`} /> : <PawIcon />}
         {dog.adopted && <div className="adopted-badge"><strong>입양 완료</strong>{dog.adopted_at && <small>{formatDogDate(dog.adopted_at)}</small>}</div>}
@@ -26,9 +26,9 @@ function DogCard({ dog }) {
         {dog.category === 'adoption' && dog.arrived_at && <p className="arrival-date">바로나도에 온 날 · {formatDogDate(dog.arrived_at)}</p>}
         {dog.category === 'adoption' && dog.adopted && dog.adopted_at && <p className="arrival-date">입양 간 날짜 · {formatDogDate(dog.adopted_at)}</p>}
         <p className="desc">{dog.category === 'resident' ? dog.description : profileSummary(dog)}</p>
-        <Link className="btn" href={`/dogs/${dog.id}`}>자세히 보기</Link>
+        <span className="btn">자세히 보기</span>
       </div>
-    </article>
+    </Link>
   );
 }
 
@@ -82,6 +82,12 @@ export default function DogListPage({ title, category }) {
               <option value="old">오래된 순</option>
             </select>
           </div>
+        )}
+
+        {!loading && !error && dogs.length > 0 && (
+          <p className="result-count" aria-live="polite">
+            {category === 'adoption' ? `${statusFilter === 'available' ? '입양 전' : statusFilter === 'adopted' ? '입양 완료' : '전체'} ${visibleDogs.length}마리` : `전체 ${visibleDogs.length}마리`}
+          </p>
         )}
 
         {!isSupabaseConfigured && (

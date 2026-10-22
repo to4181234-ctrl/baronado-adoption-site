@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { CATEGORY_RESIDENT, fetchDog } from '../../../lib/dogs';
 import SiteHeader from '../../../components/SiteHeader';
 import DogLoading from '../../../components/DogLoading';
+import ExpandableText from '../../../components/ExpandableText';
 import { formatDogDate, getAgeInfo, getDogProfile, getShelterUrl, PROFILE_FIELDS } from '../../../lib/dogProfile';
 
 function PawIcon() {
@@ -21,6 +22,7 @@ export default function DogDetailPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const startX = useRef(null);
   const modalStartX = useRef(null);
+  const didSwipe = useRef(false);
 
   useEffect(() => {
     if (!params?.id) return;
@@ -40,18 +42,20 @@ export default function DogDetailPage() {
   };
 
   const openImage = () => {
+    if (didSwipe.current) { didSwipe.current = false; return; }
     if (!hasImages) return;
     setModalOpen(true);
   };
 
   const onPointerDown = (event) => {
     startX.current = event.clientX;
+    didSwipe.current = false;
   };
 
   const onPointerUp = (event) => {
     if (startX.current === null) return;
     const diff = event.clientX - startX.current;
-    if (Math.abs(diff) > 35) move(diff < 0 ? 1 : -1);
+    if (Math.abs(diff) > 35) { didSwipe.current = true; move(diff < 0 ? 1 : -1); }
     startX.current = null;
   };
 
@@ -90,10 +94,12 @@ export default function DogDetailPage() {
                 aria-label="사진 크게 보기"
                 disabled={!hasImages}
               >
-                {hasImages ? <img key={images[index]} className="gallery-photo" src={images[index]} alt={`${dog.name} 사진 ${index + 1}`} /> : <PawIcon />}
+                {hasImages ? <img src={images[index]} alt={`${dog.name} 사진 ${index + 1}`} /> : <PawIcon />}
                 {dog.adopted && <span className="adopted-badge detail"><strong>입양 완료</strong>{dog.adopted_at && <small>{formatDogDate(dog.adopted_at)}</small>}</span>}
                 {hasImages && <span className="zoom-hint">사진 크게 보기</span>}
               </button>
+
+              {images.length > 1 && <span className="photo-count" aria-live="polite">{index + 1} / {images.length}</span>}
 
               {images.length > 1 && (
                 <>
@@ -110,17 +116,17 @@ export default function DogDetailPage() {
               {dog.category !== CATEGORY_RESIDENT && dog.arrived_at && <p className="arrival-date">바로나도에 온 날 · {formatDogDate(dog.arrived_at)}</p>}
               {dog.category !== CATEGORY_RESIDENT && dog.adopted && dog.adopted_at && <p className="arrival-date">입양 간 날짜 · {formatDogDate(dog.adopted_at)}</p>}
               {dog.category === CATEGORY_RESIDENT
-                ? <p className="desc">{dog.description || '아직 소개글이 등록되지 않았어요.'}</p>
+                ? <ExpandableText key={dog.id} text={dog.description || '아직 소개글이 등록되지 않았어요.'} className="desc" />
                 : <div className="profile-detail">
-                    {getDogProfile(dog).introduction && <p className="desc">{getDogProfile(dog).introduction}</p>}
+                    {getDogProfile(dog).introduction && <ExpandableText key={`${dog.id}-intro`} text={getDogProfile(dog).introduction} className="desc" />}
                     {PROFILE_FIELDS.filter(field => getDogProfile(dog)[field.key]).map(field =>
-                      <section className="profile-section" key={field.key}><h2>{field.label}</h2><p>{getDogProfile(dog)[field.key]}</p></section>
+                      <section className="profile-section" key={`${dog.id}-${field.key}`}><h2>{field.label}</h2><ExpandableText text={getDogProfile(dog)[field.key]} /></section>
                     )}
                     {Array.isArray(getDogProfile(dog).extra_questions) && getDogProfile(dog).extra_questions.filter(entry => entry.question && entry.answer).map((entry, questionIndex) =>
-                      <section className="profile-section" key={`question-${questionIndex}`}><h2>{entry.question}</h2><p>{entry.answer}</p></section>
+                      <section className="profile-section" key={`${dog.id}-question-${questionIndex}`}><h2>{entry.question}</h2><ExpandableText text={entry.answer} /></section>
                     )}
                     {getDogProfile(dog).shelter_name && <section className="profile-section"><h2>어느 보호소에서 왔나요?</h2><p>{getDogProfile(dog).shelter_name}</p>{getShelterUrl(getDogProfile(dog).shelter_url) && <a className="shelter-link" href={getShelterUrl(getDogProfile(dog).shelter_url)} target="_blank" rel="noopener noreferrer">보호소 홈페이지 ↗</a>}</section>}
-                    {!PROFILE_FIELDS.some(field => getDogProfile(dog)[field.key]) && <p className="desc">{dog.description || '아직 소개글이 등록되지 않았어요.'}</p>}
+                    {!getDogProfile(dog).introduction && !PROFILE_FIELDS.some(field => getDogProfile(dog)[field.key]) && <ExpandableText key={`${dog.id}-fallback`} text={dog.description || '아직 소개글이 등록되지 않았어요.'} className="desc" />}
                   </div>}
             </div>
           </article>
@@ -134,13 +140,13 @@ export default function DogDetailPage() {
             <button type="button" className="modal-nav modal-prev" aria-label="이전 사진" onClick={(event) => { event.stopPropagation(); move(-1); }}>‹</button>
           )}
           <img
-            key={images[index]}
             src={images[index]}
             alt={`${dog.name} 크게 보기 ${index + 1}`}
             onClick={(event) => event.stopPropagation()}
             onPointerDown={onModalPointerDown}
             onPointerUp={onModalPointerUp}
           />
+          {images.length > 1 && <span className="photo-count modal-count" aria-live="polite">{index + 1} / {images.length}</span>}
           {images.length > 1 && (
             <button type="button" className="modal-nav modal-next" aria-label="다음 사진" onClick={(event) => { event.stopPropagation(); move(1); }}>›</button>
           )}
