@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { recordShareClick } from '../lib/siteAnalytics';
 
 function ActionIcon({ kind }) {
   if (kind === 'share') return <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 15V3m-5 5 5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" /></svg>;
@@ -14,6 +15,7 @@ export default function DogActions({ dog = null, allowInquiry = false, hidden = 
   const canInquire = dog ? dog.category === 'adoption' && !dog.adopted : allowInquiry;
 
   const share = async () => {
+    recordShareClick(dog ? 'dog' : allowInquiry ? 'home' : 'residents', dog?.id);
     const data = {
       title: dog ? `${dog.name} · 바로나도` : '바로나도 · 가족을 찾아요',
       text: dog ? `${dog.name}의 소개를 함께 봐주세요.` : '바로나도에서 새로운 가족을 기다리는 친구들을 만나보세요.',
