@@ -141,6 +141,11 @@ function AnalyticsContent() {
   return <main className="site-shell">
     <SiteHeader />
     <section className="container stats-container">
+      <div className="admin-tabs">
+        <Link className="tab" href="/admin?category=adoption">가족을 찾아요</Link>
+        <Link className="tab" href="/admin?category=resident">상주견 소개</Link>
+        <Link className="tab active" href="/admin/analytics" aria-current="page">방문 통계</Link>
+      </div>
       <Link href="/admin" className="back-link">게시글 관리로 돌아가기</Link>
       <div className="stats-page-heading">
         <div><h1>방문 통계</h1><p>바로나도 홈페이지 방문과 강아지별 관심도를 확인합니다.</p></div>
