@@ -218,6 +218,16 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .vaccination-group { display:grid; gap:10px; border-top:1px solid var(--line); padding-top:14px; }
 .vaccination-group > strong { color:var(--brown); font-size:14px; }
 .vaccination-all { font-weight:800; color:var(--brown); }
+.vaccination-entry { display:grid; gap:4px; }
+.vaccination-date { display:grid; gap:6px; max-width:260px; margin:0 0 4px 25px; min-width:0; }
+.vaccination-date span { font-size:12px; color:var(--muted); font-weight:700; }
+.vaccination-date input { min-width:0; }
+.admin-draft-status { margin:0 0 16px; color:var(--muted); font-size:12px; line-height:1.5; }
+.admin-draft-notice { display:grid; gap:10px; margin:0 0 18px; padding:16px; background:var(--cream); border:1px solid var(--line); color:var(--brown); }
+.admin-draft-notice strong { font-size:15px; }
+.admin-draft-notice p { margin:0; font-size:13px; line-height:1.55; }
+.admin-draft-notice > div { display:flex; flex-wrap:wrap; gap:8px; }
+.admin-draft-notice .btn { margin:0; min-height:38px; padding:0 12px; font-size:13px; }
 .vaccination-legacy { background:var(--cream); padding:12px; white-space:pre-wrap; }
 .video-picker { min-width:0; }
 .video-picker > .label { margin:0 0 10px; }
@@ -225,6 +235,10 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .video-tile { min-width:0; display:grid; gap:8px; }
 .video-tile video { display:block; width:100%; aspect-ratio:4/3; object-fit:contain; background:#211b18; }
 .video-tile .btn { margin:0; }
+.video-tile .small-note { margin:0; }
+.video-poster-preview { display:grid; gap:6px; }
+.video-poster-preview img { display:block; width:100%; aspect-ratio:1; object-fit:contain; background:#211b18; }
+.video-poster-preview button { justify-self:start; border:0; padding:5px 0; background:transparent; color:var(--brown); font-size:12px; text-decoration:underline; }
 .video-add { min-height:150px; display:flex; justify-content:center; align-items:center; border:1px dashed #cbbb91; background:var(--cream); color:var(--brown); font-weight:800; cursor:pointer; text-align:center; padding:12px; }
 .video-picker .small-note { margin:10px 0 0; }
 .profile-field { display:grid; gap:5px; }

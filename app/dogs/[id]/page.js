@@ -10,7 +10,7 @@ import ExpandableText from '../../../components/ExpandableText';
 import DogActions from '../../../components/DogActions';
 import { recordVisit } from '../../../lib/siteAnalytics';
 import { formatDogDate, getAgeInfo, getDogBirthDate, getDogProfile, getShelterUrl, isDogBirthday, PROFILE_FIELDS } from '../../../lib/dogProfile';
-import { dogVideoUrls, orderedDogMedia } from '../../../lib/dogVideo';
+import { dogVideoMedia, orderedDogMedia } from '../../../lib/dogVideo';
 import VaccinationDetails from '../../../components/VaccinationDetails';
 
 function PawIcon() {
@@ -40,7 +40,7 @@ export default function DogDetailPage() {
     if (dog?.id) recordVisit('dog', dog.id);
   }, [dog?.id]);
 
-  const media = dog ? orderedDogMedia(dog.images || [], dogVideoUrls(dog.profile, process.env.NEXT_PUBLIC_SUPABASE_URL)) : [];
+  const media = dog ? orderedDogMedia(dog.images || [], dogVideoMedia(dog.profile, process.env.NEXT_PUBLIC_SUPABASE_URL)) : [];
   const current = media[index];
   const hasMedia = media.length > 0;
   const backHref = dog?.category === CATEGORY_RESIDENT ? '/residents' : '/';
@@ -97,7 +97,7 @@ export default function DogDetailPage() {
               title={current?.type === 'photo' ? '사진 크게 보기' : undefined}
             >
               {current?.type === 'video'
-                ? <div className="gallery-main gallery-video-frame"><video key={current.url} src={current.url} controls preload="none" playsInline aria-label={`${dog.name} 동영상 ${index + 1 - (dog.images || []).length}`} /></div>
+                ? <div className="gallery-main gallery-video-frame"><video key={current.url} src={current.url} poster={current.poster || undefined} controls preload="none" playsInline aria-label={`${dog.name} 동영상 ${index + 1 - (dog.images || []).length}`} /></div>
                 : <button type="button" className="gallery-main" onClick={openImage} aria-label="사진 크게 보기" disabled={!hasMedia}>
                     {current ? <img src={current.url} alt={`${dog.name} 사진 ${index + 1}`} /> : <PawIcon />}
                     {current && <span className="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.8" cy="10.8" r="6.7" /><path d="m16 16 4.5 4.5M8 10.8h5.6m-2.8-2.8v5.6" /></svg></span>}
@@ -150,7 +150,7 @@ export default function DogDetailPage() {
             <button type="button" className="modal-nav modal-prev" aria-label="이전 미디어" onClick={(event) => { event.stopPropagation(); move(-1); }}>‹</button>
           )}
           {current?.type === 'video'
-            ? <video key={current.url} src={current.url} controls preload="none" playsInline onClick={event => event.stopPropagation()} aria-label={`${dog.name} 동영상`} />
+            ? <video key={current.url} src={current.url} poster={current.poster || undefined} controls preload="none" playsInline onClick={event => event.stopPropagation()} aria-label={`${dog.name} 동영상`} />
             : <img src={current?.url} alt={`${dog.name} 크게 보기 ${index + 1}`} onClick={(event) => event.stopPropagation()} onPointerDown={onModalPointerDown} onPointerUp={onModalPointerUp} />}
           {media.length > 1 && <span className="photo-count modal-count" aria-live="polite">{current?.type === 'video' ? '동영상' : '사진'} {index + 1} / {media.length}</span>}
           {media.length > 1 && (

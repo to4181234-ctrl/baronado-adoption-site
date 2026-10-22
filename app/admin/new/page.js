@@ -15,6 +15,8 @@ import ProfileQuestionEditor from '../../../components/ProfileQuestionEditor';
 import AdminPreview from '../../../components/AdminPreview';
 import useAdminDraftProtection from '../../../components/useAdminDraftProtection';
 import { draftSnapshot } from '../../../lib/adminDraft';
+import useAdminAutosave from '../../../components/useAdminAutosave';
+import AdminAutosaveNotice from '../../../components/AdminAutosaveNotice';
 
 function NewDogForm() {
   const router = useRouter();
@@ -32,7 +34,10 @@ function NewDogForm() {
     setForm((prev) => ({ ...prev, category: initialCategory }));
   }, [initialCategory]);
 
-  useAdminDraftProtection(draftSnapshot(form, photoItems, videoItems) !== baseline);
+  const dirty = draftSnapshot(form, photoItems, videoItems) !== baseline;
+  const autosave = useAdminAutosave({ scope: 'new', form, photos: photoItems, videos: videoItems, baseline, dirty,
+    setForm, setPhotos: setPhotoItems, setVideos: setVideoItems });
+  useAdminDraftProtection(dirty && autosave.ready);
 
   const onChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -45,6 +50,7 @@ function NewDogForm() {
     setSaving(true);
     try {
       const saved = await createDog(form, photoItems, videoItems);
+      autosave.clear();
       setBaseline(draftSnapshot(form, photoItems, videoItems));
       router.replace(`/admin?category=${saved.category}`);
     } catch (err) {
@@ -62,7 +68,8 @@ function NewDogForm() {
           <h1>{CATEGORY_LABELS[form.category]} 등록</h1>
         </div>
 
-        <form className="form" onSubmit={onSubmit}>
+        <AdminAutosaveNotice autosave={autosave} />
+        {autosave.ready && <form className="form" onSubmit={onSubmit}>
           <DogImagePicker items={photoItems} setItems={setPhotoItems} />
           <DogVideoPicker items={videoItems} setItems={setVideoItems} />
 
@@ -116,7 +123,7 @@ function NewDogForm() {
             <button className="btn secondary" type="button" onClick={() => setPreview(true)}>저장 전 미리보기</button>
             <button className="btn full" disabled={saving}>{saving ? '저장 중...' : '등록하기'}</button>
           </div>
-        </form>
+        </form>}
       </section>
       {preview && <AdminPreview form={form} items={photoItems} videoItems={videoItems} onClose={() => setPreview(false)} />}
     </main>

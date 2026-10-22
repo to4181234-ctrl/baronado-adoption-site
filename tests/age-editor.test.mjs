@@ -29,12 +29,13 @@ test('estimated age starts at arrival and static age does not change', () => {
   assert.equal(elapsedCalendarMonths('2026-01-31', '2026-02-28'), 1);
 });
 
-test('resident birthday works with the existing date text; old age stays intact', () => {
+test('legacy resident birth dates display an age and keep the birth date separately', () => {
   const dog = { category: 'resident', age: '2020.10.18', profile: {} };
   assert.equal(isDogBirthday(dog, today('2026-10-18')), true);
   assert.equal(isDogBirthday(dog, today('2026-10-19')), false);
   assert.equal(getDogBirthDate(dog), '2020-10-18');
-  assert.equal(getAgeInfo(dog, today('2026-10-18')).listDisplay, '2020.10.18');
+  assert.equal(getAgeInfo(dog, today('2026-10-18')).listDisplay, '6살');
+  assert.equal(getAgeInfo(dog, today('2026-11-18')).detailDisplay, '6살 1개월');
   assert.equal(getAgeEditorValues(dog).age_kind, 'exact');
 });
 

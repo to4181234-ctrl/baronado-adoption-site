@@ -2,11 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { dogPayload, validateVideoRequest } from '../lib/server/adminData.js';
 import { getDogProfile } from '../lib/dogProfile.js';
-import { publicDogVideo, orderedDogMedia } from '../lib/dogVideo.js';
+import { publicDogVideo, publicDogPoster, dogVideoMedia, orderedDogMedia } from '../lib/dogVideo.js';
 import { BASIC_VACCINATION_KEYS, vaccinationLabels } from '../lib/vaccinations.js';
+import { videoFrameBounds } from '../lib/videoPoster.js';
 
 const base = 'https://example.supabase.co';
 const video = `${base}/storage/v1/object/public/dog-images/dogs/videos/123e4567-e89b-42d3-a456-426614174000.mp4`;
+const poster = `${base}/storage/v1/object/public/dog-images/dogs/123e4567-e89b-42d3-a456-426614174001.webp`;
 
 test('only confirmed vaccines are exposed as labels and legacy prose is retained separately', () => {
   const profile = { vaccinations: '기존 5차 접종 기록', vaccinations_checked: ['rabies', 'parvovirus'] };
@@ -41,7 +43,32 @@ test('video upload validates type, size and public storage URL', () => {
   try {
     const saved = dogPayload({ category: 'resident', images: [], profile: { videos: [video], vaccinations_checked: [] } });
     assert.deepEqual(saved.profile.videos, [video]);
+    const withPoster = dogPayload({ category: 'resident', images: [], profile: { videos: [video], video_posters: { [video]: poster } } });
+    assert.equal(withPoster.profile.video_posters[video], poster);
+    assert.deepEqual(dogVideoMedia(withPoster.profile, base), [{ url: video, poster }]);
+    assert.equal(publicDogPoster(`${poster}?download=1`, base), '');
+    assert.throws(() => dogPayload({ category: 'resident', images: [], profile: { videos: [], video_posters: { [video]: poster } } }), /대표 화면/);
     assert.throws(() => dogPayload({ category: 'resident', images: [], profile: { videos: ['https://other.example/clip.mp4'] } }), /동영상/);
+  } finally {
+    if (old === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    else process.env.NEXT_PUBLIC_SUPABASE_URL = old;
+  }
+});
+
+test('poster capture keeps portrait and landscape video frames within a small square', () => {
+  assert.deepEqual(videoFrameBounds(1920, 1080), { x: 0, y: 140, width: 640, height: 360 });
+  assert.deepEqual(videoFrameBounds(1080, 1920), { x: 140, y: 0, width: 360, height: 640 });
+});
+
+test('vaccine dates only accept selected items and valid past calendar dates', () => {
+  const old = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  process.env.NEXT_PUBLIC_SUPABASE_URL = base;
+  try {
+    const form = { category: 'adoption', age: '2살', images: [], profile: { vaccinations_checked: ['rabies'], vaccination_dates: { rabies: '2026-01-12' } } };
+    assert.equal(dogPayload(form).profile.vaccination_dates.rabies, '2026-01-12');
+    assert.throws(() => dogPayload({ ...form, profile: { ...form.profile, vaccination_dates: { parvovirus: '2026-01-12' } } }), /체크한/);
+    assert.throws(() => dogPayload({ ...form, profile: { ...form.profile, vaccination_dates: { rabies: '2026-02-30' } } }), /존재하지 않는/);
+    assert.throws(() => dogPayload({ ...form, profile: { ...form.profile, vaccination_dates: { rabies: '2099-01-01' } } }), /오늘 이전/);
   } finally {
     if (old === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL;
     else process.env.NEXT_PUBLIC_SUPABASE_URL = old;

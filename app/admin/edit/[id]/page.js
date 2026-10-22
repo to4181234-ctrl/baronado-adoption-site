@@ -16,6 +16,8 @@ import ProfileQuestionEditor from '../../../../components/ProfileQuestionEditor'
 import AdminPreview from '../../../../components/AdminPreview';
 import useAdminDraftProtection from '../../../../components/useAdminDraftProtection';
 import { draftSnapshot } from '../../../../lib/adminDraft';
+import useAdminAutosave from '../../../../components/useAdminAutosave';
+import AdminAutosaveNotice from '../../../../components/AdminAutosaveNotice';
 
 function EditDogForm() {
   const router = useRouter();
@@ -35,7 +37,7 @@ function EditDogForm() {
       .then((dog) => {
         const nextForm = { ...dog, profile: dog.category === CATEGORY_ADOPTION ? { ...getDogProfile(dog), ...dog.profile } : (dog.profile || {}) };
         const nextPhotos = (dog.images || []).map(url => ({ id: url, url }));
-        const nextVideos = (nextForm.profile.videos || []).map(url => ({ id: url, url }));
+        const nextVideos = (nextForm.profile.videos || []).map(url => ({ id: url, url, posterUrl: nextForm.profile.video_posters?.[url] || '' }));
         setForm(nextForm);
         setPhotoItems(nextPhotos);
         setVideoItems(nextVideos);
@@ -45,7 +47,9 @@ function EditDogForm() {
   }, [params?.id]);
 
   const dirty = Boolean(form && baseline && draftSnapshot(form, photoItems, videoItems) !== baseline);
-  useAdminDraftProtection(dirty && !done);
+  const autosave = useAdminAutosave({ scope: `edit_${params?.id || ''}`, form, photos: photoItems, videos: videoItems,
+    baseline, dirty, setForm, setPhotos: setPhotoItems, setVideos: setVideoItems });
+  useAdminDraftProtection(dirty && !done && autosave.ready);
 
   const onChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -58,8 +62,9 @@ function EditDogForm() {
     setSaving(true);
     try {
       const saved = await updateDog(params.id, form, photoItems, videoItems);
+      autosave.clear();
       const savedPhotos = (saved.images || []).map(url => ({ id: url, url }));
-      const savedVideos = (saved.profile?.videos || []).map(url => ({ id: url, url }));
+      const savedVideos = (saved.profile?.videos || []).map(url => ({ id: url, url, posterUrl: saved.profile?.video_posters?.[url] || '' }));
       setForm(saved);
       setPhotoItems(savedPhotos);
       setVideoItems(savedVideos);
@@ -89,7 +94,8 @@ function EditDogForm() {
               <h1>{CATEGORY_LABELS[form.category]} 수정</h1>
             </div>
 
-            <form className="form" onSubmit={onSubmit}>
+            <AdminAutosaveNotice autosave={autosave} />
+            {autosave.ready && <form className="form" onSubmit={onSubmit}>
               <DogImagePicker items={photoItems} setItems={setPhotoItems} />
               <DogVideoPicker items={videoItems} setItems={setVideoItems} />
 
@@ -140,7 +146,7 @@ function EditDogForm() {
                 <button className="btn secondary" type="button" onClick={() => setPreview(true)}>저장 전 미리보기</button>
                 <button className="btn full" disabled={saving}>{saving ? '수정 중...' : '수정하기'}</button>
               </div>
-            </form>
+            </form>}
           </>
         )}
       </section>

@@ -17,9 +17,15 @@ export default function AdminPreview({ form, items, videoItems = [], onClose }) 
     return () => items.forEach((item, index) => { if (item.file) URL.revokeObjectURL(urls[index]); });
   }, [items]);
   useEffect(() => {
-    const urls = videoItems.map(item => item.file ? URL.createObjectURL(item.file) : item.url);
-    setVideos(urls);
-    return () => videoItems.forEach((item, index) => { if (item.file) URL.revokeObjectURL(urls[index]); });
+    const previews = videoItems.map(item => ({
+      url: item.file ? URL.createObjectURL(item.file) : item.url,
+      poster: item.posterFile ? URL.createObjectURL(item.posterFile) : item.posterUrl || ''
+    }));
+    setVideos(previews);
+    return () => videoItems.forEach((item, index) => {
+      if (item.file) URL.revokeObjectURL(previews[index].url);
+      if (item.posterFile) URL.revokeObjectURL(previews[index].poster);
+    });
   }, [videoItems]);
   useEffect(() => {
     const onKey = event => { if (event.key === 'Escape') onClose(); };
@@ -44,7 +50,7 @@ export default function AdminPreview({ form, items, videoItems = [], onClose }) 
             touchStartX.current = null;
           }}>
             {current?.type === 'photo' ? <img src={current.url} alt={`${form.name || '강아지'} 사진`} />
-              : current?.type === 'video' ? <video key={current.url} src={current.url} controls preload="none" playsInline aria-label={`${form.name || '강아지'} 동영상`} />
+              : current?.type === 'video' ? <video key={current.url} src={current.url} poster={current.poster || undefined} controls preload="none" playsInline aria-label={`${form.name || '강아지'} 동영상`} />
                 : <span>등록된 사진과 동영상이 없어요</span>}
             {form.adopted && <span className="adopted-badge detail">입양 완료</span>}
             {media.length > 1 && <>
