@@ -110,7 +110,7 @@ function SquareCrop({ file, url, onApply, onCancel }) {
           onError={() => setError('이 사진을 열 수 없습니다. 원본 파일을 다시 업로드해주세요.')}
           style={dimensions.width ? { width: dimensions.width * scale, height: dimensions.height * scale, left: `calc(50% + ${position.x}px)`, top: `calc(50% + ${position.y}px)` } : { opacity: 0 }} />}
       </div>
-      <label className="crop-zoom"><span>확대</span><input type="range" min="1" max="3" step="0.01" value={zoom} aria-label="사진 확대" onChange={event => {
+      <label className="crop-zoom"><span>확대</span><input type="range" min="1" max="3" step="0.01" value={zoom} aria-label="사진 확대" onInput={event => {
         const next = Number(event.target.value);
         setZoom(next);
         setPosition(current => clampPosition(current, dimensions, frameSize, next));

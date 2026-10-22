@@ -220,11 +220,12 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .crop-dialog .small-note { margin:0 0 14px; }
 .crop-frame { width:min(100%,320px); aspect-ratio:1; position:relative; overflow:hidden; margin:auto; background:var(--cream); touch-action:none; cursor:grab; }
 .crop-frame:active { cursor:grabbing; }
-.crop-frame img { position:absolute; transform:translate(-50%,-50%); max-width:none; pointer-events:none; user-select:none; }
+.crop-frame img { position:absolute; transform:translate(-50%,-50%); max-width:none; max-height:none; object-fit:fill; pointer-events:none; user-select:none; }
 .crop-frame .crop-source-preview { inset:0; width:100%; height:100%; transform:none; object-fit:contain; opacity:.7; }
 .crop-loading { position:absolute; left:50%; bottom:12px; transform:translateX(-50%); z-index:2; padding:6px 10px; border-radius:4px; background:rgba(255,255,255,.9); color:var(--brown); font-size:12px; font-weight:800; white-space:nowrap; }
 .crop-zoom { display:flex; align-items:center; gap:12px; margin:18px 0 10px; color:var(--brown); font-size:13px; font-weight:800; }
-.crop-zoom input { flex:1; min-width:0; accent-color:var(--brown); }
+.crop-zoom input { flex:1; min-width:0; height:44px; margin:0; accent-color:var(--brown); touch-action:none; }
+.crop-zoom input::-webkit-slider-thumb { width:28px; height:28px; }
 .crop-zoom span:last-child { min-width:38px; text-align:right; }
 .crop-actions { display:flex; gap:8px; justify-content:flex-end; }
 .crop-actions .btn { margin:0; min-height:42px; font-size:14px; }
@@ -289,5 +290,38 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
   .listing-controls { column-gap:8px; }
   .listing-controls .sort-tab { padding:8px 11px; font-size:12px; }
   .filter-divider { display:none; }
-  .form-container .form .profile-editor { padding:15px; }
+  .admin-container, .form-container { padding-left:16px; padding-right:16px; }
+  .admin-container .admin-head { gap:10px; min-width:0; }
+  .admin-container .admin-head h1 { min-width:0; font-size:clamp(21px,6vw,24px); line-height:1.3; overflow-wrap:break-word; }
+  .admin-container .admin-head .btn { flex:none; margin:0; min-height:40px; padding:0 12px; font-size:13px; white-space:nowrap; }
+  .admin-container .admin-card { grid-template-columns:90px minmax(0,1fr); gap:12px; padding:12px; min-height:0; }
+  .admin-container .admin-card .dog-thumb { min-height:90px; align-self:start; }
+  .admin-container .admin-card .dog-info { min-width:0; width:100%; }
+  .admin-container .admin-card .dog-name { font-size:20px; line-height:1.25; overflow-wrap:anywhere; }
+  .admin-container .admin-card .meta { font-size:12px; line-height:1.5; overflow-wrap:anywhere; }
+  .admin-container .admin-card .desc { font-size:12px; overflow-wrap:anywhere; }
+  .admin-container .admin-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; width:100%; }
+  .admin-container .admin-actions .btn { min-width:0; width:100%; min-height:38px; margin:0; padding:5px 3px; font-size:12px; line-height:1.2; text-align:center; white-space:normal; word-break:keep-all; }
+  .admin-container .admin-actions .btn:last-child { grid-column:1 / -1; }
+  .form-container h1 { font-size:clamp(23px,6vw,28px); line-height:1.3; overflow-wrap:break-word; }
+  .form-container .form { gap:18px; }
+  .form-container .form > *, .form-container .form .profile-editor > *, .form-container .form .extra-question > * { min-width:0; max-width:100%; }
+  .form-container .form .field { min-width:0; max-width:100%; font-size:16px; }
+  .form-container .form .label { font-size:13px; }
+  .form-container .form .radio-group { gap:10px 14px; font-size:14px; }
+  .form-container .form > .radio-group .label { min-width:0; margin-right:4px; }
+  .form-container .form .check-row { align-items:flex-start; min-height:0; font-size:14px; line-height:1.5; overflow-wrap:anywhere; word-break:keep-all; }
+  .form-container .form .check-row input { margin-top:2px; }
+  .form-container .form .profile-editor { grid-template-columns:minmax(0,1fr); gap:16px; padding:15px; }
+  .form-container .form .profile-editor legend { font-size:15px; line-height:1.4; }
+  .form-container .form .extra-question { grid-template-columns:minmax(0,1fr); }
+  .form-container .form .btn { font-size:14px; line-height:1.3; text-align:center; white-space:normal; word-break:keep-all; }
+  .form-container .form .small-note { overflow-wrap:anywhere; }
+  .form-container .photo-empty { font-size:12px; line-height:1.35; }
+  .crop-dialog { width:min(410px,100%); }
+  .crop-dialog h2 { font-size:20px; }
+  .crop-dialog .small-note { font-size:12px; word-break:keep-all; }
+  .crop-zoom { gap:8px; }
+  .crop-zoom span:last-child { min-width:42px; }
+  .crop-actions .btn { min-width:0; padding:8px; font-size:14px; line-height:1.3; word-break:keep-all; }
 }
