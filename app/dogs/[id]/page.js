@@ -97,7 +97,7 @@ export default function DogDetailPage() {
               >
                 {hasImages ? <img src={images[index]} alt={`${dog.name} 사진 ${index + 1}`} /> : <PawIcon />}
                 {dog.adopted && <span className="adopted-badge detail"><strong>입양 완료</strong>{dog.adopted_at && <small>{formatDogDate(dog.adopted_at)}</small>}</span>}
-                {hasImages && <span className="zoom-hint">사진 크게 보기</span>}
+                {hasImages && <span className="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.8" cy="10.8" r="6.7" /><path d="m16 16 4.5 4.5M8 10.8h5.6m-2.8-2.8v5.6" /></svg></span>}
               </button>
 
               {images.length > 1 && <span className="photo-count" aria-live="polite">{index + 1} / {images.length}</span>}
