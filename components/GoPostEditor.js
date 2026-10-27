@@ -1,0 +1,12 @@
+'use client';
+import { useEffect,useState } from 'react';
+import { fetchDogs } from '../lib/dogs.js';
+import GoRatingsEditor from './GoRatingsEditor.js';
+import GoLoading from './GoLoading.js';
+import { EMPTY_RATINGS } from '../lib/goRatings.js';
+export default function GoPostEditor({card,onClose,onSaved}){
+ const [dogs,setDogs]=useState([]),[title,setTitle]=useState(card.title),[description,setDescription]=useState(card.description),[dogId,setDogId]=useState(card.dogId),[ratings,setRatings]=useState(card.ratings||EMPTY_RATINGS),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState('');
+ useEffect(()=>{fetchDogs('adoption').then(setDogs).catch(()=>setError('멍멍이 목록을 불러오지 못했어요.')).finally(()=>setLoading(false));},[]);
+ async function save(event){event.preventDefault();if(busy)return;setBusy(true);setError('');try{const r=await fetch(`/api/go/cards/${card.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,description,dogId,ratings})});const data=await r.json();if(!r.ok)throw new Error(data.error);onSaved(data.card);}catch(e){setError(e.message||'수정하지 못했어요.');}finally{setBusy(false);}}
+ return <div className="go-overlay" role="dialog" aria-modal="true" aria-label="내 게시물 수정"><div className="go-dialog"><button type="button" className="go-close" disabled={busy} onClick={onClose} aria-label="닫기">×</button><h2>게시물 수정</h2><img className="go-edit-fixed-photo" src={card.imageUrl} alt="수정할 수 없는 원본 사진"/><p className="go-note">사진·촬영 날짜·작성자는 원래 기록을 유지합니다. 제목·설명·멍멍이를 바꾸면 다시 공개 승인 대기로 전환돼요.</p>{loading?<GoLoading compact/>:<form onSubmit={save}><label className="go-description">멍멍이 선택<select value={dogId} onChange={e=>setDogId(e.target.value)}>{!dogs.some(d=>d.id===dogId)&&<option value={dogId}>{card.dogName}</option>}{dogs.map(dog=><option key={dog.id} value={dog.id}>{dog.name}{dog.adopted?' · 입양 완료':''}</option>)}</select></label><label className="go-description">게시물 제목<input required maxLength={80} value={title} onChange={e=>setTitle(e.target.value)}/></label><label className="go-description">설명 <span>{description.length}/200</span><textarea required rows={4} maxLength={200} value={description} onChange={e=>setDescription(e.target.value)}/></label><GoRatingsEditor value={ratings} onChange={setRatings} disabled={busy}/>{error&&<p className="go-error" role="alert">{error}</p>}<button className="go-primary go-rating-save" disabled={busy||!title.trim()||!description.trim()}>{busy?'저장 중…':'수정 저장'}</button></form>}</div></div>;
+}

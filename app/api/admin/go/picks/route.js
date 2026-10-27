@@ -5,7 +5,7 @@ import { koreaMonth, monthDate } from '../../../../../lib/goShared.js';
 export const dynamic = 'force-dynamic';
 export async function GET(request) {
   if (!hasAdminSession(request)) return Response.json({ error: '관리자 로그인이 필요해요.' }, { status: 401 });
-  try { const month = new URL(request.url).searchParams.get('month') || koreaMonth(); return Response.json({ cards: await loadGoPicks(month) }, { headers: { 'Cache-Control': 'no-store' } }); }
+  try { const month = new URL(request.url).searchParams.get('month') || koreaMonth(); return Response.json({ cards: await loadGoPicks(month, null, true) }, { headers: { 'Cache-Control': 'no-store' } }); }
   catch { return Response.json({ error: 'pick을 불러오지 못했어요.' }, { status: 400 }); }
 }
 export async function POST(request) {
