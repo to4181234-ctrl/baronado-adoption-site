@@ -1,44 +1,22 @@
 'use client';
-
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback,useEffect,useState } from 'react';
 import Link from 'next/link';
 import AdminGuard from '../../../components/AdminGuard.js';
 import SiteHeader from '../../../components/SiteHeader.js';
-
-function ReviewPage() {
-  const [cards, setCards] = useState([]);
-  const [error, setError] = useState('');
-  const [busy, setBusy] = useState('');
-  const [view, setView] = useState('pending');
-  const [page, setPage] = useState(0);
-  const [more, setMore] = useState(false);
-  const load = useCallback(async (nextPage = 0) => {
-    try {
-      const response = await fetch(`/api/admin/go/cards?status=${view}&page=${nextPage}`, { cache: 'no-store' });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-      setCards(previous => nextPage ? [...previous, ...data.cards] : data.cards);
-      setMore(data.hasMore); setPage(nextPage);
-    } catch (e) { setError(e.message || '카드를 불러오지 못했어요.'); }
-  }, [view]);
-  useEffect(() => { load(); }, [load]);
-  async function review(id, status) {
-    setBusy(id); setError('');
-    try {
-      const response = await fetch('/api/admin/go/cards', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-      setCards(previous => previous.filter(card => card.id !== id));
-    } catch (e) { setError(e.message || '검토에 실패했어요.'); }
-    finally { setBusy(''); }
-  }
-  return <main className="site-shell"><SiteHeader /><section className="container go-container"><Link href="/admin" className="back-link">관리자 목록</Link><h1>멍멍GO 카드 검토</h1><p className="go-note">강아지가 보이는지, 사람 얼굴이나 차량번호가 포함되지 않았는지 확인하고 승인해주세요.</p>
-    <div className="go-tabs" role="group" aria-label="검토 상태"><button className={view === 'pending' ? 'active' : ''} onClick={() => setView('pending')}>승인 대기</button><button className={view === 'approved' ? 'active' : ''} onClick={() => setView('approved')}>공개 카드 관리</button></div>
-    {error && <p className="go-error">{error}</p>}
-    {!cards.length && <p className="go-empty">검토할 카드가 없어요.</p>}
-    <div className="go-card-grid">{cards.map(card => <article className="go-review" key={card.id}><img src={card.imageUrl} alt={`${card.dogName} 카드 검토`} /><div><strong>{card.dogName} · {card.nickname}</strong><p>{card.description || '설명 없음'}</p><small>{new Date(card.capturedAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}</small>{card.reportCount > 0 && <p className="go-error">신고 {card.reportCount}건 · 사진을 다시 확인해주세요</p>}</div><div className="go-review-actions">{view === 'pending' && <button disabled={busy === card.id} onClick={() => review(card.id, 'approved')}>공개 승인</button>}<button disabled={busy === card.id} onClick={() => review(card.id, view === 'pending' ? 'rejected' : 'hidden')}>{view === 'pending' ? '반려' : '공개 중지'}</button></div></article>)}</div>
-    {more && <button className="go-more" onClick={() => load(page + 1)}>더 보기</button>}
-  </section></main>;
+import { REJECTION_REASONS,cardDate,koreaMonth,rejectionText } from '../../../lib/goShared.js';
+function PostStats(){
+ const [month,setMonth]=useState('');const [stats,setStats]=useState(null);const [error,setError]=useState('');
+ useEffect(()=>{setStats(null);setError('');fetch('/api/admin/go/stats'+(month?'?month='+month:''),{cache:'no-store'}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error);setStats(d);}).catch(e=>setError(e.message));},[month]);
+ return <section className="go-statistics"><div className="go-section-title"><h2>게시물 통계</h2><label className="go-month-label">등록월<input type="month" aria-label="통계 등록월" value={month} onChange={e=>setMonth(e.target.value)}/></label></div><button className="go-text-button" onClick={()=>setMonth('')}>전체 기간 보기</button>{error&&<p className="go-error">{error}</p>}{stats&&<><div className="go-stat-grid">{[['posts','전체 게시물'],['published','공개 게시물'],['pending','승인 대기'],['likes','좋아요 합계']].map(([key,label])=><div key={key}><span>{label}</span><strong>{stats.totals[key]}</strong></div>)}</div><p className="go-note">선택한 기간에 등록된 게시물이 기준입니다. 좋아요는 해당 게시물에 지금까지 쌓인 수를 합산합니다.</p><h3>멍멍이별 게시물 수</h3><div className="go-stat-dogs">{stats.dogs.map(dog=><div key={dog.dog_id}><div><strong>{dog.dog_name}</strong><span>{dog.posts}개 · 공개 {dog.published}개 · 좋아요 {dog.likes}개</span></div><div className="go-stat-bar"><span style={{width:`${Math.max(2,Number(dog.posts)/Math.max(1,...stats.dogs.map(d=>Number(d.posts)))*100)}%`}}/></div></div>)}</div>{!stats.dogs.length&&<p className="go-empty">집계할 게시물이 없어요.</p>}<h3>좋아요가 많은 게시물</h3><div className="go-stat-ranking">{stats.topPosts.map((post,i)=><Link href={`/go/posts/${post.id}`} key={post.id}><span>{i+1}</span><div><strong>{post.title}</strong><small>{post.dog_name} · {post.nickname}</small></div><b>♡ {post.like_count}</b></Link>)}</div></>}</section>;
 }
-
-export default function Page() { return <AdminGuard><ReviewPage /></AdminGuard>; }
+function ReviewPage(){
+ const [cards,setCards]=useState([]);const [view,setView]=useState('pending');const [page,setPage]=useState(0);const [more,setMore]=useState(false);const [total,setTotal]=useState(0);const [error,setError]=useState('');const [busy,setBusy]=useState('');const [query,setQuery]=useState('');const [text,setText]=useState('');
+ const [month,setMonth]=useState(koreaMonth());const [picks,setPicks]=useState([]);const [reject,setReject]=useState(null);const [reason,setReason]=useState('');const [note,setNote]=useState('');
+ const load=useCallback(async(nextPage=0)=>{if(view==='stats')return;setError('');try{const params=new URLSearchParams({status:view,page:String(nextPage),q:query});const r=await fetch(`/api/admin/go/cards?${params}`,{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error);setCards(prev=>nextPage?[...prev,...d.cards]:d.cards);setPage(nextPage);setMore(d.hasMore);setTotal(d.total);}catch(e){setError(e.message);}},[view,query]);
+ const loadPicks=useCallback(async()=>{try{const r=await fetch('/api/admin/go/picks?month='+month,{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error);setPicks(d.cards);}catch(e){setError(e.message);}},[month]);
+ useEffect(()=>{load();},[load]);useEffect(()=>{loadPicks();},[loadPicks]);
+ async function review(id,status){setBusy(id);setError('');try{const r=await fetch('/api/admin/go/cards',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,status,reason,note})});const d=await r.json();if(!r.ok)throw new Error(d.error);setReject(null);setReason('');setNote('');await load();await loadPicks();}catch(e){setError(e.message);}finally{setBusy('');}}
+ async function pick(cardId,remove=false){setBusy(cardId);setError('');try{const r=await fetch('/api/admin/go/picks',{method:remove?'DELETE':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({month,cardId})});const d=await r.json();if(!r.ok)throw new Error(d.error);await loadPicks();}catch(e){setError(e.message);}finally{setBusy('');}}
+ return <main className="site-shell"><SiteHeader/><section className="container go-container go-v2"><Link href="/admin" className="go-home">← 관리자 목록</Link><header className="go-heading"><h1>멍멍GO 게시물 관리</h1><p>사진 공개, 이 달의 pick과 게시물 통계를 관리합니다.</p></header><div className="go-admin-tabs" role="group" aria-label="게시물 관리 메뉴">{[['pending','승인 대기'],['approved','공개 게시물'],['rejected','반려 게시물'],['stats','게시물 통계']].map(([key,label])=><button key={key} aria-pressed={view===key} onClick={()=>setView(key)}>{label}</button>)}</div>{error&&<p className="go-error" role="alert">{error}</p>}{view==='stats'?<PostStats/>:<>{view==='approved'&&<section className="go-admin-picks"><div className="go-section-title"><h2>이 달의 바로나도 pick</h2><input type="month" aria-label="pick 노출월" value={month} onChange={e=>{if(e.target.value)setMonth(e.target.value);}}/></div><p className="go-note">선택한 월에만 게시판 상단에 노출됩니다. 최대 3개까지 선택할 수 있어요. ({picks.length}/3)</p><div className="go-pick-selected">{picks.map(card=><div key={card.id}><img src={card.imageUrl} alt=""/><div><strong>{card.title}</strong><span>{card.dogName}</span></div><button onClick={()=>pick(card.id,true)} disabled={busy===card.id}>해제</button></div>)}</div></section>}<form className="go-search" onSubmit={e=>{e.preventDefault();setQuery(text.trim());}}><input aria-label="관리 게시물 검색" placeholder="제목, 멍멍이 이름, 키워드 검색" value={text} maxLength={80} onChange={e=>setText(e.target.value)}/><button>검색</button></form><div className="go-section-title"><h2>{view==='pending'?'승인 대기':view==='approved'?'공개 게시물':'반려 게시물'}</h2><span>{total}개</span></div>{!cards.length&&<p className="go-empty">게시물이 없어요.</p>}<div className="go-review-list">{cards.map(card=><article className="go-review-v2" key={card.id}><img src={card.imageUrl} alt={`${card.dogName} 촬영 사진`}/><div className="go-review-content"><span className="go-board-dog">{card.dogName} · {card.nickname}</span><h3>{card.title}</h3><p>{card.description}</p><small>{cardDate(card.capturedAt)} · 좋아요 {card.likeCount}개{card.reportCount>0?` · 신고 ${card.reportCount}건`:''}</small>{view==='rejected'&&<p className="go-status">반려 · {rejectionText(card)}</p>}<div className="go-review-actions">{view!=='approved'&&<button disabled={busy===card.id} onClick={()=>review(card.id,'approved')}>공개 승인</button>}{view==='pending'&&<button disabled={busy===card.id} onClick={()=>{setReject(card);setReason('');setNote('');}}>반려</button>}{view==='approved'&&<><button disabled={busy===card.id||picks.some(p=>p.id===card.id)||picks.length>=3} onClick={()=>pick(card.id)}>{picks.some(p=>p.id===card.id)?'pick 선택됨':'pick 선택'}</button><button disabled={busy===card.id} onClick={()=>review(card.id,'hidden')}>공개 중지</button></>}</div></div></article>)}</div>{more&&<button className="go-more" onClick={()=>load(page+1)}>더 보기</button>}</>}{reject&&<div className="go-overlay" role="dialog" aria-modal="true" aria-label="반려 사유 선택"><div className="go-dialog"><button className="go-close" onClick={()=>setReject(null)} aria-label="닫기">×</button><h2>반려 사유</h2><p className="go-note">작성자의 내 카드에 안내됩니다.</p><label className="go-description">사유 선택<select value={reason} onChange={e=>setReason(e.target.value)}><option value="">선택해주세요</option>{Object.entries(REJECTION_REASONS).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>{reason==='other'&&<label className="go-description">기타 사유<textarea rows={3} maxLength={300} value={note} onChange={e=>setNote(e.target.value)}/></label>}<button className="go-primary" disabled={!reason||(reason==='other'&&!note.trim())||busy===reject.id} onClick={()=>review(reject.id,'rejected')}>반려 확정</button></div></div>}</section></main>;
+}
+export default function Page(){return <AdminGuard><ReviewPage/></AdminGuard>;}

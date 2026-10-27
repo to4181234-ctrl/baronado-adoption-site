@@ -17,3 +17,9 @@ test('password hashes are salted and only the correct secret verifies', async ()
   assert.equal(await verifySecret('wrong-value', first), false);
   assert.equal(await verifySecret(secret, 'bad-hash'), false);
 });
+
+test('four-character passwords need no number or symbol rule', () => {
+  assert.equal(passwordCheck('1234'), '1234');
+  assert.equal(passwordCheck('abcd'), 'abcd');
+  assert.throws(() => passwordCheck('abc'));
+});

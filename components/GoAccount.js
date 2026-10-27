@@ -1,37 +1,18 @@
 'use client';
+import { useEffect, useState } from 'react';
 
-import { useState } from 'react';
-
-export default function GoAccount({ member, onChange }) {
-  const [mode, setMode] = useState('login');
-  const [nickname, setNickname] = useState('');
-  const [password, setPassword] = useState('');
-  const [recoveryCode, setRecoveryCode] = useState('');
-  const [newCode, setNewCode] = useState('');
-  const [error, setError] = useState('');
-  const [busy, setBusy] = useState(false);
-
-  async function submit(event) {
-    event.preventDefault(); setBusy(true); setError('');
-    try {
-      const response = await fetch('/api/go/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: mode, nickname, password, recoveryCode }) });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || '다시 시도해주세요.');
-      setPassword(''); setRecoveryCode('');
-      if (result.recoveryCode) setNewCode(result.recoveryCode);
-      onChange(result.member, Boolean(result.recoveryCode));
-    } catch (err) { setError(err.message); }
-    finally { setBusy(false); }
-  }
-
-  if (newCode) return <div className="go-account-box" role="status"><h2>복구 코드를 꼭 보관해주세요</h2><p>비밀번호를 잊었을 때 필요합니다. 화면을 닫으면 다시 볼 수 없어요.</p><code className="go-recovery">{newCode}</code><button className="go-primary" onClick={() => setNewCode('')}>보관했어요</button></div>;
-  if (member) return <div className="go-account-inline"><span>🐾 <b>{member.nickname}</b>님의 도감</span><button type="button" onClick={async () => { await fetch('/api/go/session', { method: 'DELETE' }); onChange(null); }}>로그아웃</button></div>;
-  return <div className="go-account-box"><h2>{mode === 'register' ? '도감 만들기' : mode === 'recover' ? '비밀번호 다시 만들기' : '내 도감에 로그인'}</h2>
-    <form onSubmit={submit} className="go-account-form"><label>닉네임<input required minLength={2} maxLength={14} autoComplete="username" value={nickname} onChange={event => setNickname(event.target.value)} /></label>
-      <label>{mode === 'recover' ? '새 비밀번호' : '비밀번호'}<input required minLength={10} type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} value={password} onChange={event => setPassword(event.target.value)} /></label>
-      {mode === 'recover' && <label>복구 코드<input required value={recoveryCode} onChange={event => setRecoveryCode(event.target.value)} /></label>}
-      {error && <p className="go-error" role="alert">{error}</p>}
-      <button className="go-primary" disabled={busy}>{busy ? '처리 중…' : mode === 'register' ? '닉네임으로 시작' : mode === 'recover' ? '비밀번호 변경' : '로그인'}</button></form>
-    <div className="go-account-switch"><button onClick={() => { setMode(mode === 'register' ? 'login' : 'register'); setError(''); }}>{mode === 'register' ? '이미 도감이 있어요' : '처음이에요 · 도감 만들기'}</button><button onClick={() => { setMode(mode === 'recover' ? 'login' : 'recover'); setError(''); }}>{mode === 'recover' ? '로그인으로' : '비밀번호 찾기'}</button></div>
-  </div>;
+function EmailVerification({ purpose, onVerified, onLinked }) {
+ const [email,setEmail]=useState(''); const [currentPassword,setCurrentPassword]=useState(''); const [code,setCode]=useState(''); const [challenge,setChallenge]=useState(''); const [ready,setReady]=useState(null); const [verified,setVerified]=useState(false); const [busy,setBusy]=useState(false); const [message,setMessage]=useState(''); const [consent,setConsent]=useState(false);
+ useEffect(()=>{fetch('/api/go/email',{cache:'no-store'}).then(r=>r.json()).then(d=>setReady(d.ready)).catch(()=>setReady(false));},[]);
+ async function send(){setBusy(true);setMessage('');try{const r=await fetch('/api/go/email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'send',email,purpose,currentPassword})});const data=await r.json();if(!r.ok)throw new Error(data.error);setChallenge(data.challengeId);setMessage('이메일로 보낸 6자리 인증번호를 5분 안에 입력해주세요.');}catch(e){setMessage(e.message);}finally{setBusy(false);}}
+ async function verify(){setBusy(true);setMessage('');try{const r=await fetch('/api/go/email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',challengeId:challenge,code})});const data=await r.json();if(!r.ok)throw new Error(data.error);setVerified(true);setMessage('이메일 인증이 완료됐어요.');onVerified?.(true);if(data.member)onLinked?.(data.member);}catch(e){setMessage(e.message);}finally{setBusy(false);}}
+ return <div className="go-email-verification">{purpose==='link'&&<label>현재 비밀번호<input type="password" autoComplete="current-password" value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)}/></label>}<label>이메일<div className="go-input-action"><input type="email" autoComplete="email" value={email} disabled={verified} onChange={e=>{setEmail(e.target.value);setChallenge('');setVerified(false);onVerified?.(false);}} placeholder="계정 복구에 사용할 이메일" /><button type="button" disabled={busy||!ready||verified||!consent||!email} onClick={send}>{challenge?'재전송':'인증번호 받기'}</button></div></label>{!verified&&<label className="go-consent"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} /><span>인증·비밀번호 재설정을 위한 이메일 수집 및 이용에 동의합니다.</span></label>}{challenge&&!verified&&<label>인증번호<div className="go-input-action"><input inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,''))} placeholder="6자리 숫자" /><button type="button" onClick={verify} disabled={busy||code.length!==6}>확인</button></div></label>}{ready===false&&<p className="go-note">이메일 인증을 준비하고 있어요. 기존 회원은 닉네임으로 로그인할 수 있어요.</p>}{message&&<p className="go-note" role="status">{message}</p>}</div>;
+}
+export default function GoAccount({member,onChange}){
+ const [mode,setMode]=useState('login');const [nickname,setNickname]=useState('');const [password,setPassword]=useState('');const [confirmPassword,setConfirmPassword]=useState('');const [checked,setChecked]=useState('');const [available,setAvailable]=useState(null);const [verified,setVerified]=useState(false);const [busy,setBusy]=useState(false);const [error,setError]=useState('');
+ function changeMode(value){setMode(value);setError('');setPassword('');setConfirmPassword('');setVerified(false);}
+ async function checkNickname(){setBusy(true);setError('');try{const r=await fetch('/api/go/nickname?value='+encodeURIComponent(nickname),{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error);setAvailable(d.available);setChecked(d.available?nickname:'');}catch(e){setError(e.message);}finally{setBusy(false);}}
+ async function submit(e){e.preventDefault();setBusy(true);setError('');try{if(mode==='register'&&checked!==nickname)throw new Error('닉네임 중복확인을 해주세요.');if(mode!=='login'&&password!==confirmPassword)throw new Error('비밀번호가 일치하지 않아요.');const r=await fetch('/api/go/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:mode,nickname,password})});const d=await r.json();if(!r.ok)throw new Error(d.error);onChange(d.member);}catch(e){setError(e.message);}finally{setBusy(false);}}
+ if(member)return <div className="go-account-box"><h2>멍멍GO 계정</h2><p><b>{member.nickname}</b></p><p className="go-note">{member.emailLinked?`연결된 이메일 · ${member.emailMasked}`:'이메일을 연결하면 인증번호로 비밀번호를 재설정할 수 있어요.'}</p><EmailVerification purpose="link" onLinked={onChange}/></div>;
+ return <div className="go-account-box"><h2>{mode==='recover'?'비밀번호 재설정':'멍멍GO 회원가입/로그인'}</h2>{mode!=='recover'&&<div className="go-auth-tabs"><button type="button" aria-pressed={mode==='login'} onClick={()=>changeMode('login')}>로그인</button><button type="button" aria-pressed={mode==='register'} onClick={()=>changeMode('register')}>회원가입</button></div>}<form onSubmit={submit} className="go-account-form">{mode!=='recover'&&<label>닉네임<div className="go-input-action"><input required minLength={2} maxLength={14} autoComplete="username" value={nickname} onChange={e=>{setNickname(e.target.value);setChecked('');setAvailable(null);}} />{mode==='register'&&<button type="button" onClick={checkNickname} disabled={busy||nickname.trim().length<2}>중복확인</button>}</div>{available!==null&&mode==='register'&&<small className={available?'go-success':'go-error-text'}>{available?'사용할 수 있는 닉네임이에요.':'이미 사용 중인 닉네임이에요.'}</small>}</label>}{mode!=='login'&&<EmailVerification key={mode} purpose={mode} onVerified={setVerified}/>}<label>{mode==='recover'?'새 비밀번호':'비밀번호'}<input required minLength={4} maxLength={128} type="password" autoComplete={mode==='login'?'current-password':'new-password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="4자 이상" /></label>{mode!=='login'&&<label>비밀번호 확인<input required minLength={4} maxLength={128} type="password" autoComplete="new-password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} /></label>}{error&&<p className="go-error" role="alert">{error}</p>}<button className="go-primary" disabled={busy||(mode!=='login'&&!verified)||(mode==='register'&&checked!==nickname)}>{busy?'처리 중…':mode==='register'?'회원가입':mode==='recover'?'비밀번호 재설정':'로그인'}</button></form><div className="go-account-switch"><button type="button" onClick={()=>changeMode(mode==='recover'?'login':'recover')}>{mode==='recover'?'로그인으로 돌아가기':'비밀번호 찾기'}</button></div></div>;
 }

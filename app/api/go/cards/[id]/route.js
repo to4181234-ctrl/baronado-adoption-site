@@ -1,7 +1,17 @@
 import { adminDatabase, validId } from '../../../../../lib/server/adminData.js';
 import { goError, goMember, goMutationAllowed } from '../../../../../lib/server/goAuth.js';
+import { loadGoCard } from '../../../../../lib/server/goCards.js';
 
 export const runtime = 'nodejs';
+
+export async function GET(request, { params }) {
+  try {
+    const { id } = await params;
+    if (!validId(id)) return goError('게시물을 확인해주세요.', 404);
+    const card = await loadGoCard(id, await goMember(request));
+    return card ? Response.json({ card }, { headers: { 'Cache-Control': 'no-store' } }) : goError('게시물을 찾지 못했어요.', 404);
+  } catch { return goError('게시물을 불러오지 못했어요.', 500); }
+}
 
 export async function DELETE(request, { params }) {
   const blocked = goMutationAllowed(request);

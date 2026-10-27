@@ -178,98 +178,169 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
   .btn { min-height: 46px; font-size: 20px; }
 }
 
-/* 멍멍GO: 기존 입양 화면과 분리된 모바일 카드 도감 */
-.go-container { max-width: 760px; padding-bottom: 80px; }
-.go-hero { background: #f9e68c; border: 2px solid #47311f; border-radius: 22px; padding: 26px 22px; box-shadow: 5px 6px 0 #47311f; margin-bottom: 34px; }
-.go-eyebrow { font-size: 11px; font-weight: 900; letter-spacing: .12em; color: #7b5627; }
-.go-hero h1 { font-size: clamp(32px, 8vw, 48px); margin: 5px 0; }
-.go-hero p { margin: 0; line-height: 1.5; font-weight: 700; }
-.go-section-title, .go-collection-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 24px 0 12px; }
-.go-section-title h2, .go-collection-head h2 { margin: 0; font-size: 22px; color: var(--brown); }
-.go-section-title span { color: var(--muted); font-size: 13px; }
-.go-dog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 12px; }
-.go-dog-tile { min-width: 0; border: 1px solid var(--line); border-radius: 16px; padding: 7px; background: #fff; display: flex; flex-direction: column; gap: 4px; }
-.go-dog-tile > div { aspect-ratio: 1; background: #f1e8d2; border-radius: 11px; overflow: hidden; position: relative; }
-.go-dog-tile img { width: 100%; height: 100%; object-fit: cover; }
-.go-dog-tile div span { position: absolute; bottom: 0; inset-inline: 0; text-align: center; background: #49382cae; color: #fff; padding: 5px; font-size: 11px; }
-.go-dog-tile strong { font-size: 16px; padding: 2px 4px 0; }
-.go-dog-tile small { color: #816b53; padding: 0 4px 3px; }
-.go-dog-title { display: flex; align-items: center; gap: 14px; margin: 15px 0 28px; }
-.go-dog-title h2 { margin: 0 0 4px; font-size: 24px; }
-.go-dog-title p { margin: 0; font-size: 13px; color: var(--muted); }
-.go-dog-avatar { width: 82px; height: 82px; flex: 0 0 82px; background: var(--cream); border-radius: 18px; overflow: hidden; }
-.go-dog-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.go-primary { background: #edc935; border: 1px solid #443020; border-radius: 11px; color: #352211; font-size: 14px; font-weight: 900; min-height: 42px; padding: 9px 14px; }
-.go-primary:disabled { opacity: .55; }
-.go-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 16px 0 20px; }
-.go-tabs { display: flex; gap: 5px; padding: 4px; border-radius: 12px; background: #efe9df; }
-.go-tabs button, .go-style-switch button { border: 0; border-radius: 9px; padding: 9px 12px; background: transparent; font-size: 13px; font-weight: 800; white-space: nowrap; }
-.go-tabs button.active, .go-style-switch button.active { background: #fff; box-shadow: 0 2px 7px #37230f21; }
-.go-toolbar select { min-height: 39px; padding: 0 12px; border: 1px solid #d5cabc; border-radius: 10px; background: #fff; font-size: 13px; }
-.go-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-.go-card { background: linear-gradient(145deg, #fff4b8, #fffdf4 55%, #f1d279); border: 2px solid #7b5a2c; border-radius: 19px; padding: 8px; box-shadow: 3px 4px 0 #b49d74; min-width: 0; }
-.go-card-top { display: flex; justify-content: space-between; gap: 4px; padding: 4px 6px 7px; font-size: 10px; font-weight: 950; letter-spacing: .03em; color: #695333; }
-.go-card-art { display: block; width: 100%; aspect-ratio: 1; border: 2px solid #c8a85c; border-radius: 10px; overflow: hidden; position: relative; background: #ebd993; padding: 0; }
-.go-card-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.go-card-cutout { background: radial-gradient(circle at 50% 70%, #f6e9b8, #b9d4c4); }
-.go-card-cutout img { object-fit: contain; }
-.go-card-hint { position: absolute; right: 6px; bottom: 6px; border-radius: 99px; background: #382715cb; color: #fff; padding: 5px 8px; font-size: 10px; }
-.go-card-back { height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 16px; text-align: center; background: #fff3d5; }
-.go-card-back span { font-size: 11px; color: #766448; }
-.go-card-back p { font-size: 15px; font-weight: 800; overflow-wrap: anywhere; }
-.go-card-back small { color: #817264; }
-.go-card-body { padding: 10px 5px 4px; }
-.go-card-title, .go-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
-.go-card-title strong { font-size: 20px; }
-.go-card-title span { font-size: 10px; white-space: nowrap; color: #795d32; }
-.go-card-body p { margin: 5px 0 10px; font-size: 11px; color: #684d32; }
-.go-card-footer { border-top: 1px solid #b3996e; padding-top: 6px; font-size: 11px; min-width: 0; }
-.go-card-footer span { overflow-wrap: anywhere; }
-.go-like { border: 0; border-radius: 20px; padding: 5px 8px; background: #fff7ef; font-size: 14px; font-weight: 900; flex: 0 0 auto; }
-.go-like.liked { color: #d8515b; }
-.go-delete { border: 0; background: transparent; text-decoration: underline; color: #806f5b; padding: 5px 0 0; font-size: 10px; }
-.go-report-choices { display: grid; gap: 3px; margin-top: 5px; padding: 8px; border-radius: 8px; background: #fff; }
-.go-report-choices span { font-size: 11px; color: #806f5b; }
-.go-report-choices button { border: 1px solid #e6dbc9; background: #fffaf0; padding: 7px; border-radius: 5px; text-align: left; font-size: 11px; }
-.go-pending { color: #9c6821; font-weight: 800; }
-.go-empty { background: #f7f1e7; border-radius: 15px; text-align: center; padding: 22px 15px; line-height: 1.5; color: #574938; }
-.go-more, .go-account-link { display: block; margin: 25px auto; border: 1px solid #b29c79; background: #fff; border-radius: 10px; min-height: 40px; padding: 8px 16px; font-weight: 800; }
-.go-footnote, .go-note { font-size: 12px; line-height: 1.6; color: #776a5c; }
-.go-footnote { margin-top: 30px; }
-.go-error { color: #b32824; background: #fff1ef; border-radius: 8px; padding: 10px; font-size: 13px; }
-.go-overlay { position: fixed; inset: 0; z-index: 60; overflow-y: auto; display: flex; align-items: center; justify-content: center; padding: 18px; background: #21170dd1; }
-.go-dialog { position: relative; background: #fffdf8; width: min(450px, 100%); max-height: calc(100dvh - 36px); overflow-y: auto; border-radius: 18px; padding: 24px 18px; }
-.go-camera-dialog { width: min(540px, 100%); }
-.go-close { position: absolute; top: 8px; right: 10px; background: transparent; border: 0; font-size: 28px; z-index: 1; }
-.go-account-box h2, .go-camera h2 { margin: 0 0 16px; font-size: 22px; padding-right: 24px; }
-.go-account-box p { line-height: 1.5; }
-.go-account-form { display: grid; gap: 14px; }
-.go-account-form label, .go-description { display: grid; gap: 6px; font-size: 13px; font-weight: 800; }
-.go-account-form input, .go-description textarea { width: 100%; min-width: 0; padding: 12px; border-radius: 9px; border: 1px solid #b8aa99; background: #fff; font-size: 16px; }
-.go-account-switch { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; }
-.go-account-switch button, .go-account-inline button { border: 0; background: transparent; color: #6f5125; text-decoration: underline; padding: 6px 0; font-size: 13px; }
-.go-account-inline { display: flex; justify-content: space-between; margin-top: 25px; border-top: 1px solid #e6dccc; padding-top: 16px; font-size: 13px; }
-.go-recovery { display: block; overflow-wrap: anywhere; background: #fff3c4; border: 1px solid #aa8a4f; border-radius: 7px; padding: 16px; margin-bottom: 15px; font-size: 17px; user-select: all; }
-.go-camera .go-primary { width: 100%; }
-.go-viewfinder { background: #201c18; border-radius: 12px; overflow: hidden; position: relative; }
-.go-viewfinder video { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
-.go-frame { position: absolute; inset: 9%; border: 2px solid #fff9; border-radius: 12px; pointer-events: none; }
-.go-viewfinder > div { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 12px; }
-.go-viewfinder button { color: #fff; border: 0; background: transparent; }
-.go-viewfinder .go-shutter { width: 58px; height: 58px; border-radius: 50%; background: #fff; border: 6px solid #aaa; }
-.go-style-switch { display: flex; gap: 6px; margin: 12px 0; background: #eee8df; padding: 4px; border-radius: 11px; }
-.go-capture-preview { display: block; width: min(100%, 360px); aspect-ratio: 1; object-fit: contain; margin: 0 auto 16px; border: 2px solid #d9bd6b; border-radius: 10px; }
-.go-description span { float: right; color: #8b7a65; }
-.go-camera-actions { display: flex; gap: 10px; margin: 14px 0; }
-.go-camera-actions button:first-child { flex: 0 0 auto; border: 1px solid #b9a88b; border-radius: 10px; background: #fff; padding: 0 12px; }
-.go-review { border: 1px solid var(--line); padding: 10px; border-radius: 10px; }
-.go-review img { width: 100%; aspect-ratio: 1; object-fit: contain; background: #e9dec5; }
-.go-review p { overflow-wrap: anywhere; }
-.go-review-actions { display: flex; gap: 8px; }
-.go-review-actions button { flex: 1; padding: 10px; border-radius: 8px; border: 0; background: #eeca3a; font-weight: 800; }
-.go-review-actions button + button { background: #f1e7df; }
-@media (max-width: 390px) { .site-nav { gap: 7px; font-size: 11px; } .brand-logo { height: 17px; } .go-card-grid { gap: 8px; } .go-card-title strong { font-size: 16px; } .go-card-title span { font-size: 9px; } .go-card-top { font-size: 8px; } }
-
+/* 멍멍GO: minimal albums, community board and moderation */
+.go-container {max-width:760px;padding-bottom:60px;}
+.go-v2 {font-size:14px;line-height:1.5;}
+.go-v2 h2 {font-size:21px;letter-spacing:-.04em;margin:0;}
+.go-v2 h3 {font-size:16px;letter-spacing:-.02em;}
+.go-topline,.go-top-account,.go-local-nav {display:flex;align-items:center;gap:16px;}
+.go-topline {justify-content:space-between;margin-bottom:23px;gap:10px;}
+.go-home {font-size:12px;color:#827569;display:inline-block;}
+.go-top-account {gap:12px;justify-content:flex-end;flex-wrap:wrap;}
+.go-top-account button,.go-text-button {border:0;background:none;padding:2px 0;color:#584333;font-size:12px;}
+.go-top-account button:last-child {color:#887869;}
+.go-local-nav {gap:24px;border-bottom:1px solid #eee8df;margin-bottom:28px;}
+.go-local-nav a {font-size:14px;font-weight:600;color:#9a8f83;padding:0 0 12px;border-bottom:2px solid transparent;}
+.go-local-nav a[aria-current=page] {color:#33291e;border-color:#33291e;}
+.go-heading {margin:0 0 34px;}
+.go-heading h1 {font-size:32px;font-weight:850;letter-spacing:-.055em;line-height:1.2;}
+.go-heading>p {font-size:14px;color:#66594c;margin:10px 0 0;}
+.go-heading .go-guidance {font-size:11px;line-height:1.7;color:#a29587;max-width:600px;margin-top:13px;}
+.go-section-title {display:flex;align-items:center;justify-content:space-between;gap:12px;margin:25px 0 14px;}
+.go-section-title>span {font-size:12px;color:#998b7c;}
+.go-filter-tabs,.go-auth-tabs {display:flex;align-items:center;gap:18px;margin:0 0 23px;}
+.go-filter-tabs button,.go-auth-tabs button {border:0;background:none;color:#a19488;font-size:13px;padding:0 0 5px;border-bottom:1px solid transparent;}
+.go-filter-tabs button[aria-pressed=true],.go-auth-tabs button[aria-pressed=true] {color:#3c2d20;font-weight:800;border-bottom-color:#3c2d20;}
+.go-dog-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:22px 14px;}
+.go-dog-tile {min-width:0;display:grid;gap:5px;}
+.go-dog-tile>div {aspect-ratio:1;background:#f7f4ef;border-radius:10px;overflow:hidden;}
+.go-dog-tile img {width:100%;height:100%;object-fit:cover;display:block;}
+.go-dog-tile strong {font-size:15px;font-weight:750;}
+.go-dog-tile small {font-size:11px;color:#a1968a;}
+.go-dog-title {display:flex;align-items:center;gap:15px;margin:22px 0 28px;}
+.go-dog-title h2 {font-size:24px;}
+.go-dog-title p {margin:5px 0 0;font-size:12px;color:#8b7b6a;}
+.go-dog-avatar {width:68px;aspect-ratio:1;flex:0 0 68px;border-radius:9px;overflow:hidden;background:#f6f1e9;}
+.go-dog-avatar img {width:100%;height:100%;object-fit:cover;}
+.go-album-toolbar {display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.go-album-toolbar>span {font-size:15px;font-weight:750;}
+.go-primary {background:#f7d94d;color:#342719;border:0;border-radius:7px;font-size:13px;font-weight:750;min-height:42px;padding:10px 16px;}
+.go-primary:disabled {opacity:.45;cursor:default;}
+.go-card-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 18px;}
+.go-card-entry {min-width:0;}
+.go-card {border:1px solid #ddd6ca;background:#fff;border-radius:10px;padding:12px;box-shadow:none;}
+.go-card-top {font-size:9px;font-weight:650;letter-spacing:.11em;color:#786b5a;margin:0 0 9px;}
+.go-card-art {width:100%;aspect-ratio:1;background:#f7f4ef;border:0;border-radius:5px;overflow:hidden;}
+.go-card-art img {display:block;width:100%;height:100%;object-fit:cover;}
+.go-card-body {padding:12px 1px 1px;}
+.go-card-body>strong {font-size:22px;line-height:1.2;font-weight:750;letter-spacing:-.05em;}
+.go-card-information {display:flex;align-items:baseline;justify-content:space-between;gap:8px;color:#958575;font-size:11px;margin-top:10px;}
+.go-card-information span {text-align:right;overflow-wrap:anywhere;}
+.go-card-outside {padding:0 1px;}
+.go-card-outside h3 {margin:12px 0 5px;font-size:15px;}
+.go-record-text {font-size:13px;color:#786a5c;white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0 10px;}
+.go-status {font-size:12px;color:#927447;line-height:1.6;overflow-wrap:anywhere;}
+.go-post-actions {display:flex;align-items:center;justify-content:flex-end;gap:15px;}
+.go-post-actions button {border:0;background:none;color:#968775;font-size:12px;padding:5px 0;}
+.go-post-actions button[aria-pressed=true] {color:#c65c52;}
+.go-search {display:flex;gap:8px;margin:28px 0 18px;}
+.go-search input {flex:1;min-width:0;padding:12px 13px;border:1px solid #e4ddd3;border-radius:7px;font-size:14px;background:#fff;}
+.go-search button {border:0;border-radius:7px;background:#f1ece3;color:#665343;padding:0 17px;font-size:13px;white-space:nowrap;}
+.go-board-toolbar {display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;color:#998a7c;}
+.go-board-toolbar select {background:#fff;border:0;padding:8px;color:#6f604f;font-size:12px;}
+.go-board-list {border-top:1px solid #eae2d8;}
+.go-board-row {display:grid;grid-template-columns:102px 1fr;gap:18px;padding:20px 0;border-bottom:1px solid #eee7df;}
+.go-board-row>img {width:102px;aspect-ratio:1;object-fit:cover;border-radius:7px;background:#f5f0e7;}
+.go-board-row>div {min-width:0;}
+.go-board-dog {font-size:11px;color:#ac987d;}
+.go-board-row h2 {font-size:17px;margin:3px 0 5px;overflow-wrap:anywhere;}
+.go-board-row p {font-size:12px;color:#988b7f;margin:0;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+.go-board-meta {display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:#b0a292;margin-top:9px;}
+.go-picks {margin-bottom:30px;}
+.go-picks .go-section-title {margin-top:0;}
+.go-picks h2 {font-size:17px;}
+.go-pick-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.go-pick-grid a {display:flex;flex-direction:column;min-width:0;}
+.go-pick-grid img {display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:7px;margin-bottom:8px;}
+.go-pick-grid strong {font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.go-pick-grid span {font-size:10px;color:#9a8b7a;margin-top:3px;}
+.go-pagination {display:flex;justify-content:center;align-items:center;gap:25px;margin:28px 0;font-size:12px;color:#9b8b7b;}
+.go-pagination button {border:0;background:none;color:#776451;padding:8px;}
+.go-post-detail {max-width:430px;margin:24px auto;}
+.go-post-detail>h2 {font-size:23px;margin-bottom:22px;overflow-wrap:anywhere;}
+.go-post-detail .go-card-outside h3 {display:none;}
+.go-dog-link {display:block;font-size:12px;color:#8b755d;margin-top:28px;border-top:1px solid #eee5d8;padding-top:16px;}
+.go-empty {padding:35px 16px;text-align:center;color:#a1907d;font-size:13px;line-height:1.7;background:#fcfaf6;border-radius:8px;margin:20px 0;}
+.go-note {font-size:12px;line-height:1.6;color:#9d8b78;}
+.go-error {color:#a34a35;background:#fff6f1;border-radius:7px;padding:11px;font-size:12px;line-height:1.6;}
+.go-success {color:#66806a;}.go-error-text {color:#b75843;}
+.go-more {display:block;margin:25px auto;background:#fff;border:1px solid #ddd1bf;border-radius:6px;padding:10px 20px;color:#86735e;}
+.go-overlay {position:fixed;inset:0;z-index:60;overflow-y:auto;display:flex;align-items:center;justify-content:center;padding:18px;background:#21170db0;}
+.go-dialog {position:relative;background:#fff;width:min(450px,100%);max-height:calc(100dvh - 36px);overflow-y:auto;border-radius:12px;padding:28px 22px;}
+.go-camera-dialog {width:min(500px,100%);}
+.go-close {position:absolute;top:8px;right:11px;border:0;background:none;font-size:25px;z-index:1;color:#806e5d;}
+.go-account-box h2,.go-camera h2 {font-size:21px;letter-spacing:-.05em;margin:0 0 24px;padding-right:20px;}
+.go-account-form {display:grid;gap:18px;}
+.go-account-form label,.go-email-verification label,.go-description {display:grid;gap:7px;font-size:12px;font-weight:600;color:#685543;}
+.go-account-form input,.go-description input,.go-description textarea,.go-description select,.go-email-verification input {width:100%;min-width:0;border:1px solid #ddd2c5;padding:11px;border-radius:6px;font-size:16px;background:#fff;color:#453629;}
+.go-description {margin:15px 0;}
+.go-description textarea {resize:vertical;min-height:90px;}
+.go-description span {color:#ac9b87;font-weight:400;}
+.go-input-action {display:flex;gap:7px;align-items:stretch;}
+.go-input-action input {min-width:0;flex:1;}
+.go-input-action button {flex:0 0 auto;border:1px solid #e4d7c5;border-radius:6px;background:#faf7f0;padding:0 10px;color:#8b7459;font-size:11px;}
+.go-input-action button:disabled {opacity:.4;}
+.go-email-verification {display:grid;gap:14px;}
+.go-email-verification .go-consent {display:flex;align-items:flex-start;gap:7px;font-size:10px;color:#a49380;font-weight:400;}
+.go-consent input {width:14px;height:14px;flex:0 0 14px;margin:2px 0;}
+.go-account-switch {margin-top:18px;text-align:right;}
+.go-account-switch button {background:none;border:0;color:#9b8770;padding:2px;font-size:11px;}
+.go-account-form .go-primary {margin-top:5px;}
+.go-viewfinder {background:#1d1b17;border-radius:8px;overflow:hidden;}
+.go-viewfinder video {display:block;width:min(100%,50dvh);aspect-ratio:1;object-fit:cover;margin:auto;}
+.go-camera-controls {position:relative;display:grid;place-items:center;padding:16px 0 19px;}
+.go-camera-controls .go-camera-cancel {position:absolute;left:18px;top:50%;transform:translateY(-50%);color:#fff;background:none;border:0;font-size:12px;}
+.go-camera-controls .go-shutter {display:block;width:62px;height:62px;border:5px solid #a6a39c;outline:2px solid #fff;outline-offset:3px;background:#fff;border-radius:50%;padding:0;}
+.go-capture-preview {display:block;width:min(100%,340px);aspect-ratio:1;object-fit:cover;margin:0 auto 22px;border-radius:6px;}
+.go-camera-actions {display:grid;grid-template-columns:1fr 2fr;gap:10px;margin:20px 0;}
+.go-camera-actions>button:first-child {border:1px solid #ddd0bd;background:#fff;border-radius:7px;font-size:12px;color:#887159;}
+.go-report-choices {display:grid;gap:5px;padding:10px;margin:8px 0;background:#fcf9f3;}
+.go-report-choices span {font-size:11px;color:#9c876f;}
+.go-report-choices button {border:1px solid #ece2d4;background:#fff;border-radius:4px;padding:8px;text-align:left;font-size:11px;color:#8c755a;}
+.go-admin-tabs {display:flex;gap:18px;flex-wrap:wrap;border-bottom:1px solid #eee7dc;margin-bottom:28px;}
+.go-admin-tabs button {background:none;border:0;border-bottom:2px solid transparent;padding:0 0 12px;color:#9d8871;font-size:13px;}
+.go-admin-tabs button[aria-pressed=true] {color:#493622;border-color:#493622;font-weight:750;}
+.go-review-list {display:grid;gap:20px;}
+.go-review-v2 {display:grid;grid-template-columns:150px 1fr;gap:20px;padding-bottom:20px;border-bottom:1px solid #eee4d7;}
+.go-review-v2>img {width:150px;aspect-ratio:1;object-fit:cover;border-radius:7px;background:#faf5ec;}
+.go-review-content {min-width:0;}
+.go-review-content h3 {margin:3px 0 7px;overflow-wrap:anywhere;}
+.go-review-content p {font-size:13px;color:#a18a70;white-space:pre-wrap;overflow-wrap:anywhere;}
+.go-review-content small {font-size:11px;color:#b19a7e;}
+.go-review-actions {display:flex;gap:8px;flex-wrap:wrap;margin-top:15px;}
+.go-review-actions button {border:1px solid #e8dccb;border-radius:5px;background:#fbf7ee;color:#8a7052;padding:8px 11px;font-size:12px;}
+.go-review-actions button:first-child {background:#f9e79b;border-color:#f9e79b;color:#715b24;}
+.go-review-actions button:disabled {opacity:.4;}
+.go-admin-picks {padding:0 0 25px;border-bottom:1px solid #eee5d9;}
+.go-admin-picks input,.go-month-label input {max-width:155px;min-width:0;font-size:13px;border:1px solid #e5d8c6;background:#fff;border-radius:5px;padding:8px;color:#8d7458;}
+.go-admin-picks h2 {font-size:17px;}
+.go-pick-selected {display:grid;gap:10px;}
+.go-pick-selected>div {display:flex;align-items:center;gap:10px;}
+.go-pick-selected img {width:45px;aspect-ratio:1;object-fit:cover;border-radius:5px;}
+.go-pick-selected>div>div {display:grid;gap:3px;min-width:0;flex:1;}
+.go-pick-selected strong {font-size:12px;overflow-wrap:anywhere;}
+.go-pick-selected span {font-size:10px;color:#ac9476;}
+.go-pick-selected button {border:0;background:none;font-size:11px;color:#a38866;}
+.go-stat-grid {display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0;}
+.go-stat-grid>div {padding:18px 12px;background:#fbf8f0;border-radius:7px;display:grid;gap:7px;}
+.go-stat-grid span {font-size:11px;color:#a68f71;}
+.go-stat-grid strong {font-size:25px;color:#725734;}
+.go-month-label {display:flex;gap:8px;align-items:center;font-size:11px;color:#b0997a;}
+.go-statistics h3 {margin-top:32px;font-size:16px;}
+.go-stat-dogs {display:grid;gap:20px;}
+.go-stat-dogs>div>div:first-child {display:flex;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.go-stat-dogs strong {font-size:13px;}
+.go-stat-dogs span {font-size:11px;color:#ac9475;}
+.go-stat-bar {height:5px;background:#f5eee1;border-radius:5px;overflow:hidden;}
+.go-stat-bar span {display:block;height:5px;background:#ddbd6b;border-radius:5px;}
+.go-stat-ranking a {display:flex;align-items:center;gap:16px;border-bottom:1px solid #f0e7d9;padding:14px 0;}
+.go-stat-ranking a>span {font-size:16px;color:#c2ab8a;width:16px;}
+.go-stat-ranking a>div {flex:1;min-width:0;display:grid;gap:4px;}
+.go-stat-ranking strong {font-size:13px;overflow-wrap:anywhere;}
+.go-stat-ranking small {font-size:11px;color:#b19a7a;}
+.go-stat-ranking b {font-size:13px;color:#b08f65;white-space:nowrap;}
+@media(max-width:620px){.go-v2{padding:24px 18px 50px;}.go-heading h1{font-size:30px;}.go-topline{align-items:flex-start;}.go-top-account{gap:10px;}.go-top-account button{font-size:11px;}.go-dog-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 13px;}.go-card-grid{gap:26px 14px;}.go-card{padding:10px;}.go-card-body>strong{font-size:21px;}.go-card-information{font-size:10px;flex-wrap:wrap;gap:3px;}.go-board-row{grid-template-columns:82px 1fr;gap:14px;padding:17px 0;}.go-board-row>img{width:82px;}.go-board-row h2{font-size:15px;}.go-board-row p{font-size:11px;}.go-board-meta{gap:9px;font-size:10px;}.go-pick-grid{gap:9px;}.go-pick-grid strong{font-size:11px;}.go-pick-grid span{font-size:9px;}.go-stat-grid{grid-template-columns:repeat(2,1fr);}.go-review-v2{grid-template-columns:95px 1fr;gap:14px;}.go-review-v2>img{width:95px;}.go-review-content p{font-size:12px;}.go-admin-tabs{gap:15px;}.go-admin-tabs button{font-size:12px;}.go-month-label{flex-direction:column;align-items:flex-start;gap:4px;}}
+@media(max-width:390px){.site-nav{gap:7px;font-size:11px;}.brand-logo{height:17px;}.go-top-account button{font-size:10px;}.go-card-top{font-size:8px;}.go-card-body>strong{font-size:19px;}.go-card-information{font-size:9px;}.go-dialog{padding:26px 17px;}.go-section-title h2{font-size:18px;}}
 
 /* 2026-10 adoption-site improvements */
 .sort-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 20px; }

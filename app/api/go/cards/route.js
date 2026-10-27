@@ -11,12 +11,12 @@ export async function GET(request) {
     const url = new URL(request.url);
     const member = await goMember(request);
     const dogId = url.searchParams.get('dog');
-    if (dogId && !validId(dogId)) return goError('친구를 확인해주세요.');
+    if (dogId && !validId(dogId)) return goError('멍멍이를 확인해주세요.');
     const mine = url.searchParams.get('mine') === '1';
     if (mine && !member) return goError('로그인이 필요해요.', 401);
     const page = Number(url.searchParams.get('page') || 0);
-    if (!Number.isInteger(page) || page < 0 || page > 40) return goError('페이지를 확인해주세요.');
-    const data = await loadGoCards({ member, mine, dogId, page, order: url.searchParams.get('order') === 'oldest' ? 'oldest' : 'newest' });
+    if (!Number.isInteger(page) || page < 0 || page > 1000) return goError('페이지를 확인해주세요.');
+    const data = await loadGoCards({ member, mine, dogId, page, query: (url.searchParams.get('q') || '').slice(0, 80), order: url.searchParams.get('order') === 'oldest' ? 'oldest' : 'newest' });
     return Response.json(data, { headers: { 'Cache-Control': 'no-store' } });
   } catch { return goError('카드를 불러오지 못했어요.', 500); }
 }
@@ -36,23 +36,23 @@ export async function POST(request) {
     ]);
     if (count >= 5) return goError('하루 최대 5장까지 기록할 수 있어요.', 429);
     const dogId = form.get('dogId');
-    const style = form.get('style');
+    const title = form.get('title');
     const description = form.get('description');
     const file = form.get('photo');
-    if (!validId(dogId) || !['original', 'cutout'].includes(style) || typeof description !== 'string' || !description.trim() || description.trim().length > 200 || !file || typeof file.arrayBuffer !== 'function') return goError('사진과 기록을 확인해주세요.');
+    if (!validId(dogId) || typeof title !== 'string' || !title.trim() || title.trim().length > 80 || typeof description !== 'string' || !description.trim() || description.trim().length > 200 || !file || typeof file.arrayBuffer !== 'function') return goError('제목, 사진과 기록을 확인해주세요.');
     if (!['image/webp', 'image/png'].includes(file.type) || file.size < 1000 || file.size > 3 * 1024 * 1024) return goError('촬영 사진은 3MB 이하로 저장해주세요.');
     const { data: dog } = await db.from('dogs').select('id,category,adopted').eq('id', dogId).maybeSingle();
-    if (!dog || dog.category !== 'adoption' || dog.adopted) return goError('현재 기록할 수 없는 친구예요.', 409);
+    if (!dog || dog.category !== 'adoption' || dog.adopted) return goError('현재 기록할 수 없는 멍멍이예요.', 409);
     const raw = Buffer.from(await file.arrayBuffer());
     const image = sharp(raw, { limitInputPixels: 4_000_000 });
     const meta = await image.metadata();
     if (meta.width < 300 || meta.height < 300 || meta.width > 2500 || meta.height > 2500 || !['webp', 'png'].includes(meta.format)) return goError('사진 크기나 형식을 확인해주세요.');
-    const output = style === 'cutout' ? await image.png().toBuffer() : await image.webp({ quality: 82 }).toBuffer();
+    const output = await image.webp({ quality: 82 }).toBuffer();
     if (output.length > 3 * 1024 * 1024) return goError('사진 용량을 줄여 다시 시도해주세요.');
-    savedPath = `${member.id}/${crypto.randomUUID()}.${style === 'cutout' ? 'png' : 'webp'}`;
-    const upload = await db.storage.from('go-cards').upload(savedPath, output, { contentType: style === 'cutout' ? 'image/png' : 'image/webp', upsert: false });
+    savedPath = `${member.id}/${crypto.randomUUID()}.webp`;
+    const upload = await db.storage.from('go-cards').upload(savedPath, output, { contentType: 'image/webp', upsert: false });
     if (upload.error) throw upload.error;
-    const { data, error } = await db.from('go_cards').insert({ dog_id: dogId, member_id: member.id, image_path: savedPath, photo_style: style, description: description.trim() }).select('id').single();
+    const { data, error } = await db.from('go_cards').insert({ dog_id: dogId, member_id: member.id, image_path: savedPath, photo_style: 'original', title: title.trim(), description: description.trim() }).select('id').single();
     if (error) throw error;
     return Response.json({ id: data.id, status: 'pending' }, { status: 201 });
   } catch {
