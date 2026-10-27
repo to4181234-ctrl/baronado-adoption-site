@@ -17,7 +17,11 @@ export async function GET(request) {
 export async function PATCH(request) {
   if (!hasAdminSession(request) || !sameOrigin(request)) return Response.json({ error: '관리자 로그인이 필요해요.' }, { status: 401 });
   try {
-    const { id, status, reason, note } = await request.json();
+    const { id, status: requestedStatus, reason: requestedReason, note: requestedNote } = await request.json();
+    // Older open admin tabs may still submit the former "hidden" action.
+    const status = requestedStatus === 'hidden' ? 'rejected' : requestedStatus;
+    const reason = requestedReason || (requestedStatus === 'hidden' ? 'other' : null);
+    const note = requestedNote || (requestedStatus === 'hidden' ? '공개가 중지된 게시물입니다.' : null);
     if (!validId(id) || !['approved','rejected','hidden'].includes(status)) return Response.json({ error: '처리 상태를 확인해주세요.' }, { status: 400 });
     if (status === 'rejected' && (!Object.hasOwn(REJECTION_REASONS, reason) || (reason === 'other' && (typeof note !== 'string' || !note.trim() || note.trim().length > 300)))) return Response.json({ error: '반려 사유를 선택하고 기타 사유는 300자 이내로 적어주세요.' }, { status: 400 });
     const db = adminDatabase();
@@ -26,4 +30,20 @@ export async function PATCH(request) {
     if (status !== 'approved') await db.from('go_picks').delete().eq('card_id', id);
     return Response.json({ ok: true });
   } catch { return Response.json({ error: '게시물 검토에 실패했어요.' }, { status: 500 }); }
+}
+
+export async function DELETE(request) {
+  if (!hasAdminSession(request) || !sameOrigin(request)) return Response.json({ error: '관리자 로그인이 필요해요.' }, { status: 401 });
+  try {
+    const { id } = await request.json();
+    if (!validId(id)) return Response.json({ error: '게시물을 확인해주세요.' }, { status: 400 });
+    const db = adminDatabase();
+    const { data: card, error: readError } = await db.from('go_cards').select('id,image_path').eq('id', id).maybeSingle();
+    if (readError) throw readError;
+    if (!card) return Response.json({ error: '게시물을 찾지 못했어요.' }, { status: 404 });
+    const { error } = await db.from('go_cards').delete().eq('id', id);
+    if (error) throw error;
+    const cleanup = await db.storage.from('go-cards').remove([card.image_path]);
+    return Response.json({ ok: true, cleanupPending: Boolean(cleanup.error) });
+  } catch { return Response.json({ error: '게시물을 삭제하지 못했어요.' }, { status: 500 }); }
 }

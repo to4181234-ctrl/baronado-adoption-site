@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import GoRatingsEditor from './GoRatingsEditor.js';
+import { EMPTY_RATINGS } from '../lib/goRatings.js';
 export default function GoCamera({ dog, onDone }) {
   const video = useRef(null);
   const stream = useRef(null);
@@ -9,6 +11,7 @@ export default function GoCamera({ dog, onDone }) {
   const [preview, setPreview] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [ratings, setRatings] = useState(EMPTY_RATINGS);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   function stop() { stream.current?.getTracks().forEach(track => track.stop()); stream.current = null; setActive(false); }
@@ -31,8 +34,8 @@ export default function GoCamera({ dog, onDone }) {
   }
   async function save() {
     setBusy(true); setError('');
-    try { const form = new FormData(); form.set('dogId', dog.id); form.set('title', title); form.set('description', description); form.set('photo', original, 'camera.webp'); const r = await fetch('/api/go/cards', { method: 'POST', body: form }); const result = await r.json(); if (!r.ok) throw new Error(result.error); onDone(); }
+    try { const form = new FormData(); form.set('dogId', dog.id); form.set('title', title); form.set('description', description); form.set('ratings', JSON.stringify(ratings)); form.set('photo', original, 'camera.webp'); const r = await fetch('/api/go/cards', { method: 'POST', body: form }); const result = await r.json(); if (!r.ok) throw new Error(result.error); onDone(); }
     catch (e) { setError(e.message || '저장하지 못했어요.'); } finally { setBusy(false); }
   }
-  return <div className="go-camera"><h2>{dog.name} 촬영</h2>{!active && !original && <button className="go-primary" onClick={start}>카메라 열기</button>}{active && <div className="go-viewfinder"><video ref={video} autoPlay muted playsInline /><span className="go-frame" /><div className="go-camera-controls"><button className="go-camera-cancel" onClick={stop}>취소</button><button className="go-shutter" disabled={busy} onClick={shoot} aria-label="사진 촬영" /></div></div>}{original && <>{preview && <img className="go-capture-preview" src={preview} alt="촬영한 사진" />}<label className="go-description">게시물 제목<input maxLength={80} value={title} onChange={e => setTitle(e.target.value)} placeholder="오늘의 순간에 제목을 붙여주세요" /></label><label className="go-description">오늘의 기록 <span>{description.length}/200</span><textarea maxLength={200} rows={3} value={description} onChange={e => setDescription(e.target.value)} placeholder="이 멍멍이와 만난 순간을 남겨주세요" /></label><div className="go-camera-actions"><button disabled={busy} onClick={() => { setOriginal(null); start(); }}>다시 촬영</button><button className="go-primary" disabled={busy || !title.trim() || !description.trim()} onClick={save}>{busy ? '저장 중…' : '카드 저장'}</button></div><p className="go-note">내 도감에 먼저 저장되고, 관리자 승인 후 모두의 도감에 공개됩니다. 얼굴이나 차량번호가 보이면 다시 촬영해주세요.</p></>}{error && <p className="go-error" role="alert">{error}</p>}</div>;
+  return <div className="go-camera"><h2>{dog.name} 촬영</h2>{!active && !original && <button className="go-primary" onClick={start}>카메라 열기</button>}{active && <div className="go-viewfinder"><video ref={video} autoPlay muted playsInline /><span className="go-frame" /><div className="go-camera-controls"><button className="go-camera-cancel" onClick={stop}>취소</button><button className="go-shutter" disabled={busy} onClick={shoot} aria-label="사진 촬영" /></div></div>}{original && <>{preview && <img className="go-capture-preview" src={preview} alt="촬영한 사진" />}<label className="go-description">게시물 제목<input maxLength={80} value={title} onChange={e => setTitle(e.target.value)} placeholder="오늘의 순간에 제목을 붙여주세요" /></label><label className="go-description">오늘의 기록 <span>{description.length}/200</span><textarea maxLength={200} rows={3} value={description} onChange={e => setDescription(e.target.value)} placeholder="이 멍멍이와 만난 순간을 남겨주세요" /></label><GoRatingsEditor value={ratings} onChange={setRatings} disabled={busy} /><div className="go-camera-actions"><button disabled={busy} onClick={() => { setOriginal(null); start(); }}>다시 촬영</button><button className="go-primary" disabled={busy || !title.trim() || !description.trim()} onClick={save}>{busy ? '저장 중…' : '카드 저장'}</button></div><p className="go-note">내 도감에 먼저 저장되고, 관리자 승인 후 모두의 멍멍 도감에 공개됩니다. 얼굴이나 차량번호가 보이면 다시 촬영해주세요.</p></>}{error && <p className="go-error" role="alert">{error}</p>}</div>;
 }

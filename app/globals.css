@@ -712,3 +712,42 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
   .stats-help { padding:17px 14px; }
   .stats-help p { font-size:12px; }
 }
+
+/* Card records and author ratings stay inside the card boundary. */
+.go-card-description {margin:12px 0 14px;font-size:13px;line-height:1.7;color:#796753;white-space:pre-wrap;overflow-wrap:anywhere;}
+.go-card-ratings {display:grid;gap:8px;padding:13px 0;border-top:1px solid #eee5d8;}
+.go-card-ratings>div {display:flex;align-items:center;gap:12px;min-width:0;font-size:12px;color:#8b765b;}
+.go-card-ratings>div>span:first-child {width:38px;flex:0 0 38px;}
+.go-rating-stars {display:inline-flex;gap:3px;align-items:center;}
+.go-star {width:16px;height:16px;display:block;fill:none;stroke:#caa45e;stroke-width:1.5;}
+.go-star.filled {fill:#caa45e;}
+.go-card-ratings small {color:#b8a58d;font-size:10px;}
+.go-card-information {padding-top:11px;margin-top:0;border-top:1px solid #eee5d8;}
+.go-card-body>strong+.go-card-information {margin-top:10px;}
+.go-post-actions {justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.go-post-actions .go-like-button {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;min-width:112px;border:1px solid #d9c7ac;border-radius:8px;padding:10px 14px;background:#fff;color:#886e4d;font-size:13px;font-weight:650;touch-action:manipulation;}
+.go-like-button svg {display:block;width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;flex:0 0 21px;}
+.go-post-actions .go-like-button[aria-pressed=true] {color:#b65e50;border-color:#e3b9a9;background:#fff9f6;}
+.go-like-button[aria-pressed=true] svg {fill:currentColor;}
+.go-post-actions .go-like-button:disabled {opacity:.6;cursor:wait;}
+.go-post-actions button:focus-visible,.go-rating-options label:has(input:focus-visible) {outline:2px solid #b99656;outline-offset:3px;}
+.go-secondary-actions {display:flex;gap:4px;margin-left:auto;align-items:center;}
+.go-secondary-actions button {min-height:44px;min-width:44px;padding:8px 6px;font-size:11px;touch-action:manipulation;}
+.go-recent {margin-top:44px;padding-top:16px;border-top:1px solid #eee6da;}
+.go-recent .go-section-title {margin-top:10px;margin-bottom:20px;}
+.go-ratings-editor {margin:20px 0;}
+.go-ratings-editor fieldset {min-width:0;border:0;padding:0;margin:17px 0;}
+.go-ratings-editor legend {font-size:13px;font-weight:650;color:#80694b;padding:0;margin-bottom:4px;}
+.go-rating-options {display:flex;align-items:center;gap:2px;flex-wrap:wrap;}
+.go-rating-options label {position:relative;display:grid;place-items:center;width:44px;height:44px;border-radius:5px;cursor:pointer;touch-action:manipulation;}
+.go-rating-options input {position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden;white-space:nowrap;}
+.go-rating-options .go-star {width:27px;height:27px;}
+.go-rating-options button {min-height:44px;border:0;background:none;padding:6px;color:#a18b70;font-size:11px;}
+.go-rating-options button:disabled {opacity:.4;}
+.go-rating-save {width:100%;}
+.go-remove-options {display:grid;gap:9px;margin:20px 0;}
+.go-remove-options button {min-height:46px;border:1px solid #e5d9c7;border-radius:7px;background:#fff;text-align:left;padding:10px 13px;color:#9f896c;font-size:13px;}
+.go-remove-options button[aria-pressed=true] {background:#fbf5e7;border-color:#c6ab77;color:#70562f;font-weight:650;}
+.go-delete-warning {font-size:13px;line-height:1.7;color:#ab5f47;padding:13px;background:#fff7f2;border-radius:7px;}
+.go-primary.go-danger {background:#b56852;color:#fff;}
+@media(max-width:620px){.go-card-description{font-size:12px;margin:10px 0;}.go-card-ratings>div{font-size:10px;gap:6px;}.go-card-ratings>div>span:first-child{width:31px;flex-basis:31px;}.go-rating-stars{gap:1px;}.go-card-ratings .go-star{width:12px;height:12px;}.go-post-actions .go-like-button{min-width:106px;min-height:46px;padding:9px 10px;font-size:12px;}.go-card-information{padding-top:10px;}.go-secondary-actions button{font-size:10px;}.go-recent{margin-top:35px;}}
