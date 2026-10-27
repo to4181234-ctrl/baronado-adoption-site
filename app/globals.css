@@ -178,6 +178,98 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
   .btn { min-height: 46px; font-size: 20px; }
 }
 
+/* 멍멍GO: 기존 입양 화면과 분리된 모바일 카드 도감 */
+.go-container { max-width: 760px; padding-bottom: 80px; }
+.go-hero { background: #f9e68c; border: 2px solid #47311f; border-radius: 22px; padding: 26px 22px; box-shadow: 5px 6px 0 #47311f; margin-bottom: 34px; }
+.go-eyebrow { font-size: 11px; font-weight: 900; letter-spacing: .12em; color: #7b5627; }
+.go-hero h1 { font-size: clamp(32px, 8vw, 48px); margin: 5px 0; }
+.go-hero p { margin: 0; line-height: 1.5; font-weight: 700; }
+.go-section-title, .go-collection-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 24px 0 12px; }
+.go-section-title h2, .go-collection-head h2 { margin: 0; font-size: 22px; color: var(--brown); }
+.go-section-title span { color: var(--muted); font-size: 13px; }
+.go-dog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 12px; }
+.go-dog-tile { min-width: 0; border: 1px solid var(--line); border-radius: 16px; padding: 7px; background: #fff; display: flex; flex-direction: column; gap: 4px; }
+.go-dog-tile > div { aspect-ratio: 1; background: #f1e8d2; border-radius: 11px; overflow: hidden; position: relative; }
+.go-dog-tile img { width: 100%; height: 100%; object-fit: cover; }
+.go-dog-tile div span { position: absolute; bottom: 0; inset-inline: 0; text-align: center; background: #49382cae; color: #fff; padding: 5px; font-size: 11px; }
+.go-dog-tile strong { font-size: 16px; padding: 2px 4px 0; }
+.go-dog-tile small { color: #816b53; padding: 0 4px 3px; }
+.go-dog-title { display: flex; align-items: center; gap: 14px; margin: 15px 0 28px; }
+.go-dog-title h2 { margin: 0 0 4px; font-size: 24px; }
+.go-dog-title p { margin: 0; font-size: 13px; color: var(--muted); }
+.go-dog-avatar { width: 82px; height: 82px; flex: 0 0 82px; background: var(--cream); border-radius: 18px; overflow: hidden; }
+.go-dog-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.go-primary { background: #edc935; border: 1px solid #443020; border-radius: 11px; color: #352211; font-size: 14px; font-weight: 900; min-height: 42px; padding: 9px 14px; }
+.go-primary:disabled { opacity: .55; }
+.go-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 16px 0 20px; }
+.go-tabs { display: flex; gap: 5px; padding: 4px; border-radius: 12px; background: #efe9df; }
+.go-tabs button, .go-style-switch button { border: 0; border-radius: 9px; padding: 9px 12px; background: transparent; font-size: 13px; font-weight: 800; white-space: nowrap; }
+.go-tabs button.active, .go-style-switch button.active { background: #fff; box-shadow: 0 2px 7px #37230f21; }
+.go-toolbar select { min-height: 39px; padding: 0 12px; border: 1px solid #d5cabc; border-radius: 10px; background: #fff; font-size: 13px; }
+.go-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.go-card { background: linear-gradient(145deg, #fff4b8, #fffdf4 55%, #f1d279); border: 2px solid #7b5a2c; border-radius: 19px; padding: 8px; box-shadow: 3px 4px 0 #b49d74; min-width: 0; }
+.go-card-top { display: flex; justify-content: space-between; gap: 4px; padding: 4px 6px 7px; font-size: 10px; font-weight: 950; letter-spacing: .03em; color: #695333; }
+.go-card-art { display: block; width: 100%; aspect-ratio: 1; border: 2px solid #c8a85c; border-radius: 10px; overflow: hidden; position: relative; background: #ebd993; padding: 0; }
+.go-card-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.go-card-cutout { background: radial-gradient(circle at 50% 70%, #f6e9b8, #b9d4c4); }
+.go-card-cutout img { object-fit: contain; }
+.go-card-hint { position: absolute; right: 6px; bottom: 6px; border-radius: 99px; background: #382715cb; color: #fff; padding: 5px 8px; font-size: 10px; }
+.go-card-back { height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 16px; text-align: center; background: #fff3d5; }
+.go-card-back span { font-size: 11px; color: #766448; }
+.go-card-back p { font-size: 15px; font-weight: 800; overflow-wrap: anywhere; }
+.go-card-back small { color: #817264; }
+.go-card-body { padding: 10px 5px 4px; }
+.go-card-title, .go-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
+.go-card-title strong { font-size: 20px; }
+.go-card-title span { font-size: 10px; white-space: nowrap; color: #795d32; }
+.go-card-body p { margin: 5px 0 10px; font-size: 11px; color: #684d32; }
+.go-card-footer { border-top: 1px solid #b3996e; padding-top: 6px; font-size: 11px; min-width: 0; }
+.go-card-footer span { overflow-wrap: anywhere; }
+.go-like { border: 0; border-radius: 20px; padding: 5px 8px; background: #fff7ef; font-size: 14px; font-weight: 900; flex: 0 0 auto; }
+.go-like.liked { color: #d8515b; }
+.go-delete { border: 0; background: transparent; text-decoration: underline; color: #806f5b; padding: 5px 0 0; font-size: 10px; }
+.go-report-choices { display: grid; gap: 3px; margin-top: 5px; padding: 8px; border-radius: 8px; background: #fff; }
+.go-report-choices span { font-size: 11px; color: #806f5b; }
+.go-report-choices button { border: 1px solid #e6dbc9; background: #fffaf0; padding: 7px; border-radius: 5px; text-align: left; font-size: 11px; }
+.go-pending { color: #9c6821; font-weight: 800; }
+.go-empty { background: #f7f1e7; border-radius: 15px; text-align: center; padding: 22px 15px; line-height: 1.5; color: #574938; }
+.go-more, .go-account-link { display: block; margin: 25px auto; border: 1px solid #b29c79; background: #fff; border-radius: 10px; min-height: 40px; padding: 8px 16px; font-weight: 800; }
+.go-footnote, .go-note { font-size: 12px; line-height: 1.6; color: #776a5c; }
+.go-footnote { margin-top: 30px; }
+.go-error { color: #b32824; background: #fff1ef; border-radius: 8px; padding: 10px; font-size: 13px; }
+.go-overlay { position: fixed; inset: 0; z-index: 60; overflow-y: auto; display: flex; align-items: center; justify-content: center; padding: 18px; background: #21170dd1; }
+.go-dialog { position: relative; background: #fffdf8; width: min(450px, 100%); max-height: calc(100dvh - 36px); overflow-y: auto; border-radius: 18px; padding: 24px 18px; }
+.go-camera-dialog { width: min(540px, 100%); }
+.go-close { position: absolute; top: 8px; right: 10px; background: transparent; border: 0; font-size: 28px; z-index: 1; }
+.go-account-box h2, .go-camera h2 { margin: 0 0 16px; font-size: 22px; padding-right: 24px; }
+.go-account-box p { line-height: 1.5; }
+.go-account-form { display: grid; gap: 14px; }
+.go-account-form label, .go-description { display: grid; gap: 6px; font-size: 13px; font-weight: 800; }
+.go-account-form input, .go-description textarea { width: 100%; min-width: 0; padding: 12px; border-radius: 9px; border: 1px solid #b8aa99; background: #fff; font-size: 16px; }
+.go-account-switch { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; }
+.go-account-switch button, .go-account-inline button { border: 0; background: transparent; color: #6f5125; text-decoration: underline; padding: 6px 0; font-size: 13px; }
+.go-account-inline { display: flex; justify-content: space-between; margin-top: 25px; border-top: 1px solid #e6dccc; padding-top: 16px; font-size: 13px; }
+.go-recovery { display: block; overflow-wrap: anywhere; background: #fff3c4; border: 1px solid #aa8a4f; border-radius: 7px; padding: 16px; margin-bottom: 15px; font-size: 17px; user-select: all; }
+.go-camera .go-primary { width: 100%; }
+.go-viewfinder { background: #201c18; border-radius: 12px; overflow: hidden; position: relative; }
+.go-viewfinder video { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+.go-frame { position: absolute; inset: 9%; border: 2px solid #fff9; border-radius: 12px; pointer-events: none; }
+.go-viewfinder > div { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 12px; }
+.go-viewfinder button { color: #fff; border: 0; background: transparent; }
+.go-viewfinder .go-shutter { width: 58px; height: 58px; border-radius: 50%; background: #fff; border: 6px solid #aaa; }
+.go-style-switch { display: flex; gap: 6px; margin: 12px 0; background: #eee8df; padding: 4px; border-radius: 11px; }
+.go-capture-preview { display: block; width: min(100%, 360px); aspect-ratio: 1; object-fit: contain; margin: 0 auto 16px; border: 2px solid #d9bd6b; border-radius: 10px; }
+.go-description span { float: right; color: #8b7a65; }
+.go-camera-actions { display: flex; gap: 10px; margin: 14px 0; }
+.go-camera-actions button:first-child { flex: 0 0 auto; border: 1px solid #b9a88b; border-radius: 10px; background: #fff; padding: 0 12px; }
+.go-review { border: 1px solid var(--line); padding: 10px; border-radius: 10px; }
+.go-review img { width: 100%; aspect-ratio: 1; object-fit: contain; background: #e9dec5; }
+.go-review p { overflow-wrap: anywhere; }
+.go-review-actions { display: flex; gap: 8px; }
+.go-review-actions button { flex: 1; padding: 10px; border-radius: 8px; border: 0; background: #eeca3a; font-weight: 800; }
+.go-review-actions button + button { background: #f1e7df; }
+@media (max-width: 390px) { .site-nav { gap: 7px; font-size: 11px; } .brand-logo { height: 17px; } .go-card-grid { gap: 8px; } .go-card-title strong { font-size: 16px; } .go-card-title span { font-size: 9px; } .go-card-top { font-size: 8px; } }
+
 
 /* 2026-10 adoption-site improvements */
 .sort-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 20px; }

@@ -10,6 +10,7 @@ export default function SiteHeader() {
         <nav className="site-nav" aria-label="주요 메뉴">
           <Link href="/">가족을 찾아요</Link>
           <Link href="/residents">상주견 소개</Link>
+          <Link href="/go">멍멍GO</Link>
         </nav>
       </div>
     </header>
