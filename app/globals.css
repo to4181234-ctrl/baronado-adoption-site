@@ -204,6 +204,8 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .go-dog-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:22px 14px;}
 .go-dog-tile {min-width:0;display:grid;gap:5px;}
 .go-dog-tile>div {aspect-ratio:1;background:#f7f4ef;border-radius:10px;overflow:hidden;}
+.go-dog-tile>div {position:relative;}
+.go-collection-count {position:absolute;top:7px;left:7px;display:inline-flex;align-items:center;justify-content:center;min-height:24px;min-width:29px;padding:3px 7px;border-radius:6px;background:rgba(48,36,24,.76);color:#fff;font-size:11px;font-weight:750;line-height:1.25;pointer-events:none;}
 .go-dog-tile img {width:100%;height:100%;object-fit:cover;display:block;}
 .go-dog-tile strong {font-size:15px;font-weight:750;}
 .go-dog-tile small {font-size:11px;color:#a1968a;}
