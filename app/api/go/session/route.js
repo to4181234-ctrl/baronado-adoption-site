@@ -13,7 +13,7 @@ export async function POST(request){
   const password=passwordCheck(input.password),db=adminDatabase();
   if(input.action==='login'){
    const {key}=nicknameKey(input.nickname);
-   const {data:member,error}=await db.from('go_members').select('id,nickname,email,password_hash,disabled,session_version').eq('nickname_key',key).maybeSingle();if(error)throw error;
+   const {data:member,error}=await db.from('go_members').select('id,nickname,email,password_hash,disabled,session_version,google_sub').eq('nickname_key',key).maybeSingle();if(error)throw error;
    if(!member||member.disabled||!(await verifySecret(password,member.password_hash)))return goError('닉네임 또는 비밀번호를 확인해주세요.',401);
    return issueGoCookie(NextResponse.json({member:publicMember(member)}),member.id,member.session_version);
   }

@@ -785,3 +785,4 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 
 /* Six-card board pagination */
 .go-pagination button{min-width:54px;min-height:44px;touch-action:manipulation;}.go-pagination button:disabled{opacity:.35;cursor:default;}.go-pagination span{font-variant-numeric:tabular-nums;white-space:nowrap;}
+.go-google-account{display:grid;gap:12px;margin:20px 0;}.go-google-button{width:100%;min-height:46px;}.go-google-account h3{font-size:17px;margin:5px 0;}.go-withdraw{padding-top:16px;border-top:1px solid #e7dfd2;}.go-google-account button{min-height:44px;}.go-google-account .go-note{margin:0;}

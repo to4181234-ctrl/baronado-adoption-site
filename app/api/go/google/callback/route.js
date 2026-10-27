@@ -1,0 +1,11 @@
+import { NextResponse } from 'next/server';
+import { adminDatabase } from '../../../../../lib/server/adminData.js';
+import { issueGoCookie } from '../../../../../lib/server/goAuth.js';
+import { GOOGLE_FLOW,GOOGLE_JOIN,GOOGLE_DELETE,googleIdentity,googleCookie,packGoogle,unpackGoogle } from '../../../../../lib/server/goGoogle.js';
+export const runtime='nodejs';
+const origin='https://baronado-adoption-site-8sm2.vercel.app';
+function finish(result){return googleCookie(NextResponse.redirect(`${origin}/go?google=${result}`,303),GOOGLE_FLOW,'');}
+export async function GET(request){try{const url=new URL(request.url),flow=unpackGoogle(request.cookies.get(GOOGLE_FLOW)?.value,'google-flow');if(!flow||url.searchParams.get('state')!==flow.state||!url.searchParams.get('code')||url.searchParams.has('error'))return finish('error');const user=await googleIdentity(url.searchParams.get('code'),flow),db=adminDatabase();const {data:owner,error}=await db.from('go_members').select('id,nickname,disabled,email,session_version,google_sub').eq('google_sub',user.sub).maybeSingle();if(error)throw error;
+if(flow.memberId){const {data:member,error:lookupError}=await db.from('go_members').select('id,disabled,google_sub,session_version').eq('id',flow.memberId).maybeSingle();if(lookupError||!member||member.disabled||member.session_version!==flow.version||member.google_sub&&member.google_sub!==user.sub||owner&&owner.id!==member.id)return finish('conflict');if(flow.intent==='withdraw'){if(member.google_sub!==user.sub)return finish('conflict');return googleCookie(issueGoCookie(finish('withdraw'),member.id,member.session_version),GOOGLE_DELETE,packGoogle({memberId:member.id,sub:user.sub,version:member.session_version},'google-delete'));}const {error:linkError}=await db.from('go_members').update({google_sub:user.sub}).eq('id',member.id).eq('session_version',flow.version).select('id').single();if(linkError)return finish('conflict');return issueGoCookie(finish('linked'),member.id,member.session_version);}
+if(owner){if(owner.disabled)return finish('error');return googleCookie(issueGoCookie(finish('success'),owner.id,owner.session_version),GOOGLE_JOIN,'');}
+return googleCookie(finish('join'),GOOGLE_JOIN,packGoogle(user,'google-join'));}catch{return finish('error');}}

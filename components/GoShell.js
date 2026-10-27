@@ -9,12 +9,14 @@ export default function GoShell({ children, title = '멍멍GO!', description = '
   const [member, setMember] = useState(null);
   const [ready, setReady] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
+  const [googleMessage,setGoogleMessage]=useState('');
   useEffect(() => { fetch('/api/go/session', { cache: 'no-store' }).then(r => r.json()).then(data => setMember(data.member)).catch(() => {}).finally(() => setReady(true)); }, []);
+  useEffect(() => { const result=new URLSearchParams(location.search).get('google'); if(result){setGoogleMessage(result==='error'?'구글 인증이 취소되었거나 만료됐어요. 다시 시도해주세요.':result==='conflict'?'이미 다른 계정에 연결된 구글 계정이에요. 기존 도감을 유지하려면 사용 중인 닉네임 계정에서 연결해주세요.':'');setShowAccount(true);history.replaceState(null,'',location.pathname);} }, []);
   async function logout() { const r = await fetch('/api/go/session', { method: 'DELETE' }); if (r.ok) setMember(null); }
   return <SessionContext.Provider value={{ member, ready, openAccount: () => setShowAccount(true) }}><main className="site-shell"><SiteHeader /><section className="container go-container go-v2">
     <div className="go-topline"><Link href="/" className="go-home">바로나도 홈</Link><div className="go-top-account">{member ? <><button onClick={() => setShowAccount(true)}>{member.nickname}</button><button onClick={logout}>로그아웃</button></> : <button onClick={() => setShowAccount(true)}>멍멍GO! 회원가입/로그인</button>}</div></div>
     <nav className="go-local-nav" aria-label="멍멍GO! 메뉴"><Link aria-current={active === 'album' ? 'page' : undefined} href="/go">나의 멍멍 도감</Link><Link aria-current={active === 'community' ? 'page' : undefined} href="/go/community">모두의 멍멍 도감</Link></nav>
     <header className="go-heading"><h1>{title}</h1><p>{description}</p><p className="go-guidance">멍멍이를 쫓거나 놀라게 하지 말고, 플래시 없이 편안한 거리에서 촬영해주세요. 카메라로 현장에서 촬영한 사진만 기록할 수 있어요.</p></header>
     {children}
-  </section>{showAccount && <div className="go-overlay" role="dialog" aria-modal="true" aria-label="멍멍GO! 회원가입/로그인"><div className="go-dialog"><button className="go-close" onClick={() => setShowAccount(false)} aria-label="닫기">×</button><GoAccount member={member} onChange={value => { setMember(value); setShowAccount(false); }} /></div></div>}</main></SessionContext.Provider>;
+  </section>{showAccount && <div className="go-overlay" role="dialog" aria-modal="true" aria-label="멍멍GO! 회원가입/로그인"><div className="go-dialog"><button className="go-close" onClick={() => setShowAccount(false)} aria-label="닫기">×</button><>{googleMessage&&<p className="go-error" role="alert">{googleMessage}</p>}<GoAccount member={member} onChange={value => { setMember(value); setShowAccount(false); }} /></></div></div>}</main></SessionContext.Provider>;
 }
