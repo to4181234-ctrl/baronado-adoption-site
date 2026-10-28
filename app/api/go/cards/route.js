@@ -39,7 +39,7 @@ export async function POST(request) {
     const file = form.get('photo');
     let ratings;
     try { ratings = validateRatings(JSON.parse(form.get('ratings') || '{}')); }
-    catch { return goError('별점은 1~5개 중에서 선택해주세요.'); }
+    catch { return goError('귀여움·매력·애교를 모두 1~5점으로 선택해주세요.'); }
     if (!validId(dogId) || typeof title !== 'string' || !title.trim() || title.trim().length > 80 || typeof description !== 'string' || !description.trim() || description.trim().length > 200 || !file || typeof file.arrayBuffer !== 'function') return goError('제목, 사진과 기록을 확인해주세요.');
     if (!['image/webp', 'image/png'].includes(file.type) || file.size < 1000 || file.size > 3 * 1024 * 1024) return goError('촬영 사진은 3MB 이하로 저장해주세요.');
     const { data: dog } = await db.from('dogs').select('id,category,adopted').eq('id', dogId).maybeSingle();
