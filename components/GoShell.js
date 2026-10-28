@@ -16,7 +16,7 @@ export default function GoShell({ children, title = '멍멍GO!', description = '
   return <SessionContext.Provider value={{ member, ready, openAccount: () => setShowAccount(true) }}><main className="site-shell"><SiteHeader /><section className="container go-container go-v2">
     <div className="go-topline"><Link href="/" className="go-home">바로나도 홈</Link><div className="go-top-account">{member ? <><button onClick={() => setShowAccount(true)}>{member.nickname}</button><button onClick={logout}>로그아웃</button></> : <button onClick={() => setShowAccount(true)}>멍멍GO! 회원가입/로그인</button>}</div></div>
 
-    {!albumDetail&&<header className="go-heading"><h1>{title}</h1><p>{description}</p>{active!=='community'&&<p className="go-guidance">멍멍이를 쫓거나 놀라게 하지 말고, 플래시 없이 편안한 거리에서 촬영해주세요. 카메라로 현장에서 촬영한 사진만 기록할 수 있어요.</p>}</header>}
+    {!albumDetail&&<header className="go-heading"><h1>{title==='멍멍GO!'?<img className="go-title-logo" src="/meonggo-reference-logo.svg" alt="멍멍GO!"/>:title}</h1><p>{description}</p>{active!=='community'&&<p className="go-guidance">멍멍이를 쫓거나 놀라게 하지 말고, 플래시 없이 편안한 거리에서 촬영해주세요. 카메라로 현장에서 촬영한 사진만 기록할 수 있어요.</p>}</header>}
     {active==='album'&&!albumDetail&&member&&<div className="go-recorder-identity">
       <p className="go-recorder-name"><strong>{member.nickname}</strong> 멍기록가</p>
       <Link className="go-recorder-shortcut" href={`/go/recorders/${member.id}`} aria-label="내 멍기록가 프로필로 이동">

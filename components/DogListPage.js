@@ -7,6 +7,7 @@ import { isSupabaseConfigured } from '../lib/supabaseClient';
 import SiteHeader from './SiteHeader';
 import DogLoading from './DogLoading';
 import DogActions from './DogActions';
+import GoDiscovery from './GoDiscovery.js';
 import { recordVisit } from '../lib/siteAnalytics';
 import { formatDogDate, getAgeInfo, getDogBirthDate, isDogBirthday, profileSummary } from '../lib/dogProfile';
 
@@ -76,6 +77,7 @@ export default function DogListPage({ title, category }) {
         <div className="page-head">
           <h1>{title}</h1>
         </div>
+        {category === 'adoption' && <GoDiscovery dog={dogs.find(dog=>!dog.adopted)||dogs[0]}/>}
 
         {category === 'adoption' && (
           <div className="listing-controls">
