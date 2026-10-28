@@ -58,9 +58,9 @@ export async function POST(request) {
     savedPath = `${member.id}/${crypto.randomUUID()}.webp`;
     const upload = await db.storage.from('go-cards').upload(savedPath, output, { contentType: 'image/webp', upsert: false });
     if (upload.error) throw upload.error;
-    const { data, error } = await db.from('go_cards').insert({ dog_id: dogId, member_id: member.id, image_path: savedPath, photo_style: 'original', title: title.trim(), description: description.trim(), ...ratings }).select('id').single();
+    const { data, error } = await db.from('go_cards').insert({ dog_id: dogId, member_id: member.id, image_path: savedPath, photo_style: 'original', title: title.trim(), description: description.trim(), ...ratings }).select('id,captured_at').single();
     if (error) throw error;
-    return Response.json({ id: data.id, status: 'pending' }, { status: 201 });
+    return Response.json({ id: data.id, status: 'pending', capturedAt: data.captured_at }, { status: 201 });
   } catch {
     if (savedPath) await adminDatabase().storage.from('go-cards').remove([savedPath]);
     return goError('카드 저장에 실패했어요. 잠시 후 다시 시도해주세요.', 500);
