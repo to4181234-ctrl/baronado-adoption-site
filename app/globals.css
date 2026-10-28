@@ -861,7 +861,7 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 /* State-based titles lead the card; community pages use four previews. */
 .go-card .go-card-body>.go-card-dog-name{font-size:12px;font-weight:500;line-height:1.5;letter-spacing:0;color:#9b8870;}
 .go-card .go-card-post-title{font-size:24px;font-weight:800;line-height:1.4;margin:6px 0 12px;color:#493522;}
-.go-description input::placeholder{color:#b9ac9b;opacity:1;font-weight:400;}
+.go-description input[placeholder="예시) 잠들기 직전 말랑이"]::placeholder{color:#cfc6ba;opacity:1;font-weight:400;}
 .go-board-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px;}
 .go-board-cards .go-card-description,.go-pick-cards .go-card-description{display:none;}
 .go-board-cards .go-card-post-title{font-size:19px;line-height:1.4;min-height:2.8em;}
