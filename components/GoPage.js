@@ -26,7 +26,7 @@ function DogAlbumTile({dog,member,collection,ownCollection,collectionError}){
     </div>
     <strong>{dog.name}</strong>
    </Link>
-   {uncollected&&<Link className="go-dog-hint-link" href={'/dogs/'+dog.id} aria-label={dog.name+'의 힌트, 가족을 찾아요에서 보기'}>가족을 찾아요에서 힌트 보기 <span aria-hidden="true">›</span></Link>}
+   {uncollected&&<Link className="go-dog-hint-link" href={'/dogs/'+dog.id} aria-label={dog.name+'의 힌트, 가족을 찾아요에서 보기'}>힌트보기 <span aria-hidden="true">›</span></Link>}
  </div>;
 }
 function Album({dogId}){
