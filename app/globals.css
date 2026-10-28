@@ -993,6 +993,8 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .go-zoom-story-meta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 14px;padding-top:20px;font-size:11px;color:#9c8a75;}
 .go-photo-zoom-caption{min-height:16px;font-size:10px!important;line-height:1.55!important;color:#a9977d!important;}
 @media(max-width:480px){
+ .go-viewer-context{flex-wrap:wrap;gap:6px 10px;}
+ .go-viewer-zoom-action{flex:0 1 auto;max-width:100%;white-space:normal;word-break:keep-all;line-height:1.4;text-align:center;min-height:40px;}
  .go-photo-zoom{gap:9px;padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));}
  .go-photo-zoom-head strong{font-size:14px;}
  .go-photo-zoom-tabs{width:100%;}
