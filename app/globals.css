@@ -886,3 +886,5 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .go-completion-screen .go-sound-toggle::before{content:'';position:absolute;inset:6px;border-radius:50%;border:1px solid #ffe4a340;background:#ffffff0d;z-index:-1;}
 .go-completion-screen .go-sound-toggle[aria-pressed=true]::before{background:#ffdf8c20;}
 .go-completion-screen .go-sound-toggle svg{width:16px;height:16px;}
+
+.go-completion-screen.go-card-viewer-post{grid-template-rows:auto minmax(0,1fr) auto;}
