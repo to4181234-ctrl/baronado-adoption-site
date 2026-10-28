@@ -20,7 +20,7 @@ export default function GoShell({ children, title = '멍멍GO!', description = '
     {active==='album'&&!albumDetail&&member&&<div className="go-recorder-identity">
       <p className="go-recorder-name"><strong>{member.nickname}</strong> 멍기록가</p>
       <Link className="go-recorder-shortcut" href={`/go/recorders/${member.id}`} aria-label="내 멍기록가 프로필로 이동">
-        <span>멍기록가 프로필 가기</span>
+        <span>내 프로필 보기</span>
         <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m7 4 6 6-6 6" /></svg>
       </Link>
     </div>}
