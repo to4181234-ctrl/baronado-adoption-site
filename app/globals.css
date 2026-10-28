@@ -825,3 +825,6 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 @media(max-width:620px){.site-nav{gap:19px;}}
 @media(max-width:390px){.site-nav{gap:13px;}.top-inner{gap:9px;}}
 .go-pick-cards .go-card{background:#fff9df;border-color:#e7dba9;}
+
+.go-share-count{font-size:11px;color:#9a876c;white-space:nowrap;margin-left:auto;}.go-card-outside .go-post-actions .go-share-count{order:1;}.go-card-outside .go-post-actions .go-secondary-actions{order:2;width:100%;justify-content:flex-end;}
+.go-card-outside .go-card-tools>button:only-child{grid-column:1/-1;}
