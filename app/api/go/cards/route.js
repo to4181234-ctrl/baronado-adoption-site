@@ -3,6 +3,7 @@ import { adminDatabase, validId } from '../../../../lib/server/adminData.js';
 import { goError, goMember, goMutationAllowed } from '../../../../lib/server/goAuth.js';
 import { loadGoCards } from '../../../../lib/server/goCards.js';
 import { validateRatings } from '../../../../lib/goRatings.js';
+import { parseBulkCardIds } from '../../../../lib/goBulkDelete.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,6 +23,42 @@ export async function GET(request) {
     const data = await loadGoCards({ member, mine, dogId, page, limit, query: (url.searchParams.get('q') || '').slice(0, 80), order: url.searchParams.get('order') === 'oldest' ? 'oldest' : 'newest' });
     return Response.json(data, { headers: { 'Cache-Control': 'no-store' } });
   } catch { return goError('카드를 불러오지 못했어요.', 500); }
+}
+
+export async function DELETE(request) {
+  const blocked = goMutationAllowed(request);
+  if (blocked) return blocked;
+  const member = await goMember(request);
+  if (!member) return goError('로그인이 필요해요.', 401);
+
+  let ids;
+  try {
+    ids = parseBulkCardIds((await request.json()).ids);
+  } catch (error) {
+    return goError(error.message || '선택한 카드를 확인해주세요.');
+  }
+
+  try {
+    const db = adminDatabase();
+    const { data: owned, error: lookupError } = await db.from('go_cards')
+      .select('id').in('id', ids).eq('member_id', member.id);
+    if (lookupError) throw lookupError;
+    if (owned.length !== ids.length) return goError('본인이 작성한 카드만 삭제할 수 있어요. 목록을 다시 확인해주세요.', 403);
+
+    // Keep the owner predicate on the actual deletion as well as the preflight check.
+    const { data: deleted, error } = await db.from('go_cards').delete()
+      .in('id', ids).eq('member_id', member.id).select('id,image_path');
+    if (error) throw error;
+    const imagePaths = (deleted || []).map(card => card.image_path).filter(Boolean);
+    const cleanup = imagePaths.length ? await db.storage.from('go-cards').remove(imagePaths) : { error: null };
+    return Response.json({
+      ok: true, deletedIds: (deleted || []).map(card => card.id),
+      cleanupPending: Boolean(cleanup.error),
+      partial: (deleted || []).length !== ids.length
+    }, { headers: { 'Cache-Control': 'no-store' } });
+  } catch {
+    return goError('선택한 카드를 삭제하지 못했어요.', 500);
+  }
 }
 
 export async function POST(request) {
