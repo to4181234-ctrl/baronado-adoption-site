@@ -10,7 +10,7 @@ export async function GET(request) {
   try {
     const params = new URL(request.url).searchParams;
     const page = Math.max(0, Math.min(1000, Number(params.get('page')) || 0));
-    const moderation = ['approved','rejected'].includes(params.get('status')) ? params.get('status') : 'pending';
+    const moderation = ['approved','rejected'].includes(params.get('status')) ? params.get('status') : 'approved';
     return Response.json(await loadGoCards({ moderation, page, query: (params.get('q') || '').slice(0, 80) }), { headers: { 'Cache-Control': 'no-store' } });
   } catch { return Response.json({ error: '게시물을 가져오지 못했어요.' }, { status: 500 }); }
 }
@@ -23,7 +23,7 @@ export async function PATCH(request) {
     const reason = requestedReason || (requestedStatus === 'hidden' ? 'other' : null);
     const note = requestedNote || (requestedStatus === 'hidden' ? '공개가 중지된 게시물입니다.' : null);
     if (!validId(id) || !['approved','rejected','hidden'].includes(status)) return Response.json({ error: '처리 상태를 확인해주세요.' }, { status: 400 });
-    if (status === 'rejected' && (!Object.hasOwn(REJECTION_REASONS, reason) || (reason === 'other' && (typeof note !== 'string' || !note.trim() || note.trim().length > 300)))) return Response.json({ error: '반려 사유를 선택하고 기타 사유는 300자 이내로 적어주세요.' }, { status: 400 });
+    if (status === 'rejected' && (!Object.hasOwn(REJECTION_REASONS, reason) || (reason === 'other' && (typeof note !== 'string' || !note.trim() || note.trim().length > 300)))) return Response.json({ error: '비공개 사유를 선택하고 기타 사유는 300자 이내로 적어주세요.' }, { status: 400 });
     const db = adminDatabase();
     const { error } = await db.from('go_cards').update({ status, reviewed_at: new Date().toISOString(), rejection_reason: status === 'rejected' ? reason : null, rejection_note: status === 'rejected' && reason === 'other' ? note.trim() : null }).eq('id', id);
     if (error) throw error;
