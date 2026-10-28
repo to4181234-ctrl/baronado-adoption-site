@@ -2,6 +2,7 @@ import { hasAdminSession, sameOrigin } from '../../../../../lib/server/adminSess
 import { adminDatabase, validId } from '../../../../../lib/server/adminData.js';
 import { loadGoCards } from '../../../../../lib/server/goCards.js';
 import { REJECTION_REASONS } from '../../../../../lib/goShared.js';
+import { parseBulkCardIds } from '../../../../../lib/goBulkDelete.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -35,7 +36,32 @@ export async function PATCH(request) {
 export async function DELETE(request) {
   if (!hasAdminSession(request) || !sameOrigin(request)) return Response.json({ error: '관리자 로그인이 필요해요.' }, { status: 401 });
   try {
-    const { id } = await request.json();
+    const input = await request.json();
+    if (Array.isArray(input?.ids)) {
+      let ids;
+      try { ids = parseBulkCardIds(input.ids); }
+      catch (error) { return Response.json({ error: error.message }, { status: 400 }); }
+      const status = input.status;
+      if (!['approved','rejected'].includes(status)) return Response.json({ error: '공개·비공개 목록을 다시 선택해주세요.' }, { status: 400 });
+      const db = adminDatabase();
+      const { data: matched, error: lookupError } = await db.from('go_cards')
+        .select('id').in('id', ids).eq('status', status);
+      if (lookupError) throw lookupError;
+      if (matched.length !== ids.length) return Response.json({ error: '일부 게시물의 상태가 변경됐어요. 목록을 새로고침해주세요.' }, { status: 409 });
+
+      const { data: deleted, error } = await db.from('go_cards').delete()
+        .in('id', ids).eq('status', status).select('id,image_path');
+      if (error) throw error;
+      const files = (deleted || []).map(card => card.image_path).filter(Boolean);
+      const cleanup = files.length ? await db.storage.from('go-cards').remove(files) : { error: null };
+      return Response.json({
+        ok: true, deletedIds: (deleted || []).map(card => card.id),
+        cleanupPending: Boolean(cleanup.error),
+        partial: (deleted || []).length !== ids.length
+      }, { headers: { 'Cache-Control': 'no-store' } });
+    }
+
+    const { id } = input || {};
     if (!validId(id)) return Response.json({ error: '게시물을 확인해주세요.' }, { status: 400 });
     const db = adminDatabase();
     const { data: card, error: readError } = await db.from('go_cards').select('id,image_path').eq('id', id).maybeSingle();
