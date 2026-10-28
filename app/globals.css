@@ -857,3 +857,17 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .go-board-cards .go-card-ratings>div>span:first-child{width:27px;flex-basis:27px;}
 .go-board-cards .go-card-ratings .go-star{width:10px;height:10px;}
 @media(max-width:620px){.go-board-cards .go-card-description{font-size:9px;line-height:1.4;min-height:2.8em;margin:0 0 5px;}.go-board-cards .go-card-ratings{gap:3px;min-height:42px;margin:6px 0;padding-top:6px;}.go-board-cards .go-card-ratings>div{font-size:7px;gap:3px;min-height:11px;}.go-board-cards .go-card-ratings>div>span:first-child{width:21px;flex-basis:21px;}.go-board-cards .go-card-ratings .go-star{width:7px;height:7px;}}
+
+/* State-based titles lead the card; community pages use four previews. */
+.go-card .go-card-body>.go-card-dog-name{font-size:12px;font-weight:500;line-height:1.5;letter-spacing:0;color:#9b8870;}
+.go-card .go-card-post-title{font-size:24px;font-weight:800;line-height:1.4;margin:6px 0 12px;color:#493522;}
+.go-description input::placeholder{color:#b9ac9b;opacity:1;font-weight:400;}
+.go-board-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px;}
+.go-board-cards .go-card-description,.go-pick-cards .go-card-description{display:none;}
+.go-board-cards .go-card-post-title{font-size:19px;line-height:1.4;min-height:2.8em;}
+.go-pick-cards{max-width:600px;}
+.go-pick-cards .go-card-post-title{font-size:15px;line-height:1.4;min-height:2.8em;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;}
+.go-pick-cards .go-card-ratings>div{font-size:9px;gap:4px;}.go-pick-cards .go-card-ratings>div>span:first-child{width:27px;flex-basis:27px;}.go-pick-cards .go-card-ratings .go-star{width:10px;height:10px;}
+.go-dog-link{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px;margin-top:26px;border:1px solid #e3ce85;border-radius:12px;background:#fff4c4;color:#614922;text-decoration:none;min-height:76px;}
+.go-dog-link>span{display:grid;gap:4px;}.go-dog-link small{font-size:11px;color:#a28a57;}.go-dog-link strong{font-size:18px;font-weight:800;}.go-dog-link svg{width:24px;height:24px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}.go-dog-link:focus-visible{outline:2px solid #a87d2d;outline-offset:4px;}
+@media(max-width:620px){.go-board-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px;}.go-board-cards .go-card{padding:9px;}.go-board-cards .go-card-body>.go-card-dog-name{font-size:10px;margin-top:8px;}.go-board-cards .go-card-post-title{font-size:16px;min-height:2.8em;margin:4px 0 8px;}.go-board-cards .go-card-description{display:none;}.go-pick-cards{max-width:none;gap:10px;}.go-pick-cards>.go-card-entry{flex-basis:44%;}.go-pick-cards .go-card{padding:8px;}.go-pick-cards .go-card-body>.go-card-dog-name{font-size:10px;}.go-pick-cards .go-card-post-title{font-size:14px;}.go-dog-link{padding:16px;}.go-dog-link strong{font-size:17px;}}
