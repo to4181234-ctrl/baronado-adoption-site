@@ -839,3 +839,21 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .go-board-cards .go-card-information{margin-top:auto;padding-top:10px;}
 .go-preview-stats{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 8px;padding:9px 2px 0;font-size:11px;color:#9a8469;}
 @media(max-width:620px){.go-board-cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 8px;}.go-board-cards .go-card{padding:6px;border-radius:8px;}.go-board-cards .go-card-top{font-size:6px;letter-spacing:.02em;}.go-board-cards .go-card-body>strong{font-size:14px;margin-top:8px;}.go-board-cards .go-card-post-title{font-size:10px;line-height:1.4;min-height:2.8em;margin:7px 0;}.go-board-cards .go-card-information{display:grid;gap:3px;font-size:8px;line-height:1.4;}.go-board-cards .go-card-information span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.go-preview-stats{font-size:9px;gap:3px;}.go-board-cards .go-card-art{border-radius:4px;}}
+
+/* Community previews: visual ratings and a consistent left-aligned author footer. */
+.go-board-cards .go-card-top,.go-pick-cards .go-card-top{display:none;}
+.go-board-cards .go-card-art,.go-pick-cards .go-card-art{margin-top:0;}
+.go-board-cards .go-card-ratings{display:grid;gap:6px;min-height:67px;margin:12px 0;padding:10px 0 0;align-content:start;}
+.go-board-cards .go-card-ratings>div{display:flex;align-items:center;gap:8px;font-size:10px;min-height:15px;}
+.go-board-cards .go-card-ratings>div>span:first-child{width:30px;flex-basis:30px;}
+.go-board-cards .go-card-ratings .go-star{width:12px;height:12px;}
+.go-board-cards .go-card-information,.go-pick-cards .go-card-information{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;text-align:left;gap:4px;}
+.go-board-cards .go-card-information>span,.go-pick-cards .go-card-information>span{order:-1;max-width:100%;font-weight:700;color:#806c54;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.go-board-cards .go-card-information>time,.go-pick-cards .go-card-information>time{font-weight:400;color:#ad9a84;}
+@media(max-width:620px){.go-board-cards .go-card-ratings{gap:4px;min-height:48px;margin:8px 0;padding-top:8px;}.go-board-cards .go-card-ratings>div{gap:3px;min-height:12px;font-size:8px;}.go-board-cards .go-card-ratings>div>span:first-child{width:24px;flex-basis:24px;}.go-board-cards .go-card-ratings .go-star{width:8px;height:8px;}.go-board-cards .go-rating-stars{gap:0;}.go-board-cards .go-card-information{font-size:8px;gap:3px;}.go-board-cards .go-card-information>span{font-size:9px;}}
+/* Keep the post's title and description visible in community previews. */
+.go-board-cards .go-card-description{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:11px;line-height:1.45;min-height:2.9em;margin:0 0 7px;overflow-wrap:anywhere;}
+.go-board-cards .go-card-ratings>div{font-size:9px;gap:5px;}
+.go-board-cards .go-card-ratings>div>span:first-child{width:27px;flex-basis:27px;}
+.go-board-cards .go-card-ratings .go-star{width:10px;height:10px;}
+@media(max-width:620px){.go-board-cards .go-card-description{font-size:9px;line-height:1.4;min-height:2.8em;margin:0 0 5px;}.go-board-cards .go-card-ratings{gap:3px;min-height:42px;margin:6px 0;padding-top:6px;}.go-board-cards .go-card-ratings>div{font-size:7px;gap:3px;min-height:11px;}.go-board-cards .go-card-ratings>div>span:first-child{width:21px;flex-basis:21px;}.go-board-cards .go-card-ratings .go-star{width:7px;height:7px;}}
