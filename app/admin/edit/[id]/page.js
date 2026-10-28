@@ -53,7 +53,13 @@ function EditDogForm() {
 
   const onChange = (event) => {
     const { name, value, type, checked } = event.target;
-    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    setForm((prev) => {
+      const next = { ...prev, [name]: type === 'checkbox' ? checked : value };
+      if (name === 'arrived_at' && !value && prev.profile?.age_kind === 'estimated' && prev.profile.age_auto_update) {
+        next.profile = { ...prev.profile, age_auto_update: false };
+      }
+      return next;
+    });
   };
 
   const onSubmit = async (event) => {
@@ -126,14 +132,14 @@ function EditDogForm() {
                 <strong>O</strong>
               </label>
 
-              {form.category === CATEGORY_ADOPTION && <label><span className="label">바로나도에 온 날</span><input type="date" className="field" name="arrived_at" value={form.arrived_at || ''} onChange={onChange}/></label>}
+              {form.category === CATEGORY_ADOPTION && <div className="optional-date-field"><label><span className="label">바로나도에 온 날 <small>(선택)</small></span><input type="date" className="field" name="arrived_at" value={form.arrived_at || ''} onChange={onChange}/></label><button type="button" className="optional-date-clear" disabled={!form.arrived_at} onClick={() => setForm(prev => ({...prev,arrived_at:'',profile:prev.profile?.age_kind==='estimated'&&prev.profile.age_auto_update?{...prev.profile,age_auto_update:false}:prev.profile}))}>날짜 지우기</button></div>}
               <label className="check-row">
                 <span>입양 완료</span>
                 <input type="checkbox" name="adopted" checked={Boolean(form.adopted)} onChange={onChange} />
                 <strong>O</strong>
               </label>
 
-              {form.category === CATEGORY_ADOPTION && form.adopted && <label><span className="label">입양 간 날짜</span><input className="field" type="date" name="adopted_at" value={form.adopted_at || ''} onChange={onChange}/></label>}
+              {form.category === CATEGORY_ADOPTION && form.adopted && <div className="optional-date-field"><label><span className="label">입양 간 날짜 <small>(선택)</small></span><input className="field" type="date" name="adopted_at" value={form.adopted_at || ''} onChange={onChange}/></label><button type="button" className="optional-date-clear" disabled={!form.adopted_at} onClick={() => setForm(prev => ({...prev,adopted_at:''}))}>날짜 지우기</button></div>}}
               <VaccinationEditor form={form} setForm={setForm} />
               {form.category === CATEGORY_ADOPTION && <AdoptionExtras form={form} setForm={setForm} />}
               {form.category === CATEGORY_ADOPTION && <ProfileQuestionEditor form={form} setForm={setForm} />}
