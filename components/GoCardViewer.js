@@ -41,5 +41,5 @@ export default function GoCardViewer({card,onClose,preparedSound,member,onLogin,
   {error&&<p className="go-viewer-error" role="status">{error}</p>}
   <p className="go-viewer-replay-hint">카드를 터치하면 반짝임 효과가 다시 재생돼요.</p>
  </div>;
- return <><GoCompletion card={current} viewOnly soundButton={<GoSoundButton enabled={enabled} onClick={toggle}/>} onReplay={replay} onDone={onClose} viewerActions={controls}/>{zoomed&&<PhotoZoom card={current} onClose={()=>setZoomed(false)}/ >}{exporting&&<GoCardExport card={current} overlayClassName="go-viewer-export-overlay" onRecorded={count=>{setCurrent(previous=>({...previous,shareCount:Math.max(previous.shareCount||0,count)}));onCardChanged?.({shareCount:count});}} onClose={()=>setExporting(false)}/>}</>;
+ return <><GoCompletion card={current} viewOnly soundButton={<GoSoundButton enabled={enabled} onClick={toggle}/>} onReplay={replay} onDone={onClose} viewerActions={controls}/>{zoomed&&<PhotoZoom card={current} onClose={()=>setZoomed(false)}/>}{exporting&&<GoCardExport card={current} overlayClassName="go-viewer-export-overlay" onRecorded={count=>{setCurrent(previous=>({...previous,shareCount:Math.max(previous.shareCount||0,count)}));onCardChanged?.({shareCount:count});}} onClose={()=>setExporting(false)}/>}</>;
 }
