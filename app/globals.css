@@ -897,3 +897,68 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 .go-completion-screen .go-sound-toggle svg{width:16px;height:16px;}
 
 .go-completion-screen.go-card-viewer-post{grid-template-rows:auto minmax(0,1fr) auto;}
+
+
+/* Unified MeongGO viewer: quieter metadata, prominent actions, accessible photo zoom. */
+.go-completion-screen.go-card-viewer-post{grid-template-rows:auto minmax(0,1fr) auto;}
+.go-viewer-footer{width:min(460px,100%);padding:4px 0 0;}
+.go-viewer-controls{display:grid;gap:10px;text-align:left;}
+.go-viewer-context{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;}
+.go-viewer-author{display:grid;gap:3px;min-width:0;}
+.go-viewer-author>span{font-size:10px;line-height:1.5;color:#cbb899;}
+.go-viewer-author>a,.go-viewer-author>strong{display:inline-flex;align-items:center;flex-wrap:wrap;gap:5px;color:#fff1cc;text-decoration:none;font-size:16px;font-weight:800;line-height:1.4;word-break:break-word;}
+.go-viewer-author>a>span{font-size:11px;font-weight:600;color:#f3d49a;text-decoration:underline;text-underline-offset:3px;}
+.go-viewer-author svg{width:14px;height:14px;flex:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+.go-viewer-zoom-action{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:44px;flex:0 0 auto;border:1px solid #ead5a250;border-radius:8px;padding:8px 10px;background:#fff7dc10;color:#f3ddaf;font-size:11px;font-weight:650;white-space:nowrap;}
+.go-viewer-zoom-action svg{height:15px;width:15px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.go-viewer-main-actions{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:8px;}
+.go-viewer-main-actions button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:750;white-space:normal;word-break:keep-all;touch-action:manipulation;}
+.go-viewer-main-actions svg{width:18px;height:18px;flex:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.go-viewer-save{border:1px solid #f5df8a;background:#f5dc72;color:#3d3020;}
+.go-viewer-save svg{fill:none;}
+.go-viewer-like{border:1px solid #ffe1ac50;background:#fff8e80c;color:#f9e9cc;}
+.go-viewer-like svg{fill:none;}
+.go-viewer-like[aria-pressed=true]{background:#f9e6bd20;color:#ffe1a6;}
+.go-viewer-like[aria-pressed=true] svg{fill:#e7a96e;}
+.go-viewer-like:disabled{opacity:.6;}
+.go-viewer-replay-hint{margin:0!important;font-size:10px!important;text-align:center;color:#bba786!important;}
+.go-viewer-error{margin:0!important;font-size:12px!important;color:#ffd7bc!important;text-align:center;}
+.go-viewer-controls a:focus-visible,.go-viewer-controls button:focus-visible{outline:2px solid #ffdf8b;outline-offset:3px;}
+.go-viewer-export-overlay{z-index:140;}
+.go-photo-zoom{position:fixed;inset:0;z-index:150;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px;background:#16120ff5;color:#fff7ec;padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(16px);box-sizing:border-box;}
+.go-photo-zoom-head{display:flex;align-items:center;justify-content:space-between;gap:15px;min-height:44px;font-size:13px;font-weight:700;}
+.go-photo-zoom-head button{display:grid;place-items:center;flex:none;width:44px;height:44px;border:1px solid #ffffff5c;border-radius:50%;background:transparent;color:#fff;font-size:26px;}
+.go-photo-zoom-stage{display:grid;place-items:center;min-height:0;overflow:auto;overscroll-behavior:contain;}
+.go-photo-zoom-stage img{display:block;max-width:100%;max-height:100%;object-fit:contain;object-position:center;border-radius:5px;}
+.go-photo-zoom>p{font-size:11px;text-align:center;color:#d2c2a7;margin:0;}
+.go-photo-zoom-head button:focus-visible{outline:2px solid #ffe1a6;outline-offset:3px;}
+@media(max-width:420px){.go-viewer-footer{padding-top:2px;}.go-viewer-author>a,.go-viewer-author>strong{font-size:14px;}.go-viewer-author>a>span{font-size:10px;}.go-viewer-zoom-action{padding:7px 8px;font-size:10px;}.go-viewer-main-actions button{min-height:46px;font-size:12px;padding:9px 8px;gap:5px;}.go-viewer-main-actions svg{width:16px;height:16px;}.go-viewer-controls{gap:8px;}}
+@media(max-height:620px){.go-viewer-controls{gap:5px;}.go-viewer-main-actions button{min-height:42px;}.go-viewer-replay-hint{display:none;}}
+
+/* Recorder profile: biography is content, metrics are large, methodology is secondary. */
+.go-recorder-profile .go-recorder-intro{padding:17px 0 2px;border-top:1px solid #eee5d8;margin-top:19px;}
+.go-recorder-intro-header{display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.go-recorder-intro-header h3{margin:0;font-size:13px;font-weight:750;color:#6b533a;}
+.go-recorder-edit-trigger{display:inline-flex;align-items:center;gap:4px;border:0;background:transparent;color:#9d835d;font-size:12px;font-weight:650;min-height:42px;padding:6px 0;}
+.go-recorder-edit-trigger span{font-size:18px;line-height:1;}
+.go-recorder-profile .go-recorder-bio{display:block!important;margin:7px 0 13px;font-size:14px;line-height:1.8;color:#564331;white-space:pre-wrap;overflow-wrap:anywhere;}
+.go-recorder-profile .go-recorder-bio-empty{font-size:12px;color:#a29380;}
+.go-recorder-profile .go-recorder-totals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:19px 0 0;}
+.go-recorder-profile .go-recorder-totals>div{display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:16px 17px;background:#faf7f0;border:1px solid #eee5d7;border-radius:10px;}
+.go-recorder-profile .go-recorder-totals strong{font-size:30px;line-height:1.1;font-weight:850;color:#5a4127;font-variant-numeric:tabular-nums;}
+.go-recorder-profile .go-recorder-totals span{font-size:12px;font-weight:650;color:#8e775b;}
+.go-recorder-profile .go-recorder-stats-caption{margin:9px 0 0;font-size:10px;line-height:1.5;color:#ab9d8c;}
+.go-recorder-profile .go-recorder-edit{margin:12px 0 14px;}
+.go-recorder-edit-trigger:focus-visible{outline:2px solid #ad8648;outline-offset:2px;}
+@media(max-width:420px){.go-recorder-profile .go-recorder-totals>div{padding:14px 12px;}.go-recorder-profile .go-recorder-totals strong{font-size:28px;}.go-recorder-profile .go-recorder-bio{font-size:13px;}}
+
+/* Administrator: center the MeongGO management label and offer explicit date clearing. */
+.admin-container .admin-tabs .tab[href="/admin/go"]{text-align:center;justify-content:center;align-items:center;line-height:1.35;padding:9px 8px;word-break:keep-all;}
+.optional-date-field{display:flex;align-items:end;gap:10px;min-width:0;}
+.optional-date-field label{flex:1;min-width:0;}
+.optional-date-field .label small{font-size:11px;font-weight:500;color:#9b8a75;}
+.optional-date-field .field{width:100%;box-sizing:border-box;}
+.optional-date-clear{flex:none;min-height:44px;padding:9px 12px;background:#fbf8f2;border:1px solid #ded2c1;border-radius:8px;color:#80684d;font-size:12px;font-weight:650;touch-action:manipulation;}
+.optional-date-clear:disabled{opacity:.45;}
+.optional-date-clear:focus-visible{outline:2px solid #b8954e;outline-offset:2px;}
+@media(max-width:380px){.optional-date-field{gap:7px;}.optional-date-clear{padding:9px 8px;font-size:11px;}}
