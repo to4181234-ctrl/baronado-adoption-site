@@ -807,7 +807,16 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 /* Album hierarchy and cinematic card inspection */
 .go-sound-toggle{display:inline-grid;place-items:center;width:44px;height:44px;min-width:44px;padding:10px;border-radius:50%;flex-shrink:0;}
 .go-sound-toggle svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-.go-recorder-name{margin:20px 0 26px;font-size:16px;color:#8c7962;}.go-recorder-name strong{font-size:21px;font-weight:850;color:#443323;}
+.go-recorder-identity{display:flex;align-items:center;flex-wrap:wrap;column-gap:16px;row-gap:0;margin:20px 0 26px;}
+.go-recorder-name{margin:0;font-size:16px;line-height:1.45;color:#8c7962;}
+.go-recorder-name strong{font-size:21px;font-weight:850;color:#443323;}
+.go-recorder-shortcut{display:inline-flex;align-items:center;gap:3px;min-height:44px;color:#8f7351;font-size:12px;font-weight:650;line-height:1.4;text-decoration:none;white-space:nowrap;}
+.go-recorder-shortcut span{border-bottom:1px solid #cbb89d;padding-bottom:2px;}
+.go-recorder-shortcut svg{width:14px;height:14px;flex:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .16s ease;}
+.go-recorder-shortcut:hover,.go-recorder-shortcut:focus-visible{color:#493522;}
+.go-recorder-shortcut:hover svg{transform:translateX(2px);}
+.go-recorder-shortcut:focus-visible{outline:2px solid #b99656;outline-offset:3px;border-radius:3px;}
+@media(prefers-reduced-motion:reduce){.go-recorder-shortcut svg{transition:none;}.go-recorder-shortcut:hover svg{transform:none;}}
 .go-heading{margin-top:22px;}.go-local-nav{margin-bottom:28px;}.go-album-order select{min-height:44px;border:1px solid #e6ded2;border-radius:8px;background:#fff;padding:9px 30px 9px 12px;font:inherit;font-size:13px;color:#66533e;}
 .go-card-view-button{display:block;width:100%;padding:0;text-align:left;border:0;border-radius:12px;background:none;color:inherit;font:inherit;cursor:pointer;touch-action:manipulation;}.go-card-view-button:focus-visible{outline:2px solid #b99656;outline-offset:4px;}
 .go-card-viewer{grid-template-rows:auto minmax(0,1fr);}
