@@ -139,7 +139,7 @@ function EditDogForm() {
                 <strong>O</strong>
               </label>
 
-              {form.category === CATEGORY_ADOPTION && form.adopted && <div className="optional-date-field"><label><span className="label">입양 간 날짜 <small>(선택)</small></span><input className="field" type="date" name="adopted_at" value={form.adopted_at || ''} onChange={onChange}/></label><button type="button" className="optional-date-clear" disabled={!form.adopted_at} onClick={() => setForm(prev => ({...prev,adopted_at:''}))}>날짜 지우기</button></div>}}
+              {form.category === CATEGORY_ADOPTION && form.adopted && <div className="optional-date-field"><label><span className="label">입양 간 날짜 <small>(선택)</small></span><input className="field" type="date" name="adopted_at" value={form.adopted_at || ''} onChange={onChange}/></label><button type="button" className="optional-date-clear" disabled={!form.adopted_at} onClick={() => setForm(prev => ({...prev,adopted_at:''}))}>날짜 지우기</button></div>}
               <VaccinationEditor form={form} setForm={setForm} />
               {form.category === CATEGORY_ADOPTION && <AdoptionExtras form={form} setForm={setForm} />}
               {form.category === CATEGORY_ADOPTION && <ProfileQuestionEditor form={form} setForm={setForm} />}
