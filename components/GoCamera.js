@@ -4,6 +4,7 @@ import GoRatingsEditor from './GoRatingsEditor.js';
 import { EMPTY_RATINGS } from '../lib/goRatings.js';
 import GoLoading from './GoLoading.js';
 import GoCompletion from './GoCompletion.js';
+import GoSoundButton from './GoSoundButton.js';
 import {createCompletionSound,COMPLETION_SOUND_KEY,completionSoundEnabled} from '../lib/goCompletionSound.js';
 export default function GoCamera({ dog, onDone, onSaved, nickname, standing, firstCard=false }) {
   const [completed,setCompleted]=useState(null);
@@ -12,7 +13,7 @@ export default function GoCamera({ dog, onDone, onSaved, nickname, standing, fir
   useEffect(()=>{const player=createCompletionSound();sound.current=player;try{soundOn.current=completionSoundEnabled(localStorage.getItem(COMPLETION_SOUND_KEY));}catch{soundOn.current=true;}setSoundEnabled(soundOn.current);if(soundOn.current)player.prepare();return()=>{player.dispose();sound.current=null;};},[]);
   function toggleSound(){const enabled=!soundOn.current;soundOn.current=enabled;setSoundEnabled(enabled);try{localStorage.setItem(COMPLETION_SOUND_KEY,enabled?'on':'off');}catch{}if(enabled)sound.current?.prepare();else sound.current?.stop();}
   function replaySound(){const request=++replayRequest.current;const started=performance.now();sound.current?.stop();if(!soundOn.current)return;const delay=window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:.3;Promise.resolve(sound.current?.prepare()).then(()=>{const elapsed=(performance.now()-started)/1000;if(mounted.current&&request===replayRequest.current&&soundOn.current&&elapsed<.5)sound.current?.play(Math.max(0,delay-elapsed));});}
-  const soundButton=<button className="go-sound-toggle" type="button" aria-pressed={soundEnabled} onClick={toggleSound}>{soundEnabled?'완성 소리 켜짐':'완성 소리 꺼짐'}</button>;
+  const soundButton=<GoSoundButton enabled={soundEnabled} onClick={toggleSound}/>;
   const video = useRef(null);
   const stream = useRef(null);
   const mounted = useRef(true);

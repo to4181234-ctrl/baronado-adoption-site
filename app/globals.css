@@ -803,3 +803,24 @@ textarea.field { min-height: 240px; resize: vertical; line-height: 1.65; }
 @media(max-height:600px){.go-cinematic-footer h2{font-size:20px;}.go-cinematic-footer h2 br{display:none;}.go-cinematic-footer p{margin:3px 0 6px;font-size:10px;}.go-cinematic-footer .go-cinematic-first{margin:3px 0;}.go-cinematic-top button{min-height:36px;}.go-cinematic-close{width:36px;height:36px;}.go-complete-continue{min-height:40px;}}
 @media(prefers-reduced-motion:reduce){.go-completion-screen,.go-cinematic-anchor,.go-cinematic-glow,.go-cinematic-ring,.go-cinematic-shine,.go-cinematic-stars>span{animation:none;}.go-cinematic-anchor{opacity:1;transform:none;}.go-cinematic-glow{opacity:.5;}.go-cinematic-ring,.go-cinematic-shine,.go-cinematic-stars{display:none;}}
 .go-cinematic-anchor[role=button]{cursor:pointer;touch-action:manipulation;}.go-cinematic-anchor[role=button]:focus-visible{outline:2px solid #ffe5a3;outline-offset:10px;border-radius:12px;}.go-cinematic-footer .go-replay-hint{font-size:10px;color:#d2bc8e;margin:3px 0 8px;}.go-standing{display:grid;gap:5px;margin:18px 0;padding:15px 0;border-top:1px solid #ede4d5;border-bottom:1px solid #ede4d5;}.go-standing>span{font-size:11px;color:#a28a67;}.go-standing>strong{font-size:19px;color:#745934;}.go-standing p{font-size:12px;color:#998367;margin:0;}.go-standing small{font-size:10px;line-height:1.6;color:#aa987d;}.go-cinematic-footer .go-standing.compact{padding:7px 0;margin:4px 0 10px;border-color:#ffe4a326;gap:3px;}.go-cinematic-footer .go-standing>span{display:none;}.go-cinematic-footer .go-standing>strong{font-size:14px;color:#ffe2a0;}.go-cinematic-footer .go-standing p{margin:0;font-size:10px;}.go-cinematic-footer .go-standing small{font-size:8px;color:#ae9875;}@media(max-height:650px){.go-cinematic-footer .go-standing.compact{margin:3px 0 6px;padding:4px 0;}.go-cinematic-footer .go-standing p{display:none;}.go-cinematic-footer .go-replay-hint{margin:0 0 4px;}}
+
+/* Album hierarchy and cinematic card inspection */
+.go-sound-toggle{display:inline-grid;place-items:center;width:44px;height:44px;min-width:44px;padding:10px;border-radius:50%;flex-shrink:0;}
+.go-sound-toggle svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.go-recorder-name{margin:20px 0 26px;font-size:16px;color:#8c7962;}.go-recorder-name strong{font-size:21px;font-weight:850;color:#443323;}
+.go-heading{margin-top:22px;}.go-local-nav{margin-bottom:28px;}.go-album-order select{min-height:44px;border:1px solid #e6ded2;border-radius:8px;background:#fff;padding:9px 30px 9px 12px;font:inherit;font-size:13px;color:#66533e;}
+.go-card-view-button{display:block;width:100%;padding:0;text-align:left;border:0;border-radius:12px;background:none;color:inherit;font:inherit;cursor:pointer;touch-action:manipulation;}.go-card-view-button:focus-visible{outline:2px solid #b99656;outline-offset:4px;}
+.go-card-viewer{grid-template-rows:auto minmax(0,1fr);}
+.go-card-outside{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding-top:12px;}
+.go-card-outside .go-status{order:0;justify-self:start;margin:0;padding:5px 9px;border-radius:5px;background:#f8f4e9;color:#8c7754;font-size:11px;line-height:1.5;}
+.go-card-outside .go-card-tools{order:1;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0;}
+.go-card-outside .go-card-tools button{font-size:12px;min-height:46px;line-height:1.45;word-break:keep-all;padding:10px 8px;}
+.go-card-outside .go-card-tools button:first-child{background:#f6df69;color:#574423;border-color:#f6df69;font-weight:700;}
+.go-card-outside .go-post-actions{order:2;margin:0;padding-top:6px;border-top:1px solid #efe9df;}
+.go-card-outside .go-secondary-actions{gap:12px;}.go-card-outside .go-secondary-actions button{font-size:12px;min-height:44px;padding:8px 6px;}.go-card-outside .go-secondary-actions .go-delete-action{color:#a8786d;}
+.go-card-outside .go-note,.go-card-outside .go-report-choices{order:3;}.go-album-toolbar{gap:12px;flex-wrap:wrap;}
+
+@media(max-width:440px){.go-card-outside .go-card-tools{grid-template-columns:minmax(0,1fr);}.go-card-outside .go-secondary-actions{gap:4px;}.go-card-outside .go-secondary-actions button{font-size:11px;}}
+.site-nav{gap:28px;}
+@media(max-width:620px){.site-nav{gap:19px;}}
+@media(max-width:390px){.site-nav{gap:13px;}.top-inner{gap:9px;}}

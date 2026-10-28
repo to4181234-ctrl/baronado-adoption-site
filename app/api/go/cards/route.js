@@ -32,12 +32,7 @@ export async function POST(request) {
   let savedPath;
   try {
     const db = adminDatabase();
-    const today = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
-    const [{ count }, form] = await Promise.all([
-      db.from('go_cards').select('*', { count: 'exact', head: true }).eq('member_id', member.id).gte('created_at', today),
-      request.formData()
-    ]);
-    if (count >= 5) return goError('하루 최대 5장까지 기록할 수 있어요.', 429);
+    const form = await request.formData();
     const dogId = form.get('dogId');
     const title = form.get('title');
     const description = form.get('description');
