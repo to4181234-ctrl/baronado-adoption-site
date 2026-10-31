@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prebuild": "node scripts/install-meonggo-audio.mjs && node scripts/verify-meonggo-approved-audio.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "latest",
