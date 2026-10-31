@@ -64,3 +64,70 @@
 @keyframes meong-hit-left{50%{transform:translateX(15px) rotate(7deg)}}
 @keyframes meong-hit-right{50%{transform:translateX(-15px) rotate(-7deg)}}
 @media (prefers-reduced-motion:reduce){.meong-battle-versus.is-colliding .meong-battle-card{animation:none}}
+
+/* Figma 173:8009, 173:8823 — measured mobile artboard: 390px wide.
+   Keep original pixel frame artwork, positions, and typography. */
+.meong-battle-app{
+ padding:46px 16px 42px;
+ font-family:"MonaS12","Galmuri11",sans-serif;
+}
+.meong-battle-app h1{
+ font-family:"MonaS12","Galmuri11",sans-serif;
+ font-size:24px;
+ font-weight:700;
+ line-height:36px;
+ letter-spacing:0;
+ margin:0 0 8px;
+}
+.meong-battle-hint{font-family:"MonaS12","Galmuri11",sans-serif;font-size:12px;line-height:20px;margin:0 0 14px}
+.meong-battle-start-link{
+ font-family:"MonaS12","Galmuri11",sans-serif!important;
+ font-size:18px!important;font-weight:700!important;line-height:28px;
+ letter-spacing:0!important;margin:0 0 13px;
+}
+.meong-battle-tabs button,.meong-battle-tabs span{
+ font-family:"Pretendard",sans-serif;
+ font-size:12px;
+ line-height:17px;
+}
+.meong-battle-chosen{font-family:"Pretendard",sans-serif}
+.meong-battle-phase-fight .meong-battle-fight h1{
+ margin:0 0 56px;
+}
+.meong-battle-phase-fight .meong-battle-versus{
+ display:flex;justify-content:center;gap:41px;align-items:flex-start;
+}
+.meong-battle-phase-fight .meong-battle-card.is-mini{
+ width:146px;
+ height:232px;
+ aspect-ratio:146 / 232;
+ max-width:none;
+ flex:0 0 146px;
+}
+.meong-battle-phase-fight .meong-battle-fight>strong{
+ font-family:"MonaS12","Galmuri11",sans-serif;
+ margin:37px 0 24px;
+}
+.meong-battle-phase-fight .meong-battle-fight .meong-battle-primary{
+ width:269px;
+ height:46px;
+ max-width:100%;
+ font-family:"MonaS12","Galmuri11",sans-serif;
+ border-radius:0;
+ font-size:14px;
+ font-weight:400;
+}
+.meong-battle-phase-result .meong-battle-result h1{
+ margin:0 0 49px;
+}
+.meong-battle-phase-result .meong-battle-winner{
+ height:184px;
+}
+.meong-battle-phase-result .meong-battle-winner img{
+ max-height:184px;
+ max-width:184px;
+}
+@media(max-width:365px){
+ .meong-battle-phase-fight .meong-battle-versus{gap:calc((100vw - 32px)*.115)}
+ .meong-battle-phase-fight .meong-battle-card.is-mini{width:calc((100vw - 32px)*.41);height:auto;aspect-ratio:146/232;flex-basis:calc((100vw - 32px)*.41)}
+}
