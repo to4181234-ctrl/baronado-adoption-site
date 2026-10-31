@@ -15,3 +15,15 @@
 @keyframes v3-drawer-open{from{transform:translateX(-100%)}to{transform:translateX(0)}}
 .v3-admin-list-site .v3-admin-status-tabs:has(button:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,1fr))}
 @media(prefers-reduced-motion:reduce){.v3-filter-backdrop,.v3-filter-sheet,.v3-menu-drawer{animation:none!important}}
+
+/* Figma 173:1683: exact visitor-before-login profile and pixel battle instructions. */
+.v3-profile-head .v3-profile-anon-silhouette{width:94px!important;height:94px!important;opacity:.28;filter:grayscale(1);image-rendering:pixelated}
+.v3-profile-head .v3-anon-heading{font-size:18px!important;line-height:26px!important;white-space:nowrap;letter-spacing:-.05em!important}
+.v3-profile-head .v3-anon-lede{color:#1d1c18!important;font-size:12px!important;margin:0 0 21px!important}
+.v3-profile-head .v3-profile-login{display:block!important;line-height:20px!important;font-size:12px!important;margin:0!important;color:#1d1c18;font-family:"Pretendard Variable","Pretendard",sans-serif}
+.v3-go-site .v3-header-logout{white-space:nowrap;max-width:none;font-size:12px!important}
+.v3-album-home .v3-collection-section .v3-progress{margin-bottom:34px!important}
+.v3-album-home .v3-battle-home{margin-top:30px!important}
+.v3-album-home .v3-battle-home .v3-battle-shortcut{padding-bottom:45px!important}
+.v3-battle-home .v3-panel-content .v3-anon-battle-login{display:block;border:0;background:none;padding:0;margin:5px 0 0;font-size:12px;font-weight:500;line-height:21px;color:#1d1c18}
+.v3-go-site .v3-panel-content p{margin:6px 0 0!important}
