@@ -13,7 +13,7 @@ function Interaction(){
  useEffect(()=>{fetchDog(id).then(setDog).catch(()=>setError('강아지 정보를 불러오지 못했어요.'));},[id]);
  useEffect(()=>{if(!ready||!member)return;fetch('/api/go/interaction?dogId='+encodeURIComponent(id)).then(r=>r.json()).then(setStatus).catch(()=>setError('친밀도를 불러오지 못했어요.'));},[id,ready,member?.id]);
  useEffect(()=>{audio.current=createGameAudio();setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');const hide=()=>{if(document.hidden)audio.current?.stop()};document.addEventListener('visibilitychange',hide);return()=>{clearTimeout(timer.current);audio.current?.dispose();document.removeEventListener('visibilitychange',hide);};},[]);
- function soundToggle(){const next=!sound;setSound(next);localStorage.setItem(GAME_SOUND_KEY,next?'on':'off');if(!next)audio.current?.stop();}
+ function soundToggle(){const next=!sound;setSound(next);localStorage.setItem(GAME_SOUND_KEY,next?'on':'off');window.dispatchEvent(new Event('go-v3-settings-changed'));if(!next)audio.current?.stop();}
  function bark(){if(busy)return;barks.current=(barks.current+1)%3;audio.current?.play('bark'+(barks.current+1));setNotice(dog?.name+'가 반갑게 짖었어요!');}
  async function interact(action){
   if(busy)return;
@@ -25,7 +25,7 @@ function Interaction(){
   try{const r=await fetch('/api/go/interaction',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dogId:id,action})});const d=await r.json();if(!r.ok)throw Error(d.error||'교감에 실패했어요.');
    const m=MOTIONS[action];setPose(m.pose);setNotice(m.message);audio.current?.play(m.audio);
    setStatus(old=>({...old,level:d.level,actions:{...old.actions,[action]:{remaining:d.remaining,nextAt:d.availableAt}}}));
-   timer.current=setTimeout(()=>{setPose('front');setNotice('또 만나요!');setBusy(false);},800);
+   timer.current=setTimeout(()=>{setPose('front');setNotice('또 만나요!');setBusy(false);},2000);
   }catch(e){setError(e.message);setBusy(false);}
  }
  return <div className="v3-interact v3-interact-figma">
