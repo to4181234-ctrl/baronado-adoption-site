@@ -29,7 +29,7 @@ export default function GoCamera({dog,onDone,onSaved,nickname,firstCard=false}){
  function capture(){if(busy||!video.current?.videoWidth)return;setScan(true);audio.current?.play('shutter');timers.current.push(setTimeout(()=>finishCapture(),100));}
  function finishCapture(){timers.current.forEach(clearTimeout);timers.current=[];const v=video.current;if(!v?.videoWidth){setError('촬영 화면을 확인해주세요.');setScan(false);return;}
   const canvas=document.createElement('canvas');canvas.width=800;canvas.height=800;const ctx=canvas.getContext('2d');const side=Math.min(v.videoWidth,v.videoHeight)/zoom;const x=(v.videoWidth-side)/2,y=(v.videoHeight-side)/2;ctx.drawImage(v,x,y,side,side,0,0,800,800);
-  canvas.toBlob(file=>{setScan(false);if(!file){setError('사진 변환에 실패했어요.');return;}stream.current?.getTracks().forEach(t=>t.stop());stream.current=null;setBlob(file);setStep('edit');},'image/webp',.84);
+  canvas.toBlob(file=>{setScan(false);if(!file){setError('사진 변환에 실패했어요.');return;}stream.current?.getTracks().forEach(t=>t.stop());stream.current=null;window.dispatchEvent(new CustomEvent('go-v3-music',{detail:'stop'}));setBlob(file);setStep('edit');},'image/webp',.84);
  }
  function restart(){setBlob(null);setPreview('');setStep('intro');setScan(false);}
  async function save(){
