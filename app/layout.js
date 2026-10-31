@@ -1,6 +1,7 @@
 import './globals.css';
 import './v3.css';
 import './v3-camera.css';
+import './figma-accuracy.css';
 
 export const metadata = {
   metadataBase: new URL('https://baronado-adoption-site-8sm2.vercel.app'),

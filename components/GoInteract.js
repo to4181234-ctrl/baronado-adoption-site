@@ -8,7 +8,7 @@ import GoShell,{useGoSession} from './GoShell.js';
 const MOTIONS={snack:{name:'간식',pose:'feed',message:'냠냠! 맛있는 간식 고마워~',audio:'snack'},praise:{name:'칭찬',pose:'praise',message:'멍멍! 칭찬해줘서 신나요!',audio:'praise'},play:{name:'놀이',pose:'play',message:'같이 노니까 너무 신나요!',audio:'play'}};
 function Interaction(){
  const {id}=useParams(),router=useRouter(),{member,ready,openAccount}=useGoSession();
- const [dog,setDog]=useState(null),[status,setStatus]=useState(null),[pose,setPose]=useState('front'),[notice,setNotice]=useState('멍멍! (안녕! 자는게 아니라 생각중이었어~)'),[busy,setBusy]=useState(false),[sound,setSound]=useState(true),[error,setError]=useState('');
+ const [dog,setDog]=useState(null),[status,setStatus]=useState(null),[pose,setPose]=useState('front'),[notice,setNotice]=useState('멍멍!\n(안녕! 자는게 아니라\n생각중이었어~)'),[busy,setBusy]=useState(false),[sound,setSound]=useState(true),[error,setError]=useState('');
  const audio=useRef(null),timer=useRef(null),barks=useRef(0);
  useEffect(()=>{fetchDog(id).then(setDog).catch(()=>setError('강아지 정보를 불러오지 못했어요.'));},[id]);
  useEffect(()=>{if(!ready||!member)return;fetch('/api/go/interaction?dogId='+encodeURIComponent(id)).then(r=>r.json()).then(setStatus).catch(()=>setError('친밀도를 불러오지 못했어요.'));},[id,ready,member?.id]);
@@ -28,14 +28,23 @@ function Interaction(){
    timer.current=setTimeout(()=>{setPose('front');setNotice('또 만나요!');setBusy(false);},800);
   }catch(e){setError(e.message);setBusy(false);}
  }
- return <div className="v3-interact">
-  <div className="v3-interact-top"><div>친밀도 <b>{status?.level||0} / 10</b></div><div><button aria-label="소리 끄기 또는 켜기" onClick={soundToggle}><img src={'/figma-v3/sound-'+(sound?'on':'off')+'.png'} alt={sound?'소리 켜짐':'소리 꺼짐'}/></button><button aria-label="교감 닫기" onClick={()=>router.push('/go/'+id)}>×</button></div></div>
+ return <div className="v3-interact v3-interact-figma">
+  <div className="v3-interact-affinity">친밀도 <b>{status?.level||0} / 10</b></div>
+  <button className="v3-interact-sound" aria-label={sound?'소리 끄기':'소리 켜기'} onClick={soundToggle}><img src={'/figma-v3/sound-'+(sound?'on':'off')+'.png'} alt=""/></button>
+  <button className="v3-interact-close" aria-label="교감 닫기" onClick={()=>router.push('/go/'+id)}>×</button>
   <div className="v3-interact-machine">
-   <div className="v3-interact-screen"><button className={'v3-interact-dog'+(busy?' moving':'')} onClick={bark} aria-label="강아지 짖는 소리 재생"><img src={figmaSprite(dog?.name||'뽀실',pose)} alt={dog?.name||'강아지'}/></button><div className="v3-pixel-dialog"><span>{notice}</span></div></div>
-   <div className="v3-interact-controls">{Object.entries(MOTIONS).map(([key,v])=><div key={key}><button disabled={busy||!member||!status?.actions?.[key]?.remaining||!status?.owned} onClick={()=>interact(key)} aria-label={v.name}><span>{key==='snack'?'▣':key==='praise'?'♥':'◉'}</span></button><small>{status?.actions?.[key]?.remaining??2}/2</small></div>)}</div>
+   {['body-border','body-white','bezel-border','bezel-gray','screen-border','screen-white'].map(name=><img key={name} className={'v3-machine-layer v3-machine-'+name} src={'/figma-v3/machine-'+name+'.svg'} alt=""/>)}
+   <button className={'v3-interact-dog'+(busy?' moving':'')} onClick={bark} aria-label="강아지를 터치해 짖는 소리 듣기"><img src={figmaSprite(dog?.name||'뽀실',pose)} alt={dog?.name||'강아지'}/></button>
+   <div className="v3-machine-dialog">
+    {['dialog-bg','dialog-outer','dialog-inner'].map(name=><img key={name} className={'v3-machine-dialog-layer v3-machine-'+name} src={'/figma-v3/machine-'+name+'.svg'} alt=""/>)}
+    <span>{notice}</span>
+   </div>
+   <div className="v3-interact-controls">{Object.entries(MOTIONS).map(([key,v])=><div className={'v3-machine-action v3-machine-action-'+key} key={key}>
+    <button onClick={()=>interact(key)} disabled={busy||!member||!status?.actions?.[key]?.remaining||!status?.owned} aria-label={v.name}><img src={'/figma-v3/machine-'+(key==='snack'?'feed':key)+'.svg'} alt=""/></button><small>{status?.actions?.[key]?.remaining??2}/2</small>
+   </div>)}</div>
   </div>
-  {error&&<p className="v3-error" role="alert">{error}</p>}
-  {!member&&ready&&<button className="v3-yellow-btn" onClick={openAccount}>로그인하고 교감하기</button>}
+  {error&&<p className="v3-interact-error" role="alert">{error}</p>}
+  {!member&&ready&&<button className="v3-interact-login" onClick={openAccount}>로그인하고 교감하기</button>}
   {status&&!status.owned&&<p className="v3-interact-help">이 강아지의 카드를 먼저 수집하면 교감할 수 있어요.</p>}
  </div>;
 }

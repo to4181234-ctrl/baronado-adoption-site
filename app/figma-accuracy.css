@@ -1,0 +1,67 @@
+/* Figma 2nd revision fidelity patch.
+   Source artboards are 390px wide. Exact vector assets exported from Figma. */
+.v3-hero{background:linear-gradient(180deg,#f7d94d 0%,#f7d94d 73.5%,#d5bb43 100%)!important;position:relative!important}
+.v3-hero-original{display:block;position:absolute;left:calc(50% - 138px);top:61px;width:260px;height:74px;max-width:none;object-fit:contain}
+.v3-hero-dots{position:absolute!important;left:50%!important;top:175px!important;bottom:auto!important;transform:translateX(-50%);display:flex;gap:10px;letter-spacing:normal!important}
+.v3-hero-dots>span{display:block;width:5px;height:5px;border-radius:50%;background:#fff}
+.v3-site .v3-dog-list h1{font-size:19px;font-weight:650}
+.v3-site .v3-dog-image{background:#f6f6f3}
+.v3-site .v3-dog-tile>small{font-weight:400}
+.v3-site .v3-dogs-grid{column-gap:18px;row-gap:24px}
+/* Exact Figma vector source for the cabinet frame and three icon buttons */
+.v3-interact-figma{position:relative!important;width:390px;max-width:100%;min-height:582px!important;height:582px!important;background:#f7d94d!important;padding:0!important;overflow:hidden}
+.v3-interact-figma .v3-interact-affinity{position:absolute;top:45px;left:31px;font-size:16px;line-height:23px;font-weight:650;color:#111;z-index:4}
+.v3-interact-figma .v3-interact-affinity b{font-weight:650}
+.v3-interact-figma .v3-interact-sound,.v3-interact-figma .v3-interact-close{position:absolute;z-index:8;border:0!important;background:none!important;padding:0!important}
+.v3-interact-figma .v3-interact-sound{right:36px;top:41px;width:24px;height:24px}
+.v3-interact-figma .v3-interact-sound img{width:24px;height:24px;display:block;image-rendering:pixelated}
+.v3-interact-figma .v3-interact-close{right:16px;top:11px;width:16px;height:22px;font-size:22px;font-weight:300;line-height:1;color:#000}
+.v3-interact-figma .v3-interact-machine{position:absolute!important;top:85px!important;left:16px!important;width:360px!important;height:468px!important;min-height:0!important;max-width:none!important;border:0!important;border-radius:0!important;clip-path:none!important;margin:0!important;padding:0!important;background:transparent!important;overflow:visible!important}
+.v3-interact-figma .v3-machine-layer{position:absolute;display:block;max-width:none;object-fit:fill;pointer-events:none}
+.v3-machine-body-border{left:0;top:0;width:360px;height:468px}
+.v3-machine-body-white{left:10px;top:6px;width:348px;height:456px}
+.v3-machine-bezel-border{left:18px;top:30px;width:324px;height:318px}
+.v3-machine-bezel-gray{left:24px;top:36px;width:312px;height:306px}
+.v3-machine-screen-border{left:36px;top:48px;width:288px;height:282px}
+.v3-machine-screen-white{left:42px;top:54px;width:276px;height:270px}
+.v3-interact-figma .v3-interact-dog{position:absolute!important;left:106px!important;top:72px!important;width:146px!important;height:146px!important;margin:0!important;padding:0!important;background:none!important;border:0!important;z-index:3;display:grid;place-items:center}
+.v3-interact-figma .v3-interact-dog img{width:146px!important;height:146px!important;object-fit:contain!important;image-rendering:pixelated;max-width:none}
+.v3-interact-figma .v3-machine-dialog{position:absolute;left:72px;top:223px;width:213px;height:89px;z-index:4}
+.v3-machine-dialog-layer{display:block;position:absolute;max-width:none;pointer-events:none}
+.v3-machine-dialog-layer.v3-machine-dialog-bg,.v3-machine-dialog-layer.v3-machine-dialog-outer{left:1px;top:1px;width:211px;height:87px}
+.v3-machine-dialog-layer.v3-machine-dialog-inner{left:4px;top:6px;width:204px;height:77px}
+.v3-interact-figma .v3-machine-dialog>span{position:absolute;left:17px;top:18px;width:179px;max-height:62px;overflow:hidden;white-space:pre-line;font-size:13px;font-weight:400;line-height:20px;color:#171713}
+.v3-interact-figma .v3-interact-controls{position:absolute!important;inset:0!important;display:block!important;padding:0!important;gap:0!important;pointer-events:none}
+.v3-interact-figma .v3-machine-action{position:absolute;top:384px;width:90px;height:70px;text-align:center;pointer-events:auto}
+.v3-machine-action-snack{left:24px}.v3-machine-action-praise{left:135px}.v3-machine-action-play{left:246px}
+.v3-interact-figma .v3-machine-action>button{display:block!important;width:90px!important;max-width:none!important;height:48px!important;padding:0!important;margin:0!important;background:none!important;border:0!important;box-shadow:none!important;filter:none}
+.v3-interact-figma .v3-machine-action>button:disabled{opacity:.55}
+.v3-interact-figma .v3-machine-action>button img{width:90px;height:48px;display:block;object-fit:contain;max-width:none;image-rendering:pixelated}
+.v3-interact-figma .v3-machine-action small{display:block;width:90px;line-height:15px;font-size:11px;color:#353535;margin-top:4px}
+.v3-interact-figma .v3-interact-error,.v3-interact-figma .v3-interact-help{position:absolute;bottom:0;left:20px;right:20px;background:#fff9df;color:#ab463b;text-align:center;font-size:11px;padding:7px;margin:0;z-index:8}
+.v3-interact-figma .v3-interact-login{position:absolute;z-index:7;top:568px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #111;padding:6px 10px;font-size:11px}
+/* Original battle summary panel from Figma (position and line thickness preserved). */
+.v3-battle-home .v3-battle-shortcut{gap:22px!important;padding-bottom:41px!important}
+.v3-battle-home .v3-battle-shortcut img{width:88px!important;height:57px!important}
+.v3-battle-home .v3-battle-shortcut strong{font-size:18px!important;line-height:28px}
+.v3-battle-home .v3-pixel-panel{width:356px;max-width:100%;height:162px!important;min-height:162px!important;position:relative;box-shadow:none!important;border:0!important;background:#fff!important;margin:0!important;padding:0!important;overflow:hidden}
+.v3-battle-home .v3-album-panel-layer{position:absolute;display:block;pointer-events:none;max-width:none}
+.v3-album-panel-bg,.v3-album-panel-outer{left:0;top:0;width:356px;height:162px}
+.v3-album-panel-inner{left:8px;top:8px;width:344px;height:146px}
+.v3-battle-home .v3-panel-content{position:absolute;left:29px;top:24px;right:25px}
+.v3-battle-home .v3-panel-content b{font-size:14px;font-weight:500;line-height:23px}
+.v3-battle-home .v3-panel-content p{font-size:13px;font-weight:400;line-height:21px;margin:10px 0 0!important;color:#161616!important}
+/* Figma card dimensions: no invented rounded corners, no cast shadows. */
+.v3-go-site .go-card.go-card-v3{box-shadow:none!important;border:none!important;border-radius:0!important}
+.v3-go-site .go-card-entry{border:none!important;box-shadow:none!important}
+.v3-go-site .v3-card-dogline{margin-top:0}
+.v3-go-site .go-card-ratings .v3-stars{white-space:nowrap}
+/* Settings Figma 390px scale; no arbitrary decorative borders. */
+.v3-settings{padding:12px 16px 65px!important}
+.v3-settings h1{font-size:23px!important;font-weight:750!important;margin:0 0 39px!important}
+.v3-settings .v3-setting-item{border-bottom:1px solid #e9e2d6;padding:22px 0 30px}
+.v3-settings .v3-yellow-btn{background:#f7d94d}
+.v3-settings .v3-withdraw{width:100%;max-width:none;margin-top:62px}
+/* Narrower screens retain the Figma proportions via responsive transform. */
+@media(max-width:389px){.v3-interact-figma{width:390px;max-width:none;transform:scale(calc(100vw / 390px));transform-origin:top left;margin-bottom:calc(-582px * (1 - (100vw / 390px)))}}
+@media(prefers-reduced-motion:reduce){.v3-interact-figma .v3-interact-dog.moving img{animation:none!important}}

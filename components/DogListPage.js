@@ -17,7 +17,7 @@ export default function DogListPage({title,category}){
  const count=Math.max(1,Math.ceil(shown.length/PAGE_SIZE)),current=Math.min(page,count-1);
  return <main className="site-shell v3-site v3-list-site">
   <SiteHeader/>
-  <section className="v3-hero"><div className="v3-hero-logo"><img src="/baronado-logo.png" alt="" className="v3-hero-mark"/><span>바로나도</span></div><div className="v3-hero-dots" aria-hidden="true">● ● ●</div></section>
+  <section className="v3-hero"><img className="v3-hero-original" src="/figma-v3/hero-logo.svg" alt="바로나도"/><div className="v3-hero-dots" aria-hidden="true"><span/><span/><span/></div></section>
   <section className="v3-content v3-dog-list">
     <h1>{title}</h1>
     <div className="v3-list-controls">
