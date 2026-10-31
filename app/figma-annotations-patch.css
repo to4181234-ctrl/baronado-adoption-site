@@ -35,3 +35,23 @@
 .v3-go-site .v3-setting-item small{font-family:"Pretendard",sans-serif;font-size:12px;font-weight:400;line-height:1.5;letter-spacing:0}
 .v3-go-site .v3-setting-item button{font-family:"Pretendard",sans-serif;font-size:11px;font-weight:700;line-height:1.5;letter-spacing:0}
 .v3-go-site .v3-settings-note{font-family:"Pretendard",sans-serif;font-size:12px;font-weight:400;line-height:1.5;letter-spacing:0}
+
+/* Figma 173:3556/3634: authentic pixel-pose switching, never rotate or stretch sprite. */
+.v3-interact-figma .v3-interact-dog.is-walking img{
+ animation:meonggo-pixel-side-walk 2s steps(1,end) both!important;
+ transform-origin:center;
+}
+.v3-interact-figma .v3-interact-dog.is-reacting img{
+ animation:none!important;
+}
+@keyframes meonggo-pixel-side-walk{
+ 0%{transform:translateX(0) scaleX(1)}
+ 15%{transform:translateX(8px) scaleX(1)}
+ 35%{transform:translateX(18px) scaleX(1)}
+ 50%{transform:translateX(18px) scaleX(-1)}
+ 70%{transform:translateX(8px) scaleX(-1)}
+ 90%,100%{transform:translateX(0) scaleX(-1)}
+}
+@media(prefers-reduced-motion:reduce){
+ .v3-interact-figma .v3-interact-dog.is-walking img{animation:none!important}
+}
