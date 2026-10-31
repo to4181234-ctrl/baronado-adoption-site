@@ -51,7 +51,7 @@ function Album({initialDogId=null}){
     
   </div>}
   {notice&&<p className="v3-message" role="status">{notice}</p>}{error&&<p className="v3-error" role="alert">{error}</p>}
-  {collectConfirm&&dog&&<div className="v3-discovery-backdrop" role="presentation" onClick={()=>setCollectConfirm(false)}><section className="v3-discovery-modal v3-collection-confirm" role="dialog" aria-modal="true" aria-label="멍카드 수집 준비" onClick={e=>e.stopPropagation()}>
+  {collectConfirm&&dog&&<div className="v3-discovery-backdrop v3-discovery-figma" role="presentation" onClick={()=>setCollectConfirm(false)}><section className="v3-discovery-modal v3-collection-confirm" role="dialog" aria-modal="true" aria-label="멍카드 수집 준비" onClick={e=>e.stopPropagation()}>
   <button className="v3-discovery-close" aria-label="닫기" onClick={()=>setCollectConfirm(false)}>×</button>
   <h2><img className="v3-discovery-figma-title" src="/figma-v3/discovery-title.svg" alt="멍멍GO!"/></h2>
   <div className="v3-discovery-stage" aria-hidden="true"><img className="v3-discovery-reveal" src="/figma-v3/collar.png" alt=""/></div>
