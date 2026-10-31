@@ -117,3 +117,8 @@
 .v3-collection-section .v3-progress{margin-bottom:23px!important}
 .v3-collection-section .v3-progress>span{background:#f7d94d!important}
 .v3-site .v3-hero-logo{display:none!important}
+
+/* Figma 173:1167 modal coordinates: y=221 in a 959px frame; text paths original. */
+.v3-discovery-figma .v3-discovery-modal{width:min(345px,calc(100vw - 38px))!important;transform:translate(1.5px,-28px)}
+.v3-discovery-figma .v3-discovery-modal>h2{top:32px!important;line-height:33px!important;height:33px!important}
+.v3-discovery-figma .v3-discovery-figma-title{display:block;width:134px;height:33px;margin:0 auto;max-width:none;object-fit:contain}

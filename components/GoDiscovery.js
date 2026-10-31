@@ -14,7 +14,7 @@ export default function GoDiscovery({dogs=[],dog=null}){
  function toggle(){const next=!sound;setSound(next);try{localStorage.setItem(GAME_SOUND_KEY,next?'on':'off');}catch{}if(!next)audio.current?.stop();}
  return open&&<div className="v3-discovery-backdrop v3-discovery-figma" onClick={close} role="presentation"><section className="v3-discovery-modal" role="dialog" aria-modal="true" aria-label="첫 방문 멍멍GO! 발견" onClick={e=>e.stopPropagation()}>
   <button className="v3-discovery-close" aria-label="닫기" onClick={close}>×</button>
-  <h2>멍멍GO!</h2>
+  <h2><img className="v3-discovery-figma-title" src="/figma-v3/discovery-title.svg" alt="멍멍GO!"/></h2>
   <div className="v3-discovery-stage">
    {stage==='choice'?<div className="v3-collars">{[0,1,2].map(i=><button type="button" key={i} onClick={()=>reveal(i)} aria-label={'목줄 '+(i+1)+' 선택'}><img src="/figma-v3/collar.png" alt="픽셀 목줄"/></button>)}</div>:stage==='reveal'?<img className="v3-discovery-reveal" src="/figma-v3/collar.png" alt="강아지를 찾는 중"/>:<img className="v3-discovery-reveal" src={figmaSprite(chosen?.name||'뽀실')} alt={chosen?.name||'강아지'}/>}
   </div>
