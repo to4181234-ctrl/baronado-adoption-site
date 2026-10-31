@@ -54,7 +54,7 @@ export default function GoCardViewer({card,onClose,preparedSound,member,onLogin,
  useEffect(()=>setCurrent(card),[card]);
  useEffect(()=>{const audio=preparedSound||createCompletionSound();player.current=audio;try{on.current=completionSoundEnabled(localStorage.getItem(COMPLETION_SOUND_KEY));}catch{}setEnabled(on.current);return()=>{request.current++;audio.dispose();player.current=null;};},[]);
  function replay(){const id=++request.current,started=performance.now();player.current?.stop();if(!on.current)return;const delay=window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:.3;Promise.resolve(player.current?.prepare()).then(()=>{const elapsed=(performance.now()-started)/1000;if(id===request.current&&on.current&&elapsed<.5)player.current?.play(Math.max(0,delay-elapsed));});}
- function toggle(){on.current=!on.current;setEnabled(on.current);try{localStorage.setItem(COMPLETION_SOUND_KEY,on.current?'on':'off');}catch{}if(on.current)player.current?.prepare();else{request.current++;player.current?.stop();}}
+ function toggle(){on.current=!on.current;setEnabled(on.current);try{localStorage.setItem(COMPLETION_SOUND_KEY,on.current?'on':'off');window.dispatchEvent(new Event('go-v3-settings-changed'));}catch{}if(on.current)player.current?.prepare();else{request.current++;player.current?.stop();}}
  async function toggleLike(){
   if(!member){onClose();if(onLogin)onLogin();else location.assign('/go');return;}
   if(liking)return;setLiking(true);setError('');
