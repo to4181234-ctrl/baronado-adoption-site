@@ -3,6 +3,7 @@ import {createContext,useContext,useEffect,useState} from 'react';
 import Link from 'next/link';
 import SiteHeader from './SiteHeader.js';
 import GoAccount from './GoAccount.js';
+import GoAmbientSound from './GoAmbientSound.js';
 const SessionContext=createContext(null);
 export const useGoSession=()=>useContext(SessionContext);
 export default function GoShell({children,title='멍멍GO!',description='',active='album',albumDetail=false}){
@@ -12,7 +13,7 @@ export default function GoShell({children,title='멍멍GO!',description='',activ
  async function logout(){const r=await fetch('/api/go/session',{method:'DELETE'});if(r.ok){setMember(null);location.assign('/go');}}
  return <SessionContext.Provider value={{member,ready,openAccount:()=>setShowAccount(true),logout}}>
   <main className="site-shell v3-site v3-go-site">
-   <SiteHeader member={member} onLogout={logout} onLogin={()=>setShowAccount(true)}/>
+   <SiteHeader member={member} onLogout={logout} onLogin={()=>setShowAccount(true)}/><GoAmbientSound/>
    <section className="v3-go-app">
     {active==='community'&&<header className="v3-community-heading"><h1>모두의 도감</h1><p>멍기록가님의 수집 기록을 함께 나눠보세요</p></header>}
     {children}
