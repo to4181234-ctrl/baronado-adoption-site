@@ -62,12 +62,14 @@ function Game(){
   if(phase!=='choose'||mutating||selected.length!==2||!selected.every(c=>c.battle))return;
   finished.current=false;requestId.current=crypto.randomUUID();setColliding(false);setError('');setPhase('fight');
   sounds.current?.play('start');sounds.current?.startMusic();
-  timers.current=[setTimeout(()=>{setColliding(true);sounds.current?.duckMusic();sounds.current?.play('impact');},1400),setTimeout(()=>completeRef.current(),3000)];
+  timers.current=[setTimeout(()=>sounds.current?.play('appear'),500),setTimeout(()=>{setColliding(true);sounds.current?.duckMusic();sounds.current?.play('impact');},1400),setTimeout(()=>completeRef.current(),3000)];
  };
  const reset=()=>{stop();requestId.current=null;finished.current=false;setPhase('choose');setSelected([]);setResult(null);setColliding(false);setError('');setPage(0);};
  const changeTab=(name)=>{setTab(name);setPage(0);setError('');};
  const [first,second]=selected;
  const winner=result?.winner==='first'?first:result?.winner==='second'?second:null;
+ const spriteMap={'깡지':'dog-kangji.png','버디':'dog-buddy.png','뽀실':'dog-pposil.png','구름':'dog-gureum.png','오레오':'dog-oreo.png'};
+ const sprite=c=>spriteMap[c?.dogName]?'/figma-preview/'+spriteMap[c.dogName]:c?.imageUrl;
  return <div className="meong-battle-app">
   <div className="meong-battle-toolbar"><span>멍배틀</span><button type="button" aria-label={soundEnabled?'소리 끄기':'소리 켜기'} onClick={()=>{const on=!soundEnabled;setSoundEnabled(on);localStorage.setItem(BATTLE_SOUND_KEY,on?'on':'off');}}>{soundEnabled?'🔊 소리 켜짐':'🔇 소리 꺼짐'}</button></div>
   {!ready?<p role="status">도감을 준비하고 있어요.</p>:!member?<section className="meong-battle-login"><h2>멍배틀을 시작해볼까요?</h2><p>서로 다른 멍카드 2장을 모아 대결하고 나만의 전적을 쌓아보세요!</p><button onClick={openAccount}>로그인하고 시작하기</button></section>:<>
@@ -85,7 +87,7 @@ function Game(){
    <p className="meong-battle-rule">햇살 → 숲 → 물결 → 별빛 → 온기 → 꿈결 → 햇살<br/>기본 점수 = 파워 + 애교 · 유리한 속성 +2점</p>
   </>}
   {phase==='fight'&&<section className="meong-battle-fight"><h1>두근두근, 멍배틀!</h1><div className={'meong-battle-versus'+(colliding?' is-colliding':'')}><BattleCard card={first} mini/><BattleCard card={second} mini/></div><strong>VS</strong><button className="meong-battle-primary" disabled={mutating} onClick={()=>completeRef.current()}>{mutating?'결과 기록 중…':'SKIP 후 결과보기'}</button></section>}
-  {phase==='result'&&result&&<section className="meong-battle-result"><h1>이번 대결 승자는..</h1><div className="meong-battle-winner">{winner?<img src={winner.imageUrl} alt={winner.dogName}/>:<><img src={first.imageUrl} alt={first.dogName}/><img src={second.imageUrl} alt={second.dogName}/></>}</div><h2>{winner?winner.dogName+' 카드 승리!':'막상막하!'}</h2><p>{winner?'이번 카드의 상성이 한 수 위였어요.':'두 카드의 매력을 가릴 수 없어요'}</p><div className="meong-battle-score">{first.dogName} {result.first_power+result.first_charm} + 상성 {result.first_bonus} → {result.first_score}<br/>{second.dogName} {result.second_power+result.second_charm} + 상성 {result.second_bonus} → {result.second_score}</div><button className="meong-battle-primary" onClick={reset}>다른 카드로 대결</button><Link className="meong-battle-secondary" href="/go">도감으로</Link></section>}
+  {phase==='result'&&result&&<section className="meong-battle-result"><h1>이번 대결 승자는..</h1><div className="meong-battle-winner">{winner?<img src={sprite(winner)} alt={winner.dogName}/>:<><img src={sprite(first)} alt={first.dogName}/><img src={sprite(second)} alt={second.dogName}/></>}</div><h2>{winner?winner.dogName+' 카드 승리!':'막상막하!'}</h2><p>{winner?'이번 카드의 상성이 한 수 위였어요.':'두 카드의 매력을 가릴 수 없어요'}</p><div className="meong-battle-score">{first.dogName} {result.first_power+result.first_charm} + 상성 {result.first_bonus} → {result.first_score}<br/>{second.dogName} {result.second_power+result.second_charm} + 상성 {result.second_bonus} → {result.second_score}</div><button className="meong-battle-primary" onClick={reset}>다른 카드로 대결</button><Link className="meong-battle-secondary" href="/go">도감으로</Link></section>}
   </>}
  </div>;
 }

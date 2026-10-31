@@ -1,10 +1,10 @@
 import { adminDatabase, validId } from '../../../../lib/server/adminData.js';
 import { goError, goMember, goMutationAllowed } from '../../../../lib/server/goAuth.js';
 import { loadGoCards } from '../../../../lib/server/goCards.js';
+import { battleScore } from '../../../../lib/goBattleRules.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-const ADVANTAGE = ['햇살','숲','물결','별빛','온기','꿈결'];
 const uuid = x => typeof x === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(x);
 const noCache = { 'Cache-Control': 'no-store' };
 
@@ -58,18 +58,13 @@ export async function POST(request) {
   const byCard=new Map((stats.data||[]).map(s=>[s.card_id,s]));
   const a=byCard.get(firstId),b=byCard.get(secondId);
   if(!a||!b)return goError('카드 능력치를 준비 중이에요.',409);
-  const nextA=ADVANTAGE[(ADVANTAGE.indexOf(a.element)+1)%ADVANTAGE.length];
-  const nextB=ADVANTAGE[(ADVANTAGE.indexOf(b.element)+1)%ADVANTAGE.length];
-  const bonusA=nextA===b.element?2:0;
-  const bonusB=nextB===a.element?2:0;
-  const scoreA=Number(a.power)+Number(a.charm)+bonusA;
-  const scoreB=Number(b.power)+Number(b.charm)+bonusB;
+  const {bonusA,bonusB,scoreA,scoreB,winner}=battleScore(a,b);
   const row={
    id,member_id:member.id,first_card_id:firstId,second_card_id:secondId,
    first_dog_id:first.dog_id,second_dog_id:second.dog_id,
    first_power:a.power,first_charm:a.charm,first_element:a.element,first_bonus:bonusA,first_score:scoreA,
    second_power:b.power,second_charm:b.charm,second_element:b.element,second_bonus:bonusB,second_score:scoreB,
-   winner:scoreA===scoreB?'draw':scoreA>scoreB?'first':'second'
+   winner
   };
   const saved=await db.from('go_battles').upsert(row,{onConflict:'id',ignoreDuplicates:true});
   if(saved.error)throw saved.error;
