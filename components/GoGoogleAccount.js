@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
-export default function GoGoogleAccount({member,onChange}){
- const [config,setConfig]=useState(null),[nickname,setNickname]=useState(''),[checked,setChecked]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[withdraw,setWithdraw]=useState(false),[password,setPassword]=useState(''),[confirm,setConfirm]=useState('');
+export default function GoGoogleAccount({member,onChange,initialWithdraw=false}){
+ const [config,setConfig]=useState(null),[nickname,setNickname]=useState(''),[checked,setChecked]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[withdraw,setWithdraw]=useState(Boolean(initialWithdraw)),[password,setPassword]=useState(''),[confirm,setConfirm]=useState('');
  useEffect(()=>{fetch('/api/go/google',{cache:'no-store'}).then(r=>r.json()).then(d=>{setConfig(d);if(d.withdrawReady)setWithdraw(true);}).catch(()=>setMessage('로그인 설정을 확인하지 못했어요.'));},[]);
  async function start(intent){setBusy(true);setMessage('');try{const r=await fetch('/api/go/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'start',intent})});const d=await r.json();if(!r.ok)throw Error(d.error);location.assign(d.url);}catch(e){setMessage(e.message);setBusy(false);}}
  async function check(){setBusy(true);try{const r=await fetch('/api/go/nickname?value='+encodeURIComponent(nickname),{cache:'no-store'}),d=await r.json();if(!r.ok||!d.available)throw Error(d.error||'이미 사용 중인 닉네임이에요.');setChecked(nickname);setMessage('사용할 수 있는 닉네임이에요.');}catch(e){setMessage(e.message);}finally{setBusy(false);}}
