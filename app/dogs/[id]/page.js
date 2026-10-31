@@ -25,6 +25,7 @@ export default function DogDetailPage() {
   const [error, setError] = useState('');
   const [index, setIndex] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
+  const [activeSection,setActiveSection]=useState('overview');
   const startX = useRef(null);
   const modalStartX = useRef(null);
   const didSwipe = useRef(false);
@@ -40,6 +41,9 @@ export default function DogDetailPage() {
   useEffect(() => {
     if (dog?.id) recordVisit('dog', dog.id);
   }, [dog?.id]);
+
+  useEffect(()=>{if(!dog)return;const ids=dog.category===CATEGORY_RESIDENT?['overview','information']:['overview','information','shelter','records'];const update=()=>{let active='overview';for(const id of ids){const el=document.getElementById(id==='records'?'v3-dog-records':'v3-detail-'+id);if(el&&el.getBoundingClientRect().top<=180)active=id;}setActiveSection(active);};update();window.addEventListener('scroll',update,{passive:true});return()=>window.removeEventListener('scroll',update);},[dog?.id,dog?.category]);
+  useEffect(()=>{if(!modalOpen)return;const prior=document.body.style.overflow;document.body.style.overflow='hidden';const escape=e=>{if(e.key==='Escape')setModalOpen(false);};window.addEventListener('keydown',escape);return()=>{document.body.style.overflow=prior;window.removeEventListener('keydown',escape);};},[modalOpen]);
 
   const media = dog ? orderedDogMedia(dog.images || [], dogVideoMedia(dog.profile, process.env.NEXT_PUBLIC_SUPABASE_URL)) : [];
   const current = media[index];
@@ -92,9 +96,9 @@ export default function DogDetailPage() {
         {dog && (
           <>
           <nav className={'v3-detail-tabs'+(dog.category===CATEGORY_RESIDENT?' is-resident':'')} aria-label="상세 페이지 메뉴">
-           <button type="button" className="active" onClick={()=>document.getElementById('v3-detail-overview')?.scrollIntoView({behavior:'smooth'})}>소개</button>
-           <button type="button" onClick={()=>document.getElementById('v3-detail-information')?.scrollIntoView({behavior:'smooth'})}>상세 정보</button>
-           {dog.category!==CATEGORY_RESIDENT&&<><button type="button" onClick={()=>document.getElementById('v3-detail-shelter')?.scrollIntoView({behavior:'smooth'})}>보호소</button><button type="button" onClick={()=>document.getElementById('v3-dog-records')?.scrollIntoView({behavior:'smooth'})}>멍기록</button></>}
+           <button type="button" className={activeSection==='overview'?'active':''} aria-current={activeSection==='overview'?'location':undefined} onClick={()=>{setActiveSection('overview');document.getElementById('v3-detail-overview')?.scrollIntoView({behavior:'smooth'})}}>소개</button>
+           <button type="button" className={activeSection==='information'?'active':''} aria-current={activeSection==='information'?'location':undefined} onClick={()=>{setActiveSection('information');document.getElementById('v3-detail-information')?.scrollIntoView({behavior:'smooth'})}}>상세 정보</button>
+           {dog.category!==CATEGORY_RESIDENT&&<><button type="button" className={activeSection==='shelter'?'active':''} aria-current={activeSection==='shelter'?'location':undefined} onClick={()=>{setActiveSection('shelter');document.getElementById('v3-detail-shelter')?.scrollIntoView({behavior:'smooth'})}}>보호소</button><button type="button" className={activeSection==='records'?'active':''} aria-current={activeSection==='records'?'location':undefined} onClick={()=>{setActiveSection('records');document.getElementById('v3-dog-records')?.scrollIntoView({behavior:'smooth'})}}>멍기록</button></>}
           </nav>
           <article className="detail-card v3-figma-detail">
            <header className="v3-detail-identity">
@@ -124,11 +128,11 @@ export default function DogDetailPage() {
             <h2>상세 정보</h2>
             <h3>기본 정보</h3>
             <div className="v3-detail-properties-table">
-             {PROFILE_FIELDS.map(field=><div className="v3-detail-property" key={field.key}><span>{field.label}</span><div>{field.key==='vaccinations'?<VaccinationDetails profile={getDogProfile(dog)}/>:getDogProfile(dog)[field.key]?<ExpandableText text={getDogProfile(dog)[field.key]}/>:<span className="v3-detail-unset">정보 준비 중</span>}</div></div>)}
+             {PROFILE_FIELDS.filter(field=>dog.category!==CATEGORY_RESIDENT||['breed','vaccinations','personality','likes','dislikes','charm'].includes(field.key)).filter(field=>Boolean(getDogProfile(dog)[field.key])).map(field=><div className="v3-detail-property" key={field.key}><span>{field.label}</span><div>{field.key==='vaccinations'?<VaccinationDetails profile={getDogProfile(dog)}/>:<ExpandableText text={getDogProfile(dog)[field.key]}/>}</div></div>)}
              {Array.isArray(getDogProfile(dog).extra_questions)&&getDogProfile(dog).extra_questions.filter(x=>x.question&&x.answer).map((x,i)=><div className="v3-detail-property" key={i}><span>{x.question}</span><div>{x.answer}</div></div>)}
             </div>
            </section>
-           {dog.category!==CATEGORY_RESIDENT&&<section className="v3-detail-shelter" id="v3-detail-shelter"><h2>보호소</h2><p>{getDogProfile(dog).shelter_name||'보호소 정보 준비 중'}</p>{getShelterUrl(getDogProfile(dog).shelter_url)&&<a href={getShelterUrl(getDogProfile(dog).shelter_url)} target="_blank" rel="noopener noreferrer">보호소 홈페이지 ↗</a>}</section>}
+           {dog.category!==CATEGORY_RESIDENT&&(getDogProfile(dog).shelter_name||getDogProfile(dog).shelter_url)&&<section className="v3-detail-shelter" id="v3-detail-shelter"><h2>보호소</h2><p>{getDogProfile(dog).shelter_name||'보호소 정보 준비 중'}</p>{getShelterUrl(getDogProfile(dog).shelter_url)&&<a href={getShelterUrl(getDogProfile(dog).shelter_url)} target="_blank" rel="noopener noreferrer">보호소 홈페이지 ↗</a>}</section>}
           </article>
           </>
         )}
