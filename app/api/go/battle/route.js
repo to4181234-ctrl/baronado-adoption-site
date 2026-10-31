@@ -1,6 +1,6 @@
-import { adminDatabase, validId } from '../../../../../lib/server/adminData.js';
-import { goError, goMember, goMutationAllowed } from '../../../../../lib/server/goAuth.js';
-import { loadGoCards } from '../../../../../lib/server/goCards.js';
+import { adminDatabase, validId } from '../../../../lib/server/adminData.js';
+import { goError, goMember, goMutationAllowed } from '../../../../lib/server/goAuth.js';
+import { loadGoCards } from '../../../../lib/server/goCards.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
