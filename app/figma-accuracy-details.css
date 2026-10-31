@@ -105,3 +105,15 @@
 .v3-admin-pages span{font-size:12px}
 .v3-admin-caption{font-size:10px;color:#99938a;margin-top:28px;line-height:1.7}
 @media(min-width:700px){.v3-admin-list{max-width:390px}.v3-detail-site .container.detail-container{max-width:390px!important}}
+
+/* Exact font families specified by Figma: Gmarket Sans, Pretendard, MonaS12, GalmuriMono11 */
+.v3-site{font-family:"Pretendard Variable","Pretendard","Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+.v3-site .v3-dog-list h1,.v3-site .v3-dog-tile>strong,.v3-site .v3-detail-banner strong,.v3-site .v3-detail-identity .dog-name,.v3-site .v3-album-yellow h1,.v3-site .v3-battle-home h2,.v3-site .v3-collection-section h2,.v3-site .v3-profile-head h1{font-family:"Gmarket Sans","Pretendard Variable",sans-serif}
+.v3-discovery-figma .v3-discovery-modal>h2{font-family:"MonaS12","Galmuri11",sans-serif!important;font-size:36px!important;font-weight:700}
+.v3-discovery-figma .v3-discovery-dialog-content{font-family:"MonaS12","Galmuri11",sans-serif!important;font-size:13px!important}
+.v3-discovery-figma .v3-discovery-bottom label{font-family:"GalmuriMono11","Galmuri11",sans-serif!important}
+.v3-collection-tile.featured{background:#f7d94d!important}
+.v3-profile-head{background:#e9e0d3!important}
+.v3-collection-section .v3-progress{margin-bottom:23px!important}
+.v3-collection-section .v3-progress>span{background:#f7d94d!important}
+.v3-site .v3-hero-logo{display:none!important}
