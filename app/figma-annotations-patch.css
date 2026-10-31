@@ -27,3 +27,11 @@
 .v3-album-home .v3-battle-home .v3-battle-shortcut{padding-bottom:45px!important}
 .v3-battle-home .v3-panel-content .v3-anon-battle-login{display:block;border:0;background:none;padding:0;margin:5px 0 0;font-size:12px;font-weight:500;line-height:21px;color:#1d1c18}
 .v3-go-site .v3-panel-content p{margin:6px 0 0!important}
+
+/* Figma 173:7691 — system settings typography, measured from the current Figma frame.
+   Only staged in the Figma audit branch; not deployed. */
+.v3-go-site .v3-settings h1{font-family:"Gmarket Sans",sans-serif!important;font-size:24px!important;font-weight:500!important;line-height:1.5!important;letter-spacing:0!important}
+.v3-go-site .v3-setting-item strong{font-family:"Pretendard",sans-serif;font-size:17px;font-weight:700;line-height:1.5;letter-spacing:0}
+.v3-go-site .v3-setting-item small{font-family:"Pretendard",sans-serif;font-size:12px;font-weight:400;line-height:1.5;letter-spacing:0}
+.v3-go-site .v3-setting-item button{font-family:"Pretendard",sans-serif;font-size:11px;font-weight:700;line-height:1.5;letter-spacing:0}
+.v3-go-site .v3-settings-note{font-family:"Pretendard",sans-serif;font-size:12px;font-weight:400;line-height:1.5;letter-spacing:0}
