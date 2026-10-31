@@ -1,0 +1,66 @@
+.meong-battle-app{width:min(100%,390px);margin:0 auto;padding:18px 16px 42px;background:#fff;color:#181713;min-height:650px;font-family:Pretendard,"Noto Sans KR",system-ui,sans-serif}
+.meong-battle-app button{font:inherit;cursor:pointer}.meong-battle-app button:disabled{cursor:not-allowed}
+.meong-battle-toolbar{display:flex;justify-content:space-between;align-items:center;margin:0 0 25px;font-size:12px}
+.meong-battle-toolbar span{font-size:13px;font-weight:800}
+.meong-battle-toolbar button{background:#fff;border:1px solid #e3e0d8;border-radius:7px;padding:6px 10px;font-size:11px}
+.meong-battle-app h1{font-size:24px;font-weight:900;letter-spacing:-.05em;line-height:1.35;margin:0 0 9px}
+.meong-battle-hint{font-size:12px;color:#817b70;margin:0 0 31px}
+.meong-battle-start-link{display:block;border:0;padding:0;background:#fff;font-size:18px!important;font-weight:900!important;letter-spacing:-.035em;text-align:left;margin:0 0 27px}
+.meong-battle-start-link:disabled{color:#a7a29b;opacity:.65}
+.meong-battle-tabs{display:flex;align-items:baseline;gap:17px;margin:0 0 15px;border-bottom:1px solid #f1f0eb}
+.meong-battle-tabs button{background:#fff;border:0;border-bottom:3px solid transparent;font-size:12px;padding:0 0 8px;font-weight:400;color:#89847e;white-space:nowrap}
+.meong-battle-tabs button.active{border-color:#fade40;color:#181713;font-weight:700}
+.meong-battle-tabs span{margin-left:auto;font-size:12px;white-space:nowrap}
+.meong-battle-search{display:flex;gap:7px;margin:0 0 15px}
+.meong-battle-search input{width:100%;min-width:0;border:1px solid #e0e0d9;background:#faf9f5;border-radius:6px;padding:11px 10px;font-size:12px;color:#181713}
+.meong-battle-search button{border:0;border-radius:6px;background:#fade40;flex-shrink:0;width:67px;font-size:12px}
+.meong-battle-sort{display:flex;gap:8px;align-items:center;margin:7px 0 15px;font-size:11px}
+.meong-battle-sort button{border:0;background:transparent;font-size:11px}
+.meong-battle-sort span{margin-left:auto;color:#8b877f}
+.meong-battle-chosen{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 15px;min-height:20px}
+.meong-battle-chosen button{border:1px solid #f3db69;border-radius:4px;background:#fff9d6;padding:5px 8px;font-size:10px}
+.meong-battle-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 24px}
+.meong-battle-entry{min-width:0}
+.meong-battle-entry>span{display:block;margin:6px 10px 0;font-size:11px}
+.meong-battle-entry>small{display:block;margin:3px 10px;color:#747474;font-size:10px}
+.meong-battle-card{display:block;position:relative;width:100%;min-width:0;aspect-ratio:240 / 384;border:0;background:#fff;padding:0;text-align:left;color:#181713;transition:transform .12s}
+.meong-battle-card:disabled{cursor:default}
+.meong-battle-frame{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none}
+.meong-card-content{position:absolute;inset:3.7% 7%;display:flex;flex-direction:column;overflow:hidden;pointer-events:none}
+.meong-card-brand{font-size:6px;line-height:1.5;white-space:nowrap;font-weight:500}
+.meong-card-photo{margin-top:6px;width:100%;height:48%;object-fit:cover}
+.meong-card-element{align-self:flex-end;background:#d7ebc8;border:1px solid #9bba8b;padding:1px 4px;font-size:7px}
+.meong-card-content strong{font-size:12px;margin:1px 0 4px;font-weight:850}
+.meong-card-rating{font-size:10px;line-height:1.65;white-space:nowrap}
+.meong-card-rating em{font-style:normal;color:#d5ab20;letter-spacing:0;font-size:9px}
+.meong-card-author{display:flex;justify-content:space-between;gap:2px;margin-top:auto;font-size:6px;white-space:nowrap;max-width:100%;overflow:hidden}
+.meong-card-author small{font-size:6px}
+.meong-battle-card.is-picked:after{content:"";position:absolute;inset:0;border:3px solid #fade40;pointer-events:none}
+.meong-card-selected{position:absolute;top:6px;right:6px;background:#fade40;color:#181713;border-radius:15px;padding:2px 6px;font-size:12px;line-height:1.4}
+.meong-battle-pager{display:flex;align-items:center;justify-content:center;gap:15px;margin:25px 0 16px}
+.meong-battle-pager button{border:0;background:#fff;font-size:12px;padding:5px}
+.meong-battle-pager span{font-size:12px}
+.meong-battle-primary,.meong-battle-secondary,.meong-battle-login button{display:flex;width:min(100%,270px);height:46px;align-items:center;justify-content:center;text-align:center;margin:0 auto;border:0;border-radius:8px;background:#fade40;color:#181713;font-size:14px;font-weight:800;text-decoration:none}
+.meong-battle-primary:disabled{opacity:.55}
+.meong-battle-rule{margin:22px 0 0;color:#817b70;font-size:11px;line-height:1.75;text-align:center}
+.meong-battle-empty{background:#faf9f5;border:1px solid #eeece6;padding:36px 15px;text-align:center;font-size:12px;color:#837e75}
+.meong-battle-error{color:#b43b35;font-size:12px;line-height:1.6}
+.meong-battle-fight h1{margin:40px 0 75px}
+.meong-battle-versus{display:flex;gap:22px;justify-content:center;align-items:center}
+.meong-battle-card.is-mini{width:calc(50% - 12px);flex:none}
+.meong-battle-fight>strong{display:block;margin:29px 0 32px;text-align:center;font-size:25px;font-weight:900}
+.meong-battle-versus.is-colliding .meong-battle-card:first-child{animation:meong-hit-left .26s both}
+.meong-battle-versus.is-colliding .meong-battle-card:last-child{animation:meong-hit-right .26s both}
+.meong-battle-result h1{margin:40px 0 110px}
+.meong-battle-winner{height:135px;display:flex;justify-content:center;align-items:center}
+.meong-battle-winner img{max-width:155px;width:48%;max-height:150px;object-fit:contain}
+.meong-battle-result h2{font-size:25px;font-weight:900;text-align:center;margin:38px 0 12px}
+.meong-battle-result p{text-align:center;font-size:14px;margin:0 0 35px}
+.meong-battle-score{margin:0 auto 57px;width:100%;max-width:328px;border:5px double #181713;padding:18px;font-size:14px;line-height:1.8}
+.meong-battle-secondary{margin-top:16px;border:1px solid #e7e3d9;background:#fff}
+.meong-battle-login{border:1px solid #e8e4dd;padding:40px 15px;border-radius:8px;text-align:center}
+.meong-battle-login h2{font-size:19px;margin:0 0 15px}
+.meong-battle-login p{font-size:13px;line-height:1.6;margin:0 0 24px}
+@keyframes meong-hit-left{50%{transform:translateX(15px) rotate(7deg)}}
+@keyframes meong-hit-right{50%{transform:translateX(-15px) rotate(-7deg)}}
+@media (prefers-reduced-motion:reduce){.meong-battle-versus.is-colliding .meong-battle-card{animation:none}}

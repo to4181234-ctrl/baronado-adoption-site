@@ -24,7 +24,7 @@ export default function GoShell({ children, title = '멍멍GO!', description = '
         <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m7 4 6 6-6 6" /></svg>
       </Link>
     </div>}
-    <nav className="go-local-nav" aria-label="멍멍GO! 메뉴"><Link aria-current={active === 'album' ? 'page' : undefined} href="/go">나의 멍멍 도감</Link><Link aria-current={active === 'community' ? 'page' : undefined} href="/go/community">모두의 멍멍 도감</Link></nav>
+    <nav className="go-local-nav" aria-label="멍멍GO! 메뉴"><Link aria-current={active === 'album' ? 'page' : undefined} href="/go">나의 멍멍 도감</Link><Link aria-current={active === 'community' ? 'page' : undefined} href="/go/community">모두의 멍멍 도감</Link><Link aria-current={active === 'battle' ? 'page' : undefined} href="/go/battle">멍배틀</Link></nav>
     {children}
   </section>{showAccount && <div className="go-overlay" role="dialog" aria-modal="true" aria-label="멍멍GO! 회원가입/로그인"><div className="go-dialog"><button className="go-close" onClick={() => setShowAccount(false)} aria-label="닫기">×</button><>{googleMessage&&<p className="go-error" role="alert">{googleMessage}</p>}<GoAccount member={member} onChange={value => { setMember(value); setShowAccount(false); }} /></></div></div>}</main></SessionContext.Provider>;
 }
