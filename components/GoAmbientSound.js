@@ -16,7 +16,7 @@ export default function GoAmbientSound(){
   if(!allowed){pause();return;}
   // Album/interaction page: only an explicit in-page gesture unlocks the album loop.
   function gesture(e){
-   if(!e.target?.closest?.('.v3-go-app')||e.target.closest('a[href^="/go/"]')||e.target.closest('.v3-camera-close'))return;
+   if(!e.target?.closest?.('.v3-go-app')||e.target.closest('a[href^="/go/"]')||e.target.closest('.v3-album-collect')||e.target.closest('.v3-camera-close'))return;
    if(!audioEnabled())return;
    activated=true;switchTo(mode);
   }
