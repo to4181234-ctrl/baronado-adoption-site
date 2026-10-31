@@ -55,3 +55,14 @@
 @media(prefers-reduced-motion:reduce){
  .v3-interact-figma .v3-interact-dog.is-walking img{animation:none!important}
 }
+
+/* Figma 173:7691 — the 7-day reset is an independent action, not passive help text. */
+.v3-go-site .v3-setting-reset{
+ display:inline-block;width:auto;height:auto;background:none;border:0;
+ padding:0;margin:0;text-align:left;color:#605a51;cursor:pointer;
+ font-family:"Pretendard",sans-serif;font-size:13px;font-weight:400;line-height:1.5;
+}
+.v3-go-site .v3-setting-reset:focus-visible{outline:2px solid #141414;outline-offset:3px}
+.v3-go-site .v3-setting-reset:disabled{opacity:.45;cursor:not-allowed}
+.v3-discovery-figma .v3-collection-confirm .v3-discovery-dialog-content{font-family:"MonaS12",sans-serif;font-size:13px}
+.v3-discovery-figma .v3-collection-confirm .v3-discovery-stage img{object-fit:contain;image-rendering:pixelated}
