@@ -11,7 +11,7 @@ function SettingsContent(){
  const router=useRouter();
  const pendingKey='meonggo-avatar-pending';
  const pathname=usePathname()||'/go/settings',tab=pathname.endsWith('/profile')?'profile':pathname.endsWith('/avatar')?'avatar':'settings';
- const {member,ready,openAccount}=useGoSession();
+ const {member,ready,openAccount,openWithdraw}=useGoSession();
  const [sound,setSound]=useState(true),[popup,setPopup]=useState(true),[bio,setBio]=useState(''),[nickname,setNickname]=useState(''),[avatar,setAvatar]=useState(null),[owned,setOwned]=useState([]),[busy,setBusy]=useState(false),[msg,setMsg]=useState('');
  useEffect(()=>{try{setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');setPopup(localStorage.getItem(POPUP_ENABLED_KEY)!=='off');}catch{}},[]);
  useEffect(()=>{if(!member)return;setBio(member.profileBio||'');setNickname(member.nickname||'');let pending=null;try{pending=sessionStorage.getItem(pendingKey)}catch{}setAvatar(pending||member.avatarDog||null);
@@ -31,7 +31,7 @@ function SettingsContent(){
    <p className="v3-settings-note">설정은 현재 브라우저에 저장돼요.<br/>팝업의 ‘7일간 보지 않기’와 환경설정의 켜기/끄기는 별개예요.</p>
    <button className="v3-yellow-btn" onClick={saveSettings}>저장</button>
    <Link className="v3-settings-text-link" href="/go/profile">프로필 수정 ›</Link>
-   <button className="v3-yellow-btn v3-withdraw" onClick={openAccount}>회원 탈퇴</button>
+   <button className="v3-yellow-btn v3-withdraw" onClick={()=>member?openWithdraw():openAccount()}>회원 탈퇴</button>
    </>:tab==='profile'?<><h1>프로필 수정</h1><div className="v3-profile-edit-portrait"><img src={figmaSprite(avatar||"구름",avatar?"front":"shadow")} alt={avatar||"미획득 실루엣"}/></div><Link className="v3-outline-btn" href="/go/avatar">대표 캐릭터 바꾸기</Link>
     <label className="v3-input-label">닉네임<input value={nickname} maxLength={8} onChange={e=>setNickname(e.target.value)} autoComplete="nickname"/><small>2~8자 · 중복 불가</small></label>
     <label className="v3-input-label">한 줄 소개<textarea maxLength={50} rows={3} value={bio} onChange={e=>setBio(e.target.value)} placeholder="나만의 이야기를 적어주세요."/><small>최대 50자</small></label>
