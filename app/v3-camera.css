@@ -1,0 +1,76 @@
+
+/* Figma camera, game and updated global chrome */
+.v3-header-go .v3-member-greet{font-size:10px;white-space:nowrap;margin-left:auto;max-width:145px;overflow:hidden;text-overflow:ellipsis}
+.v3-header-go .v3-header-logout{border:0;background:none;color:#141414;font-size:10px;white-space:nowrap;padding:3px 0}
+.v3-capture{min-height:calc(100vh - 42px);color:#111;background:#fff}
+.v3-capture-live-art{position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;min-height:calc(100vh - 42px);max-height:1100px;overflow:hidden;background-size:cover;background-position:center;background-color:#ffe077}
+.v3-camera-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.v3-capture-tip{position:absolute;top:59px;left:16px;right:16px;z-index:3;color:#fff;text-shadow:0 1px 2px #0009;font-size:12px}
+.v3-capture-tip>button{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;border:0;border-radius:7px;background:#fff;color:#111;font-size:11px;margin:0 0 8px;text-shadow:none}
+.v3-capture-tip p{font-size:12px;margin:0}
+.v3-camera-square{position:absolute;top:24%;left:4%;right:4%;aspect-ratio:1;max-height:48%;border:2px solid #fff;z-index:2;pointer-events:none}
+.v3-camera-square.is-scanning:before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:#fbe04c;box-shadow:0 0 20px 4px #fff9;animation:v3-camera-scan 2s linear 1}
+@keyframes v3-camera-scan{from{top:0}to{top:98%}}
+.v3-camera-zoom{position:absolute;bottom:27%;align-self:center;z-index:3;display:flex;align-items:center;gap:17px;color:white;border-radius:50px;padding:5px 12px;background:#000a;font-size:11px}
+.v3-camera-zoom button{border:0;color:white;background:none;font-size:17px}
+.v3-camera-collar{position:absolute;width:95px;height:65px;bottom:20%;align-self:center;z-index:3;object-fit:contain;image-rendering:pixelated}
+.v3-camera-dialog-box{position:relative;z-index:4;width:calc(100% - 34px);margin:0 auto 39px;max-width:340px;min-height:121px;padding:15px 18px!important;background:#fff;color:#111;text-shadow:none}
+.v3-camera-dialog-box button{display:block;font-size:13px;margin:5px 0 0;border:0;background:none;color:#111;padding:0;line-height:1.4;text-align:left}
+.v3-camera-dialog-box button:first-of-type{margin-top:11px}
+.v3-capture-edit{padding:45px 16px;min-height:770px}
+.v3-capture-edit h2{font-size:19px;margin:0 0 22px}
+.v3-capture-photo{display:block;width:100%;aspect-ratio:1;object-fit:cover}
+.v3-capture-edit .v3-retry{font-size:12px;border:0;background:none;padding:13px 0 39px}
+.v3-capture-edit label{font-size:13px;font-weight:700;display:flex;flex-direction:column;gap:10px}
+.v3-capture-edit label input{border:0;background:#f8f7f3;padding:16px 12px;font-size:14px;width:100%}
+.v3-capture-edit>p{color:#a19c92;font-size:11px;margin:23px 0 30px}
+.v3-capture-edit .v3-yellow-btn{max-width:none}
+.v3-capture-complete{min-height:680px;padding:47px 16px 30px;display:flex;align-items:center;flex-direction:column;gap:27px;background:#fff}
+.v3-capture-complete h2{font-size:21px;font-weight:800;margin:0 0 6px}
+.v3-complete-card{width:195px;position:relative}
+.v3-complete-card .go-card-entry{width:100%}
+.v3-complete-card .go-card.go-card-v3{position:relative!important;aspect-ratio:240/384!important;height:auto!important;border:0!important;border-radius:0!important;background:#fff!important;padding:0!important;box-shadow:none!important;overflow:hidden}
+.v3-complete-card .v3-card-frame{position:absolute;inset:0;width:100%;height:100%}
+.v3-complete-card .v3-card-inside{position:absolute;inset:4% 8%;display:flex;flex-direction:column}
+.v3-complete-card .go-card-top{font-size:8px!important}
+.v3-complete-card .go-card-art{width:100%;aspect-ratio:1;margin:7px 0!important}
+.v3-complete-card .go-card-art img{width:100%;height:100%;object-fit:cover}
+.v3-complete-card .v3-card-dogline{display:flex;justify-content:space-between}
+.v3-complete-card .go-card-information{font-size:8px!important;margin-top:auto}
+.v3-complete-card .go-card-ratings{font-size:12px!important}
+.v3-complete-card .v3-stars{color:#e8b429}
+.v3-capture-complete .v3-yellow-btn{max-width:250px;margin-top:13px}
+.v3-go-site .go-camera,.v3-camera-panel .go-camera{background:#fff}
+.v3-go-site .go-card-view-button{border:0;background:transparent;width:100%;padding:0}
+.v3-go-site .go-card-entry .go-card-face-link{border:0;background:transparent;padding:0}
+.v3-go-site .go-card-entry .go-card-face-link .go-card{height:auto}
+.v3-go-site .go-card-entry .go-card-target{border:0}
+.v3-go-site .go-card-entry .go-card-target:focus-visible{outline:3px solid #fbe04c;outline-offset:1px}
+.v3-go-site .go-card-entry .go-card{transition:transform .12s}
+.v3-go-site .go-card-entry .go-card:active{transform:translateY(2px)}
+/* Battle Figma frame: align card/result views with 390px design */
+.v3-go-site .meong-battle-app{max-width:390px;width:100%;padding:22px 16px 42px;min-height:750px}
+.v3-go-site .meong-battle-app h1{font-size:23px}
+.v3-go-site .meong-battle-toolbar{margin:0 0 28px}
+.v3-go-site .meong-battle-tabs button.active{border-bottom-color:#fbe04c}
+.v3-go-site .meong-battle-primary,.v3-go-site .meong-battle-login button{background:#fbe04c}
+.v3-go-site .meong-battle-card{border:0;border-radius:0}
+.v3-go-site .meong-battle-frame{border:0}
+.v3-go-site .meong-battle-result h1{margin:40px 0 105px}
+.v3-go-site .meong-battle-score{border:5px double #121212}
+.v3-go-site .meong-battle-result .meong-battle-winner img{image-rendering:pixelated}
+.v3-go-site .meong-battle-card .meong-card-photo{object-fit:cover}
+/* Admin Figma login and forms */
+.v3-site .admin-container .admin-head,.v3-site .admin-container .page-head{background:#fbe04c}
+.v3-site .admin-container .admin-head{padding:18px 16px}
+.v3-site .admin-container .admin-head h1{font-size:22px!important}
+.v3-site .admin-container .admin-card .dog-thumb{border:0;background:#f7f6f1}
+.v3-site .admin-container .admin-card .adopted-badge{font-size:10px}
+.v3-site .admin-container .admin-tabs a{font-size:11px}
+.v3-site .admin-container .admin-actions .btn.danger{background:#ffebe8;color:#ab4343}
+.v3-site .form-container .form input,.v3-site .form-container .form textarea{background:#f7f6f2;border-radius:5px;border:1px solid #ebe5db;padding:10px}
+.v3-site .form-container .form label{font-size:12px}
+.v3-site .form-container .form .btn{border-radius:5px;background:#fbe04c}
+.v3-site .go-card-entry article{background:#fff}
+@media(max-width:390px){.v3-camera-square{top:24%}.v3-capture-tip{top:40px}.v3-camera-dialog-box{margin-bottom:23px}}
+@media(prefers-reduced-motion:reduce){.v3-camera-square.is-scanning:before{animation:none}}

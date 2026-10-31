@@ -81,10 +81,10 @@ export default function DogDetailPage() {
   };
 
   return (
-    <main className="site-shell">
+    <main className="site-shell v3-site v3-detail-site">
       <SiteHeader />
       <section className="container detail-container has-detail-actions">
-        <Link className="back-link" href={backHref}>뒤로 가기</Link>
+        <div className="v3-detail-banner"><Link className="v3-back" href={backHref}>‹ 뒤로 가기</Link><strong>{dog?.category===CATEGORY_RESIDENT?"상주견 소개":"가족을 찾아요"}</strong></div>
 
         {loading && <DogLoading />}
         {error && <div className="message error">{error}</div>}

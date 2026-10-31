@@ -1,122 +1,37 @@
 'use client';
-
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { fetchDogs } from '../lib/dogs';
-import { isSupabaseConfigured } from '../lib/supabaseClient';
+import {useEffect,useMemo,useState} from 'react';
+import {fetchDogs} from '../lib/dogs';
+import {getAgeInfo} from '../lib/dogProfile';
+import {recordVisit} from '../lib/siteAnalytics';
 import SiteHeader from './SiteHeader';
-import DogLoading from './DogLoading';
 import DogActions from './DogActions';
-import { recordVisit } from '../lib/siteAnalytics';
-import { formatDogDate, getAgeInfo, getDogBirthDate, isDogBirthday, profileSummary } from '../lib/dogProfile';
-
-function PawIcon() {
-  return <svg className="paw" viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M20.3 27.1c4.1 0 7.4 4.3 7.4 9.6s-3.3 9.6-7.4 9.6-7.4-4.3-7.4-9.6 3.3-9.6 7.4-9.6Zm23.4 0c4.1 0 7.4 4.3 7.4 9.6s-3.3 9.6-7.4 9.6-7.4-4.3-7.4-9.6 3.3-9.6 7.4-9.6ZM15.9 17.7c3 0 5.4 3.1 5.4 6.9s-2.4 6.9-5.4 6.9-5.4-3.1-5.4-6.9 2.4-6.9 5.4-6.9Zm32.2 0c3 0 5.4 3.1 5.4 6.9s-2.4 6.9-5.4 6.9-5.4-3.1-5.4-6.9 2.4-6.9 5.4-6.9ZM32 11.2c3.2 0 5.8 3.4 5.8 7.6s-2.6 7.6-5.8 7.6-5.8-3.4-5.8-7.6 2.6-7.6 5.8-7.6Zm0 29.1c7 0 14.1 5.8 14.1 11.5 0 4.1-3.6 5.3-7.8 4.3-2.1-.5-4.1-1.4-6.3-1.4s-4.2.9-6.3 1.4c-4.2 1-7.8-.2-7.8-4.3 0-5.7 7.1-11.5 14.1-11.5Z"/></svg>;
-}
-
-function DogCard({ dog }) {
-  const firstImage = dog.images?.[0];
-  return (
-    <Link className="dog-card dog-card-link" href={`/dogs/${dog.id}`} aria-label={`${dog.name} 상세 보기`}>
-      <div className="dog-thumb">
-        {firstImage ? <img src={firstImage} alt={`${dog.name} 사진`} /> : <PawIcon />}
-        {dog.adopted && <div className="adopted-badge"><strong>입양 완료</strong>{dog.adopted_at && <small>{formatDogDate(dog.adopted_at)}</small>}</div>}
-      </div>
-      <div className="dog-info">
-        <h2 className="dog-name">{dog.name}{isDogBirthday(dog) && <span className="birthday-icon" role="img" aria-label="생일 축하"> 🎉</span>}</h2>
-        <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {getAgeInfo(dog).listDisplay}</p>
-        {getDogBirthDate(dog) && <p className="arrival-date">생년월일 · {formatDogDate(getDogBirthDate(dog))}</p>}
-        {dog.category === 'adoption' && dog.arrived_at && <p className="arrival-date">바로나도에 온 날 · {formatDogDate(dog.arrived_at)}</p>}
-        {dog.category === 'adoption' && dog.adopted && dog.adopted_at && <p className="arrival-date">입양 간 날짜 · {formatDogDate(dog.adopted_at)}</p>}
-        <p className="desc">{dog.category === 'resident' ? dog.description : profileSummary(dog)}</p>
-        <span className="dog-story-link"><span>{dog.name}의 이야기 보기</span><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></span>
-      </div>
-    </Link>
-  );
-}
-
-export default function DogListPage({ title, category }) {
-  const [dogs, setDogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [sort, setSort] = useState('default');
-  const [statusFilter, setStatusFilter] = useState('all');
-
-  useEffect(() => {
-    recordVisit(category === 'resident' ? 'residents' : 'home');
-  }, [category]);
-
-  useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setLoading(false);
-      return;
-    }
-    fetchDogs(category)
-      .then(setDogs)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [category]);
-
-  const visibleDogs = (category === 'adoption'
-    ? dogs.filter((dog) => statusFilter === 'adopted'
-      ? dog.adopted
-      : statusFilter === 'available'
-        ? !dog.adopted
-        : true)
-    : dogs
-  ).slice().sort((a, b) =>
-    (category === 'adoption' && statusFilter === 'all' ? Number(a.adopted) - Number(b.adopted) : 0)
-    || (sort === 'old' ? 1 : -1) * String(a.created_at || '').localeCompare(String(b.created_at || ''))
-    || String(a.id).localeCompare(String(b.id)));
-
-  return (
-    <main className="site-shell">
-      <SiteHeader />
-      <section className="container list-container">
-        <div className="page-head">
-          <h1>{title}</h1>
-        </div>
-
-        {category === 'adoption' && (
-          <div className="listing-controls">
-            <select aria-label="입양 상태" value={statusFilter} onChange={event => setStatusFilter(event.target.value)}>
-              <option value="all">전체보기</option>
-              <option value="available">입양 전</option>
-              <option value="adopted">입양 완료</option>
-            </select>
-            <select aria-label="등록 순서" value={sort} onChange={event => setSort(event.target.value)}>
-              <option value="default">최신 등록</option>
-              <option value="old">오래된 순</option>
-            </select>
-          </div>
-        )}
-
-        {!loading && !error && dogs.length > 0 && (
-          <p className="result-count" aria-live="polite">
-            {category === 'adoption' ? `${statusFilter === 'available' ? '입양 전' : statusFilter === 'adopted' ? '입양 완료' : '전체'} ${visibleDogs.length}마리` : `전체 ${visibleDogs.length}마리`}
-          </p>
-        )}
-
-        {!isSupabaseConfigured && (
-          <div className="message error">Supabase 환경변수가 아직 연결되지 않았어요. 배포 전 Vercel 환경변수를 입력해주세요.</div>
-        )}
-
-        {loading && <DogLoading />}
-        {error && <div className="message error">{error}</div>}
-
-        {!loading && !error && visibleDogs.length === 0 && (
-          <div className="empty-state">
-            {dogs.length === 0 ? '아직 업로드된 게시글이 없어요' : '해당 조건에 맞는 게시글이 없어요.'}
-          </div>
-        )}
-
-        {!loading && !error && visibleDogs.length > 0 && (
-          <div className="dog-list">
-            {visibleDogs.map((dog) => <DogCard key={dog.id} dog={dog} />)}
-          </div>
-        )}
-      </section>
-      <DogActions allowInquiry={category === 'adoption'} />
-    </main>
-  );
+import GoDiscovery from './GoDiscovery';
+const PAGE_SIZE=4;
+export default function DogListPage({title,category}){
+ const resident=category==='resident';
+ const [dogs,setDogs]=useState([]),[loading,setLoading]=useState(true),[error,setError]=useState('');
+ const [filter,setFilter]=useState('all'),[order,setOrder]=useState('newest'),[page,setPage]=useState(0);
+ useEffect(()=>{recordVisit(resident?'residents':'home');let active=true;fetchDogs(category).then(data=>{if(active)setDogs(data);}).catch(e=>{if(active)setError(e.message||'목록을 불러오지 못했어요.');}).finally(()=>{if(active)setLoading(false);});return()=>{active=false;};},[category,resident]);
+ const shown=useMemo(()=>dogs.filter(d=>resident||filter==='all'||(filter==='adopted'?d.adopted:!d.adopted)).sort((a,b)=>{if(!resident&&filter==='all'&&a.adopted!==b.adopted)return Number(a.adopted)-Number(b.adopted);const t=String(a.created_at||'').localeCompare(String(b.created_at||''));return order==='oldest'?t:-t;}),[dogs,resident,filter,order]);
+ const count=Math.max(1,Math.ceil(shown.length/PAGE_SIZE)),current=Math.min(page,count-1);
+ return <main className="site-shell v3-site v3-list-site">
+  <SiteHeader/>
+  <section className="v3-hero"><div className="v3-hero-logo"><img src="/baronado-logo.png" alt="" className="v3-hero-mark"/><span>바로나도</span></div><div className="v3-hero-dots" aria-hidden="true">● ● ●</div></section>
+  <section className="v3-content v3-dog-list">
+    <h1>{title}</h1>
+    <div className="v3-list-controls">
+     {!resident&&<label>입양 상태 <select value={filter} aria-label="입양 상태" onChange={e=>{setFilter(e.target.value);setPage(0);}}><option value="all">전체보기</option><option value="available">입양 전</option><option value="adopted">입양 완료</option></select></label>}
+     <label>등록 순서 <select value={order} aria-label="등록 순서" onChange={e=>{setOrder(e.target.value);setPage(0);}}><option value="newest">최신순</option><option value="oldest">오래된순</option></select></label>
+    </div>
+    <p className="v3-muted v3-count">전체 {shown.length}마리</p>
+    {loading&&<p className="v3-status" role="status">강아지들을 불러오는 중이에요.</p>}
+    {error&&<p className="v3-error" role="alert">{error}</p>}
+    {!loading&&!shown.length&&<p className="v3-status">해당하는 강아지가 없어요.</p>}
+    <div className="v3-dogs-grid">{shown.slice(current*PAGE_SIZE,(current+1)*PAGE_SIZE).map(dog=><Link className="v3-dog-tile" key={dog.id} href={'/dogs/'+dog.id}><div className="v3-dog-image">{dog.images?.[0]?<img src={dog.images[0]} alt={dog.name} loading="lazy"/>:<span className="v3-empty-photo">멍멍!</span>}{dog.adopted&&<span className="v3-adopted">입양 완료</span>}</div><strong>{dog.name}</strong><small>{dog.gender} │ 중성화 {dog.neutered?'O':'X'} │ {getAgeInfo(dog).listDisplay}</small></Link>)}</div>
+    <nav className="v3-pager" aria-label="목록 페이지"><button disabled={current===0} aria-label="이전 페이지" onClick={()=>setPage(current-1)}>〈</button><span>{current+1} / {count}</span><button disabled={current===count-1} aria-label="다음 페이지" onClick={()=>setPage(current+1)}>〉</button></nav>
+  </section>
+  <DogActions allowInquiry={!resident}/>
+  {!resident&&<GoDiscovery dogs={dogs} dog={dogs[0]}/>}
+ </main>;
 }

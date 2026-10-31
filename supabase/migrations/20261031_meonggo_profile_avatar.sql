@@ -1,0 +1,1 @@
+ALTER TABLE public.go_members ADD COLUMN IF NOT EXISTS avatar_dog text CHECK(avatar_dog IS NULL OR avatar_dog IN ('깡지','버디','뽀실','구름','오레오'));

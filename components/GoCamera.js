@@ -1,58 +1,57 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import GoRatingsEditor from './GoRatingsEditor.js';
-import { EMPTY_RATINGS,ratingsComplete } from '../lib/goRatings.js';
-import GoLoading from './GoLoading.js';
-import GoCompletion from './GoCompletion.js';
-import GoSoundButton from './GoSoundButton.js';
-import {createCompletionSound,COMPLETION_SOUND_KEY,completionSoundEnabled} from '../lib/goCompletionSound.js';
-export default function GoCamera({ dog, onDone, onSaved, nickname, standing, firstCard=false }) {
-  const [completed,setCompleted]=useState(null);
-  const [soundEnabled,setSoundEnabled]=useState(true);
-  const sound=useRef(null),soundOn=useRef(true),saving=useRef(false),replayRequest=useRef(0);
-  useEffect(()=>{const player=createCompletionSound();sound.current=player;try{soundOn.current=completionSoundEnabled(localStorage.getItem(COMPLETION_SOUND_KEY));}catch{soundOn.current=true;}setSoundEnabled(soundOn.current);if(soundOn.current)player.prepare();return()=>{player.dispose();sound.current=null;};},[]);
-  function toggleSound(){const enabled=!soundOn.current;soundOn.current=enabled;setSoundEnabled(enabled);try{localStorage.setItem(COMPLETION_SOUND_KEY,enabled?'on':'off');}catch{}if(enabled)sound.current?.prepare();else sound.current?.stop();}
-  function replaySound(){const request=++replayRequest.current;const started=performance.now();sound.current?.stop();if(!soundOn.current)return;const delay=window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:.3;Promise.resolve(sound.current?.prepare()).then(()=>{const elapsed=(performance.now()-started)/1000;if(mounted.current&&request===replayRequest.current&&soundOn.current&&elapsed<.5)sound.current?.play(Math.max(0,delay-elapsed));});}
-  const soundButton=<GoSoundButton enabled={soundEnabled} onClick={toggleSound}/>;
-  const video = useRef(null);
-  const stream = useRef(null);
-  const mounted = useRef(true);
-  const [active, setActive] = useState(false);
-  const [original, setOriginal] = useState(null);
-  const [preview, setPreview] = useState('');
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [ratings, setRatings] = useState(EMPTY_RATINGS);
-  const [busy, setBusy] = useState(false);
-  const [opening, setOpening] = useState(false);
-  const [error, setError] = useState('');
-  function stop() { stream.current?.getTracks().forEach(track => track.stop()); stream.current = null; setActive(false); }
-  useEffect(() => { mounted.current = true; return () => { mounted.current = false; stream.current?.getTracks().forEach(track => track.stop()); }; }, []);
-  useEffect(() => { if (!original) { setPreview(''); return; } const url = URL.createObjectURL(original); setPreview(url); return () => URL.revokeObjectURL(url); }, [original]);
-  useEffect(() => { if (active && video.current && stream.current) { video.current.srcObject = stream.current; video.current.play().catch(() => {}); } }, [active]);
-  async function start() {
-    if(opening)return;
-    setError('');
-    if (!navigator.mediaDevices?.getUserMedia) return setError('카메라를 사용할 수 없어요. 브라우저의 카메라 권한을 확인해주세요.');
-    setOpening(true);
-    try { const motionReady = new Promise(resolve => setTimeout(resolve, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1000)); const source = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 1280 } } }); if (!mounted.current) { source.getTracks().forEach(track => track.stop()); return; } stream.current = source; await motionReady; if (!mounted.current) { source.getTracks().forEach(track => track.stop()); return; } setActive(true); }
-    catch { setError('카메라 권한이 필요해요. 브라우저 설정에서 허용해주세요.'); } finally { if(mounted.current)setOpening(false); }
-  }
-  async function shoot() {
-    if (busy) return;
-    const node = video.current;
-    if (!node?.videoWidth) return setError('카메라가 준비되면 다시 눌러주세요.');
-    setBusy(true);
-    try { const canvas = document.createElement('canvas'); canvas.width = canvas.height = 768; const side = Math.min(node.videoWidth, node.videoHeight); canvas.getContext('2d').drawImage(node, (node.videoWidth-side)/2, (node.videoHeight-side)/2, side, side, 0, 0, 768, 768); const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', .84)); if (!blob) throw new Error(); stop(); setOriginal(blob); }
-    catch { setError('촬영하지 못했어요. 다시 시도해주세요.'); } finally { setBusy(false); }
-  }
-  async function save() {
-    if(saving.current||completed)return;if(!ratingsComplete(ratings)){setError('별점 세 항목을 모두 선택해주세요.');return;}saving.current=true;
-    if(soundOn.current)sound.current?.prepare();
-    setBusy(true); setError('');
-    try { const form = new FormData(); form.set('dogId', dog.id); form.set('title', title); form.set('description', description); form.set('ratings', JSON.stringify(ratings)); form.set('photo', original, 'camera.webp'); const r = await fetch('/api/go/cards', { method: 'POST', body: form }); const result = await r.json(); if (!r.ok) throw new Error(result.error); if(!mounted.current)return;setCompleted({firstCard,id:result.id,dogName:dog.name,title,description,ratings,imageUrl:preview,nickname,capturedAt:result.capturedAt||new Date().toISOString()});if(soundOn.current)sound.current?.play(window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:.3);onSaved?.(); }
-    catch (e) { setError(e.message || '저장하지 못했어요.'); } finally { saving.current=false;if(mounted.current)setBusy(false); }
-  }
-  if(completed)return <GoCompletion card={completed} soundButton={soundButton} standing={standing} onReplay={replaySound} onDone={onDone}/>;
-  return <div className="go-camera"><div className="go-camera-heading"><h2>{dog.name} 촬영</h2>{soundButton}</div>{!active && !original && <div className="go-camera-ready"><GoLoading mode="bounce" label={opening?'카메라를 연결하고 있어요.':'멍멍이를 만날 준비가 됐나요?'} /><button className="go-primary" disabled={opening} onClick={start}>{opening?'카메라 연결 중…':'카메라 열기'}</button></div>}{active && <div className="go-viewfinder"><video ref={video} autoPlay muted playsInline /><span className="go-frame" /><div className="go-camera-controls"><button className="go-camera-cancel" onClick={stop}>취소</button><button className="go-shutter" disabled={busy} onClick={shoot} aria-label="사진 촬영" /></div></div>}{original && <>{preview && <img className="go-capture-preview" src={preview} alt="촬영한 사진" />}<label className="go-description">어떤 상태의 멍멍이 인가요?<input maxLength={80} value={title} onChange={e => setTitle(e.target.value)} placeholder="예시) 잠들기 직전 말랑이" /></label><label className="go-description">오늘의 기록 <span>{description.length}/200</span><textarea maxLength={200} rows={3} value={description} onChange={e => setDescription(e.target.value)} placeholder="이 멍멍이와 만난 순간을 남겨주세요" /></label><GoRatingsEditor value={ratings} onChange={setRatings} disabled={busy} /><div className="go-camera-actions"><button disabled={busy} onClick={() => { setOriginal(null); start(); }}>다시 촬영</button><button className="go-primary" disabled={busy || !title.trim() || !description.trim() || !ratingsComplete(ratings)} onClick={save}>{busy ? '저장 중…' : '카드 저장'}</button></div><p className="go-note">저장하면 내 도감과 모두의 멍멍 도감에 바로 공개됩니다. 얼굴이나 차량번호가 보이면 다시 촬영해주세요.</p></>}{error && <p className="go-error" role="alert">{error}</p>}</div>;
+import {useEffect,useRef,useState} from 'react';
+import GoCard from './GoCard.js';
+import {createGameAudio,GAME_SOUND_KEY} from '../lib/goV3Audio.js';
+import {figmaSprite} from '../lib/goV3Game.js';
+const defaultRatings={cuteness:3,charm:3,affection:3};
+export default function GoCamera({dog,onDone,onSaved,nickname,firstCard=false}){
+ const [step,setStep]=useState('intro'),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+ const [sound,setSound]=useState(true),[zoom,setZoom]=useState(1),[preview,setPreview]=useState(''),[blob,setBlob]=useState(null),[title,setTitle]=useState('');
+ const [saved,setSaved]=useState(null),[scan,setScan]=useState(false);
+ const stream=useRef(null),video=useRef(null),audio=useRef(null),timers=useRef([]),mounted=useRef(true),saving=useRef(false);
+ useEffect(()=>{mounted.current=true;audio.current=createGameAudio();setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');const onHide=()=>{if(document.hidden)audio.current?.stop()};document.addEventListener('visibilitychange',onHide);return()=>{mounted.current=false;timers.current.forEach(clearTimeout);stream.current?.getTracks().forEach(t=>t.stop());audio.current?.dispose();document.removeEventListener('visibilitychange',onHide);};},[]);
+ useEffect(()=>{if(step==='live'&&stream.current&&video.current){video.current.srcObject=stream.current;video.current.play().catch(()=>{});}},[step]);
+ useEffect(()=>{if(!blob){setPreview('');return;}const url=URL.createObjectURL(blob);setPreview(url);return()=>URL.revokeObjectURL(url);},[blob]);
+ function end(){timers.current.forEach(clearTimeout);timers.current=[];stream.current?.getTracks().forEach(t=>t.stop());stream.current=null;audio.current?.stop();onDone?.();}
+ function toggleSound(){const value=!sound;setSound(value);localStorage.setItem(GAME_SOUND_KEY,value?'on':'off');if(!value)audio.current?.stop();}
+ async function openCamera(){
+  if(busy)return;
+  setBusy(true);setError('');
+  try{
+   if(!navigator.mediaDevices?.getUserMedia)throw Error('카메라를 지원하지 않는 브라우저예요.');
+   const opened=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:1280}}});
+   if(!mounted.current){opened.getTracks().forEach(t=>t.stop());return;}
+   stream.current=opened;setStep('live');audio.current?.play('discover');
+  }catch(e){setError(e?.name==='NotAllowedError'?'카메라 권한을 허용한 뒤 다시 시도해주세요.':e.message||'카메라를 열지 못했어요.');}
+  finally{setBusy(false);}
+ }
+ function scale(next){const amount=Math.min(2,Math.max(1,next));setZoom(amount);const track=stream.current?.getVideoTracks()?.[0];try{const range=track?.getCapabilities?.()?.zoom;if(range){track.applyConstraints({advanced:[{zoom:Math.min(range.max,Math.max(range.min,amount))}]}).catch(()=>{});}}catch{}}
+ function capture(){if(busy||!video.current?.videoWidth)return;setScan(true);audio.current?.play('shutter');timers.current.push(setTimeout(()=>finishCapture(),2000));}
+ function finishCapture(){timers.current.forEach(clearTimeout);timers.current=[];const v=video.current;if(!v?.videoWidth){setError('촬영 화면을 확인해주세요.');setScan(false);return;}
+  const canvas=document.createElement('canvas');canvas.width=800;canvas.height=800;const ctx=canvas.getContext('2d');const side=Math.min(v.videoWidth,v.videoHeight)/zoom;const x=(v.videoWidth-side)/2,y=(v.videoHeight-side)/2;ctx.drawImage(v,x,y,side,side,0,0,800,800);
+  canvas.toBlob(file=>{setScan(false);if(!file){setError('사진 변환에 실패했어요.');return;}stream.current?.getTracks().forEach(t=>t.stop());stream.current=null;setBlob(file);setStep('edit');},'image/webp',.84);
+ }
+ function restart(){setBlob(null);setPreview('');setStep('intro');setScan(false);}
+ async function save(){
+  if(saving.current||!blob||!title.trim())return;
+  saving.current=true;setBusy(true);setError('');
+  try{
+   const form=new FormData();form.set('dogId',dog.id);form.set('title',title.trim());form.set('description',title.trim());form.set('ratings',JSON.stringify(defaultRatings));form.set('photo',blob,'camera.webp');
+   const r=await fetch('/api/go/cards',{method:'POST',body:form});const data=await r.json();if(!r.ok)throw Error(data.error||'카드를 저장하지 못했어요.');
+   const current=await fetch('/api/go/cards/'+data.id,{cache:'no-store'}).then(r=>r.json()).catch(()=>({}));
+   const card=current.card||{id:data.id,imageUrl:preview,dogName:dog.name,title:title.trim(),nickname:nickname||'멍기록가',capturedAt:data.capturedAt,ratings:defaultRatings};
+   setSaved(card);setStep('done');audio.current?.play('acquire');onSaved?.(card);
+  }catch(e){setError(e.message);}finally{saving.current=false;setBusy(false);}
+ }
+ return <div className={'v3-capture v3-capture-'+step}>
+  {step==='intro'&&<div className="v3-capture-live-art" style={{backgroundImage:dog.images?.[0]?'url('+dog.images[0]+')':undefined}}>
+   <div className="v3-capture-tip"><button onClick={toggleSound}>음원 {sound?'켜짐':'꺼짐'}</button><p>‘네모칸’ 안에 잘 맞춰 수집해주세요</p></div>
+   <div className="v3-camera-square"></div><img className="v3-camera-collar" src="/figma-v3/collar.png" alt="픽셀 목줄"/>
+   <div className="v3-pixel-dialog v3-camera-dialog-box">야생의 {dog.name}가 나타났다!<button onClick={openCamera} disabled={busy}>▶ {busy?'카메라 연결 중…':'수집한다'}</button><button onClick={end}>　도망간다</button></div>
+  </div>}
+  {step==='live'&&<div className="v3-capture-live-art"><video ref={video} autoPlay muted playsInline className="v3-camera-video" style={{transform:'scale('+zoom+')'}}/><div className="v3-capture-tip"><button onClick={toggleSound}>음원 {sound?'켜짐':'꺼짐'}</button><p>‘네모칸’ 안에 잘 맞춰 수집해주세요</p></div><div className={'v3-camera-square'+(scan?' is-scanning':'')}/><div className="v3-camera-zoom"><button onClick={()=>scale(zoom-.2)}>−</button><b>{zoom.toFixed(1)}x</b><button onClick={()=>scale(zoom+.2)}>＋</button></div><img src="/figma-v3/collar.png" alt="" className="v3-camera-collar"/>{scan?<div className="v3-pixel-dialog v3-camera-dialog-box">두근두근! {dog.name}를 수집하고 있어요.<button onClick={finishCapture}>▶ SKIP 후 결과보기</button></div>:<div className="v3-pixel-dialog v3-camera-dialog-box">야생의 {dog.name}가 나타났다!<button onClick={capture}>▶ 수집한다</button><button onClick={end}>　도망간다</button></div>}</div>}
+  {step==='edit'&&<div className="v3-capture-edit"><h2>수집한 멍멍이 확인하기</h2><img src={preview} className="v3-capture-photo" alt="촬영한 강아지"/><button className="v3-retry" onClick={restart}>다시 수집 ›</button><label>카드 제목<input maxLength={30} value={title} onChange={e=>setTitle(e.target.value)} placeholder={dog.name+'의 소중한 순간'} /></label><p>저장하면 모두의 도감에 바로 공개돼요.</p><button className="v3-yellow-btn" disabled={busy||!title.trim()} onClick={save}>{busy?'저장 중…':'카드 저장하고 게시하기'}</button></div>}
+  {step==='done'&&<div className="v3-capture-complete"><h2>멍카드 수집 완료!</h2><div className="v3-complete-card">{saved&&<GoCard card={saved} compact/>}</div><button className="v3-yellow-btn" onClick={end}>내 카드 보러가기</button></div>}
+  {error&&<p className="v3-error" role="alert">{error}</p>}
+ </div>;
 }

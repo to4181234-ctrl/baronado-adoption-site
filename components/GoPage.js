@@ -1,75 +1,57 @@
 'use client';
 import Link from 'next/link';
-import { useCallback,useEffect,useRef,useState } from 'react';
-import { fetchDogs } from '../lib/dogs.js';
-import { cardDate } from '../lib/goShared.js';
+import {useCallback,useEffect,useRef,useState} from 'react';
+import {fetchDogs} from '../lib/dogs.js';
+import {figmaSprite,FIGMA_DOGS,gameElement} from '../lib/goV3Game.js';
 import GoShell,{useGoSession} from './GoShell.js';
-import GoCard from './GoCard.js';
 import GoCamera from './GoCamera.js';
-import GoLoading from './GoLoading.js';
-import GoStanding from './GoStanding.js';
-const emptyCollection={owner:null,counts:{},covers:{},progress:null,badges:[],ready:false};
-
-function DogAlbumTile({dog,member,collection,ownCollection,collectionError}){
- const count=ownCollection?(collection.counts[dog.id]||0):null;
- const cover=ownCollection?collection.covers[dog.id]?.imageUrl:null;
- const uncollected=ownCollection&&count===0;
- // Keep uncollected identities concealed while the member's counts are loading.
- const hidden=Boolean(member&&!collectionError&&(uncollected||!ownCollection));
- const thumbnail=cover||dog.images?.[0]||'';
- return <div className={'go-dog-tile'+(uncollected?' go-dog-tile-uncollected':'')}>
-   <Link className="go-dog-tile-main" href={'/go/'+dog.id} aria-label={dog.name+' 도감 열기'+(count==null?'':' · 모은 카드 '+count+'장')}>
-    <div className={'go-dog-tile-cover'+(hidden?' go-dog-tile-cover-hidden':'')}>
-     {hidden?<img className="go-dog-silhouette" src="/go-dog-silhouette.svg" alt="" aria-hidden="true"/>:thumbnail&&<img className="go-dog-cover-photo" src={thumbnail} alt="" loading="lazy"/>}
-     {member&&!collectionError&&<span className="go-collection-count">{count==null?'…':count+'장'}</span>}
-     <span className="go-album-open" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5H5v14h14v-4M13 3h8v8M21 3 11 13"/></svg></span>
-    </div>
-    <strong>{dog.name}</strong>
-   </Link>
-   {uncollected&&<Link className="go-dog-hint-link" href={'/dogs/'+dog.id} aria-label={dog.name+'의 힌트, 가족을 찾아요에서 보기'}>힌트보기 <span aria-hidden="true">›</span></Link>}
- </div>;
-}
-function Album({dogId}){
+import GoCard from './GoCard.js';
+const EMPTY={counts:{},covers:{},progress:null,standing:null,ready:false};
+function Album({initialDogId=null}){
  const {member,ready,openAccount}=useGoSession();
- const [dogs,setDogs]=useState([]),[dogsReady,setDogsReady]=useState(false),[adopted,setAdopted]=useState(false),[cards,setCards]=useState([]),[page,setPage]=useState(0),[hasMore,setHasMore]=useState(false),[loading,setLoading]=useState(false),[order,setOrder]=useState('newest'),[error,setError]=useState(''),[showCamera,setShowCamera]=useState(false);
- const [collection,setCollection]=useState(emptyCollection),[collectionError,setCollectionError]=useState(''),[claiming,setClaiming]=useState(false),[stampMessage,setStampMessage]=useState(''),[resetting,setResetting]=useState(false);const collectionRequest=useRef(0),cardsRequest=useRef(0);
- const [selecting,setSelecting]=useState(false),[selectedIds,setSelectedIds]=useState([]),[deleting,setDeleting]=useState(false),[bulkNotice,setBulkNotice]=useState('');
- const [showAllAdopted,setShowAllAdopted]=useState(false);
- const dog=dogs.find(item=>item.id===dogId);const ownCollection=collection.owner===member?.id&&collection.ready;
- useEffect(()=>{fetchDogs('adoption').then(setDogs).catch(()=>setError('멍멍 도감을 불러오지 못했어요.')).finally(()=>setDogsReady(true));},[]);
- const load=useCallback(async(nextPage=0)=>{const requestId=++cardsRequest.current;if(!member){setCards([]);setLoading(false);return;}setLoading(true);setError('');try{const params=new URLSearchParams({mine:'1',page:String(nextPage),order,limit:dogId?'4':'2'});if(dogId)params.set('dog',dogId);const r=await fetch(`/api/go/cards?${params}`,{cache:'no-store'});const data=await r.json();if(!r.ok)throw new Error(data.error);if(requestId!==cardsRequest.current)return;setCards(previous=>nextPage?[...previous,...data.cards]:data.cards);setPage(nextPage);setHasMore(Boolean(dogId&&data.hasMore));}catch(e){if(requestId===cardsRequest.current)setError(e.message||'카드를 불러오지 못했어요.');}finally{if(requestId===cardsRequest.current)setLoading(false);}},[dogId,member,order]);
- useEffect(()=>{load();},[load]);
- const loadCollection=useCallback(async()=>{const requestId=++collectionRequest.current;if(!member)return;setCollectionError('');setCollection(previous=>previous.owner===member.id?previous:{...emptyCollection,owner:member.id});try{const r=await fetch(`/api/go/collection${dogId?`?dog=${dogId}`:''}`,{cache:'no-store'});const data=await r.json();if(!r.ok)throw new Error(data.error);if(requestId!==collectionRequest.current)return;setCollection({...data,owner:member.id,ready:true});}catch(e){if(requestId===collectionRequest.current)setCollectionError(e.message||'도감 현황을 불러오지 못했어요.');}},[member,dogId]);
- useEffect(()=>{loadCollection();},[loadCollection]);
- function removed(id){setCards(previous=>previous.filter(item=>item.id!==id));load();loadCollection();}
- useEffect(()=>{setSelecting(false);setSelectedIds([]);setBulkNotice('');},[dogId,member?.id,order]);
- function toggleSelection(){if(deleting)return;setSelecting(previous=>!previous);setSelectedIds([]);setBulkNotice('');}
- function toggleSelected(id){setSelectedIds(previous=>{if(previous.includes(id))return previous.filter(item=>item!==id);if(previous.length>=50){setBulkNotice('한 번에 최대 50개까지 삭제할 수 있어요.');return previous;}return [...previous,id];});}
- function selectVisible(){const ids=cards.slice(0,50).map(card=>card.id);setSelectedIds(ids);if(cards.length>50)setBulkNotice('한 번에 최대 50개까지 선택할 수 있어요.');}
- async function removeSelected(){
-  if(!member||!selectedIds.length||deleting)return;
-  if(!window.confirm(`선택한 카드 ${selectedIds.length}개를 완전히 삭제할까요? 사진과 좋아요도 함께 삭제되며 복구할 수 없어요.`))return;
-  setDeleting(true);setBulkNotice('');
-  try{
-   const response=await fetch('/api/go/cards',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids:selectedIds})});
-   const result=await response.json();if(!response.ok)throw new Error(result.error||'선택 삭제에 실패했어요.');
-   const deleted=result.deletedIds||[];
-   setCards(previous=>previous.filter(card=>!deleted.includes(card.id)));
-   setSelectedIds([]);setSelecting(false);
-   setBulkNotice(`${deleted.length}개 카드를 삭제했어요.${result.cleanupPending?' 사진 파일 정리가 지연되고 있어요.':''}${result.partial?' 일부 카드는 삭제되지 않았어요.':''}`);
-   await Promise.all([load(),loadCollection()]);
-  }catch(error){setBulkNotice(error.message||'선택한 카드를 삭제하지 못했어요.');}
-  finally{setDeleting(false);}
+ const [dogs,setDogs]=useState([]),[loadingDogs,setLoadingDogs]=useState(true),[collection,setCollection]=useState(EMPTY);
+ const [error,setError]=useState(''),[ownCards,setOwnCards]=useState([]),[cardTotal,setCardTotal]=useState(0),[cardPage,setCardPage]=useState(0),[order,setOrder]=useState('newest');
+ const [camera,setCamera]=useState(null),[selection,setSelection]=useState(false),[selectedIds,setSelectedIds]=useState([]),[deleting,setDeleting]=useState(false);
+ const [notice,setNotice]=useState(''),[stampBusy,setStampBusy]=useState(false),[showAdopted,setShowAdopted]=useState(false);
+ const dogId=initialDogId;
+ const dog=dogs.find(x=>x.id===dogId)||null;
+ useEffect(()=>{fetchDogs('adoption').then(setDogs).catch(()=>setError('강아지 목록을 불러오지 못했어요.')).finally(()=>setLoadingDogs(false));},[]);
+ const reloadCollection=useCallback(()=>{if(!member){setCollection(EMPTY);return Promise.resolve();}return fetch('/api/go/collection',{cache:'no-store'}).then(r=>r.json()).then(data=>{if(data.error)throw Error(data.error);setCollection({...data,ready:true});}).catch(e=>setError(e.message));},[member?.id]);
+ const reloadCards=useCallback(()=>{if(!member){setOwnCards([]);return Promise.resolve();}const p=new URLSearchParams({mine:'1',page:String(cardPage),limit:'4',order});if(dogId)p.set('dog',dogId);return fetch('/api/go/cards?'+p,{cache:'no-store'}).then(r=>r.json()).then(data=>{if(data.error)throw Error(data.error);setOwnCards(data.cards||[]);setCardTotal(data.total||0);}).catch(e=>setError(e.message));},[member?.id,cardPage,order,dogId]);
+ useEffect(()=>{reloadCollection();},[reloadCollection]);
+ useEffect(()=>{reloadCards();},[reloadCards]);
+ useEffect(()=>{setCardPage(0);setSelection(false);setSelectedIds([]);},[dogId,member?.id]);
+ const count=dogId?(collection.counts?.[dogId]||0):0;
+ const claimed=FIGMA_DOGS.filter(name=>{const d=dogs.find(x=>x.name===name);return d&&(collection.counts?.[d.id]||0)>0;}).length;
+ const totalDogs=FIGMA_DOGS.length;
+ const figure=(name,unlocked=false,shadow=false)=>figmaSprite(name,shadow||!unlocked?'shadow':'front');
+ function toggle(id){setSelectedIds(prev=>prev.includes(id)?prev.filter(x=>x!==id):[...prev,id].slice(0,50));}
+ async function deleteSelected(){
+  if(!selectedIds.length||deleting)return;
+  if(!confirm('선택한 카드 '+selectedIds.length+'개를 삭제할까요? 카드와 사진은 복구할 수 없어요.'))return;
+  setDeleting(true);
+  try{const r=await fetch('/api/go/cards',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids:selectedIds})});const d=await r.json();if(!r.ok)throw Error(d.error||'삭제에 실패했어요.');setNotice((d.deletedIds?.length||0)+'개의 카드를 삭제했어요.');setSelectedIds([]);setSelection(false);setCardPage(0);await Promise.all([reloadCards(),reloadCollection()]);}catch(e){setNotice(e.message);}finally{setDeleting(false);}
  }
- const selectionTools=selecting&&<div className="go-bulk-toolbar" role="group" aria-label="나의 카드 선택 삭제"><span><strong>{selectedIds.length}개</strong> 선택됨</span><button type="button" disabled={deleting||!cards.length} onClick={selectVisible}>보이는 카드 전체 선택</button><button type="button" disabled={deleting||!selectedIds.length} onClick={()=>setSelectedIds([])}>선택 해제</button><button type="button" className="go-bulk-delete-button" disabled={deleting||!selectedIds.length} onClick={removeSelected}>{deleting?'삭제 중…':`선택 ${selectedIds.length}개 삭제`}</button></div>;
- async function claim(){setClaiming(true);setStampMessage('');try{const r=await fetch('/api/go/collection',{method:'POST'});const data=await r.json();if(!r.ok)throw new Error(data.error);await loadCollection();setStampMessage('도감 완성 스탬프를 받았어요!');}catch(e){setStampMessage(e.message);}finally{setClaiming(false);}}
- async function resetCover(){setResetting(true);setCollectionError('');try{const r=await fetch('/api/go/collection',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({dogId,cardId:null})});const data=await r.json();if(!r.ok)throw new Error(data.error);await loadCollection();}catch(e){setCollectionError(e.message);}finally{setResetting(false);}}
- const filtered=dogs.filter(item=>item.adopted===adopted);
- const visibleDogs=adopted&&!showAllAdopted?filtered.slice(0,3):filtered;
- const cardGrid=<div className="go-card-grid">{cards.map(card=><GoCard key={`${card.id}-${member?.id}`} card={card} member={member} onLogin={openAccount} onDelete={removed} compact={selecting||!dogId} showTitle={Boolean(dogId)||selecting} viewOnClick={Boolean(dogId)&&!selecting} allowCover={Boolean(dogId)&&!selecting} linkToPost={!dogId&&!selecting} selectMode={selecting} selected={selectedIds.includes(card.id)} onSelect={toggleSelected} coverCardId={ownCollection?collection.covers[card.dogId]?.cardId:null} onCollectionChange={loadCollection} onUpdated={()=>{load();loadCollection();}}/>)}</div>;
- const collectionNotice=member&&collectionError&&<p className="go-note" role="status">{collectionError} <button type="button" className="go-text-button" onClick={loadCollection}>다시 불러오기</button></p>;
- if(!dogId)return <><div className="go-section-title"><h2>나의 멍멍 도감</h2><span>{filtered.length}개의 도감</span></div><div className="go-filter-tabs" role="group" aria-label="입양 상태"><button aria-pressed={!adopted} onClick={()=>{setAdopted(false);setShowAllAdopted(false);}}>입양 전</button><button aria-pressed={adopted} onClick={()=>{setAdopted(true);setShowAllAdopted(false);}}>입양 완료</button></div>{member&&ownCollection&&collection.progress?.complete&&!collection.progress.claimed&&<div className="go-earned-stamps"><button className="go-text-button" disabled={claiming} onClick={claim}>{claiming?'스탬프 받는 중…':'완성 스탬프 받기'}</button>{stampMessage&&<p role="status">{stampMessage}</p>}</div>}{member&&ownCollection&&collection.badges?.length>0&&<div className="go-earned-stamps" aria-label="받은 완성 스탬프">{collection.badges.slice(0,3).map(badge=><div key={badge.id}><span className="go-stamp-mark" aria-hidden="true">완성</span><div><strong>{badge.dogCount}개 도감 완성</strong><time>{cardDate(badge.earnedAt)}</time></div></div>)}</div>}{error&&<p className="go-error">{error}</p>}{collectionNotice}{!dogsReady?<GoLoading mode="bounce"/>:<div className="go-dog-grid">{visibleDogs.map(item=><DogAlbumTile key={item.id} dog={item} member={member} collection={collection} ownCollection={ownCollection} collectionError={collectionError}/>)}</div>}{adopted&&filtered.length>3&&dogsReady&&<button type="button" className="go-adopted-more" aria-expanded={showAllAdopted} aria-label={showAllAdopted?'입양 완료 도감 접기':`입양 완료 도감 ${filtered.length-3}개 더 보기`} onClick={()=>setShowAllAdopted(value=>!value)}>{showAllAdopted?'접기':`더 보기 · ${filtered.length-3}개`} <span aria-hidden="true">{showAllAdopted?'⌃':'⌄'}</span></button>}<section className="go-recent"><div className="go-section-title"><h2>최근 업로드</h2>{member&&cards.length>0&&<button type="button" className="go-bulk-mode-button" disabled={deleting} onClick={toggleSelection}>{selecting?'선택 취소':'선택 삭제'}</button>}</div>{bulkNotice&&<p className="go-note" role="status">{bulkNotice}</p>}{selectionTools}{ready&&!member?<p className="go-empty">로그인하면 최근 업로드한 나의 카드를 볼 수 있어요.</p>:loading||!ready?<GoLoading mode="bounce" label="최근 카드를 불러오고 있어요."/>:cards.length?cardGrid:<p className="go-empty">아직 업로드한 카드가 없어요.</p>}</section></>;
- const cover=ownCollection?collection.covers[dogId]:null;
- return <><Link className="go-home" href="/go">← 나의 멍멍 도감 목록</Link>{dog?<><div className="go-dog-title"><div className="go-dog-avatar">{(cover?.imageUrl||dog.images?.[0])&&<img src={cover?.imageUrl||dog.images[0]} alt=""/>}</div><div><h2>{dog.name} 도감</h2><p>{dog.adopted?'입양 완료 · 지난 카드는 그대로 남아 있어요.':'현장에서 만난 순간을 내 카드로 기록해요.'}</p>{cover&&<button type="button" className="go-text-button" disabled={resetting} onClick={resetCover}>기본 대표 사진으로 바꾸기</button>}</div></div>{member&&ownCollection&&<GoStanding standing={collection.standing} dogName={dog.name}/>}<div className="go-album-toolbar"><label className="go-album-order"><select aria-label="카드 등록 순서" value={order} onChange={e=>{setCards([]);setHasMore(false);setOrder(e.target.value);}}><option value="newest">최신순</option><option value="oldest">오래된순</option></select></label>{member&&cards.length>0&&<button type="button" className="go-bulk-mode-button" disabled={deleting} onClick={toggleSelection}>{selecting?'선택 취소':'선택 삭제'}</button>}{!dog.adopted&&<button className="go-primary" onClick={()=>member?setShowCamera(true):openAccount()}>카메라 촬영</button>}</div></>:dogsReady?<p className="go-note">도감을 찾지 못했어요.</p>:<GoLoading mode="bounce"/>}{error&&<p className="go-error">{error}</p>}{collectionNotice}{bulkNotice&&<p className="go-note" role="status">{bulkNotice}</p>}{selectionTools}{ready&&!member&&<div className="go-empty">상단에서 회원가입/로그인 후 내 카드를 모아보세요.</div>}{member&&!loading&&!cards.length&&<p className="go-empty">아직 기록한 카드가 없어요.</p>}{cardGrid}{loading&&<GoLoading mode="bounce"/>}{hasMore&&!loading&&<button className="go-more" onClick={()=>load(page+1)}>더 보기</button>}{showCamera&&dog&&<div className="go-overlay" role="dialog" aria-modal="true" aria-label="멍멍이 촬영"><div className="go-dialog go-camera-dialog"><button className="go-close" onClick={()=>setShowCamera(false)} aria-label="닫기">×</button><GoCamera dog={dog} nickname={member?.nickname} standing={ownCollection?collection.standing:null} firstCard={Boolean(ownCollection&&!(collection.counts[dog.id]>0))} onSaved={()=>{load();loadCollection();}} onDone={()=>setShowCamera(false)}/></div></div>}</>;
+ async function claim(){if(stampBusy)return;setStampBusy(true);try{const r=await fetch('/api/go/collection',{method:'POST'});const d=await r.json();if(!r.ok)throw Error(d.error);setNotice('완성 스탬프를 받았어요!');reloadCollection();}catch(e){setNotice(e.message);}finally{setStampBusy(false);}}
+ function CardList(){return <><div className="v3-card-list">{ownCards.map(card=>selection?<GoCard key={card.id} card={card} member={member} onLogin={openAccount} compact previewStats selectMode selected={selectedIds.includes(card.id)} onSelect={toggle}/>:<GoCard key={card.id} card={card} member={member} onLogin={openAccount} compact previewStats linkToPost onDelete={()=>{reloadCards();reloadCollection();}}/>)}</div><div className="v3-pager"><button disabled={cardPage===0} onClick={()=>setCardPage(x=>x-1)}>〈</button><span>{cardPage+1} / {Math.max(1,Math.ceil(cardTotal/4))}</span><button disabled={(cardPage+1)*4>=cardTotal} onClick={()=>setCardPage(x=>x+1)}>〉</button></div></>;}
+ return <>
+  {dogId?<div className="v3-album-detail">
+   {dog?<><section className="v3-album-yellow"><div><h1>{dog.name} 도감</h1><p>{dog.adopted?'입양을 완료한 멍멍이예요.':'고라이스는 '+dog.name+' 멍기록가 중 상위에 있어요'}</p><small>보유 카드 수 {count}장</small></div><div className="v3-album-dog-row"><Link href={'/go/interact/'+dog.id} className="v3-album-avatar"><img src={figure(dog.name,count>0)} alt={dog.name}/><span>{dog.name} 만나러가기 ›</span></Link><div><h3>{dog.name}</h3><p>수집 카드<br/>{count}장</p><p>속성<br/><b>✦ {gameElement(dog.name)}</b></p></div></div>{!dog.adopted&&<button className="v3-album-collect" onClick={()=>member?setCamera(dog):openAccount()}>멍카드 수집하러가기 ›</button>}</section>
+   <div className="v3-album-cards"><div className="v3-section-bar"><h2>수집한 카드 ({cardTotal}장)</h2><select aria-label="카드 정렬" value={order} onChange={e=>{setCardPage(0);setOrder(e.target.value)}}><option value="newest">등록 순서 | 최신순</option><option value="oldest">등록 순서 | 오래된순</option></select></div>
+    {member&&<div className="v3-manage"><button onClick={()=>{setSelection(v=>!v);setSelectedIds([]);}}>{selection?'선택 취소':'내 카드 관리'}</button>{selection&&<button disabled={!selectedIds.length||deleting} onClick={deleteSelected}>{deleting?'삭제 중…':'선택 '+selectedIds.length+'장 삭제'}</button>}</div>}
+    {!member?<p className="v3-status" onClick={openAccount}>로그인하면 수집한 카드가 나타나요. <button onClick={openAccount}>로그인하기</button></p>:cardTotal?<CardList/>:<div className="v3-empty-collection">아직 수집한 카드가 없어요.<br/>{dog.name}를 만나 첫 카드를 만들어보세요.</div>}</div>
+   </>:loadingDogs?<p className="v3-status">도감을 불러오는 중…</p>:<p className="v3-error">도감을 찾지 못했어요.</p>}
+   <Link href="/go" className="v3-return-link">← 내 도감으로 돌아가기</Link>
+  </div>:<div className="v3-album-home">
+    <section className="v3-profile-head"><div className="v3-profile-avatar"><img src={figmaSprite(member?.avatarDog||'구름')} alt="프로필 캐릭터"/></div><div><h1>{member?.nickname||'멍기록가'}</h1><p>멍기록가</p><small>{member?.profileBio||'자기소개가 없습니다.'}</small><Link href="/go/settings">› 프로필 수정</Link>{member&&<Link href={'/go/recorders/'+member.id}>› 내 프로필 미리보기</Link>}{!member&&<button className="v3-profile-login" onClick={openAccount}>› 로그인하고 시작하기</button>}</div></section>
+    <section className="v3-collection-section"><h2>내 도감</h2><div className="v3-progress-label">도감 수집 {claimed} / {totalDogs}</div><div className="v3-progress"><span style={{width:(claimed/totalDogs*100)+'%'}}/></div>
+     <div className="v3-collection-grid">{FIGMA_DOGS.map(name=>{const d=dogs.find(x=>x.name===name),owned=Boolean(d&&member&&(collection.counts?.[d.id]||0)>0);return <Link href={d?'/go/'+d.id:'/go'} className={'v3-collection-tile'+(owned?' unlocked':'')} key={name}><img src={figure(name,owned)} alt={owned?name:'미획득 실루엣'}/><strong>{name}</strong></Link>})}</div></section>
+    <section className="v3-battle-home"><h2>멍배틀</h2><Link href="/go/battle" className="v3-battle-shortcut"><img src="/figma-v3/collar.png" alt="픽셀 목줄"/><strong>멍배틀 하러가기 ›</strong></Link><div className="v3-pixel-panel"><b>멍멍이별 대결 전적</b><p>{claimed?'나의 멍멍이 카드로 대결 기록을 쌓아보세요.':'멍배틀을 하고 기록을 쌓아보세요.'}</p></div></section>
+    {member&&collection.progress?.complete&&!collection.progress.claimed&&<button className="v3-yellow-btn" onClick={claim} disabled={stampBusy}>도감 완성 스탬프 받기</button>}
+    <div className="v3-album-links"><Link href="/go/community">모두의 도감 보기 ›</Link><Link href="/go/guide">게임 안내 ›</Link></div>
+  </div>}
+  {notice&&<p className="v3-message" role="status">{notice}</p>}{error&&<p className="v3-error" role="alert">{error}</p>}
+  {camera&&<div className="v3-camera-backdrop" role="presentation"><section className="v3-camera-panel" role="dialog" aria-modal="true" aria-label="멍멍이 카드 촬영"><button className="v3-camera-close" onClick={()=>setCamera(null)} aria-label="카메라 닫기">×</button><GoCamera dog={camera} nickname={member?.nickname} standing={collection.standing} firstCard={!collection.counts?.[camera.id]} onSaved={()=>{reloadCards();reloadCollection();}} onDone={()=>setCamera(null)}/></section></div>}
+ </>;
 }
-export default function GoPage({dogId=null}){return <GoShell albumDetail={Boolean(dogId)}><Album dogId={dogId}/></GoShell>;}
+export default function GoPage({dogId=null}){return <GoShell active="album" albumDetail={Boolean(dogId)}><Album initialDogId={dogId}/></GoShell>}
