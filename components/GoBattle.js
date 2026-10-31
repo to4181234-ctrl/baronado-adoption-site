@@ -70,8 +70,8 @@ function Game(){
  const winner=result?.winner==='first'?first:result?.winner==='second'?second:null;
  const spriteMap={'깡지':'dog-kangji.png','버디':'dog-buddy.png','뽀실':'dog-pposil.png','구름':'dog-gureum.png','오레오':'dog-oreo.png'};
  const sprite=c=>spriteMap[c?.dogName]?'/figma-preview/'+spriteMap[c.dogName]:c?.imageUrl;
- return <div className="meong-battle-app">
-  <div className="meong-battle-toolbar"><span>멍배틀</span><button type="button" aria-label={soundEnabled?'소리 끄기':'소리 켜기'} onClick={()=>{const on=!soundEnabled;setSoundEnabled(on);localStorage.setItem(BATTLE_SOUND_KEY,on?'on':'off');window.dispatchEvent(new Event('go-v3-settings-changed'));}}>{soundEnabled?'🔊 소리 켜짐':'🔇 소리 꺼짐'}</button></div>
+ return <div className={"meong-battle-app meong-battle-phase-"+phase}>
+  
   {!ready?<p role="status">도감을 준비하고 있어요.</p>:!member?<section className="meong-battle-login"><h2>멍배틀을 시작해볼까요?</h2><p>서로 다른 멍카드 2장을 모아 대결하고 나만의 전적을 쌓아보세요!</p><button onClick={openAccount}>로그인하고 시작하기</button></section>:<>
   {phase==='choose'&&<>
    <h1>멍배틀</h1><p className="meong-battle-hint">서로 다른 강아지 카드 2장을 골라주세요</p>
