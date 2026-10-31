@@ -10,7 +10,8 @@ const suspense=[220,246.94,293.66,246.94,220,329.63,293.66,246.94,196,246.94,293
 export default function GoAmbientSound(){
  const pathname=usePathname();
  useEffect(()=>{
-  if(pathname?.startsWith('/go/battle')||!pathname?.startsWith('/go'))return;
+  // Ambient music is exclusive to the interactive game, not navigation, profile, or community pages.
+  if(!pathname?.startsWith('/go/interact/'))return;
   let ctx=null,unlocked=false,step=0,mode='calm',interval=null;
   const enabled=()=>{try{return localStorage.getItem(GAME_SOUND_KEY)!=='off';}catch{return true;}};
   function note(frequency){
