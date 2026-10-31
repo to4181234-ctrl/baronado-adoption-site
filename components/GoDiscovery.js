@@ -3,11 +3,11 @@ import Link from 'next/link';
 import {useEffect,useRef,useState} from 'react';
 import {figmaSprite,FIGMA_DOGS} from '../lib/goV3Game.js';
 import {createGameAudio,GAME_SOUND_KEY} from '../lib/goV3Audio.js';
-const HIDE_KEY='baronado-go-intro-hide-until',SEEN_KEY='baronado-go-intro-session-seen',WEEK=7*86400000;
+const HIDE_KEY='baronado-go-intro-hide-until',SEEN_KEY='baronado-go-intro-session-seen',POPUP_ENABLED_KEY='baronado-go-intro-enabled',WEEK=7*86400000;
 export default function GoDiscovery({dogs=[],dog=null}){
  const [open,setOpen]=useState(false),[stage,setStage]=useState('choice'),[hide,setHide]=useState(false),[sound,setSound]=useState(true),[chosen,setChosen]=useState(null);
  const t=useRef(null),audio=useRef(null);
- useEffect(()=>{audio.current=createGameAudio();setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');let already=false;try{already=sessionStorage.getItem(SEEN_KEY)==='1'||Number(localStorage.getItem(HIDE_KEY)||0)>Date.now();}catch{}if(!already){setOpen(true);try{sessionStorage.setItem(SEEN_KEY,'1');}catch{}}const h=()=>{if(document.hidden)audio.current?.stop();};document.addEventListener('visibilitychange',h);return()=>{clearTimeout(t.current);audio.current?.dispose();document.removeEventListener('visibilitychange',h);};},[]);
+ useEffect(()=>{audio.current=createGameAudio();setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');let already=false;try{already=localStorage.getItem(POPUP_ENABLED_KEY)==='off'||sessionStorage.getItem(SEEN_KEY)==='1'||Number(localStorage.getItem(HIDE_KEY)||0)>Date.now();}catch{}if(!already){setOpen(true);try{sessionStorage.setItem(SEEN_KEY,'1');}catch{}}const h=()=>{if(document.hidden)audio.current?.stop();};document.addEventListener('visibilitychange',h);return()=>{clearTimeout(t.current);audio.current?.dispose();document.removeEventListener('visibilitychange',h);};},[]);
  function close(){clearTimeout(t.current);audio.current?.stop();setOpen(false);if(hide)try{localStorage.setItem(HIDE_KEY,String(Date.now()+WEEK));}catch{}}
  function reveal(i){if(stage!=='choice')return;const list=Array.isArray(dogs)?dogs.filter(d=>FIGMA_DOGS.includes(d.name)):[];const d=list[Math.floor(Math.random()*Math.max(1,list.length))]||dog||null;setChosen(d);setStage('reveal');audio.current?.play('collar');t.current=setTimeout(()=>finish(),2000);}
  function finish(){clearTimeout(t.current);setStage('result');audio.current?.play('discover');}
