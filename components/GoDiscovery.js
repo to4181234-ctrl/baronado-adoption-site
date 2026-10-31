@@ -3,12 +3,47 @@ import Link from 'next/link';
 import {useEffect,useRef,useState} from 'react';
 import {figmaSprite,FIGMA_DOGS} from '../lib/goV3Game.js';
 import {createGameAudio,GAME_SOUND_KEY} from '../lib/goV3Audio.js';
-const HIDE_KEY='baronado-go-intro-hide-until',SEEN_KEY='baronado-go-intro-session-seen',POPUP_ENABLED_KEY='baronado-go-intro-enabled',WEEK=7*86400000;
+const HIDE_KEY='baronado-go-intro-hide-until',ANON_SEEN_KEY='baronado-go-intro-anon-day',WEEK=7*86400000;
+const koreanDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 export default function GoDiscovery({dogs=[],dog=null}){
  const [open,setOpen]=useState(false),[stage,setStage]=useState('choice'),[hide,setHide]=useState(false),[sound,setSound]=useState(true),[chosen,setChosen]=useState(null);
- const t=useRef(null),audio=useRef(null);
- useEffect(()=>{audio.current=createGameAudio();setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');let already=false;try{already=localStorage.getItem(POPUP_ENABLED_KEY)==='off'||sessionStorage.getItem(SEEN_KEY)==='1'||Number(localStorage.getItem(HIDE_KEY)||0)>Date.now();}catch{}if(!already){setOpen(true);try{sessionStorage.setItem(SEEN_KEY,'1');}catch{}}const h=()=>{if(document.hidden)audio.current?.stop();};document.addEventListener('visibilitychange',h);return()=>{clearTimeout(t.current);audio.current?.dispose();document.removeEventListener('visibilitychange',h);};},[]);
- function close(){clearTimeout(t.current);audio.current?.stop();setOpen(false);if(hide)try{localStorage.setItem(HIDE_KEY,String(Date.now()+WEEK));}catch{}}
+ const t=useRef(null),audio=useRef(null),loggedIn=useRef(false);
+ useEffect(()=>{
+  let mounted=true;audio.current=createGameAudio();
+  try{setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');}catch{}
+  async function checkPopup(){
+   try{
+    const session=await fetch('/api/go/session',{cache:'no-store'}).then(r=>r.json());
+    if(!mounted)return;
+    if(session.member){
+     loggedIn.current=true;
+     const settingsResponse=await fetch('/api/go/settings',{cache:'no-store'});
+     if(!settingsResponse.ok)return; // Do not show until account preference is known.
+     const prefs=await settingsResponse.json();
+     if(!mounted||!prefs.popupEnabled||prefs.seenToday||Date.parse(prefs.hideUntil||0)>Date.now())return;
+     setOpen(true);
+     fetch('/api/go/settings',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'seen'})}).catch(()=>{});
+    }else{
+     const seen=localStorage.getItem(ANON_SEEN_KEY)===koreanDay();
+     const hidden=Number(localStorage.getItem(HIDE_KEY)||0)>Date.now();
+     if(!seen&&!hidden){setOpen(true);localStorage.setItem(ANON_SEEN_KEY,koreanDay());}
+    }
+   }catch{
+    // Storage-restricted guests do not cause a repeated automatic popup.
+   }
+  }
+  checkPopup();
+  const h=()=>{if(document.hidden)audio.current?.stop();};
+  document.addEventListener('visibilitychange',h);
+  return()=>{mounted=false;clearTimeout(t.current);audio.current?.dispose();document.removeEventListener('visibilitychange',h);};
+ },[]);
+ function close(){
+  clearTimeout(t.current);audio.current?.stop();setOpen(false);
+  if(!hide)return;
+  if(loggedIn.current){
+   fetch('/api/go/settings',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hideWeek'})}).catch(()=>{});
+  }else{try{localStorage.setItem(HIDE_KEY,String(Date.now()+WEEK));}catch{}}
+ }
  function reveal(i){if(stage!=='choice')return;const list=Array.isArray(dogs)?dogs.filter(d=>FIGMA_DOGS.includes(d.name)):[];const d=list[Math.floor(Math.random()*Math.max(1,list.length))]||dog||null;setChosen(d);setStage('reveal');audio.current?.play('collar');audio.current?.schedule('discover',200);t.current=setTimeout(()=>finish(),2000);}
  function finish(){clearTimeout(t.current);setStage('result');audio.current?.stop();}
  function toggle(){const next=!sound;setSound(next);try{localStorage.setItem(GAME_SOUND_KEY,next?'on':'off');window.dispatchEvent(new Event('go-v3-settings-changed'));}catch{}if(!next)audio.current?.stop();}
