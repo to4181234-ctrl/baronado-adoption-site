@@ -90,57 +90,49 @@ export default function DogDetailPage() {
         {error && <div className="message error">{error}</div>}
 
         {dog && (
-          <article className="detail-card">
-            <div
-              className="gallery"
-              onPointerDown={onPointerDown}
-              onPointerUp={onPointerUp}
-              title={current?.type === 'photo' ? '사진 크게 보기' : undefined}
-            >
-              {current?.type === 'video'
-                ? <div className="gallery-main gallery-video-frame"><video key={current.url} src={current.url} poster={current.poster || undefined} controls preload="none" playsInline aria-label={`${dog.name} 동영상 ${index + 1 - (dog.images || []).length}`} /></div>
-                : <button type="button" className="gallery-main" onClick={openImage} aria-label="사진 크게 보기" disabled={!hasMedia}>
-                    {current ? <img src={current.url} alt={`${dog.name} 사진 ${index + 1}`} /> : <PawIcon />}
-                    {current && <span className="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.8" cy="10.8" r="6.7" /><path d="m16 16 4.5 4.5M8 10.8h5.6m-2.8-2.8v5.6" /></svg></span>}
-                  </button>}
-              {dog.adopted && <span className="adopted-badge detail"><strong>입양 완료</strong>{dog.adopted_at && <small>{formatDogDate(dog.adopted_at)}</small>}</span>}
-
-              {media.length > 1 && <span className="photo-count" aria-live="polite">{current?.type === 'video' ? '동영상' : '사진'} {index + 1} / {media.length}</span>}
-
-              {media.length > 1 && (
-                <>
-                  <button type="button" className="gallery-arrow gallery-prev" onClick={(event) => { event.stopPropagation(); move(-1); }} aria-label="이전 미디어">‹</button>
-                  <button type="button" className="gallery-arrow gallery-next" onClick={(event) => { event.stopPropagation(); move(1); }} aria-label="다음 미디어">›</button>
-                </>
-              )}
+          <>
+          <nav className={'v3-detail-tabs'+(dog.category===CATEGORY_RESIDENT?' is-resident':'')} aria-label="상세 페이지 메뉴">
+           <button type="button" className="active" onClick={()=>document.getElementById('v3-detail-overview')?.scrollIntoView({behavior:'smooth'})}>소개</button>
+           <button type="button" onClick={()=>document.getElementById('v3-detail-information')?.scrollIntoView({behavior:'smooth'})}>상세 정보</button>
+           {dog.category!==CATEGORY_RESIDENT&&<><button type="button" onClick={()=>document.getElementById('v3-detail-shelter')?.scrollIntoView({behavior:'smooth'})}>보호소</button><button type="button" onClick={()=>document.getElementById('v3-dog-records')?.scrollIntoView({behavior:'smooth'})}>멍기록</button></>}
+          </nav>
+          <article className="detail-card v3-figma-detail">
+           <header className="v3-detail-identity">
+            <h1 className="dog-name">{dog.name}{isDogBirthday(dog)&&<span className="birthday-icon" role="img" aria-label="생일 축하"> 🎉</span>}</h1>
+            <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered?'O':'X'} ㅣ {getAgeInfo(dog).detailDisplay}</p>
+            {getDogBirthDate(dog)&&<p className="arrival-date">생년월일 · {formatDogDate(getDogBirthDate(dog))}</p>}
+            {dog.category!==CATEGORY_RESIDENT&&dog.arrived_at&&<p className="arrival-date">바로나도에 온 날 · {formatDogDate(dog.arrived_at)}</p>}
+            {dog.category!==CATEGORY_RESIDENT&&dog.adopted&&dog.adopted_at&&<p className="arrival-date">입양 간 날짜 · {formatDogDate(dog.adopted_at)}</p>}
+           </header>
+           <div className="gallery v3-detail-gallery" onPointerDown={onPointerDown} onPointerUp={onPointerUp} title={current?.type==='photo'?'사진 크게 보기':undefined}>
+            {current?.type==='video'
+             ? <div className="gallery-main gallery-video-frame"><video key={current.url} src={current.url} poster={current.poster||undefined} controls preload="none" playsInline aria-label={dog.name+' 동영상'}/></div>
+             : <button type="button" className="gallery-main" onClick={openImage} aria-label="사진 크게 보기" disabled={!hasMedia}>{current?<img src={current.url} alt={dog.name+' 사진 '+(index+1)}/>:<PawIcon/>}{current&&<span className="zoom-hint" aria-hidden="true">⛶</span>}</button>}
+            {dog.adopted&&<span className="adopted-badge detail"><strong>입양 완료</strong></span>}
+           </div>
+           <nav className="v3-detail-gallery-navigation" aria-label="강아지 사진 이동">
+            <button type="button" onClick={()=>move(-1)} disabled={media.length<2}>‹ 이전</button>
+            <span>{hasMedia?index+1:0} / {media.length||0}</span>
+            <button type="button" onClick={()=>move(1)} disabled={media.length<2}>다음 ›</button>
+           </nav>
+           <div className="v3-detail-divider" aria-hidden="true"/>
+           <section className="v3-detail-about" id="v3-detail-overview">
+            <h2>{dog.name}를 소개합니다</h2>
+            <ExpandableText key={dog.id} text={getDogProfile(dog).introduction||dog.description||'아직 소개글이 등록되지 않았어요.'} className="desc"/>
+           </section>
+           <section className="v3-detail-properties" id="v3-detail-information">
+            <h2>상세 정보</h2>
+            <h3>기본 정보</h3>
+            <div className="v3-detail-properties-table">
+             {PROFILE_FIELDS.map(field=><div className="v3-detail-property" key={field.key}><span>{field.label}</span><div>{field.key==='vaccinations'?<VaccinationDetails profile={getDogProfile(dog)}/>:getDogProfile(dog)[field.key]?<ExpandableText text={getDogProfile(dog)[field.key]}/>:<span className="v3-detail-unset">정보 준비 중</span>}</div></div>)}
+             {Array.isArray(getDogProfile(dog).extra_questions)&&getDogProfile(dog).extra_questions.filter(x=>x.question&&x.answer).map((x,i)=><div className="v3-detail-property" key={i}><span>{x.question}</span><div>{x.answer}</div></div>)}
             </div>
-
-            <div className="detail-body">
-              <h1 className="dog-name">{dog.name}{isDogBirthday(dog) && <span className="birthday-icon" role="img" aria-label="생일 축하"> 🎉</span>}</h1>
-              <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered ? 'O' : 'X'} ㅣ {getAgeInfo(dog).detailDisplay}</p>
-              {getDogBirthDate(dog) && <p className="arrival-date">생년월일 · {formatDogDate(getDogBirthDate(dog))}</p>}
-              {dog.category !== CATEGORY_RESIDENT && getAgeInfo(dog).referenceDisplay && <p className="arrival-date">{getAgeInfo(dog).referenceDisplay}</p>}
-              {dog.category !== CATEGORY_RESIDENT && dog.arrived_at && <p className="arrival-date">바로나도에 온 날 · {formatDogDate(dog.arrived_at)}</p>}
-              {dog.category !== CATEGORY_RESIDENT && dog.adopted && dog.adopted_at && <p className="arrival-date">입양 간 날짜 · {formatDogDate(dog.adopted_at)}</p>}
-              {dog.category === CATEGORY_RESIDENT
-                ? <ExpandableText key={dog.id} text={dog.description || '아직 소개글이 등록되지 않았어요.'} className="desc" />
-                : <div className="profile-detail">
-                    {getDogProfile(dog).introduction && <ExpandableText key={`${dog.id}-intro`} text={getDogProfile(dog).introduction} className="desc" />}
-                    {PROFILE_FIELDS.map(field => field.key === 'vaccinations'
-                      ? <VaccinationDetails key={`${dog.id}-vaccinations`} profile={getDogProfile(dog)} />
-                      : getDogProfile(dog)[field.key] ? <section className="profile-section" key={`${dog.id}-${field.key}`}><h2>{field.label}</h2><ExpandableText text={getDogProfile(dog)[field.key]} /></section> : null
-                    )}
-                    {Array.isArray(getDogProfile(dog).extra_questions) && getDogProfile(dog).extra_questions.filter(entry => entry.question && entry.answer).map((entry, questionIndex) =>
-                      <section className="profile-section" key={`${dog.id}-question-${questionIndex}`}><h2>{entry.question}</h2><ExpandableText text={entry.answer} /></section>
-                    )}
-                    {getDogProfile(dog).shelter_name && <section className="profile-section"><h2>어느 보호소에서 왔나요?</h2><p>{getDogProfile(dog).shelter_name}</p>{getShelterUrl(getDogProfile(dog).shelter_url) && <a className="shelter-link" href={getShelterUrl(getDogProfile(dog).shelter_url)} target="_blank" rel="noopener noreferrer">보호소 홈페이지 ↗</a>}</section>}
-                    {!getDogProfile(dog).introduction && !PROFILE_FIELDS.some(field => getDogProfile(dog)[field.key]) && <ExpandableText key={`${dog.id}-fallback`} text={dog.description || '아직 소개글이 등록되지 않았어요.'} className="desc" />}
-                  </div>}
-              {dog.category === CATEGORY_RESIDENT && <VaccinationDetails profile={dog.profile} />}
-            </div>
+           </section>
+           {dog.category!==CATEGORY_RESIDENT&&<section className="v3-detail-shelter" id="v3-detail-shelter"><h2>보호소</h2><p>{getDogProfile(dog).shelter_name||'보호소 정보 준비 중'}</p>{getShelterUrl(getDogProfile(dog).shelter_url)&&<a href={getShelterUrl(getDogProfile(dog).shelter_url)} target="_blank" rel="noopener noreferrer">보호소 홈페이지 ↗</a>}</section>}
           </article>
+          </>
         )}
-        {dog&&dog.category!==CATEGORY_RESIDENT&&<GoDogRecords key={dog.id} dog={dog}/>}
+        {dog&&dog.category!==CATEGORY_RESIDENT&&<div id="v3-dog-records"><GoDogRecords key={dog.id} dog={dog}/></div>}
       </section>
 
       {dog && <DogActions dog={dog} hidden={modalOpen} />}

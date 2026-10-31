@@ -1,0 +1,107 @@
+
+/* Figma first-visit modal: source 173:1167, 390px design. */
+.v3-discovery-figma .v3-discovery-modal{width:min(345px,calc(100vw - 48px))!important;max-width:345px!important;min-height:461px!important;height:461px!important;padding:0!important;border-radius:6px!important;position:relative;display:block!important;overflow:hidden;background:#fff}
+.v3-discovery-figma .v3-discovery-close{position:absolute;top:9px;right:14px;z-index:3;width:20px;height:20px;font-size:23px;line-height:20px;border:0;background:none}
+.v3-discovery-figma .v3-discovery-modal>h2{position:absolute;left:0;right:0;top:30px;text-align:center;font-size:36px!important;font-weight:900!important;line-height:54px;letter-spacing:-.06em;margin:0;white-space:nowrap}
+.v3-discovery-figma .v3-discovery-stage{position:absolute;top:147px;left:0;width:100%;min-height:0!important;height:78px;display:flex;align-items:center;justify-content:center}
+.v3-discovery-figma .v3-collars{width:100%;display:flex;justify-content:center;align-items:center;gap:14px}
+.v3-discovery-figma .v3-collars button{width:71px;height:46px;padding:0;flex:0 0 71px;border:0;background:transparent}
+.v3-discovery-figma .v3-collars img{display:block;width:71px;height:46px;image-rendering:pixelated;object-fit:contain}
+.v3-discovery-figma .v3-discovery-reveal{width:110px;height:110px;object-fit:contain;image-rendering:pixelated}
+.v3-discovery-figma .v3-discovery-dialog{position:absolute;top:280px;left:29px;width:285px;height:119px;background:transparent;box-shadow:none;border:0;margin:0;padding:0;color:#181713;white-space:normal}
+.v3-discovery-figma .v3-discovery-dialog-layer{display:block;position:absolute;pointer-events:none;max-width:none;object-fit:fill}
+.v3-discovery-figma .v3-discovery-dialog-bg,.v3-discovery-figma .v3-discovery-dialog-outer{left:1.5px;top:1.3px;width:282px;height:116px}
+.v3-discovery-figma .v3-discovery-dialog-inner{left:6px;top:7.76px;width:273px;height:103px}
+.v3-discovery-figma .v3-discovery-dialog-content{position:absolute;top:24px;left:23px;right:18px;font-size:13px;line-height:20px;white-space:normal}
+.v3-discovery-figma .v3-discovery-dialog-content button,.v3-discovery-figma .v3-discovery-dialog-content a{display:flex;align-items:center;gap:8px;line-height:20px;height:23px;font-size:13px!important;text-align:left!important;color:#111!important;padding:0!important;background:none;border:0}
+.v3-discovery-figma .v3-discovery-dialog-content button:first-of-type{margin:8px 0 0!important}
+.v3-discovery-figma .v3-discovery-arrow{display:inline-block;width:9px;height:14px;object-fit:contain}
+.v3-discovery-figma .v3-discovery-bottom{position:absolute;left:34px;right:20px;bottom:21px;width:auto!important;margin:0!important;display:flex;align-items:center;justify-content:space-between}
+.v3-discovery-figma .v3-discovery-bottom label{font-size:12px!important;line-height:18px;gap:8px}
+.v3-discovery-figma .v3-discovery-bottom input{width:14px;height:14px;margin:0;accent-color:#f7d94d}
+.v3-discovery-figma .v3-discovery-bottom img{width:24px;height:24px}
+.v3-discovery-figma .v3-discovery-close:focus-visible,.v3-discovery-figma button:focus-visible{outline:2px solid #b59813;outline-offset:2px}
+/* Dog details: Figma 173:1018, 173:11010. */
+.v3-detail-site .container.detail-container{max-width:390px!important;padding:0 16px 48px!important}
+.v3-detail-site .v3-detail-banner{height:118px!important;min-height:118px;margin:0 -16px!important;background:#f7d94d;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:14px 16px 13px!important;gap:13px!important}
+.v3-detail-site .v3-detail-banner a{font-size:10px;margin:0!important;color:#584a20}
+.v3-detail-site .v3-detail-banner strong{font-size:17px;font-weight:700}
+.v3-detail-site .v3-detail-tabs{height:59px;display:flex;justify-content:space-around;align-items:flex-start;gap:0;border:0;overflow:auto;white-space:nowrap;margin:0}
+.v3-detail-site .v3-detail-tabs button{border:0;border-bottom:2px solid transparent;background:#fff;padding:16px 4px 13px;font-size:10px;min-width:63px;line-height:18px}
+.v3-detail-site .v3-detail-tabs button.active{border-bottom:2px solid #f7d94d;font-weight:650}
+.v3-detail-site .v3-figma-detail{display:flex!important;flex-direction:column!important;gap:0!important;margin:0!important}
+.v3-detail-site .v3-detail-identity{min-height:140px;padding:19px 0 18px}
+.v3-detail-site .v3-detail-identity .dog-name{font-size:21px!important;font-weight:750;margin:0 0 10px!important}
+.v3-detail-site .v3-detail-identity .meta{font-size:11px!important;line-height:16px!important;margin:0 0 9px!important}
+.v3-detail-site .v3-detail-identity .arrival-date{font-size:10px!important;line-height:16px!important;color:#8e877c!important;margin:0 0 3px}
+.v3-detail-site .v3-detail-gallery{width:100%!important;height:331px!important;min-height:331px!important;position:relative;background:#fff!important;overflow:hidden}
+.v3-detail-site .v3-detail-gallery .gallery-main{width:100%!important;height:331px!important;aspect-ratio:auto!important;margin:0!important;padding:0!important;display:block!important;border:0!important;background:#fff!important}
+.v3-detail-site .v3-detail-gallery .gallery-main>img{width:100%;height:100%;object-fit:cover}
+.v3-detail-site .v3-detail-gallery .zoom-hint{position:absolute;right:16px;bottom:17px;font-size:21px;color:#fff;border:0;background:#0005}
+.v3-detail-site .v3-detail-gallery-navigation{height:59px;display:flex;justify-content:space-between;align-items:flex-start;padding-top:14px;font-size:10px}
+.v3-detail-site .v3-detail-gallery-navigation button{background:none;border:0;padding:0;font-size:10px}
+.v3-detail-site .v3-detail-gallery-navigation button:disabled{opacity:.35}
+.v3-detail-site .v3-detail-gallery-navigation span{font-size:10px}
+.v3-detail-site .v3-detail-divider{height:8px;background:#f6f3ed;margin:0 -16px}
+.v3-detail-site .v3-detail-about{padding:23px 0 29px;min-height:140px}
+.v3-detail-site .v3-detail-about h2{font-size:14px!important;font-weight:650;margin:0 0 18px}
+.v3-detail-site .v3-detail-about .desc{font-size:12px!important;line-height:1.75!important}
+.v3-detail-site .v3-detail-properties{padding-top:0}
+.v3-detail-site .v3-detail-properties h2{font-size:15px!important;font-weight:650;margin:0 0 15px}
+.v3-detail-site .v3-detail-properties h3{font-size:12px!important;font-weight:650;background:#f3ecdb;height:41px;display:flex;align-items:center;padding:0 16px;margin:0 0 5px}
+.v3-detail-site .v3-detail-properties-table{width:100%}
+.v3-detail-site .v3-detail-property{border-bottom:1px solid #e7e0d8;display:grid;grid-template-columns:122px 1fr;gap:0;align-items:center;min-height:63px;padding:12px 15px;font-size:11px;line-height:1.6}
+.v3-detail-site .v3-detail-property>span{font-weight:600}
+.v3-detail-site .v3-detail-property>div{color:#5a544b;font-size:11px}
+.v3-detail-site .v3-detail-property .vaccination-details{margin:0!important}
+.v3-detail-site .v3-detail-property .vaccination-details h2{display:none}
+.v3-detail-site .v3-detail-unset{color:#8b847c}
+.v3-detail-site .v3-detail-shelter{padding:29px 0}
+.v3-detail-site .v3-detail-shelter h2{font-size:15px!important;margin:0 0 14px}
+.v3-detail-site .v3-detail-shelter p,.v3-detail-site .v3-detail-shelter a{font-size:12px;line-height:1.8}
+.v3-detail-site .gallery video{height:100%}
+.v3-detail-site .v3-detail-gallery .adopted-badge.detail{position:absolute;top:10px;left:10px}
+/* 390px Figma admin list layout, not old dashboard cards. */
+.v3-admin-list-site .v3-header{border-bottom:1px solid #e7e0d6}
+.v3-admin-list-site .v3-header-inner{height:44px}
+.v3-admin-list{max-width:390px;margin:0 auto;padding:0 16px 45px;background:white}
+.v3-admin-chooser{height:46px;font-size:11px;color:#77736a;position:relative}
+.v3-admin-chooser summary{list-style:none;cursor:pointer;padding-top:13px}
+.v3-admin-chooser summary::-webkit-details-marker{display:none}
+.v3-admin-chooser[open] nav{position:absolute;top:30px;left:0;right:0;background:#fff;z-index:5;border:1px solid #e7e0d6;box-shadow:0 6px 13px #0001}
+.v3-admin-chooser nav a{display:block;padding:13px 12px;border-bottom:1px solid #eee8e1;font-size:12px}
+.v3-admin-list-banner{height:88px;background:#fae04b;margin:0 -16px 24px;padding:14px 16px}
+.v3-admin-list-banner h1{font-size:23px;font-weight:750;line-height:35px;margin:0}
+.v3-admin-list-banner p{font-size:12px;line-height:18px;margin:0}
+.v3-admin-add{width:100%;height:44px;display:flex;align-items:center;justify-content:center;background:#fae04b;border-radius:6px;font-size:13px;font-weight:750;margin-bottom:16px}
+.v3-admin-search{display:grid;grid-template-columns:minmax(0,263px) 83px;gap:12px;margin-bottom:16px}
+.v3-admin-search input{height:46px;background:#faf8f3;border:0;border-radius:5px;padding:0 12px;font-size:13px;width:100%;min-width:0;color:#1d1c18}
+.v3-admin-search button{height:44px;background:#fff;border:1px solid #e7e0d6;border-radius:6px;font-size:13px}
+.v3-admin-status-tabs{display:grid;grid-template-columns:repeat(4,1fr);height:47px;border-bottom:0;margin-bottom:16px}
+.v3-admin-status-tabs button{min-width:0;padding:0 1px;border:0;border-bottom:2px solid #e7e0d6;background:#fff;color:#77736a;font-size:12px}
+.v3-admin-status-tabs button.active{border-color:#fae04b;color:#1d1c18;font-weight:700}
+.v3-admin-sort{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px}
+.v3-admin-sort label,.v3-admin-sort select{height:44px;display:flex;align-items:center;padding:0 8px;border:1px solid #e7e0d6;border-radius:6px;font-size:12px;background:white;color:#1d1c18}
+.v3-admin-sort select{width:100%;appearance:auto}
+.v3-admin-total{font-size:11px;color:#77736a;line-height:18px;margin:0 0 15px}
+.v3-admin-dogs{display:block}
+.v3-admin-dog{padding:0 0 15px;margin:0 0 23px;border-bottom:1px solid #e7e0d6;min-height:160px}
+.v3-admin-dog-info{display:flex;gap:16px;align-items:flex-start}
+.v3-admin-photo{width:84px;height:84px;flex:0 0 84px;background:#f7f7f1;overflow:hidden}
+.v3-admin-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.v3-admin-dog-text{min-width:0;flex:1}
+.v3-admin-dog-name{display:flex;justify-content:space-between;gap:5px;align-items:center;margin:0 0 9px}
+.v3-admin-dog-name strong{font-size:17px;font-weight:750}
+.v3-admin-dog-name small{font-size:11px;color:#3b6249;white-space:nowrap}
+.v3-admin-dog-name small.adopted{color:#9a6f3f}
+.v3-admin-dog-text p{font-size:11px;line-height:18px;margin:2px 0;color:#1d1c18}
+.v3-admin-dog-text p.v3-admin-date{color:#77736a}
+.v3-admin-dog-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-top:16px}
+.v3-admin-dog-actions a,.v3-admin-dog-actions button{display:flex;align-items:center;justify-content:center;text-align:center;height:44px;font-size:12px;border:1px solid #e7e0d6;background:#fff;border-radius:6px;color:#1d1c18}
+.v3-admin-dog-actions button{background:#fff1ee;border-color:#fff1ee;color:#b43e31}
+.v3-admin-pages{display:flex;justify-content:space-between;align-items:center;margin-top:9px}
+.v3-admin-pages button{background:#fff;border:1px solid #e7e0d6;border-radius:6px;padding:10px 13px;font-size:12px;min-width:51px}
+.v3-admin-pages button:disabled{opacity:.4}
+.v3-admin-pages span{font-size:12px}
+.v3-admin-caption{font-size:10px;color:#99938a;margin-top:28px;line-height:1.7}
+@media(min-width:700px){.v3-admin-list{max-width:390px}.v3-detail-site .container.detail-container{max-width:390px!important}}
