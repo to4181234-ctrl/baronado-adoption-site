@@ -66,3 +66,15 @@
 .v3-go-site .v3-setting-reset:disabled{opacity:.45;cursor:not-allowed}
 .v3-discovery-figma .v3-collection-confirm .v3-discovery-dialog-content{font-family:"MonaS12",sans-serif;font-size:13px}
 .v3-discovery-figma .v3-collection-confirm .v3-discovery-stage img{object-fit:contain;image-rendering:pixelated}
+
+/* Figma 173:1513: discovered dog fades in without stretching the original pixel art. */
+.v3-discovery-figma .v3-discovery-result{
+ animation:meonggo-discovery-entry .34s steps(1,end) both!important;
+ transform-origin:center;
+}
+@keyframes meonggo-discovery-entry{
+ 0%{opacity:0;transform:translateY(2px)}
+ 70%{opacity:1;transform:translateY(-2px)}
+ 100%{opacity:1;transform:translateY(0)}
+}
+@media(prefers-reduced-motion:reduce){.v3-discovery-figma .v3-discovery-result{animation:none!important}}
