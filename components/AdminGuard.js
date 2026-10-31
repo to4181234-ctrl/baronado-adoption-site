@@ -79,11 +79,11 @@ export default function AdminGuard({ children }) {
     </>;
   }
 
-  return <main className="site-shell">
+  return <main className="site-shell v3-site v3-admin-login-site">
     <SiteHeader />
     <section className="container narrow form-container">
       <div className="admin-login-panel">
-        <h1>관리자 페이지</h1>
+        <div className="v3-admin-login-banner"><h1>관리자 로그인</h1><p>관리자 비밀번호로 로그인해 주세요.</p></div>
         {status === 'loading' && <DogLoading />}
         {status === 'unconfigured' && <div className="message error" role="alert">
           <p>관리자 서버 설정을 확인해야 합니다.</p>
@@ -94,16 +94,16 @@ export default function AdminGuard({ children }) {
         {status === 'unavailable' && <p className="message error">관리자 인증 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.</p>}
         {status === 'signed-out' && (
           <form className="form" onSubmit={login}>
-            <p className="small-note">공통 비밀번호를 입력하면 게시글을 관리할 수 있습니다.</p>
+            <p className="small-note">게시물과 사이트 설정을 관리하는 공간이에요.</p>
             <label>
               <span className="label">관리자 비밀번호</span>
               <input className="field" type="password" autoComplete="current-password"
                 required minLength={4} maxLength={256}
                 value={password} onChange={event => setPassword(event.target.value)}
-                placeholder="공통 비밀번호" />
+                placeholder="비밀번호 입력" />
             </label>
             {error && <p className="message error" role="alert">{error}</p>}
-            <button className="btn full" type="submit" disabled={busy}>{busy ? '확인 중...' : '관리자 페이지 열기'}</button>
+            <button className="btn full" type="submit" disabled={busy}>{busy ? '확인 중...' : '로그인'}</button>
           </form>
         )}
       </div>

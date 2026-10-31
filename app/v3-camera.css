@@ -74,3 +74,51 @@
 .v3-site .go-card-entry article{background:#fff}
 @media(max-width:390px){.v3-camera-square{top:24%}.v3-capture-tip{top:40px}.v3-camera-dialog-box{margin-bottom:23px}}
 @media(prefers-reduced-motion:reduce){.v3-camera-square.is-scanning:before{animation:none}}
+
+
+.v3-admin-login-site .form-container{max-width:390px!important;padding:48px 16px 50px!important}
+.v3-admin-login-site .admin-login-panel{border:0;background:#fff;box-shadow:none;padding:0}
+.v3-admin-login-site .v3-admin-login-banner{background:#fbe04c;margin:0 -16px 23px;padding:19px 16px}
+.v3-admin-login-site .v3-admin-login-banner h1{font-size:22px!important;font-weight:850;margin:0 0 9px;color:#141414}
+.v3-admin-login-site .v3-admin-login-banner p{font-size:12px;margin:0}
+.v3-admin-login-site .small-note{font-size:12px;color:#898279;margin:0 0 28px}
+.v3-admin-login-site .form label{font-size:13px;font-weight:600}
+.v3-admin-login-site .field{height:48px;background:#f7f6f2;border-radius:4px;border:0;padding:12px;font-size:13px;margin-top:9px}
+.v3-admin-login-site button.btn.full{width:100%;height:44px;background:#fbe04c;border:0;border-radius:5px;color:#111;font-size:13px;margin-top:25px}
+.v3-admin-login-site .form{gap:11px}
+.v3-header-admin .v3-main-nav{display:none}
+
+
+.v3-post-detail{max-width:390px;margin:0 auto;padding:28px 16px 65px;min-height:800px}
+.v3-post-detail .v3-back{margin-bottom:20px}
+.v3-post-detail h1{font-size:22px;font-weight:850;line-height:1.45;margin:0 auto 34px;text-align:center}
+.v3-post-card{width:min(100%,242px);margin:0 auto 20px;position:relative}
+.v3-post-card .go-card-entry{width:100%;border:0;padding:0}
+.v3-post-card .go-card.go-card-v3{width:100%!important;aspect-ratio:240/384!important;height:auto!important;position:relative!important;display:block!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+.v3-post-card .v3-card-frame{width:100%;height:100%;position:absolute;inset:0}
+.v3-post-card .v3-card-inside{position:absolute;inset:4% 8%;display:flex;flex-direction:column}
+.v3-post-card .go-card-art{width:100%;aspect-ratio:1;background:#fff2b7;margin:8px 0 10px;border:0!important;border-radius:0!important}
+.v3-post-card .go-card-art img{width:100%;height:100%;object-fit:cover}
+.v3-post-card .v3-card-dogline{display:flex;justify-content:space-between;align-items:center;gap:5px}
+.v3-post-card .v3-card-dogline strong{font-size:16px}
+.v3-post-card .go-card-top{font-size:9px}
+.v3-post-card .go-card-information{margin-top:auto;display:flex;justify-content:space-between;font-size:8px}
+.v3-post-card .v3-stars{color:#e8b429}
+.v3-post-card .go-card-ratings{margin:0!important}
+.v3-post-card .go-card-ratings>div{display:flex;align-items:center;gap:7px;font-size:13px}
+.v3-post-card .go-card-entry .go-card-actions{margin-top:18px}
+.v3-post-sparkle{font-size:32px;position:absolute;margin-left:305px;margin-top:65px;color:#ffbd21;animation:v3-sparkle 1.5s ease-out both}
+.v3-post-author{display:flex;align-items:center;flex-direction:column;gap:7px;font-size:12px;margin:16px 0 30px}
+.v3-post-author time{font-size:11px;color:#98938c}
+.v3-post-primary-actions{display:grid;grid-template-columns:1fr;gap:10px;margin:28px 0 16px}
+.v3-post-primary-actions button{height:44px;border:0;border-radius:6px;background:#fbe04c;font-size:13px;font-weight:650}
+.v3-post-link{display:flex;justify-content:center;align-items:center;text-align:center;height:44px;border:1px solid #e9e2d7;border-radius:6px;font-size:12px}
+@keyframes v3-sparkle{from{transform:scale(0);opacity:0}50%{transform:scale(1.15);opacity:1}to{transform:scale(1);opacity:1}}
+.v3-go-site .go-recorder-profile{margin:30px 16px 0;padding:30px 15px;background:#ece4d9;border:0}
+.v3-go-site .go-recorder-profile h2{font-size:22px;color:#111}
+.v3-go-site .go-recorder-intro{font-size:12px}
+.v3-go-site .go-recorder-totals{display:flex;gap:15px;font-size:12px}
+.v3-go-site .go-board-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;padding:10px 16px}
+.v3-go-site .go-recorder-profile~.go-section-title{padding:25px 16px 10px}
+.v3-go-site .go-pagination{display:flex;gap:18px;justify-content:center;padding:25px}
+@media(prefers-reduced-motion:reduce){.v3-post-sparkle{animation:none}}
