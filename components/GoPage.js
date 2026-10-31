@@ -51,7 +51,18 @@ function Album({initialDogId=null}){
     
   </div>}
   {notice&&<p className="v3-message" role="status">{notice}</p>}{error&&<p className="v3-error" role="alert">{error}</p>}
-  {collectConfirm&&dog&&<div className="v3-discovery-backdrop" role="presentation" onClick={()=>setCollectConfirm(false)}><section className="v3-collection-confirm" role="dialog" aria-modal="true" aria-label="멍카드 수집 준비" onClick={e=>e.stopPropagation()}><button className="v3-collection-confirm-close" aria-label="닫기" onClick={()=>setCollectConfirm(false)}>×</button><p>{dog.name}의 멍카드를 수집하러 갈까요?</p><button onClick={()=>{setCollectConfirm(false);setCamera(dog);}}>▶ 네</button><button onClick={()=>setCollectConfirm(false)}>　아직..</button></section></div>}
+  {collectConfirm&&dog&&<div className="v3-discovery-backdrop" role="presentation" onClick={()=>setCollectConfirm(false)}><section className="v3-discovery-modal v3-collection-confirm" role="dialog" aria-modal="true" aria-label="멍카드 수집 준비" onClick={e=>e.stopPropagation()}>
+  <button className="v3-discovery-close" aria-label="닫기" onClick={()=>setCollectConfirm(false)}>×</button>
+  <h2><img className="v3-discovery-figma-title" src="/figma-v3/discovery-title.svg" alt="멍멍GO!"/></h2>
+  <div className="v3-discovery-stage" aria-hidden="true"><img className="v3-discovery-reveal" src="/figma-v3/collar.png" alt=""/></div>
+  <div className="v3-discovery-dialog">
+   {['bg','outer','inner'].map(n=><img key={n} className={'v3-discovery-dialog-layer v3-discovery-dialog-'+n} src={'/figma-v3/discovery-dialog-'+n+'.svg'} alt=""/>)}
+   <div className="v3-discovery-dialog-content">멍카드 수집 할 준비 되셨나요?
+    <button onClick={()=>{setCollectConfirm(false);setCamera(dog);}}>▶ 네</button>
+    <button onClick={()=>setCollectConfirm(false)}>　아직..</button>
+   </div>
+  </div>
+ </section></div>}
   {camera&&<div className="v3-camera-backdrop" role="presentation"><section className="v3-camera-panel" role="dialog" aria-modal="true" aria-label="멍멍이 카드 촬영"><button className="v3-camera-close" onClick={()=>setCamera(null)} aria-label="카메라 닫기">×</button><GoCamera dog={camera} nickname={member?.nickname} standing={collection.standing} firstCard={!collection.counts?.[camera.id]} onSaved={()=>{reloadCards();reloadCollection();}} onDone={()=>setCamera(null)}/></section></div>}
  </>;
 }
