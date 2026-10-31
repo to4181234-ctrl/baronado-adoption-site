@@ -78,3 +78,24 @@
  100%{opacity:1;transform:translateY(0)}
 }
 @media(prefers-reduced-motion:reduce){.v3-discovery-figma .v3-discovery-result{animation:none!important}}
+
+/* Frame 173:7691 / 173:5244: measured positions and type, 390px viewport.
+   System title top 94px; community title top 88px. */
+.v3-go-site .v3-settings{padding-top:16px!important}
+.v3-go-site .v3-settings h1{margin-bottom:42px!important}
+.v3-go-site .v3-community-heading{padding-top:46px}
+.v3-go-site .v3-community-heading h1{
+ font-family:"MonaS12","Galmuri11",sans-serif!important;
+ font-size:24px!important;
+ font-weight:700!important;
+ line-height:36px!important;
+ letter-spacing:0!important;
+ margin:0 0 8px!important;
+}
+.v3-go-site .v3-community-heading p{
+ font-family:"MonaS12","Galmuri11",sans-serif;
+ font-size:12px;
+ font-weight:400;
+ line-height:20px;
+ color:#151515;
+}
