@@ -9,11 +9,11 @@ export default function GoCamera({dog,onDone,onSaved,nickname,firstCard=false}){
  const [sound,setSound]=useState(true),[zoom,setZoom]=useState(1),[preview,setPreview]=useState(''),[blob,setBlob]=useState(null),[title,setTitle]=useState('');
  const [saved,setSaved]=useState(null),[scan,setScan]=useState(false);
  const stream=useRef(null),video=useRef(null),audio=useRef(null),timers=useRef([]),mounted=useRef(true),saving=useRef(false);
- useEffect(()=>{mounted.current=true;audio.current=createGameAudio();window.dispatchEvent(new CustomEvent('go-v3-music',{detail:'camera'}));setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');const onHide=()=>{if(document.hidden)audio.current?.stop()};document.addEventListener('visibilitychange',onHide);return()=>{mounted.current=false;window.dispatchEvent(new CustomEvent('go-v3-music',{detail:'calm'}));timers.current.forEach(clearTimeout);stream.current?.getTracks().forEach(t=>t.stop());audio.current?.dispose();document.removeEventListener('visibilitychange',onHide);};},[]);
+ useEffect(()=>{mounted.current=true;audio.current=createGameAudio();setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');const onHide=()=>{if(document.hidden)audio.current?.stop()};document.addEventListener('visibilitychange',onHide);return()=>{mounted.current=false;window.dispatchEvent(new CustomEvent('go-v3-music',{detail:'calm'}));timers.current.forEach(clearTimeout);stream.current?.getTracks().forEach(t=>t.stop());audio.current?.dispose();document.removeEventListener('visibilitychange',onHide);};},[]);
  useEffect(()=>{if(step==='live'&&stream.current&&video.current){video.current.srcObject=stream.current;video.current.play().catch(()=>{});}},[step]);
  useEffect(()=>{if(!blob){setPreview('');return;}const url=URL.createObjectURL(blob);setPreview(url);return()=>URL.revokeObjectURL(url);},[blob]);
  function end(){timers.current.forEach(clearTimeout);timers.current=[];stream.current?.getTracks().forEach(t=>t.stop());stream.current=null;audio.current?.stop();onDone?.();}
- function toggleSound(){const value=!sound;setSound(value);localStorage.setItem(GAME_SOUND_KEY,value?'on':'off');if(!value)audio.current?.stop();}
+ function toggleSound(){const value=!sound;setSound(value);localStorage.setItem(GAME_SOUND_KEY,value?'on':'off');window.dispatchEvent(new Event('go-v3-settings-changed'));if(!value)audio.current?.stop();}
  async function openCamera(){
   if(busy)return;
   setBusy(true);setError('');
@@ -21,12 +21,12 @@ export default function GoCamera({dog,onDone,onSaved,nickname,firstCard=false}){
    if(!navigator.mediaDevices?.getUserMedia)throw Error('카메라를 지원하지 않는 브라우저예요.');
    const opened=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:1280}}});
    if(!mounted.current){opened.getTracks().forEach(t=>t.stop());return;}
-   stream.current=opened;setStep('live');audio.current?.play('discover');
+   stream.current=opened;setStep('live');window.dispatchEvent(new CustomEvent('go-v3-music',{detail:'camera'}));
   }catch(e){setError(e?.name==='NotAllowedError'?'카메라 권한을 허용한 뒤 다시 시도해주세요.':e.message||'카메라를 열지 못했어요.');}
   finally{setBusy(false);}
  }
  function scale(next){const amount=Math.min(2,Math.max(1,next));setZoom(amount);const track=stream.current?.getVideoTracks()?.[0];try{const range=track?.getCapabilities?.()?.zoom;if(range){track.applyConstraints({advanced:[{zoom:Math.min(range.max,Math.max(range.min,amount))}]}).catch(()=>{});}}catch{}}
- function capture(){if(busy||!video.current?.videoWidth)return;setScan(true);audio.current?.play('shutter');timers.current.push(setTimeout(()=>finishCapture(),2000));}
+ function capture(){if(busy||!video.current?.videoWidth)return;setScan(true);audio.current?.play('shutter');timers.current.push(setTimeout(()=>finishCapture(),100));}
  function finishCapture(){timers.current.forEach(clearTimeout);timers.current=[];const v=video.current;if(!v?.videoWidth){setError('촬영 화면을 확인해주세요.');setScan(false);return;}
   const canvas=document.createElement('canvas');canvas.width=800;canvas.height=800;const ctx=canvas.getContext('2d');const side=Math.min(v.videoWidth,v.videoHeight)/zoom;const x=(v.videoWidth-side)/2,y=(v.videoHeight-side)/2;ctx.drawImage(v,x,y,side,side,0,0,800,800);
   canvas.toBlob(file=>{setScan(false);if(!file){setError('사진 변환에 실패했어요.');return;}stream.current?.getTracks().forEach(t=>t.stop());stream.current=null;setBlob(file);setStep('edit');},'image/webp',.84);
