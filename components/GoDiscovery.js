@@ -9,9 +9,9 @@ export default function GoDiscovery({dogs=[],dog=null}){
  const t=useRef(null),audio=useRef(null);
  useEffect(()=>{audio.current=createGameAudio();setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');let already=false;try{already=localStorage.getItem(POPUP_ENABLED_KEY)==='off'||sessionStorage.getItem(SEEN_KEY)==='1'||Number(localStorage.getItem(HIDE_KEY)||0)>Date.now();}catch{}if(!already){setOpen(true);try{sessionStorage.setItem(SEEN_KEY,'1');}catch{}}const h=()=>{if(document.hidden)audio.current?.stop();};document.addEventListener('visibilitychange',h);return()=>{clearTimeout(t.current);audio.current?.dispose();document.removeEventListener('visibilitychange',h);};},[]);
  function close(){clearTimeout(t.current);audio.current?.stop();setOpen(false);if(hide)try{localStorage.setItem(HIDE_KEY,String(Date.now()+WEEK));}catch{}}
- function reveal(i){if(stage!=='choice')return;const list=Array.isArray(dogs)?dogs.filter(d=>FIGMA_DOGS.includes(d.name)):[];const d=list[Math.floor(Math.random()*Math.max(1,list.length))]||dog||null;setChosen(d);setStage('reveal');audio.current?.play('collar');t.current=setTimeout(()=>finish(),2000);}
- function finish(){clearTimeout(t.current);setStage('result');audio.current?.play('discover');}
- function toggle(){const next=!sound;setSound(next);try{localStorage.setItem(GAME_SOUND_KEY,next?'on':'off');}catch{}if(!next)audio.current?.stop();}
+ function reveal(i){if(stage!=='choice')return;const list=Array.isArray(dogs)?dogs.filter(d=>FIGMA_DOGS.includes(d.name)):[];const d=list[Math.floor(Math.random()*Math.max(1,list.length))]||dog||null;setChosen(d);setStage('reveal');audio.current?.play('collar');audio.current?.schedule('discover',200);t.current=setTimeout(()=>finish(),2000);}
+ function finish(){clearTimeout(t.current);setStage('result');audio.current?.stop();}
+ function toggle(){const next=!sound;setSound(next);try{localStorage.setItem(GAME_SOUND_KEY,next?'on':'off');window.dispatchEvent(new Event('go-v3-settings-changed'));}catch{}if(!next)audio.current?.stop();}
  return open&&<div className="v3-discovery-backdrop v3-discovery-figma" onClick={close} role="presentation"><section className="v3-discovery-modal" role="dialog" aria-modal="true" aria-label="첫 방문 멍멍GO! 발견" onClick={e=>e.stopPropagation()}>
   <button className="v3-discovery-close" aria-label="닫기" onClick={close}>×</button>
   <h2><img className="v3-discovery-figma-title" src="/figma-v3/discovery-title.svg" alt="멍멍GO!"/></h2>
