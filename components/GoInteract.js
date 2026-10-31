@@ -8,8 +8,24 @@ import GoShell,{useGoSession} from './GoShell.js';
 const MOTIONS={snack:{name:'간식',pose:'feed',message:'냠냠! 맛있는 간식 고마워~',audio:'snack'},praise:{name:'칭찬',pose:'praise',message:'멍멍! 칭찬해줘서 신나요!',audio:'praise'},play:{name:'놀이',pose:'play',message:'같이 노니까 너무 신나요!',audio:'play'}};
 function Interaction(){
  const {id}=useParams(),router=useRouter(),{member,ready,openAccount}=useGoSession();
- const [dog,setDog]=useState(null),[status,setStatus]=useState(null),[pose,setPose]=useState('front'),[notice,setNotice]=useState('멍멍!\n(안녕! 자는게 아니라\n생각중이었어~)'),[visibleNotice,setVisibleNotice]=useState(''),[walking,setWalking]=useState(false),[busy,setBusy]=useState(false),[sound,setSound]=useState(true),[error,setError]=useState('');
+ const [dog,setDog]=useState(null),[status,setStatus]=useState(null),[pose,setPose]=useState('front'),[notice,setNotice]=useState('멍멍!\n(안녕! 자는게 아니라\n생각중이었어~)'),[visibleNotice,setVisibleNotice]=useState(''),[walking,setWalking]=useState(false),[busy,setBusy]=useState(false),[now,setNow]=useState(Date.now()),[sound,setSound]=useState(true),[error,setError]=useState('');
  const audio=useRef(null),timer=useRef(null),barks=useRef(0),typeTimer=useRef(null);
+ useEffect(()=>{const id=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(id);},[]);
+ function remainingLabel(action){
+  const state=status?.actions?.[action];
+  if(!state)return '2/2';
+  if(state.remaining<=0)return '내일 00:00';
+  const until=state.nextAt?Date.parse(state.nextAt)-now:0;
+  if(Number.isFinite(until)&&until>0){
+   const sec=Math.ceil(until/1000);
+   return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
+  }
+  return state.remaining+'/2';
+ }
+ function actionBlocked(action){
+  const state=status?.actions?.[action];
+  return busy||!member||!status?.owned||!state?.remaining||Boolean(state.nextAt&&Date.parse(state.nextAt)>now);
+ }
  // Current Figma 173:3556/3634: a five-second quiet period triggers a short side walk.
  useEffect(()=>{
   if(busy||pose!=='front'||typeof document==='undefined'||document.hidden)return;
@@ -61,7 +77,7 @@ function Interaction(){
     <span onClick={()=>setVisibleNotice(notice)} aria-live="polite">{visibleNotice}</span>
    </div>
    <div className="v3-interact-controls">{Object.entries(MOTIONS).map(([key,v])=><div className={'v3-machine-action v3-machine-action-'+key} key={key}>
-    <button onClick={()=>interact(key)} disabled={busy||!member||!status?.actions?.[key]?.remaining||!status?.owned} aria-label={v.name}><img src={'/figma-v3/machine-'+(key==='snack'?'feed':key)+'.svg'} alt=""/></button><small>{status?.actions?.[key]?.remaining??2}/2</small>
+    <button onClick={()=>interact(key)} disabled={actionBlocked(key)} aria-label={v.name}><img src={'/figma-v3/machine-'+(key==='snack'?'feed':key)+'.svg'} alt=""/></button><small>{remainingLabel(key)}</small>
    </div>)}</div>
   </div>
   {error&&<p className="v3-interact-error" role="alert">{error}</p>}
