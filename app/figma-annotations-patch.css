@@ -99,3 +99,161 @@
  line-height:20px;
  color:#151515;
 }
+
+/* 2026-11-01 Figma fidelity audit: the game UI uses MonaS12, not Gmarket
+   for its inventory headings or its pixel-interface copy.
+   Reference frame: 173:1683 (390px), 173:5244, 173:7691.
+   Keep the family/resident pages' existing Gmarket Sans rules intact. */
+.v3-header-go .v3-header-inner{gap:17px}
+.v3-header-go .v3-go-brand{
+  font-family:"MonaS12",sans-serif!important;
+  font-size:12.5797px!important;
+  font-weight:700!important;
+  line-height:19px!important;
+  letter-spacing:0!important;
+  position:relative;
+  top:4px;
+}
+.v3-album-home .v3-profile-head .v3-anon-heading{
+  font-family:"MonaS12",sans-serif!important;
+  font-size:17.9104px!important;
+  font-weight:700!important;
+  letter-spacing:0!important;
+  transform:translate(-15px,-4px);
+}
+.v3-album-home .v3-profile-head p,
+.v3-album-home .v3-profile-head small{
+  font-family:"MonaS12",sans-serif!important;
+  font-weight:400;
+}
+.v3-album-home .v3-profile-head .v3-anon-lede{
+  font-family:"MonaS12",sans-serif!important;
+  font-size:11.7446px!important;
+}
+.v3-album-home .v3-profile-head .v3-profile-login{
+  font-family:"MonaS12",sans-serif!important;
+  font-size:11px!important;
+  font-weight:400!important;
+  padding-left:16px!important;
+  transform:translateY(7px);
+}
+.v3-go-site .v3-album-home .v3-collection-section h2,
+.v3-go-site .v3-album-home .v3-battle-home h2{
+  font-family:"MonaS12",sans-serif!important;
+  font-size:15.3159px!important;
+  font-weight:700!important;
+  letter-spacing:0!important;
+  line-height:24px!important;
+}
+.v3-album-home .v3-collection-section h2{transform:translateY(3px)}
+.v3-album-home .v3-collection-section .v3-progress-label{
+  font-family:"MonaS12",sans-serif!important;
+  font-size:12.5px!important;
+  font-weight:400!important;
+  line-height:21px!important;
+  transform:translateY(6px);
+}
+.v3-album-home .v3-collection-section .v3-progress{transform:translateY(14px)}
+.v3-album-home .v3-collection-tile strong{
+  font-family:"MonaS12",sans-serif!important;
+  font-size:12px!important;
+  font-weight:700!important;
+  line-height:21px!important;
+  align-self:flex-start;
+  text-align:left;
+  margin-left:6px;
+  transform:translateY(-7px);
+}
+.v3-go-site .v3-album-home .v3-battle-shortcut strong{
+  font-family:"MonaS12",sans-serif!important;
+  font-size:17.9104px!important;
+  font-weight:700!important;
+  line-height:27.61px!important;
+  letter-spacing:0!important;
+}
+.v3-go-site .v3-album-home .v3-panel-content{
+  font-family:"MonaS12",sans-serif!important;
+}
+.v3-go-site .v3-album-home .v3-panel-content b,
+.v3-go-site .v3-album-home .v3-panel-content p{
+  font-family:"MonaS12",sans-serif!important;
+  font-weight:400!important;
+}
+.v3-go-site .v3-community-heading p{color:#817b70!important}
+
+
+/* Preserve the 390px Figma inventory grid and battle positions while
+   rendering Mona's taller glyph metrics: frame 173:1683. */
+.v3-album-home .v3-collection-section .v3-progress-label{
+  transform:translateY(5px);
+  margin-bottom:0!important;
+}
+.v3-album-home .v3-collection-section .v3-progress{
+  transform:none!important;
+  margin-bottom:27px!important;
+}
+.v3-album-home .v3-collection-tile strong{transform:none}
+.v3-go-site .v3-album-home .v3-battle-shortcut strong{transform:translateY(10px)}
+
+
+.v3-album-home .v3-collection-section .v3-progress{
+  transform:translateY(7px)!important;
+}
+.v3-album-home .v3-profile-head .v3-profile-login{position:relative}
+.v3-album-home .v3-profile-head .v3-profile-login::before{
+  content:"";
+  position:absolute;
+  width:6px;
+  height:8.48px;
+  left:4px;
+  top:5px;
+  background:url("/figma-v3/discovery-select-arrow.svg") center/contain no-repeat;
+}
+.v3-go-site .meong-battle-app{
+  font-family:"MonaS12",sans-serif!important;
+  padding-top:46px!important;
+}
+.v3-go-site .meong-battle-app h1{
+  font-family:"MonaS12",sans-serif!important;
+  font-size:24px!important;
+  font-weight:700!important;
+  line-height:36px!important;
+  letter-spacing:0!important;
+  margin-bottom:8px!important;
+}
+.v3-go-site .meong-battle-hint{
+  font-family:"MonaS12",sans-serif!important;
+  font-size:12px!important;
+  font-weight:400!important;
+  line-height:20px!important;
+}
+.v3-go-site .meong-battle-start-link{
+  font-family:"MonaS12",sans-serif!important;
+  font-weight:700!important;
+  letter-spacing:0!important;
+}
+.v3-go-site .go-card.go-card-v3,
+.v3-go-site .v3-community-list,
+.v3-go-site .v3-community-heading{
+  font-family:"MonaS12",sans-serif!important;
+}
+
+
+/* Keep the pixel battle panel pinned to the Figma's y=873 despite
+   the actual 24px-high Mona heading (frame 173:1683). */
+.v3-go-site .v3-album-home .v3-battle-home h2{margin-bottom:11px!important}
+.v3-go-site .v3-album-home .v3-battle-shortcut img{transform:translateY(2px)}
+.v3-go-site .v3-album-home .v3-battle-shortcut strong{transform:translateY(17px)}
+.v3-go-site .v3-album-home .v3-panel-content{top:25px!important}
+.v3-go-site .v3-album-home .v3-panel-content p{transform:translateY(6px)}
+.v3-go-site .v3-album-home .v3-panel-content .v3-anon-battle-login{
+  position:relative;
+  transform:translateY(12px);
+  padding-left:13px;
+  font-family:"MonaS12",sans-serif!important;
+}
+.v3-go-site .v3-album-home .v3-panel-content .v3-anon-battle-login::before{
+  content:"";position:absolute;left:0;top:6px;width:6px;height:8.5px;
+  background:url("/figma-v3/discovery-select-arrow.svg") center/contain no-repeat;
+}
+
