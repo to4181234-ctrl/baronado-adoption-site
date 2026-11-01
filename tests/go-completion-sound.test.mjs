@@ -1,12 +1,30 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createCompletionSound,completionSoundEnabled} from '../lib/goCompletionSound.js';
-test('completion sound does not fetch before opting in and never waits to play if unavailable',async()=>{
- let requests=0,plays=0;const originalFetch=globalThis.fetch;
- globalThis.document={visibilityState:'visible'};
- globalThis.window={AudioContext:class {currentTime=0;state='running';resume(){return Promise.resolve();}close(){return Promise.resolve();}decodeAudioData(){return Promise.resolve({});}createBufferSource(){return {connect(){},start(){plays++;},stop(){}};}}};
- globalThis.fetch=async()=>{requests++;return {ok:true,arrayBuffer:async()=>new ArrayBuffer(0)}};
- try{const sound=createCompletionSound();sound.play();assert.equal(requests,0);assert.equal(plays,0);await sound.prepare();await sound.prepare();assert.equal(requests,1);sound.play();assert.equal(plays,1);document.visibilityState='hidden';sound.play();assert.equal(plays,1);sound.dispose();document.visibilityState='visible';sound.play();assert.equal(plays,1);}finally{globalThis.fetch=originalFetch;delete globalThis.window;delete globalThis.document;}
-});
 
-test("sound defaults to on and remembers an explicit off choice",()=>{assert.equal(completionSoundEnabled(null),true);assert.equal(completionSoundEnabled("on"),true);assert.equal(completionSoundEnabled("off"),false);});
+test('approved completion MP3 plays only while visible, enabled and not disposed',async()=>{
+ let created=0,plays=0,pauses=0,saved=null;
+ const previous={Audio:globalThis.Audio,window:globalThis.window,document:globalThis.document,localStorage:globalThis.localStorage};
+ globalThis.window={};
+ globalThis.document={hidden:false};
+ globalThis.localStorage={getItem:()=>saved};
+ globalThis.Audio=class {
+  constructor(src){created++;assert.match(src,/Card_Acquired\.mp3$/);this.currentTime=0;this.volume=1;}
+  play(){plays++;return Promise.resolve();}
+  pause(){pauses++;}
+ };
+ try{
+  const sound=createCompletionSound();
+  assert.equal(created,0,'no audio object created before user interaction');
+  sound.play();assert.equal(created,1);assert.equal(plays,1);
+  await sound.prepare();assert.equal(created,1);
+  globalThis.document.hidden=true;sound.play();assert.equal(plays,1);
+  globalThis.document.hidden=false;saved='off';sound.play();assert.equal(plays,1);
+  saved='on';sound.play();assert.equal(plays,2);
+  sound.dispose();assert.ok(pauses>0);sound.play();assert.equal(plays,2);
+ }finally{
+  for(const [key,value] of Object.entries(previous)){if(value===undefined)delete globalThis[key];else globalThis[key]=value;}
+ }
+});
+test('sound defaults to on and remembers an explicit off choice',()=>{
+ assert.equal(completionSoundEnabled(nu¶»§q«^

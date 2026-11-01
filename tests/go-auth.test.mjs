@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { hashSecret, verifySecret, nicknameKey, passwordCheck } from '../lib/server/goAuth.js';
 
 test('nicknames normalize consistently and reject whitespace/markup', () => {
-  assert.deepEqual(nicknameKey('  Happy_Dog '), { nickname: 'Happy_Dog', key: 'happy_dog' });
+  assert.deepEqual(nicknameKey('  Good_Dog '), { nickname: 'Good_Dog', key: 'good_dog' });
   assert.throws(() => nicknameKey('<script>'));
   assert.throws(() => nicknameKey('이 름'));
 });
