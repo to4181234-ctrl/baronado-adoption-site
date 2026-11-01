@@ -257,3 +257,30 @@
   background:url("/figma-v3/discovery-select-arrow.svg") center/contain no-repeat;
 }
 
+
+/* Narrow phones: allow the 390px Figma layout to reflow without
+   forcing horizontal scrolling or clipping the pixel-panel border. */
+@media(max-width:359px){
+  .v3-go-site .v3-album-home .v3-profile-head>div:last-child{min-width:0}
+  .v3-go-site .v3-album-home .v3-profile-head .v3-anon-heading{
+    white-space:normal!important;
+    font-size:14px!important;
+    line-height:20px!important;
+    transform:translateY(-4px);
+  }
+  .v3-go-site .v3-album-home .v3-profile-head .v3-anon-lede{
+    overflow-wrap:anywhere;
+    font-size:10px!important;
+  }
+  .v3-go-site .v3-album-home .v3-album-panel-bg,
+  .v3-go-site .v3-album-home .v3-album-panel-outer{
+    width:100%!important;
+    height:100%!important;
+    object-fit:fill;
+  }
+  .v3-go-site .v3-album-home .v3-album-panel-inner{
+    width:calc(100% - 16px)!important;
+    height:calc(100% - 16px)!important;
+    object-fit:fill;
+  }
+}
