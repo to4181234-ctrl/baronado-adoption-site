@@ -4,6 +4,15 @@ import './v3-camera.css';
 import './figma-accuracy.css';
 import './figma-accuracy-details.css';
 import './figma-annotations-patch.css';
+import './banner.css';
+import './banner-admin.css';
+import './detail-zoom.css';
+import './go-report.css';
+import './go-report-admin.css';
+import './go-admin-cards.css';
+import './go-admin-stats.css';
+import './go-admin-card-detail.css';
+import './go-battle-standing.css';
 
 export const metadata = {
   metadataBase: new URL('https://baronado-adoption-site-8sm2.vercel.app'),

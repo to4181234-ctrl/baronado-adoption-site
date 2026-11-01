@@ -1,0 +1,30 @@
+.v3-admin-cards{max-width:390px;margin:0 auto;padding:24px 16px 48px;font-family:"Pretendard Variable","Pretendard",sans-serif}
+.v3-admin-cards h1{font-size:24px;line-height:1.5;font-weight:700;margin:22px 0}
+.v3-admin-card-menu{display:flex;gap:12px;margin:8px 0 22px;font-size:12px}
+.v3-admin-card-menu a{flex:1;padding:12px;border:1px solid #e7e0d6;text-align:center}
+.v3-admin-card-search{display:flex;gap:8px;margin:20px 0}
+.v3-admin-card-search input{flex:1;min-width:0;padding:12px;border:1px solid #e7e0d6}
+.v3-admin-card-search button{background:#f7d94d;border:0;padding:0 12px}
+.v3-admin-card-filters{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.v3-admin-card-filters select{min-width:0;width:100%;padding:10px 4px;border:1px solid #e7e0d6;background:#fff;font-size:11px}
+.v3-admin-card-toolbar{display:flex;align-items:center;justify-content:space-between;margin:20px 0;font-size:12px}
+.v3-admin-card-toolbar button{border:1px solid #e7e0d6;background:#fff;padding:10px}
+.v3-admin-card-selection{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0;padding:12px;border:1px solid #e7e0d6;font-size:12px}
+.v3-admin-card-selection button{border:1px solid #e7e0d6;background:#fff;padding:9px}
+.v3-admin-card-selection button:last-child{background:#f7d94d;border:0}
+.v3-admin-card-row{display:flex;align-items:center;gap:12px;border-bottom:1px solid #e7e0d6;padding:15px 0;font-size:12px}
+.v3-admin-card-row>img{height:90px;width:80px;object-fit:cover}
+.v3-admin-card-row>div{min-width:0;flex:1}.v3-admin-card-row strong{font-size:15px}
+.v3-admin-card-row p{margin:10px 0 4px}.v3-admin-card-row small{font-size:11px;color:#837d73}
+
+.v3-admin-cards{padding-top:16px}
+.v3-admin-cards>.v3-back{display:block;font-size:12px;line-height:18px;margin-bottom:30px}
+.v3-admin-cards h1{font-size:23px;line-height:35px;font-weight:700;margin:0 0 4px}
+.v3-admin-cards-subtitle{font-size:12px;line-height:18px;margin:0 0 45px}
+.v3-admin-card-menu{margin-bottom:24px}
+.v3-admin-card-filters{grid-template-columns:1fr 1fr;gap:12px}
+.v3-admin-card-filters select{font-size:14px;font-weight:600;line-height:21px;min-height:44px}
+.v3-admin-card-status-tabs{display:flex;justify-content:space-between;gap:5px;margin:20px 0 16px}
+.v3-admin-card-status-tabs button{background:transparent;border:0;border-bottom:2px solid #e7e0d6;flex:1;padding:12px 1px;color:#605e59;font-size:13px}
+.v3-admin-card-status-tabs button[aria-pressed=true]{border-color:#141414;color:#141414;font-weight:700}
+.v3-admin-card-toolbar{font-size:13px;line-height:20px;font-weight:600}

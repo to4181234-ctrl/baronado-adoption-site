@@ -1,0 +1,5 @@
+.v3-report-form{padding:16px;background:#fff;border:1px solid #ded8cc;display:flex;flex-direction:column;gap:12px;font-family:"MonaS12",sans-serif;color:#161616}
+.v3-report-form>strong{font-size:14px}.v3-report-form>label{font-size:13px;display:flex;align-items:center;gap:9px}
+.v3-report-form .v3-report-detail{display:flex;flex-direction:column;align-items:stretch}
+.v3-report-form .v3-report-detail textarea{width:100%;resize:vertical;border:1px solid #ded8cc;padding:10px;font:inherit}
+.v3-report-actions{display:flex;gap:10px}.v3-report-actions button{flex:1;min-height:40px;border:1px solid #e5dfd4;background:#fff;font:inherit}.v3-report-actions button[type=submit]{background:#f7d94d;border:0}

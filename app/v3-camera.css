@@ -13,6 +13,15 @@
 @keyframes v3-camera-scan{from{top:0}to{top:98%}}
 .v3-camera-zoom{position:absolute;bottom:27%;align-self:center;z-index:3;display:flex;align-items:center;gap:17px;color:white;border-radius:50px;padding:5px 12px;background:#000a;font-size:11px}
 .v3-camera-zoom button{border:0;color:white;background:none;font-size:17px}
+/* The reset label is Pretendard SemiBold 10.230769px in Figma 175:5. */
+.v3-camera-zoom .v3-camera-zoom-reset{font-family:Pretendard,sans-serif;font-size:10.230769px;font-weight:600;line-height:1.45;padding:0;cursor:pointer}
+.v3-capture-live .v3-capture-live-art{touch-action:none}
+/* Figma 175:5: 390x844 frame, white 1:1 guide at x16,y190,350x350. */
+/* Figma y=190 is measured from the full 844px frame; the 42px site header
+   sits outside .v3-capture-live-art. Therefore the stage-relative top is 148px. */
+.v3-capture-live .v3-camera-square{top:148px;left:16px;right:auto;width:min(350px,calc(100% - 32px));height:auto;max-height:none;aspect-ratio:1;box-sizing:border-box}
+/* Keep the guide fixed while the video itself zooms. */
+.v3-capture-live .v3-camera-square{transform:none}
 .v3-camera-collar{position:absolute;width:95px;height:65px;bottom:20%;align-self:center;z-index:3;object-fit:contain;image-rendering:pixelated}
 .v3-camera-dialog-box{position:relative;z-index:4;width:calc(100% - 34px);margin:0 auto 39px;max-width:340px;min-height:121px;padding:15px 18px!important;background:#fff;color:#111;text-shadow:none}
 .v3-camera-dialog-box button{display:block;font-size:13px;margin:5px 0 0;border:0;background:none;color:#111;padding:0;line-height:1.4;text-align:left}

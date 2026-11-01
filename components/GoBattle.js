@@ -39,11 +39,10 @@ function Game(){
  const choose=(card)=>{
   if(phase!=='choose'||!card.battle)return;
   const old=selected.some(c=>c.id===card.id);
-  if(old){setSelected(list=>list.filter(c=>c.id!==card.id));sounds.current?.play('deselect');return;}
+  if(old){setSelected(list=>list.filter(c=>c.id!==card.id));return;}
   if(selected.length===2)return;
   if(selected.some(c=>c.dogId===card.dogId)){setError('서로 다른 강아지 카드를 골라주세요.');return;}
   setError('');setSelected(list=>[...list,card]);
-  sounds.current?.play(selected.length===1?'ready':'select');
  };
  const complete=useCallback(async()=>{
   if(finished.current||!requestId.current)return;
@@ -52,7 +51,12 @@ function Game(){
   try{
    const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,secondId:selected[1].id})});
    const body=await response.json();
-   if(!response.ok)throw Error(body.error||'대결 결과를 저장하지 못했어요.');
+   if(!response.ok){
+    // Figma 173:8416: a card removed or hidden after selection must not
+    // remain selected or be reused for another attempt.
+    if(response.status===409){setSelected([]);requestId.current=null;}
+    throw Error(body.error||'대결 결과를 저장하지 못했어요.');
+   }
    setResult(body.battle);setPhase('result');sounds.current?.play(body.battle.winner==='draw'?'draw':body.battle.winner==='first'?'victory':'defeat');
   }catch(e){setError(e.message);setPhase('choose');}
   finally{setMutating(false);}

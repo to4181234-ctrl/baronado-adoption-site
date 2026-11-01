@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {MAX_BANNERS,normalizedOrder,targetHref,validateBanner} from '../lib/bannerRules.mjs';
+const valid={name:'기본 바로나도 배너',alt:'바로나도 로고',image_url:'https://example.supabase.co/storage/v1/object/public/dog-images/banners/abc.jpg',link_type:'none',external_url:'',visible:true};
+test('Figma limit is three including invisible',()=>assert.equal(MAX_BANNERS,3));
+test('no-link and three in-app routes',()=>{assert.equal(targetHref('none'),null);assert.equal(targetHref('adoption'),'/');assert.equal(targetHref('resident'),'/residents');assert.equal(targetHref('go'),'/go')});
+test('only safe HTTPS external URLs',()=>{assert.equal(targetHref('external','javascript:alert(1)'),null);assert.equal(targetHref('external','http://example.com'),null);assert.equal(targetHref('external','https://user:password@example.com'),null);assert.equal(targetHref('external','https://example.com/dog'),'https://example.com/dog')});
+test('valid internal link and image is accepted',()=>assert.equal(validateBanner(valid,{allowedImageOrigin:'https://example.supabase.co'}).name,'기본 바로나도 배너'));
+test('image may not use external host or arbitrary bucket',()=>{assert.throws(()=>validateBanner(valid,{allowedImageOrigin:'https://other.example.co'}));assert.throws(()=>validateBanner({...valid,image_url:'https://example.supabase.co/storage/v1/object/public/dog-images/dogs/abc.jpg'}))});
+test('invalid name and alternate text rejected',()=>{assert.throws(()=>validateBanner({...valid,alt:'  '}));assert.throws(()=>validateBanner({...valid,name:' '.repeat(81)}))});
+test('external link requires HTTPS',()=>{assert.throws(()=>validateBanner({...valid,link_type:'external',external_url:'https://'}));assert.equal(validateBanner({...valid,link_type:'external',external_url:'https://example.com/'}).external_url,'https://example.com/')});
+test('three ordered ids validated',()=>{const ids=['a','b','c'];assert.deepEqual(normalizedOrder(['c','a','b'],ids),['c','a','b']);assert.throws(()=>normalizedOrder(['a','a','c'],ids));assert.throws(()=>normalizedOrder(['a','c','x'],ids));assert.throws(()=>normalizedOrder(['a','b','c','d'],['a','b','c','d']))});

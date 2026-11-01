@@ -1,0 +1,10 @@
+.v3-admin-card-detail{max-width:390px;margin:auto;padding:25px 16px 50px;font-family:"Pretendard Variable","Pretendard",sans-serif}
+.v3-admin-card-detail h1{font-size:24px;margin:23px 0}.v3-admin-card-detail h2{font-size:17px;margin:22px 0 12px}
+.v3-admin-card-detail p{font-size:12px;line-height:1.7}.v3-admin-card-detail-photo{width:100%;aspect-ratio:1;object-fit:cover}
+.v3-admin-card-detail-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:25px}
+.v3-admin-card-detail-actions button,.v3-admin-card-detail-actions a{display:block;border:1px solid #e7e0d6;padding:12px;background:#fff;font-size:12px;text-align:center}
+.v3-admin-card-detail-actions button:last-of-type{background:#f7d94d;border:0}
+
+.v3-admin-card-detail{padding-top:16px}
+.v3-admin-card-detail>.v3-back{display:block;font-size:12px;line-height:18px;margin-bottom:30px}
+.v3-admin-card-detail h1{font-size:23px;line-height:35px;font-weight:700;margin:0 0 4px}

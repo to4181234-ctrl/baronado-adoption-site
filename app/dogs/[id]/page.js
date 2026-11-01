@@ -13,6 +13,7 @@ import { formatDogDate, getAgeInfo, getDogBirthDate, getDogProfile, getShelterUr
 import { dogVideoMedia, orderedDogMedia } from '../../../lib/dogVideo';
 import VaccinationDetails from '../../../components/VaccinationDetails';
 import GoDogRecords from '../../../components/GoDogRecords';
+import ZoomablePhoto from '../../../components/ZoomablePhoto';
 
 function PawIcon() {
   return <svg className="paw" viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M20.3 27.1c4.1 0 7.4 4.3 7.4 9.6s-3.3 9.6-7.4 9.6-7.4-4.3-7.4-9.6 3.3-9.6 7.4-9.6Zm23.4 0c4.1 0 7.4 4.3 7.4 9.6s-3.3 9.6-7.4 9.6-7.4-4.3-7.4-9.6 3.3-9.6 7.4-9.6ZM15.9 17.7c3 0 5.4 3.1 5.4 6.9s-2.4 6.9-5.4 6.9-5.4-3.1-5.4-6.9 2.4-6.9 5.4-6.9Zm32.2 0c3 0 5.4 3.1 5.4 6.9s-2.4 6.9-5.4 6.9-5.4-3.1-5.4-6.9 2.4-6.9 5.4-6.9ZM32 11.2c3.2 0 5.8 3.4 5.8 7.6s-2.6 7.6-5.8 7.6-5.8-3.4-5.8-7.6 2.6-7.6 5.8-7.6Zm0 29.1c7 0 14.1 5.8 14.1 11.5 0 4.1-3.6 5.3-7.8 4.3-2.1-.5-4.1-1.4-6.3-1.4s-4.2.9-6.3 1.4c-4.2 1-7.8-.2-7.8-4.3 0-5.7 7.1-11.5 14.1-11.5Z"/></svg>;
@@ -27,8 +28,8 @@ export default function DogDetailPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeSection,setActiveSection]=useState('overview');
   const startX = useRef(null);
-  const modalStartX = useRef(null);
   const didSwipe = useRef(false);
+  function closeModal(){if(window.history.state?.v3ZoomModal)window.history.back();setModalOpen(false)}
 
   useEffect(() => {
     if (!params?.id) return;
@@ -43,7 +44,7 @@ export default function DogDetailPage() {
   }, [dog?.id]);
 
   useEffect(()=>{if(!dog)return;const ids=dog.category===CATEGORY_RESIDENT?['overview','information']:['overview','information','shelter','records'];const update=()=>{let active='overview';for(const id of ids){const el=document.getElementById(id==='records'?'v3-dog-records':'v3-detail-'+id);if(el&&el.getBoundingClientRect().top<=180)active=id;}setActiveSection(active);};update();window.addEventListener('scroll',update,{passive:true});return()=>window.removeEventListener('scroll',update);},[dog?.id,dog?.category]);
-  useEffect(()=>{if(!modalOpen)return;const prior=document.body.style.overflow;document.body.style.overflow='hidden';const escape=e=>{if(e.key==='Escape')setModalOpen(false);};window.addEventListener('keydown',escape);return()=>{document.body.style.overflow=prior;window.removeEventListener('keydown',escape);};},[modalOpen]);
+  useEffect(()=>{if(!modalOpen)return;const prior=document.body.style.overflow;document.body.style.overflow='hidden';window.history.pushState({...window.history.state,v3ZoomModal:true},'');const back=()=>setModalOpen(false);const escape=e=>{if(e.key==='Escape')closeModal();};window.addEventListener('keydown',escape);window.addEventListener('popstate',back);return()=>{document.body.style.overflow=prior;window.removeEventListener('keydown',escape);window.removeEventListener('popstate',back);};},[modalOpen]);
 
   const media = dog ? orderedDogMedia(dog.images || [], dogVideoMedia(dog.profile, process.env.NEXT_PUBLIC_SUPABASE_URL)) : [];
   const current = media[index];
@@ -71,17 +72,6 @@ export default function DogDetailPage() {
     const diff = event.clientX - startX.current;
     if (Math.abs(diff) > 35) { didSwipe.current = true; move(diff < 0 ? 1 : -1); }
     startX.current = null;
-  };
-
-  const onModalPointerDown = (event) => {
-    modalStartX.current = event.clientX;
-  };
-
-  const onModalPointerUp = (event) => {
-    if (modalStartX.current === null) return;
-    const diff = event.clientX - modalStartX.current;
-    if (Math.abs(diff) > 35) move(diff < 0 ? 1 : -1);
-    modalStartX.current = null;
   };
 
   return (
@@ -142,14 +132,14 @@ export default function DogDetailPage() {
       {dog && <DogActions dog={dog} hidden={modalOpen} />}
 
       {modalOpen && hasMedia && (
-        <div className="image-modal viewer-modal" onClick={() => setModalOpen(false)}>
+        <div className="image-modal viewer-modal" onClick={closeModal}>
           <button className="modal-close" aria-label="닫기">×</button>
           {media.length > 1 && (
             <button type="button" className="modal-nav modal-prev" aria-label="이전 미디어" onClick={(event) => { event.stopPropagation(); move(-1); }}>‹</button>
           )}
           {current?.type === 'video'
             ? <video key={current.url} src={current.url} poster={current.poster || undefined} controls preload="none" playsInline onClick={event => event.stopPropagation()} aria-label={`${dog.name} 동영상`} />
-            : <img src={current?.url} alt={`${dog.name} 크게 보기 ${index + 1}`} onClick={(event) => event.stopPropagation()} onPointerDown={onModalPointerDown} onPointerUp={onModalPointerUp} />}
+            : <ZoomablePhoto src={current?.url} alt={`${dog.name} 크게 보기 ${index + 1}`} onSwipe={move} />}
           {media.length > 1 && <span className="photo-count modal-count" aria-live="polite">{current?.type === 'video' ? '동영상' : '사진'} {index + 1} / {media.length}</span>}
           {media.length > 1 && (
             <button type="button" className="modal-nav modal-next" aria-label="다음 미디어" onClick={(event) => { event.stopPropagation(); move(1); }}>›</button>

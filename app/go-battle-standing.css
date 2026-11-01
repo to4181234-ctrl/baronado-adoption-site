@@ -1,0 +1,7 @@
+/* Frame 173:2123: three records within a fixed-height pixel dialogue panel. */
+.v3-go-site .v3-battle-standing{font-family:"MonaS12",sans-serif;font-size:12px;line-height:18px}
+.v3-battle-standing-list{display:grid;gap:1px;margin-top:5px}
+.v3-battle-standing-list p{font-size:11px!important;line-height:17px!important;margin:0!important;transform:none!important}
+.v3-battle-standing-pager{display:flex;justify-content:flex-end;align-items:center;gap:13px;margin-top:5px;font-size:10px}
+.v3-battle-standing-pager button{padding:0;border:0;background:transparent;font:inherit;color:#181818}
+.v3-battle-standing-pager button:disabled{opacity:.3}

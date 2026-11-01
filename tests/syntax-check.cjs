@@ -1,0 +1,5 @@
+const fs=require('node:fs'),path=require('node:path');
+let ts;try{ts=require('typescript')}catch{try{ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js')}catch{throw Error('Install typescript to run the JSX syntax check')}}
+const root=path.resolve(__dirname,'..');let failed=false;
+function visit(dir){for(const ent of fs.readdirSync(dir,{withFileTypes:true})){if(ent.name==='patches')continue;const filename=path.join(dir,ent.name);if(ent.isDirectory()){visit(filename);continue}if(!/\.(js|mjs)$/.test(ent.name))continue;const code=fs.readFileSync(filename,'utf8');const src=ts.createSourceFile(filename,code,ts.ScriptTarget.ESNext,true,ts.ScriptKind.JSX);if(src.parseDiagnostics.length){failed=true;for(const d of src.parseDiagnostics){const info=src.getLineAndCharacterOfPosition(d.start);console.error(filename+':'+(info.line+1)+':'+(info.character+1),ts.flattenDiagnosticMessageText(d.messageText,'\n'))}}else console.log('Syntax OK:',path.relative(root,filename))}}
+visit(root);if(failed)process.exitCode=1;

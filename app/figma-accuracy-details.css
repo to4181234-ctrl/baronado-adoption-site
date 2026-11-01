@@ -112,7 +112,7 @@
 .v3-discovery-figma .v3-discovery-modal>h2{font-family:"MonaS12","Galmuri11",sans-serif!important;font-size:36px!important;font-weight:700}
 .v3-discovery-figma .v3-discovery-dialog-content{font-family:"MonaS12","Galmuri11",sans-serif!important;font-size:13px!important}
 .v3-discovery-figma .v3-discovery-bottom label{font-family:"GalmuriMono11","Galmuri11",sans-serif!important}
-.v3-collection-tile.featured{background:#f7d94d!important}
+.v3-go-site .v3-collection-tile:not(.unlocked):active{background:#f7d94d!important}
 .v3-profile-head{background:#e9e0d3!important}
 .v3-collection-section .v3-progress{margin-bottom:23px!important}
 .v3-collection-section .v3-progress>span{background:#f7d94d!important}

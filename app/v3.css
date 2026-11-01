@@ -163,7 +163,7 @@ html,body{background:#fff;color:#151515}
 .v3-board-sort{display:flex;align-items:center;justify-content:space-between;margin:0 0 17px}
 .v3-board-sort select{border:0;background:none;font-size:11px}
 .v3-board-sort span{font-size:10px;color:#9b9489}
-.v3-community-author{font-size:11px;margin-top:7px}
+.v3-community-author{font-size:11px;margin-top:7px;display:block;color:inherit;text-decoration:none}
 .v3-community-item time{display:block;margin-top:3px;font-size:10px;color:#8a8479}
 /* Camera and new card overlay */
 .v3-camera-backdrop{position:fixed;inset:0;background:#141414bb;z-index:80;overflow:auto}
