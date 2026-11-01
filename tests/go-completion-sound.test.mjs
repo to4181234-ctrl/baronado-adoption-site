@@ -27,4 +27,7 @@ test('approved completion MP3 plays only while visible, enabled and not disposed
  }
 });
 test('sound defaults to on and remembers an explicit off choice',()=>{
- assert.equal(completionSoundEnabled(nu¶»§q«^
+ assert.equal(completionSoundEnabled(null),true);
+ assert.equal(completionSoundEnabled('on'),true);
+ assert.equal(completionSoundEnabled('off'),false);
+});
