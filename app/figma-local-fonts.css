@@ -1,0 +1,19 @@
+/* Figma-specific local font faces. Exact family names, regular/bold faces and decimals preserved. */
+/* Official Google Fonts Inter, SIL OFL; used only by the existing Inter callsites. */
+@font-face{font-family:"Inter";src:url("/fonts/figma/Inter-Medium.ttf") format("truetype");font-style:normal;font-weight:500;font-display:swap}
+@font-face{font-family:"Inter";src:url("/fonts/figma/Inter-Bold.ttf") format("truetype");font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:"MonaS12";src:url("/fonts/figma/MonaS12-Regular.otf") format("opentype");font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:"MonaS12";src:url("/fonts/figma/MonaS12-Bold.otf") format("opentype");font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:"Mona12";src:url("/fonts/figma/Mona12-Regular.otf") format("opentype");font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:"Mona12";src:url("/fonts/figma/Mona12-Bold.otf") format("opentype");font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:"Pretendard Variable";src:url("/fonts/figma/PretendardVariable.woff2") format("woff2");font-style:normal;font-weight:100 900;font-display:swap}
+@font-face{font-family:"Pretendard";src:url("/fonts/figma/PretendardVariable.woff2") format("woff2");font-style:normal;font-weight:100 900;font-display:swap}
+@font-face{font-family:"GalmuriMono11";src:url("/fonts/figma/GalmuriMono11-Regular.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap}
+
+/* User-provided Gmarket Sans OTF, preserving Figma family and weights. */
+@font-face{font-family:"Gmarket Sans";src:url("/fonts/figma/GmarketSansLight.otf") format("opentype");font-style:normal;font-weight:300;font-display:swap}
+@font-face{font-family:"GmarketSans";src:url("/fonts/figma/GmarketSansLight.otf") format("opentype");font-style:normal;font-weight:300;font-display:swap}
+@font-face{font-family:"Gmarket Sans";src:url("/fonts/figma/GmarketSansMedium.otf") format("opentype");font-style:normal;font-weight:500;font-display:swap}
+@font-face{font-family:"GmarketSans";src:url("/fonts/figma/GmarketSansMedium.otf") format("opentype");font-style:normal;font-weight:500;font-display:swap}
+@font-face{font-family:"Gmarket Sans";src:url("/fonts/figma/GmarketSansBold.otf") format("opentype");font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:"GmarketSans";src:url("/fonts/figma/GmarketSansBold.otf") format("opentype");font-style:normal;font-weight:700;font-display:swap}

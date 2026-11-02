@@ -1,0 +1,211 @@
+/* BARONADO / 03 멍멍GO! / Figma frames 173:1683, 173:1845, 173:2123.
+ * Exported values are in CSS px at the reference width 390px.
+ * Intentionally scoped to the real Next.js album home only, NOT its dog detail pages.
+ * No substituted illustration or CSS imitation of the Figma pixel panel.
+ * Original panel SVG files are already identical to Figma's exported vector bytes.
+ * Visual/functional verification on a running Next.js app is still required.
+ */
+.v3-go-site .v3-album-home.v3-album-figma {
+  width:100%;max-width:390px;min-height:1060px;
+  font-family:'MonaS12',sans-serif;color:#181713;
+}
+/* The header belongs to GoShell, not to GoPage. Scope to the three album states. */
+.v3-go-site:has(.v3-album-figma) .v3-go-brand{
+  font-family:'MonaS12',sans-serif!important;
+  font-size:12.5796918869px!important;font-weight:700!important;
+  line-height:1.5!important;letter-spacing:0!important;
+}
+.v3-go-site:has(.v3-album-figma) .v3-header-logout,
+.v3-go-site:has(.v3-album-figma) .v3-member-greet{
+  font-family:'Pretendard Variable','Pretendard',sans-serif!important;
+  font-size:13px!important;font-weight:500!important;letter-spacing:0!important;
+  line-height:1.5!important;
+}
+/* Figma profile area: frame y=42, h=183; avatar x=16 y=69, 126×126. */
+.v3-go-site .v3-album-figma .v3-profile-head{
+  position:relative;display:block!important;box-sizing:border-box;
+  width:100%;height:183px;min-height:183px!important;
+  margin:0;padding:0!important;background:#e9e0d3!important;
+}
+.v3-go-site .v3-album-figma .v3-profile-avatar{
+  position:absolute;left:16px;top:27px;width:126px;height:126px;
+  margin:0;border:0;border-radius:5px;background:#fff;
+}
+.v3-go-site .v3-album-figma .v3-profile-avatar img{
+  position:absolute;left:13px;top:7px;width:102px;height:102px;
+  max-width:none;object-fit:contain;image-rendering:pixelated;
+}
+.v3-go-site .v3-album-figma.v3-album-guest .v3-profile-avatar img.v3-profile-anon-silhouette{
+  left:14px;top:7px;width:94px!important;height:94px!important;
+  opacity:.28;filter:grayscale(1);
+}
+.v3-go-site .v3-album-figma .v3-profile-head > div:last-child{display:contents}
+.v3-go-site .v3-album-figma .v3-profile-head h1{
+  position:absolute;left:159px;top:24px;width:231px;max-width:calc(100% - 160px);
+  margin:0!important;padding:0!important;
+  color:#181713!important;font-family:'MonaS12',sans-serif!important;
+  font-size:17.91044616699px!important;font-weight:700!important;
+  line-height:1.5!important;letter-spacing:0!important;white-space:nowrap;
+}
+.v3-go-site .v3-album-figma.v3-album-guest .v3-profile-head h1{left:160px}
+.v3-go-site .v3-album-figma .v3-profile-head p{
+  position:absolute;left:160px;top:54px;width:92.35px;
+  margin:0!important;padding:0!important;
+  color:#65615a!important;font-family:'MonaS12',sans-serif!important;
+  font-size:11px!important;font-weight:400!important;
+  line-height:1.5!important;letter-spacing:0!important;
+}
+.v3-go-site .v3-album-figma .v3-profile-head small{
+  position:absolute;left:160px;top:76px;width:214px;
+  margin:0!important;padding:0!important;
+  color:#a6a096!important;font-family:'MonaS12',sans-serif!important;
+  font-size:11.74455452px!important;font-weight:400!important;
+  line-height:1.5!important;letter-spacing:0!important;
+}
+.v3-go-site .v3-album-figma.v3-album-guest .v3-profile-head small{color:#181713!important}
+.v3-go-site .v3-album-figma .v3-profile-head a,
+.v3-go-site .v3-album-figma .v3-profile-head .v3-profile-login{
+  position:absolute;left:162px;width:212px;height:19px;
+  display:flex!important;align-items:center;gap:6px;
+  margin:0!important;padding:0!important;
+  background:none!important;border:0!important;box-shadow:none!important;
+  font-family:'MonaS12',sans-serif!important;font-size:11px!important;
+  font-weight:400!important;line-height:1.5!important;
+  letter-spacing:0!important;color:#181713!important;text-align:left!important;
+  text-decoration:none;cursor:pointer;
+}
+.v3-go-site .v3-album-figma .v3-profile-head a:nth-of-type(1),
+.v3-go-site .v3-album-figma .v3-profile-head button.v3-profile-login:nth-of-type(1){top:118px}
+.v3-go-site .v3-album-figma .v3-profile-head a:nth-of-type(2),
+.v3-go-site .v3-album-figma .v3-profile-head button.v3-profile-login:nth-of-type(2){top:138px}
+.v3-go-site .v3-album-figma .v3-profile-head .v3-album-pixel-arrow{
+  display:block;flex:none;width:6px;height:9px;object-fit:contain;
+}
+/* Collection section at frame y=225; title (16,247), bar (16,314). */
+.v3-go-site .v3-album-figma .v3-collection-section{
+  box-sizing:border-box;width:100%;padding:22px 16px 0!important;margin:0;
+}
+.v3-go-site .v3-album-figma .v3-collection-section h2,
+.v3-go-site .v3-album-figma .v3-battle-home h2{
+  margin:0 0 20px!important;padding:0!important;
+  color:#181713!important;font-family:'MonaS12',sans-serif!important;
+  font-size:15.31585216522px!important;font-weight:700!important;
+  line-height:24px!important;letter-spacing:0!important;
+}
+.v3-go-site .v3-album-figma .v3-progress-label{
+  margin:0 0 2px!important;padding:0!important;
+  color:#181713!important;font-family:'MonaS12',sans-serif!important;
+  font-size:12.5px!important;font-weight:400!important;
+  line-height:21px!important;letter-spacing:0!important;
+}
+.v3-go-site .v3-album-figma .v3-collection-section .v3-progress{
+  box-sizing:border-box;width:188px;height:9px;min-height:9px;
+  padding:0;border:0;border-radius:17px;
+  background:#dcdcdc!important;margin:0 0 18px!important;overflow:hidden;
+}
+.v3-go-site .v3-album-figma .v3-progress > span{
+  display:block;height:9px;border-radius:17px;background:#f7d94d!important;
+}
+.v3-go-site .v3-album-figma .v3-collection-grid{
+  width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:15px 11px;margin:0!important;padding:0!important;
+}
+.v3-go-site .v3-album-figma .v3-collection-tile{
+  position:relative;box-sizing:border-box;width:100%;height:137px;
+  min-width:0;border:0!important;border-radius:8px!important;
+  background:#faf8f2!important;padding:0!important;margin:0!important;
+  display:block!important;text-decoration:none!important;
+}
+.v3-go-site .v3-album-figma .v3-collection-tile.unlocked{background:#f7d94d!important}
+.v3-go-site .v3-album-figma .v3-collection-tile:active{background:#f7d94d!important}
+.v3-go-site .v3-album-figma .v3-collection-tile img{
+  position:absolute;left:9px;top:11px;display:block;
+  width:94px;height:94px;max-width:calc(100% - 18px);margin:0!important;
+  object-fit:contain;image-rendering:pixelated;
+}
+.v3-go-site .v3-album-figma .v3-collection-tile.unlocked img{
+  left:7px;top:10px;width:97px;height:97px;max-width:calc(100% - 14px);
+}
+.v3-go-site .v3-album-figma .v3-collection-tile strong{
+  position:absolute;left:13px;top:107px;width:85px;max-width:calc(100% - 26px);
+  display:block;margin:0!important;padding:0!important;
+  color:#181713!important;font-family:'MonaS12',sans-serif!important;
+  font-size:12px!important;font-weight:700!important;
+  line-height:21px!important;letter-spacing:0!important;text-align:center!important;
+}
+/* Figma divider y=660; battle heading y=676; collar y=723; pixel panel y=873. */
+.v3-go-site .v3-album-figma .v3-battle-home{
+  box-sizing:border-box;margin:30px 16px 0!important;
+  padding:15px 0 0!important;border:0!important;
+  border-top:1px solid #eae4d9!important;
+}
+.v3-go-site .v3-album-figma .v3-battle-home h2{margin:0!important}
+.v3-go-site .v3-album-figma .v3-battle-shortcut{
+  box-sizing:border-box;display:flex!important;flex-direction:column;
+  align-items:center;justify-content:flex-start;
+  margin:23px 0 0!important;padding:0 0 28.4px!important;
+  gap:37px!important;color:#181713!important;text-decoration:none!important;
+}
+.v3-go-site .v3-album-figma .v3-battle-shortcut img{
+  display:block;width:88px!important;height:57.0489px!important;
+  margin:0!important;max-width:none!important;object-fit:contain;image-rendering:pixelated;
+}
+.v3-go-site .v3-album-figma .v3-battle-shortcut strong{
+  display:block;margin:0!important;padding:0!important;
+  font-family:'MonaS12',sans-serif!important;
+  font-size:17.91044616699px!important;font-weight:700!important;
+  line-height:27.61194038px!important;letter-spacing:0!important;
+  color:#181713!important;text-align:center;
+}
+.v3-go-site .v3-album-figma .v3-battle-home .v3-pixel-panel{
+  position:relative;box-sizing:border-box;width:356px;max-width:100%;
+  min-height:162px!important;height:162px!important;
+  margin:0!important;padding:0!important;border:0!important;
+  border-radius:0!important;background:#fff!important;box-shadow:none!important;overflow:hidden;
+}
+.v3-go-site .v3-album-figma .v3-pixel-panel .v3-album-panel-layer{
+  position:absolute;display:block;max-width:none!important;pointer-events:none;
+}
+.v3-go-site .v3-album-figma .v3-album-panel-bg,
+.v3-go-site .v3-album-figma .v3-album-panel-outer{left:0;top:0;width:356px;height:162px}
+.v3-go-site .v3-album-figma .v3-album-panel-inner{left:8px;top:8px;width:344px;height:146px}
+.v3-go-site .v3-album-figma .v3-panel-content{
+  position:absolute;left:29px;top:28px;right:25px;
+  color:#000!important;font-family:'MonaS12',sans-serif!important;
+}
+.v3-go-site .v3-album-figma .v3-panel-content b{
+  display:block;font-family:'MonaS12',sans-serif!important;
+  font-weight:400!important;font-size:14.333333px!important;
+  line-height:23px!important;letter-spacing:0!important;
+}
+.v3-go-site .v3-album-figma .v3-panel-content p{
+  display:block;margin:9px 0 0!important;padding:0!important;
+  color:#000!important;font-family:'MonaS12',sans-serif!important;
+  font-weight:400!important;font-size:14.333333px!important;
+  line-height:26.23px!important;letter-spacing:0!important;
+}
+.v3-go-site .v3-album-figma .v3-panel-content .v3-anon-battle-login{
+  display:flex;align-items:center;gap:6px;
+  margin:1px 0 0!important;padding:0!important;
+  border:0!important;box-shadow:none!important;border-radius:0!important;background:none!important;
+  color:#000!important;font-family:'MonaS12',sans-serif!important;
+  font-size:14.333333px!important;font-weight:400!important;
+  line-height:26.23px!important;letter-spacing:0!important;text-align:left!important;
+}
+.v3-go-site .v3-album-figma .v3-anon-battle-login img{
+  display:block;width:7px;height:10px;max-width:none;
+}
+/* No invented style overrides at the 390px reference width. Smaller widths stay usable. */
+@media(max-width:374px){
+ .v3-go-site .v3-album-figma .v3-profile-head h1{font-size:clamp(14px,4.1vw,17.910446px)!important;white-space:normal}
+ .v3-go-site .v3-album-figma .v3-profile-head small{width:calc(100% - 166px)}
+ .v3-go-site .v3-album-figma .v3-collection-tile img{max-width:calc(100% - 18px);height:auto;aspect-ratio:1}
+}
+
+/* Keep the original 356 x 162 panel intact on narrower mobile screens. */
+.v3-go-site .v3-album-figma .v10-panel-canvas{position:relative;width:356px;height:162px;transform-origin:top left}
+@media(max-width:389px){
+ .v3-go-site .v3-album-figma .v3-profile-head .v3-profile-login{width:calc(100% - 174px)}
+ .v3-go-site .v3-album-figma .v3-battle-home .v3-pixel-panel{container-type:inline-size;height:auto!important;min-height:0!important;aspect-ratio:356/162}
+ .v3-go-site .v3-album-figma .v10-panel-canvas{transform:scale(calc(100cqw / 356px))}
+}

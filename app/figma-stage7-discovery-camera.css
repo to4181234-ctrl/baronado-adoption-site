@@ -1,0 +1,20 @@
+/* Stage 7: Figma 173:3556 / 173:4487 / 175:5. Scope to existing Go surfaces. */
+.v3-discovery-confirmed-line{white-space:pre-line;font-family:'MonaS12',monospace;font-size:12px;line-height:1.5;margin:8px 0 12px}
+.v3-capture-live .v3-capture-live-art{height:calc(100dvh - 42px);max-height:none;min-height:640px}
+.v3-capture-live .v3-camera-square{position:absolute;width:min(calc(100% - 32px),calc(100dvh - 200px));height:auto;aspect-ratio:1;left:50%;right:auto;top:45%;transform:translate(-50%,-50%);max-height:none;border:2px solid white}
+.v3-capture-edit{box-sizing:border-box;max-width:390px;width:100%;margin:auto;min-height:804px;padding:26px 16px 32px;font-family:'MonaS12',sans-serif}
+.v3-capture-edit h2{margin:0 0 22px;font-family:'MonaS12',sans-serif;font-size:20px;line-height:1.45;font-weight:700}
+.v3-capture-edit .v3-capture-photo{width:100%;aspect-ratio:1;object-fit:cover}
+.v3-capture-edit .v3-retry{font-family:'GalmuriMono11',monospace;font-size:13px;line-height:1.45;padding:13px 0 39px}
+.v3-capture-edit label{font-family:'MonaS12',sans-serif;font-size:14px;line-height:1.45;font-weight:700;gap:9px}
+.v3-capture-edit label input{height:48px;background:#f9f7f1;border:0;font-family:'GalmuriMono11',monospace;font-size:13px}
+.v3-capture-title-count{display:block;text-align:right;font-family:Pretendard,sans-serif;font-size:10px;color:#85857d;margin-top:8px}
+.v3-capture-edit>p{font-family:'GalmuriMono11',monospace;font-size:12px;margin:28px 0 30px;color:#8d8d8d}
+.v3-capture-edit>.v3-yellow-btn{display:block;width:100%;height:46px;border:0;border-radius:6px;background:#fade40;font-family:'GalmuriMono11',monospace;font-size:13px}
+.v3-camera-error{padding:16px;font-size:13px;color:#a93626}
+.v3-camera-error button{margin-right:12px;padding:10px;background:#fff;border:1px solid #ded6c7;border-radius:5px;color:#181713}
+.v3-capture-complete a.v3-yellow-btn{display:flex;align-items:center;justify-content:center;text-decoration:none;color:#181713}
+
+/* Figma camera photo is an illustration of the intended camera feed, not a production background. */
+.v3-capture-permission-intro{background-image:none!important;background-color:#20201e;color:#fff}
+.v3-capture-permission-intro .v3-camera-square{border:2px solid #fff;background:transparent}

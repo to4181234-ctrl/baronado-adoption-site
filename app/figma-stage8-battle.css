@@ -1,0 +1,13 @@
+/* Stage 8 — Figma 173:8009/8416/8823/9029/7503. Existing original card assets remain intact. */
+.meong-battle-phase-choose .meong-battle-grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:25px;row-gap:35px}
+.meong-battle-phase-choose .meong-battle-entry{min-width:0}
+.meong-battle-phase-choose .meong-battle-card{aspect-ratio:166/265}
+.meong-battle-phase-choose .meong-battle-card.is-picked{outline:3px solid #fade40;outline-offset:0}
+.meong-battle-phase-choose .meong-battle-sort{font-family:'MonaS12',sans-serif;font-size:11px;line-height:1.5}
+.meong-battle-phase-choose .meong-battle-sort button{font-family:inherit;font-size:inherit}
+.meong-battle-phase-choose .meong-battle-search input{height:44px}
+.meong-battle-phase-choose .meong-battle-search button{height:44px}
+.meong-battle-phase-choose .meong-battle-entry>span{font-family:'MonaS12',sans-serif;font-size:11px;line-height:17px}
+.meong-battle-phase-choose .meong-battle-entry>small{font-family:'MonaS12',sans-serif;font-size:11px;line-height:17px}
+.meong-battle-phase-result .meong-battle-result h2{font-family:'MonaS12',sans-serif;font-weight:700}
+.meong-battle-phase-result .meong-battle-score{font-family:'MonaS12',sans-serif}

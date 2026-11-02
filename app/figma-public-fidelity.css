@@ -1,0 +1,120 @@
+/* Final Figma 2nd revision, adoption/resident lists and details: artboards 173:3, 173:878,
+   173:11010, 173:1018. This sheet is scoped to public pages only.
+   Do not apply these typography rules to MeongGO or the admin. */
+.v3-site.v3-list-site .v3-header-inner,
+.v3-site.v3-detail-site .v3-header-inner{max-width:390px;min-height:42px;gap:0;padding:0 16px}
+.v3-site.v3-list-site .v3-brand,
+.v3-site.v3-detail-site .v3-brand{font-family:"Gmarket Sans",sans-serif;font-size:11px;font-weight:500;letter-spacing:0;line-height:1.5}
+.v3-site.v3-list-site .v3-main-nav,
+.v3-site.v3-detail-site .v3-main-nav{gap:12px;margin-left:auto}
+.v3-site.v3-list-site .v3-main-nav a,
+.v3-site.v3-detail-site .v3-main-nav a{font-family:"Gmarket Sans",sans-serif;font-size:11px;font-weight:500;letter-spacing:0;line-height:1.5}
+.v3-site.v3-list-site .v3-main-nav a:last-child,
+.v3-site.v3-detail-site .v3-main-nav a:last-child{font-family:"MonaS12",sans-serif;font-size:10px;font-weight:700;line-height:1.5;letter-spacing:0}
+.v3-site.v3-list-site .v3-main-nav a[aria-current="page"],
+.v3-site.v3-detail-site .v3-main-nav a[aria-current="page"]{font-weight:500}
+
+/* Figma hero: y=42 height=196; original SVG content x=57 y=103, 259.37×73.58. */
+.v3-site.v3-list-site .v3-figma-hero{position:relative;width:100%;max-width:390px;height:196px;overflow:hidden;touch-action:pan-y;background:linear-gradient(180deg,#f7d94d 0%,#f7d94d 73.5%,#d5bb43 100%)!important}
+.v3-site.v3-list-site .v3-hero-track{height:100%;width:100%;display:flex;transition:transform 300ms ease;will-change:transform}
+.v3-site.v3-list-site .v3-hero-slide{width:100%;height:100%;position:relative;flex:0 0 100%;overflow:hidden}
+.v3-site.v3-list-site .v3-hero-slide>img,.v3-site.v3-list-site .v3-hero-slide>a>img{display:block;width:100%;height:100%;object-fit:cover}
+.v3-site.v3-list-site .v3-hero-slide>a{display:block;height:100%;width:100%}
+.v3-site.v3-list-site .v3-hero-slide.is-original>img{position:absolute;left:calc(50% - 138px);top:61px;width:259.371px;height:73.583px;max-width:none;object-fit:contain}
+.v3-site.v3-list-site .v3-hero-dots{position:absolute!important;left:50%!important;top:175px!important;bottom:auto!important;display:flex;gap:10px;transform:translateX(-50%);align-items:center}
+.v3-site.v3-list-site .v3-hero-dots button{display:block;width:5px;height:5px;min-width:5px;padding:0;outline-offset:4px;border:0;border-radius:50%;background:#ffffff79;cursor:pointer}
+.v3-site.v3-list-site .v3-hero-dots button[aria-current="true"]{background:#fff}
+
+/* Listing geometry (both pages): title x16/y280, controls y329, count y357, image y378.5. */
+.v3-site.v3-list-site .v3-content.v3-dog-list{width:100%;max-width:390px;padding:42px 16px 50px;margin:0 auto}
+.v3-site.v3-list-site .v3-dog-list h1{font-family:"Gmarket Sans",sans-serif;font-size:18px;font-weight:500;letter-spacing:0;line-height:1.5;margin:0 0 22px}
+.v3-site.v3-list-site .v3-list-controls{height:16.5px;align-items:center;gap:22px;margin:0 0 11.5px}
+.v3-site.v3-list-site .v3-list-controls .v3-list-filter{display:flex;gap:10px;align-items:center;height:16.5px;font-family:"Pretendard",sans-serif!important;font-size:11px;line-height:1.5;white-space:nowrap}
+.v3-site.v3-list-site .v3-list-controls .v3-list-filter>span{font-weight:800;font-size:11px;color:#54402d;line-height:1.5;letter-spacing:0}
+.v3-site.v3-list-site .v3-list-controls .v3-list-filter>button{display:inline-flex;align-items:center;gap:2px;color:#54402d;font-family:"Pretendard",sans-serif;font-weight:500;font-size:11px;line-height:1.5;padding:0;background:none;border:0;cursor:pointer}
+.v3-site.v3-resident-list .v3-list-controls .v3-list-filter{gap:7px}
+.v3-site.v3-resident-list .v3-list-controls .v3-list-filter>button{gap:4px}
+.v3-site.v3-list-site .v3-list-chevron{display:block;width:9px;height:5px;max-width:none;margin:0}
+.v3-site.v3-list-site .v3-count{margin:0 0 6.5px;font-family:"Pretendard",sans-serif;font-size:10px;font-weight:500;line-height:15px;letter-spacing:0;color:#948d82}
+.v3-site.v3-list-site .v3-dogs-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px;row-gap:33px;margin:0}
+.v3-site.v3-list-site .v3-dog-tile{display:block;min-width:0;text-align:left;color:#111;text-decoration:none}
+.v3-site.v3-list-site .v3-dog-image{width:100%;aspect-ratio:1/1;overflow:hidden;position:relative;background:#f6f6f3;border:1px solid #e9e0d3}
+.v3-site.v3-list-site .v3-dog-image img{display:block;width:100%;height:100%;object-fit:cover;transition:none}
+.v3-site.v3-list-site .v3-dog-tile:active img{transform:none}
+.v3-site.v3-list-site .v3-dog-tile>strong{display:block;margin:11px 0 7px;font-family:"Gmarket Sans",sans-serif;font-size:16px;font-weight:500;line-height:1.5;letter-spacing:0;color:#000}
+.v3-site.v3-list-site .v3-dog-tile .v3-dog-meta{display:flex;gap:6.5px;align-items:center;white-space:nowrap;font-family:"Pretendard",sans-serif;font-size:10.606px;font-weight:500;line-height:1.5;letter-spacing:0;color:#000}
+.v3-site.v3-list-site .v3-dog-meta i{flex:0 0 1px;width:1px;height:9.28px;background:#b7b1a9;display:block}
+.v3-site.v3-list-site .v3-dog-meta span{display:inline-block;white-space:nowrap}
+.v3-site.v3-list-site .v3-adopted{position:absolute;inset:0;display:grid;place-items:center;background:#0008;color:#fff;font-family:"Pretendard",sans-serif;font-size:14px;font-weight:700}
+.v3-site.v3-list-site .v3-pager{display:flex;align-items:center;justify-content:center;gap:8px;margin:46px 0 0;font-family:"Pretendard",sans-serif;font-size:10.606px;line-height:1.5;color:#111}
+.v3-site.v3-list-site .v3-pager button{width:8px;height:14px;padding:0;border:0;display:grid;place-items:center;background:none;cursor:pointer}
+.v3-site.v3-list-site .v3-pager button img{display:block;width:8px;height:14px;max-width:none}
+.v3-site.v3-list-site .v3-pager button:disabled{opacity:.35;cursor:default}
+.v3-site.v3-list-site .v3-pager span{font-family:"Pretendard",sans-serif;font-weight:500;font-size:10.606px;white-space:nowrap;line-height:1.5}
+.v3-site.v3-list-site .v3-filter-sheet{max-width:390px}
+
+/* Shared Figma detail: banner y42..160; tabs y160..219, identity y241. */
+.v3-site.v3-detail-site .container.detail-container{max-width:390px!important;padding:0 16px 55px!important}
+.v3-site.v3-detail-site .v3-detail-banner{height:118px!important;min-height:118px!important;background:#f7d94d;margin:0 -16px!important;padding:26px 17px 0!important;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;gap:16px!important}
+.v3-site.v3-detail-site .v3-detail-banner a{font-family:"Pretendard",sans-serif;font-size:13px;font-weight:400;line-height:1.5;letter-spacing:0;margin:0!important;color:#54402d;text-decoration:none}
+.v3-site.v3-detail-site .v3-detail-banner strong{font-family:"Gmarket Sans",sans-serif;font-size:20px;font-weight:500;line-height:1.5;letter-spacing:0;color:#171411}
+.v3-site.v3-detail-site .v3-detail-tabs{height:59px;min-height:59px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;margin:0;gap:0}
+.v3-site.v3-detail-site .v3-detail-tabs.is-resident{grid-template-columns:repeat(2,minmax(0,1fr))}
+.v3-site.v3-detail-site .v3-detail-tabs button{height:51px;min-width:0;border:0;border-bottom:2px solid transparent;padding:14px 8px 13px;font-family:"Pretendard",sans-serif;font-size:12px;font-weight:500;line-height:1.5;letter-spacing:0;text-align:center;color:#161616;background:#fff}
+.v3-site.v3-detail-site .v3-detail-tabs button.active{font-weight:700;border-bottom:2px solid #f7d94d}
+.v3-site.v3-detail-site .v3-detail-identity{min-height:140px;padding:22px 0 18px}
+.v3-site.v3-detail-site .v3-detail-identity .dog-name{font-family:"Gmarket Sans",sans-serif;font-size:25px!important;font-weight:500;line-height:1.5;letter-spacing:0;margin:0 0 10px!important}
+.v3-site.v3-detail-site .v3-detail-identity .meta{font-family:"Pretendard",sans-serif;font-size:14px!important;font-weight:500;line-height:1.5!important;letter-spacing:0;margin:0 0 10px!important}
+.v3-site.v3-detail-site .v3-detail-identity .arrival-date{font-family:"Pretendard",sans-serif;font-size:12px!important;font-weight:400;line-height:1.5!important;letter-spacing:0;margin:0}
+.v3-site.v3-detail-site .v3-detail-gallery,.v3-site.v3-detail-site .v3-detail-gallery .gallery-main{width:100%!important;height:331px!important;min-height:331px!important;max-width:none;position:relative;overflow:hidden;background:#fff}
+.v3-site.v3-detail-site .v3-detail-gallery .gallery-main>img{width:100%;height:100%;display:block;object-fit:cover}
+.v3-site.v3-detail-site .v3-detail-gallery-navigation{height:59px;padding-top:14px;font-family:"Pretendard",sans-serif;font-size:12px;line-height:1.5;align-items:flex-start}
+.v3-site.v3-detail-site .v3-detail-gallery-navigation button,
+.v3-site.v3-detail-site .v3-detail-gallery-navigation span{font-family:"Pretendard",sans-serif;font-size:12px;font-weight:400;line-height:1.5;color:#161616}
+.v3-site.v3-detail-site .v3-detail-divider{height:8px;background:#f6f3ed;margin:0 -16px}
+.v3-site.v3-detail-site .v3-detail-about{padding:27px 0 40px;min-height:0}
+.v3-site.v3-resident-detail .v3-detail-about{padding-bottom:33px}
+.v3-site.v3-detail-site .v3-detail-about h2{font-family:"Pretendard",sans-serif;font-size:17px!important;font-weight:500;line-height:1.5;letter-spacing:0;margin:0 0 13px}
+.v3-site.v3-detail-site .v3-detail-about .desc{font-family:"Pretendard",sans-serif;font-size:14px!important;font-weight:400;line-height:1.65!important;letter-spacing:0}
+.v3-site.v3-detail-site .v3-detail-properties{padding-top:0}
+.v3-site.v3-detail-site .v3-detail-properties h2{font-family:"Pretendard",sans-serif;font-size:17px!important;font-weight:500;line-height:1.5;letter-spacing:0;margin:0 0 15.5px}
+.v3-site.v3-detail-site .v3-detail-property-group{margin:0 0 2px}
+.v3-site.v3-detail-site .v3-detail-properties h3{font-family:"Inter","Pretendard",sans-serif;font-size:14px!important;font-weight:700;line-height:1.5;letter-spacing:0;background:#f3ecdb;margin:0!important;height:41px;display:flex;align-items:center;padding:0 12px}
+.v3-site.v3-detail-site .v3-detail-property{border-bottom:1px solid #e7e0d8;display:grid;grid-template-columns:106px minmax(0,1fr);gap:0;min-height:75px;align-items:center;padding:14px 16px;font-size:14px;line-height:1.5}
+.v3-site.v3-detail-site .v3-detail-property>span{font-family:"Pretendard",sans-serif;font-size:14px;font-weight:700;color:#111}
+.v3-site.v3-detail-site .v3-detail-property>div{font-family:"Pretendard",sans-serif;font-size:14px;font-weight:500;line-height:1.65;color:#323232;min-width:0;white-space:pre-wrap}
+.v3-site.v3-detail-site .v3-detail-shelter{padding:29px 0}
+.v3-site.v3-detail-site .v3-detail-shelter h2,.v3-site.v3-detail-site .go-dog-records h2{font-family:"Pretendard",sans-serif;font-size:17px!important;font-weight:500;line-height:1.5;letter-spacing:0}
+.v3-site.v3-detail-site .v3-detail-shelter p{font-family:"Pretendard",sans-serif;font-size:14px;line-height:1.65;font-weight:400}
+.v3-site.v3-detail-site .v3-detail-shelter a{font-family:"Pretendard",sans-serif;font-size:13px;line-height:1.6}
+.v3-site.v3-detail-site .go-dog-records .go-board-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.v3-site.v3-detail-site .go-dog-records .go-dog-record-link{display:flex;align-items:center;justify-content:center;min-height:44px;font-family:"Pretendard",sans-serif;font-size:13px;font-weight:600}
+.v3-site.v3-detail-site .v3-detail-viewer img{object-fit:contain;touch-action:none;transform-origin:center center;max-width:min(960px,92vw);max-height:86dvh;will-change:transform}
+.v3-site.v3-detail-site .v3-detail-viewer{overflow:hidden}
+@media(max-width:390px){.v3-site.v3-list-site .v3-dogs-grid{row-gap:clamp(24px,8.46vw,33px)}.v3-site.v3-list-site .v3-dog-tile .v3-dog-meta{gap:clamp(2px,1.67vw,6.5px)}.v3-site.v3-list-site .v3-dog-tile>strong{font-size:clamp(14px,4.1026vw,16px)}}
+@media(prefers-reduced-motion:reduce){.v3-site.v3-list-site .v3-hero-track{transition:none}}
+/* Figma adoption detail public-photo preview: two 170×226 cards, 168×168 images. */
+.v3-site.v3-detail-site .v3-figma-records{margin-top:0;border-top:0;padding-top:0;padding-bottom:0}
+.v3-site.v3-detail-site .v3-figma-records>h2{font-family:"Pretendard",sans-serif;font-size:17px!important;font-weight:500;line-height:1.5;margin:0 0 21px;letter-spacing:0}
+.v3-site.v3-detail-site .v3-record-preview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.v3-site.v3-detail-site .v3-record-preview{display:block;min-height:226px;color:#171713;text-decoration:none;overflow:hidden}
+.v3-site.v3-detail-site .v3-record-preview img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
+.v3-site.v3-detail-site .v3-record-preview strong{display:block;margin:13px 10px 4px;font-family:"Pretendard",sans-serif;font-size:13px;font-weight:600;line-height:1.45;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.v3-site.v3-detail-site .v3-record-preview small{display:block;margin:0 10px;font-family:"Pretendard",sans-serif;font-size:11px;font-weight:400;line-height:1.45;color:#77716a}
+.v3-site.v3-detail-site .v3-figma-records .go-dog-record-link{margin-top:36px;display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;border:0;border-radius:0;background:#f7d94d;color:#111;font-family:"Pretendard",sans-serif;font-size:13px;font-weight:600}
+/* Navigation positions verified against the original 390px detail frames. */
+.v3-site.v3-detail-site .v3-detail-tabs:not(.is-resident){grid-template-columns:repeat(4,72px);justify-content:space-between}
+.v3-site.v3-detail-site .v3-detail-tabs:not(.is-resident) button:first-child{text-align:left;padding-left:8px}
+.v3-site.v3-detail-site .v3-detail-tabs:not(.is-resident) button:nth-child(2){text-indent:-16px}
+.v3-site.v3-detail-site .v3-detail-tabs:not(.is-resident) button:last-child{text-align:right;padding-right:8px}
+.v3-site.v3-detail-site .v3-detail-tabs.is-resident{grid-template-columns:repeat(2,116px);column-gap:20px;justify-content:center;transform:translateX(-6px)}
+
+/* Only the tab labels which use Inter in the finalized Figma frame get Inter. */
+.v3-site.v3-detail-site .v3-detail-tabs button:nth-child(2),
+.v3-site.v3-adoption-detail .v3-detail-tabs button:nth-child(4){font-family:"Inter","Pretendard",sans-serif;font-weight:500}
+.v3-site.v3-adoption-detail .v3-detail-tabs button:first-child,
+.v3-site.v3-resident-detail .v3-detail-tabs button:first-child{font-weight:700}
+/* Figma's disabled previous arrow already has its gray tone in the original SVG. */
+.v3-site.v3-list-site .v3-pager button:disabled{opacity:1;cursor:default}
+.v3-site.v3-list-site .v3-pager button:first-child:not(:disabled) img{filter:brightness(.52)}
+.v3-site.v3-list-site .v3-pager button:last-child:disabled img{opacity:.45}

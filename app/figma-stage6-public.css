@@ -1,0 +1,77 @@
+/* Scoped implementation: latest Figma 173:5244, 173:5650 (390px); no global overrides. */
+.v3-go-site:has(.v6-public-board) .v3-community-heading{padding:46px 16px 0!important;box-sizing:border-box;height:132px}
+.v3-go-site:has(.v6-public-board) .v3-community-heading h1{margin:0!important;font-family:'MonaS12',sans-serif!important;font-size:24px!important;font-weight:700!important;line-height:36px!important;letter-spacing:0!important;color:#181713}
+.v3-go-site:has(.v6-public-board) .v3-community-heading p{margin:8px 0 0!important;font-family:'MonaS12',sans-serif!important;font-size:12px!important;font-weight:400!important;line-height:20px!important;color:#817b70}
+.v3-go-site .v6-public-board{padding:0 16px 24px;font-family:'MonaS12',sans-serif;color:#181713}
+.v3-go-site .v6-public-search{display:flex;gap:10px;margin:0 0 27px;height:44px}
+.v3-go-site .v6-public-search input{box-sizing:border-box;width:calc(100% - 82px);min-width:0;flex:1;border:1px solid #eae4d9;border-radius:8px;background:#fff;padding:0 12px;font-family:'MonaS12',sans-serif;font-size:11px;font-weight:400;line-height:16.5px;color:#181713}
+.v3-go-site .v6-public-search button{width:72px;flex:0 0 72px;border:0;border-radius:8px;background:#f7d94d;font-family:'MonaS12',sans-serif;font-size:14px;line-height:21px;color:#181713}
+.v3-go-site .v6-public-toolbar{display:flex;align-items:center;justify-content:space-between;min-height:17px;margin-bottom:26px;gap:8px}
+.v3-go-site .v6-public-toolbar label{font-size:11px;line-height:16.5px;white-space:nowrap}
+.v3-go-site .v6-public-toolbar select{border:0;background:transparent;padding:0 14px 0 0;appearance:none;cursor:pointer;font:inherit;color:#181713;background-image:url('/figma-v3/list-chevron.svg');background-repeat:no-repeat;background-position:right center;background-size:8px 5px}
+.v3-go-site .v6-public-toolbar>span{font-size:10px;line-height:15px;white-space:nowrap}
+.v3-go-site .v6-public-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:25px;row-gap:30px;margin-left:1px;margin-right:0}
+.v3-go-site .v6-public-item{min-width:0;width:100%;margin:0;padding:0}
+.v3-go-site .v6-public-item .go-card-entry{width:100%!important;margin:0!important;padding:0!important;background:none!important;border:0!important}
+.v3-go-site .v6-public-item .go-card.go-card-v3{width:100%!important;aspect-ratio:166 / 265!important;height:auto!important;min-height:0!important}
+.v3-go-site .v6-public-item .v3-card-inside{inset:13px 15px 10px 10px!important;font-family:'MonaS12',sans-serif!important}
+.v3-go-site .v6-public-item .go-card-top{font:400 7px/10.5px 'MonaS12',sans-serif!important;margin-bottom:6px!important}
+.v3-go-site .v6-public-item .go-card-art{aspect-ratio:1!important;margin-bottom:5px!important}
+.v3-go-site .v6-public-item .v3-card-dogline strong{font:700 12.3243px/18.486px 'MonaS12',sans-serif!important}
+.v3-go-site .v6-public-item .go-card-ratings>div{font:400 10px/15px 'MonaS12',sans-serif!important}
+.v3-go-site .v6-public-item .v3-element-tag,.v3-go-site .v6-public-item .go-card-information,.v3-go-site .v6-public-item .go-card-information *{font:400 7px/10.5px 'MonaS12',sans-serif!important}
+.v3-go-site .v6-public-author{display:block;text-decoration:none!important;color:#181713;font:400 11px/16.5px 'MonaS12',sans-serif!important;margin:8px 0 2px 14px}
+.v3-go-site .v6-public-item>time{display:block;font:400 11px/16.5px 'MonaS12',sans-serif;color:#817b70;margin-left:14px}
+.v3-go-site .v6-public-pager{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:38px;font:400 10.6055px/16px 'MonaS12',sans-serif}
+.v3-go-site .v6-public-pager button{border:0;background:transparent;cursor:pointer;padding:0;width:10px;height:16px;display:grid;place-items:center}
+.v3-go-site .v6-public-pager button:disabled{opacity:.35;cursor:default}
+.v3-go-site .v6-public-pager img{width:8px;height:14px;object-fit:contain}
+.v3-go-site .v6-public-message{min-height:130px;text-align:center;padding-top:48px;font:400 12px/1.5 'MonaS12',sans-serif;color:#817b70}
+.v3-go-site .v6-public-message button{font:inherit;margin-top:10px;border:0;background:#f7d94d;border-radius:7px;padding:9px 14px;color:#181713}
+.v3-go-site .v6-public-board :is(button,a,input,select):focus-visible,.v3-go-site .v6-public-post :is(button,a):focus-visible{outline:2px solid #9b7a13;outline-offset:3px}
+/* Public card detail: Figma 173:5650, relative to common 42px header. */
+.v3-go-site .v6-public-post{position:relative;max-width:390px;margin:0 auto;min-height:892px;padding:75px 16px 48px;box-sizing:border-box;font-family:'MonaS12',sans-serif;text-align:center;color:#181713;overflow:hidden}
+.v3-go-site .v6-public-post h1{font:700 24px/36px 'MonaS12',sans-serif!important;margin:0 auto 43px!important;max-width:356px;position:relative;z-index:2;overflow-wrap:anywhere}
+.v3-go-site .v6-public-post .v6-post-card{position:relative;width:254.3245px;margin:0 auto 19px;z-index:2}
+.v3-go-site .v6-public-post .v6-post-card .go-card-entry{width:100%;margin:0;padding:0}
+.v3-go-site .v6-public-post .v6-post-card .go-card.go-card-v3{width:100%!important;aspect-ratio:254.3245 / 406!important;height:auto!important}
+.v3-go-site .v6-public-post .v6-post-card .v3-card-inside{inset:19px 23px 15px 15px!important;font-family:'MonaS12',sans-serif!important}
+.v3-go-site .v6-public-post .v6-post-card .go-card-top{font:400 10.725px/16.0875px 'MonaS12',sans-serif!important}
+.v3-go-site .v6-public-post .v6-post-card .v3-card-dogline strong{font:700 18.882px/28.323px 'MonaS12',sans-serif!important}
+.v3-go-site .v6-public-post .v6-post-card .go-card-ratings>div{font:400 15.321px/22.98px 'MonaS12',sans-serif!important}
+.v3-go-site .v6-public-post .v6-post-card .go-card-information,.v3-go-site .v6-public-post .v6-post-card .go-card-information *{font:400 10.725px/16.0875px 'MonaS12',sans-serif!important}
+.v3-go-site .v6-public-post .v6-post-author{display:block;text-decoration:none;color:#181713;font:400 16.054px/24px 'MonaS12',sans-serif;margin:0 auto 5px;position:relative;z-index:2}
+.v3-go-site .v6-public-post .v6-post-date{display:block;color:#747474;font:400 16.054px/24px 'MonaS12',sans-serif;position:relative;z-index:2}
+.v3-go-site .v6-public-post .v6-post-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;margin-top:36px;position:relative;z-index:2}
+.v3-go-site .v6-public-post .v6-post-actions button,.v3-go-site .v6-public-post .v6-post-actions a{box-sizing:border-box;display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:8px;border:1px solid #eae4d9;background:#fff;color:#181713;height:46px;font:400 14px/21px 'MonaS12',sans-serif}
+.v3-go-site .v6-public-post .v6-post-actions .v6-save{border:0;background:#f7d94d}
+.v3-go-site .v6-public-post .v6-dog-link{grid-column:1/-1}
+.v3-go-site .v6-public-post .v6-report{display:block;margin:22px 0 0;text-align:left;background:none;border:0;padding:0;color:#817b70;font:400 12px/20px 'Pretendard Variable',sans-serif}
+.v3-go-site .v6-public-post .v6-report-options{border:1px solid #eae4d9;border-radius:8px;padding:12px;margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+.v3-go-site .v6-public-post .v6-report-options button{padding:7px;border:1px solid #ddd;background:#fff;border-radius:5px}
+.v3-go-site .v6-public-post .v6-status{font-size:12px;color:#a33b30}
+@media(max-width:350px){.v3-go-site .v6-public-grid{column-gap:12px}.v3-go-site .v6-public-post .v6-post-card{width:min(254.3245px,100%)}}
+/* Public recorder: Figma 173:7076 and notes 173:7488. */
+.v10-public-recorder .v10-recorder-back{display:block;box-sizing:border-box;width:100%;height:47px;padding:16px 16px 11px;border:0;background:white;text-align:left;font:400 12px/18px 'Pretendard',sans-serif;color:#181713}
+.v10-public-recorder .v10-recorder-identity{position:relative;height:183px;background:#e9e0d3;color:#181713}
+.v10-recorder-identity .v10-recorder-portrait{position:absolute;left:16px;top:27px;width:126px;height:126px;background:white;border-radius:5px}
+.v10-recorder-identity .v10-recorder-portrait img{position:absolute;left:13px;top:7px;width:102px;height:102px;object-fit:contain;image-rendering:pixelated}
+.v10-recorder-identity h1{position:absolute;left:156.98px;top:24px;width:calc(100% - 172.98px);margin:0;font:700 25.913px/1.5 'MonaS12',sans-serif;overflow-wrap:anywhere}
+.v10-recorder-identity>span{position:absolute;left:160.45px;top:67.4px;font:400 16px/24px 'MonaS12',sans-serif;color:#65615a}
+.v10-recorder-identity>p{position:absolute;left:160px;top:108px;width:calc(100% - 176px);margin:0;font:400 16px/24px 'MonaS12',sans-serif;overflow-wrap:anywhere;white-space:pre-wrap}
+.v3-go-site .v10-recorder-board{padding-top:34px}
+.v3-go-site .v10-recorder-board .v6-public-toolbar{margin-bottom:21px}
+@media(max-width:350px){.v10-recorder-identity h1{font-size:21px}.v10-recorder-identity>p{font-size:13px;line-height:20px}}
+/* Measured list card slots from Figma 173:5257, keeping the existing SVG frame. */
+.v3-go-site .v6-public-search{margin-bottom:33px}
+.v3-go-site .v6-public-search input{font:400 12px/1.45 'Pretendard',sans-serif;background:#faf9f5;border-color:#e0e0d9;border-radius:6px}
+.v3-go-site .v6-public-search button{font:600 13px/1.45 'Pretendard',sans-serif;background:#fade40;border-radius:6px}
+.v3-go-site .v6-public-toolbar>span{font:400 11px/1.45 'Pretendard',sans-serif;color:#73736b}
+.v3-go-site .v6-public-grid{row-gap:20px}
+.v3-go-site .v6-public-item .v3-card-inside{inset:0!important;display:block}
+.v3-go-site .v6-public-item .go-card-top{position:absolute;left:6.0241%;top:5.283%;letter-spacing:0}
+.v3-go-site .v6-public-item .go-card-art{position:absolute;left:9.6386%;top:10.566%;width:80.7229%!important;height:49.8113%!important;aspect-ratio:auto!important;margin:0!important}
+.v3-go-site .v6-public-item .v3-card-dogline{position:absolute;left:9.6386%;right:9.6386%;top:63.7736%;margin:0}
+.v3-go-site .v6-public-item .go-card-ratings{position:absolute;left:9.6386%;right:9.6386%;top:74.717%;border:0!important;gap:4px!important}
+.v3-go-site .v6-public-item .go-card-ratings>div{color:#000}
+.v3-go-site .v6-public-item .go-card-information{position:absolute;left:6.0241%;right:9.6386%;bottom:5.283%;border:0!important;margin:0!important}

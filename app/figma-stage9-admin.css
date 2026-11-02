@@ -1,0 +1,23 @@
+/* 9차 관리자 목록의 한정 스타일: Figma 43:1454, 390px 기준 */
+.go-container .go-admin-filters{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 18px}
+.go-container .go-admin-filters label{font-family:'Pretendard',sans-serif;font-size:12px;line-height:18px;color:#77736a}
+.go-container .go-admin-filters select{display:block;box-sizing:border-box;margin-top:6px;width:100%;height:44px;border:1px solid #e7e0d6;border-radius:6px;background:white;padding:0 10px;color:#1d1c18;font:600 14px/21px 'Pretendard',sans-serif}
+.go-container .go-search input{background:#faf8f3;border-radius:5px;font-family:'Pretendard',sans-serif;font-size:14px}
+.go-container .go-search button{font:600 14px/21px 'Pretendard',sans-serif}
+.meong-battle-insufficient{margin:14px 0 18px;padding:20px 16px;background:#faf8f3;text-align:center;font-family:'MonaS12',sans-serif}
+.meong-battle-insufficient h2{font-weight:700;font-size:18px;line-height:1.5}
+.meong-battle-insufficient p{font-size:12px;line-height:1.5}
+.meong-battle-insufficient a{display:inline-block;margin-top:12px;padding:13px 18px;background:#fade40;border-radius:6px;color:#181713;text-decoration:none}
+
+/* Figma 78:313/368 banner management. Scope only admin banners. */
+.v3-admin-banner-page .v3-admin-banner-wrap{max-width:390px;margin:0 auto;padding:18px 16px 40px;font-family:'Pretendard',sans-serif;color:#1d1c18}
+.v3-admin-banner-wrap>header{background:#fae04b;margin:18px -16px 24px;padding:16px;min-height:88px;box-sizing:border-box}
+.v3-admin-banner-wrap>header h1{font-weight:700;font-size:23px;line-height:35px;margin:0}
+.v3-admin-banner-wrap>header p{font-size:12px;line-height:18px;margin:0}
+.v3-admin-banner-summary{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.v3-admin-banner-summary strong{font-size:14px}.v3-admin-banner-wrap button{border:1px solid #e7e0d6;background:white;border-radius:6px;padding:12px;font:600 14px/20px 'Pretendard',sans-serif;color:#1d1c18}
+.v3-admin-banner-summary button,.v3-admin-banner-actions button:last-child{background:#fae04b;border-color:#fae04b}
+.v3-admin-banner-record{padding-bottom:22px;margin-bottom:28px;border-bottom:1px solid #e7e0d6}.v3-admin-banner-record>img,.v3-admin-banner-preview{display:block;width:100%;aspect-ratio:390/196;object-fit:cover;background:#fae04b}
+.v3-admin-banner-record h2{font-size:18px;line-height:27px;margin:12px 0 4px}.v3-admin-banner-record p{font-size:12px;color:#77736a}.v3-admin-banner-actions{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.v3-admin-banner-wrap button:disabled{opacity:.45;cursor:not-allowed}.v3-admin-banner-editor{display:grid;gap:12px;padding:16px;margin-bottom:26px;background:#faf8f3}
+.v3-admin-banner-editor h2{font-size:18px}.v3-admin-banner-editor label{display:grid;gap:5px;font-size:13px;font-weight:600}.v3-admin-banner-editor label:has([type=checkbox]){display:flex;align-items:center}.v3-admin-banner-editor input:not([type=checkbox]),.v3-admin-banner-editor select{max-width:100%;min-height:44px;border:1px solid #e7e0d6;background:white;border-radius:5px;font:14px 'Pretendard',sans-serif;padding:8px;box-sizing:border-box}

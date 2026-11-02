@@ -1,9 +1,11 @@
 'use client';
 import Link from 'next/link';
 import {usePathname} from 'next/navigation';
-import {useEffect,useState} from 'react';
+import {useContext,useEffect,useState} from 'react';
+import {AdminSessionContext} from './AdminSessionContext.js';
 export default function SiteHeader({member=null,onLogout=null,onLogin=null}){
  const pathname=usePathname()||'/';
+ const adminSession=useContext(AdminSessionContext);
  const inGo=pathname.startsWith('/go');
  const inAdmin=pathname.startsWith('/admin');
  const [open,setOpen]=useState(false);
@@ -13,7 +15,7 @@ export default function SiteHeader({member=null,onLogout=null,onLogin=null}){
  return <header className={'v3-header'+(inGo?' v3-header-go':'')+(inAdmin?' v3-header-admin':'')}>
   <div className="v3-header-inner">
    {inGo?<><button type="button" className="v3-hamburger" onClick={()=>setOpen(value=>!value)} aria-label="멍기록가 메뉴 열기" aria-expanded={open}><span/><span/><span/></button><Link className="v3-go-brand" href="/go">멍멍GO!</Link><div className="v3-header-fill"/>{member?<><span className="v3-member-greet">{member.nickname}님 안녕하세요</span><button className="v3-header-logout" onClick={onLogout}>로그아웃</button></>:<button className="v3-header-logout" onClick={onLogin}>회원가입 / 로그인</button>}</>:
-   <><Link className="v3-brand" href={inAdmin?'/admin':'/'}>{inAdmin?'바로나도 관리자':'바로나도'}</Link><nav aria-label="주요 메뉴" className="v3-main-nav">{links.map(([href,label])=><Link key={href} href={href} aria-current={pathname===href?'page':undefined}>{label}</Link>)}</nav></>}
+   <><Link className="v3-brand" href={inAdmin?'/admin':'/'}>{inAdmin?'바로나도 관리자':'바로나도'}</Link>{inAdmin&&adminSession&&<button className="v10-admin-logout" onClick={adminSession.logout} disabled={adminSession.busy}>로그아웃</button>}<nav aria-label="주요 메뉴" className="v3-main-nav">{links.map(([href,label])=><Link key={href} href={href} aria-current={pathname===href?'page':undefined}>{label}</Link>)}</nav></>}
   </div>
   {open&&<div className="v3-menu-scrim" onClick={()=>setOpen(false)} role="presentation"><nav className="v3-menu-drawer" aria-label="멍기록가 메뉴" onClick={e=>e.stopPropagation()}><div className="v3-menu-title">멍기록가 메뉴<button type="button" aria-label="메뉴 닫기" onClick={()=>setOpen(false)}>×</button></div>{links.map(([href,label])=><Link href={href} key={href} aria-current={pathname===href?'page':undefined} onClick={()=>setOpen(false)}>{label}</Link>)}</nav></div>}
  </header>;

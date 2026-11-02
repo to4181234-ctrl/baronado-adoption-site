@@ -1,0 +1,11 @@
+{
+  "syntheticBackend": true,
+  "results": [
+    "response retry retains one card, one image and original ratings/title",
+    "concurrent same-ID saves converge to one card without deleting another upload",
+    "committed insert with lost response preserves image and replays success",
+    "confirmed insert failure cleans only its own image",
+    "another owner request ID is rejected without upload",
+    "malformed request ID rejected"
+  ]
+}

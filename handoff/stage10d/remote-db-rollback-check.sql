@@ -1,0 +1,70 @@
+BEGIN;
+SET LOCAL lock_timeout='5s';
+DO $$
+DECLARE a uuid:=gen_random_uuid(); b uuid:=gen_random_uuid(); d1 uuid; d2 uuid;
+ c1 uuid:=gen_random_uuid(); c2 uuid:=gen_random_uuid(); c3 uuid:=gen_random_uuid(); c4 uuid:=gen_random_uuid();
+ banner1 uuid; banner2 uuid:=gen_random_uuid(); banner3 uuid:=gen_random_uuid(); rejected boolean;
+BEGIN
+ SELECT id INTO d1 FROM public.dogs WHERE name='깡지' LIMIT 1;
+ SELECT id INTO d2 FROM public.dogs WHERE id<>d1 AND category='adoption' LIMIT 1;
+ ASSERT d1 IS NOT NULL AND d2 IS NOT NULL,'fixture requires two dogs';
+ INSERT INTO public.go_members(id,nickname,nickname_key,password_hash,recovery_hash,avatar_dog)
+ VALUES(a,'배포검증A','deploy-check-'||a,'unused','unused','깡지'),(b,'배포검증B','deploy-check-'||b,'unused','unused','깡지');
+ INSERT INTO public.go_cards(id,member_id,dog_id,image_path,photo_style,title) VALUES
+ (c1,a,d1,'deploy-rollback/'||c1,'original','rollback test'),(c2,a,d1,'deploy-rollback/'||c2,'original','rollback test'),
+ (c3,a,d2,'deploy-rollback/'||c3,'original','rollback test'),(c4,b,d1,'deploy-rollback/'||c4,'original','rollback test');
+ ASSERT (SELECT count(*) FROM public.go_battle_card_stats WHERE card_id IN(c1,c2,c3,c4))=4,'battle stats trigger';
+ rejected:=false;
+ BEGIN INSERT INTO public.go_reports(member_id,card_id,reason,reason_detail) VALUES(b,c1,'other',repeat('가',9));
+ EXCEPTION WHEN check_violation THEN rejected:=true; END;
+ ASSERT rejected,'9-char other rejected';
+ INSERT INTO public.go_reports(member_id,card_id,reason,reason_detail) VALUES(b,c1,'other',repeat('가',10));
+ rejected:=false;
+ BEGIN INSERT INTO public.go_reports(member_id,card_id,reason) VALUES(b,c1,'spam');
+ EXCEPTION WHEN unique_violation THEN rejected:=true; END;
+ ASSERT rejected,'duplicate report rejected';
+ rejected:=false;
+ BEGIN UPDATE public.go_reports SET reason_detail=repeat('가',301) WHERE member_id=b;
+ EXCEPTION WHEN check_violation THEN rejected:=true; END;
+ ASSERT rejected,'301-char report rejected';
+ UPDATE public.go_reports SET reason_detail=repeat('가',300),status='reviewed',reviewed_at=now() WHERE member_id=b;
+ ASSERT (SELECT status FROM public.go_cards WHERE id=c1)='approved','report review does not hide';
+ ASSERT NOT has_table_privilege('anon','public.go_reports','SELECT'),'anon reports denied';
+ ASSERT NOT has_table_privilege('authenticated','public.go_reports','INSERT'),'authenticated reports denied';
+ ASSERT has_table_privilege('service_role','public.go_reports','SELECT,INSERT,UPDATE'),'server reports permitted';
+ SELECT id INTO banner1 FROM public.site_banners ORDER BY sort_order LIMIT 1;
+ ASSERT (SELECT count(*) FROM public.site_banners)=1,'default banner only before rollback test';
+ INSERT INTO public.site_banners(id,title,image_url,image_alt,enabled) VALUES
+ (banner2,'배포 검증 2','/figma-v3/hero-logo.svg','검증',false),(banner3,'배포 검증 3','/figma-v3/hero-logo.svg','검증',true);
+ rejected:=false;
+ BEGIN INSERT INTO public.site_banners(title,image_url) VALUES('fourth','/figma-v3/hero-logo.svg');
+ EXCEPTION WHEN raise_exception THEN rejected:=true; END;
+ ASSERT rejected,'hidden banner counts toward three';
+ PERFORM public.go_reorder_site_banners(ARRAY[banner3,banner1,banner2],ARRAY[banner2]);
+ ASSERT (SELECT sort_order=0 AND NOT enabled FROM public.site_banners WHERE id=banner3),'order and visibility together';
+ ASSERT (SELECT enabled FROM public.site_banners WHERE id=banner2),'chosen visibility';
+ rejected:=false;
+ BEGIN PERFORM public.go_reorder_site_banners(ARRAY[banner1]);
+ EXCEPTION WHEN serialization_failure THEN rejected:=true; END;
+ ASSERT rejected,'incomplete reorder rejected';
+ rejected:=false;
+ BEGIN PERFORM public.go_reorder_site_banners(ARRAY[banner1,banner1,banner3]);
+ EXCEPTION WHEN serialization_failure THEN rejected:=true; END;
+ ASSERT rejected,'duplicate reorder rejected';
+ ASSERT NOT has_function_privilege('anon','public.go_reorder_site_banners(uuid[],uuid[])','EXECUTE'),'anon RPC denied';
+ ASSERT NOT has_function_privilege('authenticated','public.go_reorder_site_banners(uuid[],uuid[])','EXECUTE'),'authenticated RPC denied';
+ ASSERT has_function_privilege('service_role','public.go_reorder_site_banners(uuid[],uuid[])','EXECUTE'),'server RPC permitted';
+ INSERT INTO public.go_affinity(member_id,dog_id,level) VALUES(a,d1,5),(a,d2,5),(b,d1,5);
+ INSERT INTO public.go_interactions(member_id,dog_id,action) VALUES(a,d1,'snack');
+ DELETE FROM public.go_cards WHERE id=c1;
+ ASSERT (SELECT level FROM public.go_affinity WHERE member_id=a AND dog_id=d1)=5,'remaining card preserves affinity';
+ ASSERT (SELECT avatar_dog FROM public.go_members WHERE id=a)='깡지','remaining card preserves avatar';
+ DELETE FROM public.go_cards WHERE id=c2;
+ ASSERT NOT EXISTS(SELECT FROM public.go_affinity WHERE member_id=a AND dog_id=d1),'last card clears affinity';
+ ASSERT NOT EXISTS(SELECT FROM public.go_interactions WHERE member_id=a AND dog_id=d1),'last card clears interaction';
+ ASSERT (SELECT avatar_dog IS NULL FROM public.go_members WHERE id=a),'last card clears avatar';
+ ASSERT (SELECT level FROM public.go_affinity WHERE member_id=b AND dog_id=d1)=5,'other member preserved';
+ ASSERT (SELECT level FROM public.go_affinity WHERE member_id=a AND dog_id=d2)=5,'other dog preserved';
+END $$;
+ROLLBACK;
+SELECT 'PASS: remote PostgreSQL assertions completed; all fixture changes rolled back' AS result;

@@ -1,4 +1,5 @@
 'use client';
+import {AdminSessionContext} from './AdminSessionContext.js';
 
 import { useEffect, useState } from 'react';
 import SiteHeader from './SiteHeader';
@@ -70,13 +71,7 @@ export default function AdminGuard({ children }) {
   };
 
   if (status === 'authorized') {
-    return <>
-      <div className="admin-session-bar">
-        <span>관리자 모드</span>
-        <button type="button" onClick={logout} disabled={busy}>로그아웃</button>
-      </div>
-      {children}
-    </>;
+    return <AdminSessionContext.Provider value={{logout,busy}}>{children}</AdminSessionContext.Provider>;
   }
 
   return <main className="site-shell v3-site v3-admin-login-site">

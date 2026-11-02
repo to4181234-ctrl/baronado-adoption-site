@@ -1,8 +1,9 @@
 import sharp from 'sharp';
+import { randomInt } from 'node:crypto';
+import {drawGoCardRatings} from '../../../../lib/goCardDraw.js';
 import { adminDatabase, validId } from '../../../../lib/server/adminData.js';
 import { goError, goMember, goMutationAllowed } from '../../../../lib/server/goAuth.js';
 import { loadGoCards } from '../../../../lib/server/goCards.js';
-import { validateRatings } from '../../../../lib/goRatings.js';
 import { parseBulkCardIds } from '../../../../lib/goBulkDelete.js';
 
 export const runtime = 'nodejs';
@@ -72,13 +73,21 @@ export async function POST(request) {
     const form = await request.formData();
     const dogId = form.get('dogId');
     const title = form.get('title');
-    const description = form.get('description');
     const file = form.get('photo');
-    let ratings;
-    try { ratings = validateRatings(JSON.parse(form.get('ratings') || '{}')); }
-    catch { return goError('귀여움·매력·애교를 모두 1~5점으로 선택해주세요.'); }
-    if (!validId(dogId) || typeof title !== 'string' || !title.trim() || title.trim().length > 80 || typeof description !== 'string' || !description.trim() || description.trim().length > 200 || !file || typeof file.arrayBuffer !== 'function') return goError('제목, 사진과 기록을 확인해주세요.');
+    const suppliedId = form.get('requestId');
+    if (suppliedId !== null && !validId(suppliedId)) return goError('저장 요청을 확인해주세요.');
+    const cardId = suppliedId || crypto.randomUUID();
+    if (!validId(dogId) || typeof title !== 'string' || !title.trim() || title.trim().length > 30 || !file || typeof file.arrayBuffer !== 'function') return goError('제목, 사진과 기록을 확인해주세요.');
     if (!['image/webp', 'image/png'].includes(file.type) || file.size < 1000 || file.size > 3 * 1024 * 1024) return goError('촬영 사진은 3MB 이하로 저장해주세요.');
+    const replay = async () => {
+      const { data, error } = await db.from('go_cards').select('id,member_id,dog_id,status,captured_at').eq('id',cardId).maybeSingle();
+      if (error) throw error;
+      if (!data) return null;
+      if (data.member_id !== member.id || data.dog_id !== dogId) return goError('다른 저장 요청과 겹쳤어요. 다시 촬영해주세요.',409);
+      return Response.json({id:data.id,status:data.status,capturedAt:data.captured_at},{status:200});
+    };
+    const existing = await replay();
+    if (existing) return existing;
     const { data: dog } = await db.from('dogs').select('id,category,adopted').eq('id', dogId).maybeSingle();
     if (!dog || dog.category !== 'adoption' || dog.adopted) return goError('현재 기록할 수 없는 멍멍이예요.', 409);
     const raw = Buffer.from(await file.arrayBuffer());
@@ -87,11 +96,25 @@ export async function POST(request) {
     if (meta.width < 300 || meta.height < 300 || meta.width > 2500 || meta.height > 2500 || !['webp', 'png'].includes(meta.format)) return goError('사진 크기나 형식을 확인해주세요.');
     const output = await image.webp({ quality: 82 }).toBuffer();
     if (output.length > 3 * 1024 * 1024) return goError('사진 용량을 줄여 다시 시도해주세요.');
-    savedPath = `${member.id}/${crypto.randomUUID()}.webp`;
-    const upload = await db.storage.from('go-cards').upload(savedPath, output, { contentType: 'image/webp', upsert: false });
-    if (upload.error) throw upload.error;
-    const { data, error } = await db.from('go_cards').insert({ dog_id: dogId, member_id: member.id, image_path: savedPath, photo_style: 'original', status:'approved', title: title.trim(), description: description.trim(), ...ratings }).select('id,captured_at').single();
-    if (error) throw error;
+    const uploadPath = `${member.id}/${cardId}.webp`;
+    const upload = await db.storage.from('go-cards').upload(uploadPath, output, { contentType: 'image/webp', upsert: false });
+    if (upload.error) {
+      const completed = await replay();
+      if (completed) return completed;
+      if (['409','Duplicate'].includes(String(upload.error.statusCode)) || upload.error.error === 'Duplicate') return goError('카드를 저장하고 있어요. 잠시 후 같은 사진으로 다시 시도해주세요.',409);
+      throw upload.error;
+    }
+    savedPath = uploadPath;
+    // One go_cards row is also the public post via go_card_index; status approved publishes immediately.
+    savedPath = null;
+    const { data, error } = await db.from('go_cards').insert({ id:cardId, dog_id: dogId, member_id: member.id, image_path: savedPath, photo_style: 'original', status:'approved', title: title.trim(), description: title.trim(), ...drawGoCardRatings(randomInt) }).select('id,captured_at').single();
+    if (error) {
+      // A lost insert response must not delete an image belonging to a committed card.
+      const completed = await replay();
+      if (completed) { savedPath = null; return completed; }
+      savedPath = uploadPath;
+      throw error;
+    }
     return Response.json({ id: data.id, status: 'approved', capturedAt: data.captured_at }, { status: 201 });
   } catch {
     if (savedPath) await adminDatabase().storage.from('go-cards').remove([savedPath]);

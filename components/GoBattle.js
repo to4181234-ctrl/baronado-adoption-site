@@ -4,28 +4,19 @@ import Link from 'next/link';
 import GoShell,{useGoSession} from './GoShell.js';
 import {createBattleSound,BATTLE_SOUND_KEY} from '../lib/goBattleSound.js';
 import './GoBattle.css';
+import GoCardFace from './GoCardFace.js';
 
-const initial={cards:[],hasMore:false,total:0};
+const initial={cards:[],hasMore:false,total:0,eligibleDogKinds:0};
 function BattleCard({card,selected,onSelect,disabled=false,mini=false}){
- const stats=card.battle;
  return <button type="button" className={'meong-battle-card'+(selected?' is-picked':'')+(mini?' is-mini':'')} onClick={onSelect} disabled={disabled||!onSelect} aria-pressed={Boolean(selected)}>
-  <img className="meong-battle-frame" src="/figma-preview/card-frame.svg" alt=""/>
-  <span className="meong-card-content">
-   <span className="meong-card-brand">MEONG MEONG GO!</span>
-   <img className="meong-card-photo" src={card.imageUrl} alt={card.dogName+' 카드 사진'}/>
-   <span className="meong-card-element">{stats?.element||'속성 확인'}</span>
-   <strong>{card.dogName}</strong>
-   <span className="meong-card-rating">파워 <em>{stats?.power?'★'.repeat(stats.power):'-'}</em></span>
-   <span className="meong-card-rating">애교 <em>{stats?.charm?'★'.repeat(stats.charm):'-'}</em></span>
-   <span className="meong-card-author">BY. {card.nickname}<small>{card.capturedAt?new Date(card.capturedAt).toLocaleDateString('ko-KR') : ''}</small></span>
-  </span>{selected&&<span className="meong-card-selected">✓</span>}
+  <GoCardFace card={card}/>{selected&&<span className="meong-card-selected">✓</span>}
  </button>;
 }
 function Game(){
  const {member,ready,openAccount}=useGoSession();
  const [tab,setTab]=useState('all'),[query,setQuery]=useState(''),[searched,setSearched]=useState('');
  const [order,setOrder]=useState('newest'),[page,setPage]=useState(0);
- const [data,setData]=useState(initial),[loading,setLoading]=useState(false),[error,setError]=useState('');
+ const [data,setData]=useState(initial),[loading,setLoading]=useState(true),[error,setError]=useState('');
  const [selected,setSelected]=useState([]),[phase,setPhase]=useState('choose');
  const [colliding,setColliding]=useState(false),[result,setResult]=useState(null),[mutating,setMutating]=useState(false);
  const [soundEnabled,setSoundEnabled]=useState(false),[soundReady,setSoundReady]=useState(false);
@@ -40,7 +31,7 @@ function Game(){
   if(phase!=='choose'||!card.battle)return;
   const old=selected.some(c=>c.id===card.id);
   if(old){setSelected(list=>list.filter(c=>c.id!==card.id));sounds.current?.play('deselect');return;}
-  if(selected.length===2)return;
+  if(selected.length===2){setError('카드는 2장까지만 선택할 수 있어요. 기존 선택을 해제해주세요.');return;}
   if(selected.some(c=>c.dogId===card.dogId)){setError('서로 다른 강아지 카드를 골라주세요.');return;}
   setError('');setSelected(list=>[...list,card]);
   sounds.current?.play(selected.length===1?'ready':'select');
@@ -52,7 +43,7 @@ function Game(){
   try{
    const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,secondId:selected[1].id})});
    const body=await response.json();
-   if(!response.ok)throw Error(body.error||'대결 결과를 저장하지 못했어요.');
+   if(!response.ok){if(response.status===409){setSelected([]);setResult(null);}throw Error(body.error||'대결 결과를 저장하지 못했어요.');}
    setResult(body.battle);setPhase('result');sounds.current?.play(body.battle.winner==='draw'?'draw':body.battle.winner==='first'?'victory':'defeat');
   }catch(e){setError(e.message);setPhase('choose');}
   finally{setMutating(false);}
@@ -70,19 +61,20 @@ function Game(){
  const winner=result?.winner==='first'?first:result?.winner==='second'?second:null;
  const spriteMap={'깡지':'dog-kangji.png','버디':'dog-buddy.png','뽀실':'dog-pposil.png','구름':'dog-gureum.png','오레오':'dog-oreo.png'};
  const sprite=c=>spriteMap[c?.dogName]?'/figma-preview/'+spriteMap[c.dogName]:c?.imageUrl;
+ const insufficient=phase==='choose'&&!loading&&!error&&!searched&&tab==='all'&&data.eligibleDogKinds<2;
  return <div className={"meong-battle-app meong-battle-phase-"+phase}>
   
   {!ready?<p role="status">도감을 준비하고 있어요.</p>:!member?<section className="meong-battle-login"><h2>멍배틀을 시작해볼까요?</h2><p>서로 다른 멍카드 2장을 모아 대결하고 나만의 전적을 쌓아보세요!</p><button onClick={openAccount}>로그인하고 시작하기</button></section>:<>
-  {phase==='choose'&&<>
+  {insufficient?<section className="meong-battle-shortage" role="status"><h1>새로운 멍멍이를 만나볼까요?</h1><img src="/figma-battle/insufficient-kangji.svg" alt="깡지 픽셀 캐릭터"/><p>서로 다른 강아지 카드<br/>2장이 있어야 대결할 수 있어요.</p><Link className="meong-battle-primary" href="/go">카드 수집하러가기</Link><Link className="meong-battle-secondary" href="/go">도감으로</Link></section>:phase==='choose'&&<>
    <h1>멍배틀</h1><p className="meong-battle-hint">서로 다른 강아지 카드 2장을 골라주세요</p>
-   <button className="meong-battle-start-link" disabled={selected.length!==2} onClick={start}>선택한 2장으로 멍배틀하기 &gt;</button>
+   <button className="meong-battle-start-link" disabled={selected.length!==2||mutating} onClick={start}>선택한 2장으로 멍배틀하기 &gt;</button>
    <div className="meong-battle-tabs"><button className={tab==='mine'?'active':''} onClick={()=>changeTab('mine')}>내 카드</button><button className={tab==='all'?'active':''} onClick={()=>changeTab('all')}>모두의 카드</button><span>선택 {selected.length}/2</span></div>
    <form className="meong-battle-search" onSubmit={e=>{e.preventDefault();setPage(0);setSearched(query);}}><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="제목·작성자·강아지 이름"/><button type="submit">검색</button></form>
    <div className="meong-battle-sort">등록 순서 | <button onClick={()=>{setPage(0);setOrder(x=>x==='newest'?'oldest':'newest');}}>{order==='newest'?'최신순':'오래된순'}⌄</button><span>전체 {data.total}장</span></div>
-   <div className="meong-battle-chosen">{selected.length===0&&<span className="meong-battle-chosen-placeholder">고른 카드 2장을 이곳에서 확인할 수 있어요.</span>}{selected.map(c=><button key={c.id} onClick={()=>choose(c)}>{c.dogName} · {c.title} ×</button>)}</div>
+   <div className="meong-battle-chosen" aria-label="선택한 카드">{selected.length===0&&<span className="meong-battle-chosen-placeholder">고른 카드 2장을 이곳에서 확인할 수 있어요.</span>}{selected.map(c=><button type="button" key={c.id} onClick={()=>choose(c)} aria-label={c.dogName+' 카드 선택 해제'}>{c.dogName} · {c.title} ×</button>)}</div>
    {error&&<p className="meong-battle-error" role="alert">{error}</p>}
    {loading?<p className="meong-battle-empty">카드를 불러오는 중이에요.</p>:data.cards.length?<div className="meong-battle-grid">{data.cards.map(c=><div className="meong-battle-entry" key={c.id}><BattleCard card={c} onSelect={()=>choose(c)} selected={selected.some(v=>v.id===c.id)}/><span>{c.nickname} 멍기록가</span><small>{c.capturedAt?new Date(c.capturedAt).toLocaleDateString('ko-KR'):''}</small></div>)}</div>:<div className="meong-battle-empty">표시할 카드가 없어요. {tab==='mine'?'카드를 수집하러 가볼까요?':''}</div>}
-   <div className="meong-battle-pager"><button disabled={page===0||loading} onClick={()=>setPage(p=>p-1)}>‹ 이전</button><span>{page+1}</span><button disabled={!data.hasMore||loading} onClick={()=>setPage(p=>p+1)}>다음 ›</button></div>
+   {data.total>4&&<div className="meong-battle-pager"><button disabled={page===0||loading} onClick={()=>setPage(p=>p-1)}>‹ 이전</button><span>{page+1}</span><button disabled={!data.hasMore||loading} onClick={()=>setPage(p=>p+1)}>다음 ›</button></div>}
   </>}
   {phase==='fight'&&<section className="meong-battle-fight"><h1>두근두근, 멍배틀!</h1><div className={'meong-battle-versus'+(colliding?' is-colliding':'')}><BattleCard card={first} mini/><BattleCard card={second} mini/></div><strong>VS</strong><button className="meong-battle-primary" disabled={mutating} onClick={()=>completeRef.current()}>{mutating?'결과 기록 중…':'SKIP 후 결과보기'}</button></section>}
   {phase==='result'&&result&&<section className="meong-battle-result"><h1>이번 대결 승자는..</h1><div className="meong-battle-winner">{winner?<img src={sprite(winner)} alt={winner.dogName}/>:<><img src={sprite(first)} alt={first.dogName}/><img src={sprite(second)} alt={second.dogName}/></>}</div><h2>{winner?winner.dogName+' 카드 승리!':'막상막하!'}</h2><p>{winner?'이번 카드의 상성이 한 수 위였어요.':'두 카드의 매력을 가릴 수 없어요'}</p><div className="meong-battle-score">{first.dogName} {result.first_power+result.first_charm} + 상성 {result.first_bonus} → {result.first_score}<br/>{second.dogName} {result.second_power+result.second_charm} + 상성 {result.second_bonus} → {result.second_score}</div><button className="meong-battle-primary" onClick={reset}>다른 카드로 대결</button><Link className="meong-battle-secondary" href="/go">도감으로</Link></section>}

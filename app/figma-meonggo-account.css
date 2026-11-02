@@ -1,0 +1,238 @@
+/* Figma 2차 final account flows: 173:7614 (profile), 173:7650 (avatar),
+   173:7691 (settings), 173:6375 (withdraw). Artboards are 390px wide.
+   Scoped to these Next.js routes; not a global design-system override. */
+.v3-go-site .v3-account-figma,
+.v3-go-site .v3-withdraw-confirm-figma{
+  position:relative;box-sizing:border-box;max-width:390px;width:100%;min-height:802px;
+  margin:0 auto;padding:0!important;background:#fff;color:#181713;
+  font-family:"Pretendard Variable","Pretendard",sans-serif;
+}
+.v3-go-site .v3-account-figma *,
+.v3-go-site .v3-withdraw-confirm-figma *{box-sizing:border-box}
+.v3-go-site .v3-account-figma>.v3-back,
+.v3-go-site .v3-withdraw-confirm-figma>.v3-back{
+  position:absolute;top:16px;left:16px;width:90px;height:20px;display:block;margin:0!important;
+  padding:0;border:0;background:transparent;font-family:"Pretendard",sans-serif;
+  font-size:12px;line-height:18px;font-weight:400;color:#181713;text-decoration:none;
+}
+.v3-go-site .v3-account-figma>h1,
+.v3-go-site .v3-account-figma .v3-account-login-required>h1,
+.v3-go-site .v3-withdraw-confirm-figma>h1{
+  position:absolute;top:52px;left:16px;right:16px;margin:0!important;
+  color:#181713;font-family:"Gmarket Sans",sans-serif!important;
+  font-size:24px!important;line-height:36px!important;font-weight:500!important;letter-spacing:0!important;
+}
+.v3-go-site .v3-account-figma .v3-account-save{
+  position:absolute;top:556px;left:50%;transform:translateX(-50%);display:flex;
+  align-items:center;justify-content:center;width:min(210px,calc(100% - 32px));height:46px;
+  border:0;border-radius:8px;background:#f7d94d;color:#181713;
+  font-family:"Pretendard",sans-serif;font-size:14px;font-weight:700;line-height:21px;
+  padding:0!important;margin:0!important;cursor:pointer;
+}
+.v3-go-site .v3-account-figma .v3-account-save:disabled{opacity:.45;cursor:not-allowed}
+.v3-go-site .v3-account-figma .v3-account-login-required>p{
+  position:absolute;top:109px;left:16px;right:16px;margin:0;font-size:13px;line-height:19.5px;color:#817b70;
+}
+.v3-go-site .v3-account-figma .v3-account-login-required>.v3-account-save{top:270px}
+.v3-go-site .v3-account-figma .v3-message{position:absolute;top:610px;left:16px;right:16px;margin:0;font-size:12px;line-height:18px}
+.v3-go-site .v3-account-settings .v3-message{top:575px}
+/* Profile edit: original editable bounds, not CSS guessed margins. */
+.v3-go-site .v3-account-profile .v3-profile-edit-portrait{
+  position:absolute;top:109px;left:50%;transform:translateX(-50%);
+  margin:0!important;width:100px;height:100px;display:flex;align-items:center;justify-content:center;
+}
+.v3-go-site .v3-account-profile .v3-profile-edit-portrait img{
+  display:block;width:100px;height:100px;max-width:none;object-fit:contain;image-rendering:pixelated;
+}
+.v3-go-site .v3-account-profile .v3-outline-btn{
+  position:absolute;top:224px;left:50%;transform:translateX(-50%);
+  width:230px;height:46px;margin:0!important;padding:0!important;
+  border:1px solid #eae4d9;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-family:"Pretendard",sans-serif;font-weight:700;font-size:14px;line-height:21px;color:#181713;text-decoration:none;
+}
+.v3-go-site .v3-account-profile .v3-input-label{
+  position:absolute;left:16px;right:16px;margin:0!important;display:block;
+  font-family:"Pretendard",sans-serif;font-size:12px;font-weight:700;line-height:18px;color:#181713;
+}
+.v3-go-site .v3-account-profile .v3-account-nickname{top:304px}
+.v3-go-site .v3-account-profile .v3-account-bio{top:418px}
+.v3-go-site .v3-account-profile .v3-input-label>input,
+.v3-go-site .v3-account-profile .v3-input-label>textarea{
+  position:absolute;left:0;right:0;top:25px;box-sizing:border-box;
+  width:100%;margin:0!important;border:0!important;border-radius:6px!important;
+  background:#faf8f2!important;color:#181713!important;
+  font-family:"Pretendard",sans-serif!important;font-size:14px!important;font-weight:400!important;
+  line-height:21px!important;padding:10px 12px!important;resize:none;
+}
+.v3-go-site .v3-account-profile .v3-account-nickname input{height:44px}
+.v3-go-site .v3-account-profile .v3-account-bio textarea{height:68px}
+.v3-go-site .v3-account-profile .v3-input-label>small{
+  position:absolute;left:0;top:74px;margin:0!important;display:block;
+  font-family:"Pretendard",sans-serif;font-size:11px!important;font-weight:400!important;line-height:15.95px!important;color:#85857d;
+}
+.v3-go-site .v3-account-profile .v3-account-bio>small{top:99px}
+/* Avatar: tiles 110 x 138, x=16/140/264, y=194/350 of full 390px frame. */
+.v3-go-site .v3-account-avatar>.v3-settings-note{
+  position:absolute;left:16px;right:16px;top:109px;margin:0!important;
+  font-family:"Pretendard",sans-serif;font-size:12px!important;font-weight:400!important;
+  line-height:18px!important;color:#817b70!important;
+}
+.v3-go-site .v3-account-avatar .v3-avatar-grid{
+  position:absolute;top:152px;left:16px;right:16px;margin:0!important;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:14px;row-gap:18px;
+}
+.v3-go-site .v3-account-avatar .v3-avatar-grid button{
+  height:138px;min-height:138px;width:100%;padding:8px 0 9px!important;
+  margin:0;border:0;border-radius:8px;background:#faf8f2;
+  color:#181713;display:flex;align-items:center;justify-content:space-between;flex-direction:column;gap:0;
+  opacity:1!important;cursor:pointer;
+}
+.v3-go-site .v3-account-avatar .v3-avatar-grid button.chosen{background:#f7d94d!important}
+.v3-go-site .v3-account-avatar .v3-avatar-grid button:disabled{cursor:not-allowed;opacity:1!important}
+.v3-go-site .v3-account-avatar .v3-avatar-grid img{
+  width:90px;height:90px;max-width:100%;object-fit:contain;image-rendering:pixelated;flex:none;
+}
+.v3-go-site .v3-account-avatar .v3-avatar-grid button.chosen img{width:98px;height:94px}
+.v3-go-site .v3-account-avatar .v3-avatar-grid span{
+  display:block;max-width:100%;font-family:"Gmarket Sans",sans-serif;font-size:13px!important;
+  font-weight:500;line-height:19.5px;text-align:center;white-space:nowrap;
+}
+/* Settings: exact block start coordinates, remove old flex-row spacing overrides. */
+.v3-go-site .v3-account-settings .v3-account-setting-row{position:absolute;left:16px;right:16px;height:91px;border:0;margin:0;padding:0}
+.v3-go-site .v3-account-settings .v3-account-setting-row::after{
+  content:"";position:absolute;height:1px;left:0;right:0;background:#eae4d9;
+}
+.v3-go-site .v3-account-settings .v3-account-setting-sound{top:152px}
+.v3-go-site .v3-account-settings .v3-account-setting-sound::after{top:90px}
+.v3-go-site .v3-account-settings .v3-account-setting-popup{top:274px;height:106px}
+.v3-go-site .v3-account-settings .v3-account-setting-popup::after{top:105px}
+.v3-go-site .v3-account-settings .v3-account-setting-row>strong{
+  position:absolute;left:0;top:0;font-family:"Pretendard",sans-serif;
+  font-size:17px!important;font-weight:700!important;line-height:25.5px;color:#181713;
+}
+.v3-go-site .v3-account-settings .v3-account-setting-row>button:not(.v3-account-reset){
+  position:absolute;top:0;right:0;width:72px;height:26px;
+  border:0;border-radius:3px;background:#f7d94d;color:#181713;
+  font-family:"Pretendard",sans-serif;font-size:11px!important;font-weight:700;line-height:16.5px;
+  margin:0!important;padding:0!important;
+}
+.v3-go-site .v3-account-settings .v3-account-setting-row>button[aria-pressed="false"]{background:#dedbd4}
+.v3-go-site .v3-account-settings .v3-account-setting-row>small{
+  position:absolute;left:0;top:39px;font-family:"Pretendard",sans-serif;
+  font-size:12px!important;line-height:18px!important;font-weight:400!important;color:#817b70;
+}
+.v3-go-site .v3-account-settings .v3-account-reset{
+  position:absolute;top:53px;left:0;margin:0;padding:0;border:0;background:transparent;
+  font-family:"Pretendard",sans-serif;font-size:13px;line-height:19.5px;color:#181713;cursor:pointer;
+}
+.v3-go-site .v3-account-settings .v3-account-reset:disabled{opacity:.5}
+.v3-go-site .v3-account-settings>.v3-settings-note{
+  position:absolute;left:16px;right:16px;top:413px;margin:0!important;
+  font-family:"Pretendard",sans-serif;font-size:12px!important;line-height:18px!important;
+  font-weight:400;color:#817b70!important;
+}
+.v3-go-site .v3-account-settings>.v3-account-save{top:518px}
+.v3-go-site .v3-account-settings .v3-account-withdraw{
+  position:absolute;top:645px;left:16px;right:16px;display:flex;align-items:center;justify-content:center;
+  width:auto;height:44px;margin:0;padding:0;border:0;border-radius:6px;
+  background:#fade40;color:#0d0d0d;
+  font-family:"Pretendard",sans-serif;font-size:13px;font-weight:600;line-height:18.85px;
+}
+/* Withdrawal is a separate confirmed screen. No mutation occurs until authenticated action. */
+.v3-go-site .v3-withdraw-confirm-figma>h1{white-space:nowrap}
+.v3-go-site .v3-withdraw-confirm-figma>h1 span{font-family:"MonaS12",sans-serif;font-weight:700}
+.v3-go-site .v3-withdraw-scope,.v3-go-site .v3-withdraw-unrecoverable,
+.v3-go-site .v3-withdraw-final,.v3-go-site .v3-withdraw-ack{
+  position:absolute;left:16px;right:16px;margin:0;font-family:"Pretendard",sans-serif;
+}
+.v3-go-site .v3-withdraw-scope{top:134px;font-size:16px;line-height:24px;font-weight:400;color:#181713}
+.v3-go-site .v3-withdraw-unrecoverable{top:228px;font-size:13px;line-height:19.5px;color:#817b70}
+.v3-go-site .v3-withdraw-final{top:287px;font-size:13px;line-height:18.85px;color:#85857d}
+.v3-go-site .v3-withdraw-ack{top:340px;font-size:14px;line-height:21px;display:flex;gap:9px;align-items:center;cursor:pointer}
+.v3-go-site .v3-withdraw-ack input{width:16px;height:16px;margin:0;accent-color:#f7d94d}
+.v3-go-site .v3-withdraw-cancel,.v3-go-site .v3-withdraw-confirm-action{
+  position:absolute;left:16px;right:16px;width:auto;height:46px;display:flex;align-items:center;justify-content:center;
+  border:0;border-radius:8px;font-family:"Pretendard",sans-serif;font-size:14px;line-height:21px;font-weight:700;text-decoration:none;
+}
+.v3-go-site .v3-withdraw-cancel{top:418px;background:#f7d94d;color:#181713}
+.v3-go-site .v3-withdraw-confirm-action{top:480px;background:#fff1ed;border:1px solid #eae4d9;color:#a13c2c;cursor:pointer}
+.v3-go-site .v3-withdraw-confirm-action:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:370px){.v3-go-site .v3-account-avatar .v3-avatar-grid{column-gap:9px}}
+@media(prefers-reduced-motion:reduce){.v3-go-site .v3-account-figma *, .v3-go-site .v3-withdraw-confirm-figma *{scroll-behavior:auto}}
+/* Figma 173:9115 — game guide text and six unchanged 64×64 pixel sources. */
+.v3-go-site .v3-guide-figma{
+  position:relative;width:100%;max-width:390px;min-height:1328px;box-sizing:border-box;
+  padding:0!important;margin:0 auto;background:#fff;color:#181713;
+  font-family:"Pretendard",sans-serif;
+}
+.v3-go-site .v3-guide-figma .v3-back{
+  position:absolute;top:16px;left:16px;width:90px;height:20px;margin:0!important;
+  padding:0;font:400 12px/18px "Pretendard",sans-serif;color:#181713;
+}
+.v3-go-site .v3-guide-figma>h1{
+  position:absolute;top:57px;left:16px;right:16px;margin:0!important;
+  font-family:"Gmarket Sans",sans-serif!important;font-size:24px!important;font-weight:500!important;
+  letter-spacing:0!important;line-height:36px!important;color:#181713;
+}
+.v3-go-site .v3-guide-figma .v3-guide-steps{
+  position:absolute;top:124px;left:16px;right:16px;margin:0!important;padding:0;
+}
+.v3-go-site .v3-guide-figma .v3-guide-steps section{
+  position:relative;height:127px;border:0!important;padding:0!important;margin:0!important;
+}
+.v3-go-site .v3-guide-figma .v3-guide-steps section::after{
+  content:"";position:absolute;top:91px;left:0;right:0;height:1px;background:#eae4d9;
+}
+.v3-go-site .v3-guide-figma .v3-guide-steps h2{
+  position:absolute;top:0;left:0;right:0;font:700 18px/27px "Pretendard",sans-serif!important;
+  color:#181713;margin:0!important;
+}
+.v3-go-site .v3-guide-figma .v3-guide-steps p{
+  position:absolute;top:39px;left:0;right:0;font:400 13px/19.5px "Pretendard",sans-serif!important;
+  color:#817b70;margin:0!important;
+}
+.v3-go-site .v3-guide-figma .v3-guide-elements-title{
+  position:absolute;top:629px;left:16px;right:16px;margin:0!important;
+  font:700 18px/27px "Pretendard",sans-serif!important;color:#181713;
+}
+.v3-go-site .v3-guide-figma .v3-guide-element-grid{
+  position:absolute;left:12px;top:691px;display:grid;grid-template-columns:repeat(3,120px);
+  grid-template-rows:100px 100px;column-gap:0;row-gap:0;margin:0;padding:0;
+}
+.v3-go-site .v3-guide-figma .v3-guide-element{
+  position:relative;width:120px;height:100px;margin:0;padding:0;border:0;
+}
+.v3-go-site .v3-guide-figma .v3-guide-element img{
+  position:absolute;top:0;left:28px;width:64px;height:64px;max-width:none;display:block;
+  object-fit:contain;image-rendering:pixelated;
+}
+.v3-go-site .v3-guide-figma .v3-guide-element span{
+  position:absolute;left:18px;top:66px;display:block;width:100px;margin:0;
+  font:400 12px/18px "Pretendard",sans-serif;color:#817b70;
+}
+.v3-go-site .v3-guide-figma .v3-guide-cycle,
+.v3-go-site .v3-guide-figma .v3-guide-rules,
+.v3-go-site .v3-guide-figma .v3-guide-footnote,
+.v3-go-site .v3-guide-figma .v3-guide-affinity-text{
+  position:absolute;left:16px;right:16px;margin:0!important;
+  font-family:"Pretendard",sans-serif;font-weight:400;font-size:12px;line-height:18px;color:#817b70;
+}
+.v3-go-site .v3-guide-figma .v3-guide-cycle{top:905px}
+.v3-go-site .v3-guide-figma .v3-guide-rules{top:951px}
+.v3-go-site .v3-guide-figma .v3-guide-footnote{top:1051px;font-size:11px;line-height:16.5px}
+.v3-go-site .v3-guide-figma .v3-guide-affinity-title{
+  position:absolute;top:1128px;left:16px;right:16px;margin:0!important;
+  font:600 18px/26.1px "Pretendard",sans-serif;color:#0d0d0d;
+}
+.v3-go-site .v3-guide-figma .v3-guide-affinity-text{
+  top:1168px;font-size:12px;line-height:17.4px;color:#0d0d0d;
+}
+@media(max-width:389px){
+  .v3-go-site .v3-guide-figma .v3-guide-element-grid{
+    left:max(0px,calc((100% - 360px) / 2));grid-template-columns:repeat(3,minmax(0,120px));
+    width:min(360px,100%);
+  }
+  .v3-go-site .v3-guide-figma .v3-guide-element{width:100%}
+  .v3-go-site .v3-guide-figma .v3-guide-element img{left:calc((100% - 64px) / 2)}
+  .v3-go-site .v3-guide-figma .v3-guide-element span{left:calc((100% - 100px) / 2)}
+}

@@ -11,8 +11,12 @@ export async function GET(request) {
   try {
     const params = new URL(request.url).searchParams;
     const page = Math.max(0, Math.min(1000, Number(params.get('page')) || 0));
-    const moderation = ['approved','rejected'].includes(params.get('status')) ? params.get('status') : 'approved';
-    return Response.json(await loadGoCards({ moderation, page, query: (params.get('q') || '').slice(0, 80) }), { headers: { 'Cache-Control': 'no-store' } });
+    const status=params.get('status');
+    const moderation = ['approved','rejected'].includes(status) ? status : 'approved';
+    const order = params.get('order') === 'oldest' ? 'oldest' : 'newest';
+    const dogId = params.get('dogId') || '';
+    if (dogId && !validId(dogId)) return Response.json({error:'강아지 필터를 확인해주세요.'},{status:400});
+    return Response.json(await loadGoCards({ moderation, adminAll:status==='all',limit:5, page, dogId:dogId||null, order, query: (params.get('q') || '').slice(0, 80) }), { headers: { 'Cache-Control': 'no-store' } });
   } catch { return Response.json({ error: '게시물을 가져오지 못했어요.' }, { status: 500 }); }
 }
 export async function PATCH(request) {
@@ -42,15 +46,17 @@ export async function DELETE(request) {
       try { ids = parseBulkCardIds(input.ids); }
       catch (error) { return Response.json({ error: error.message }, { status: 400 }); }
       const status = input.status;
-      if (!['approved','rejected'].includes(status)) return Response.json({ error: '공개·비공개 목록을 다시 선택해주세요.' }, { status: 400 });
+      if (!['all','approved','rejected'].includes(status)) return Response.json({ error: '공개·비공개 목록을 다시 선택해주세요.' }, { status: 400 });
       const db = adminDatabase();
-      const { data: matched, error: lookupError } = await db.from('go_cards')
-        .select('id').in('id', ids).eq('status', status);
+      let lookup=db.from('go_cards').select('id').in('id',ids);
+      if(status!=='all')lookup=lookup.eq('status',status);
+      const { data: matched, error: lookupError } = await lookup;
       if (lookupError) throw lookupError;
       if (matched.length !== ids.length) return Response.json({ error: '일부 게시물의 상태가 변경됐어요. 목록을 새로고침해주세요.' }, { status: 409 });
 
-      const { data: deleted, error } = await db.from('go_cards').delete()
-        .in('id', ids).eq('status', status).select('id,image_path');
+      let deletion=db.from('go_cards').delete().in('id',ids);
+      if(status!=='all')deletion=deletion.eq('status',status);
+      const { data: deleted, error } = await deletion.select('id,image_path');
       if (error) throw error;
       const files = (deleted || []).map(card => card.image_path).filter(Boolean);
       const cleanup = files.length ? await db.storage.from('go-cards').remove(files) : { error: null };

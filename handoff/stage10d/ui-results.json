@@ -1,0 +1,352 @@
+{
+  "syntheticBackend": true,
+  "results": [
+    {
+      "label": "admin-list-320",
+      "path": "/admin/go",
+      "errors": [],
+      "width": 320,
+      "scrollWidth": 320,
+      "brokenImages": []
+    },
+    {
+      "label": "admin-detail-320",
+      "path": "/admin/go",
+      "errors": [],
+      "width": 320,
+      "scrollWidth": 320,
+      "brokenImages": []
+    },
+    {
+      "label": "banner-list-320",
+      "path": "/admin/banners",
+      "errors": [],
+      "width": 320,
+      "scrollWidth": 320,
+      "brokenImages": []
+    },
+    {
+      "label": "banner-editor-320",
+      "path": "/admin/banners",
+      "errors": [],
+      "width": 320,
+      "scrollWidth": 320,
+      "brokenImages": []
+    },
+    {
+      "label": "battle-shortage-320",
+      "path": "/go/battle",
+      "errors": [],
+      "width": 320,
+      "scrollWidth": 320,
+      "brokenImages": []
+    },
+    {
+      "label": "admin-list-390",
+      "path": "/admin/go",
+      "errors": [],
+      "width": 390,
+      "scrollWidth": 390,
+      "brokenImages": []
+    },
+    {
+      "label": "admin-detail-390",
+      "path": "/admin/go",
+      "errors": [],
+      "width": 390,
+      "scrollWidth": 390,
+      "brokenImages": []
+    },
+    {
+      "label": "banner-list-390",
+      "path": "/admin/banners",
+      "errors": [],
+      "width": 390,
+      "scrollWidth": 390,
+      "brokenImages": []
+    },
+    {
+      "label": "banner-editor-390",
+      "path": "/admin/banners",
+      "errors": [],
+      "width": 390,
+      "scrollWidth": 390,
+      "brokenImages": []
+    },
+    {
+      "label": "battle-shortage-390",
+      "path": "/go/battle",
+      "errors": [],
+      "width": 390,
+      "scrollWidth": 390,
+      "brokenImages": []
+    },
+    {
+      "label": "admin-list-1440",
+      "path": "/admin/go",
+      "errors": [],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "brokenImages": []
+    },
+    {
+      "label": "admin-detail-1440",
+      "path": "/admin/go",
+      "errors": [],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "brokenImages": []
+    },
+    {
+      "label": "banner-list-1440",
+      "path": "/admin/banners",
+      "errors": [],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "brokenImages": []
+    },
+    {
+      "label": "banner-editor-1440",
+      "path": "/admin/banners",
+      "errors": [],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "brokenImages": []
+    },
+    {
+      "label": "battle-shortage-1440",
+      "path": "/go/battle",
+      "errors": [],
+      "width": 1440,
+      "scrollWidth": 1440,
+      "brokenImages": []
+    },
+    {
+      "label": "all-hidden-banners-collapse-after-atomic-save",
+      "passed": true
+    },
+    {
+      "label": "banner-image-description-persists",
+      "passed": true
+    },
+    {
+      "label": "three-record-limit-and-saved-reorder",
+      "passed": true
+    }
+  ],
+  "metrics": [
+    {
+      "width": 320,
+      "screen": "banner-list",
+      "geometry": [
+        {
+          "selector": "h1",
+          "x": 16,
+          "y": 106,
+          "width": 288,
+          "height": 35,
+          "font": "Pretendard, sans-serif"
+        },
+        {
+          "selector": ".v3-admin-banner-summary",
+          "x": 16,
+          "y": 202,
+          "width": 288,
+          "height": 44,
+          "font": "Pretendard, sans-serif"
+        },
+        {
+          "selector": ".v10-banner-art",
+          "x": 16,
+          "y": 268,
+          "width": 288,
+          "height": 144.734375,
+          "font": "Pretendard, sans-serif"
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "screen": "shortage",
+      "geometry": [
+        {
+          "selector": "h1",
+          "x": 16,
+          "y": 88,
+          "width": 288,
+          "height": 72
+        },
+        {
+          "selector": ".meong-battle-shortage>img",
+          "x": 80,
+          "y": 226,
+          "width": 160,
+          "height": 160
+        },
+        {
+          "selector": ".meong-battle-shortage>p",
+          "x": 16,
+          "y": 420,
+          "width": 288,
+          "height": 54
+        },
+        {
+          "selector": ".meong-battle-primary",
+          "x": 34.5,
+          "y": 514,
+          "width": 251,
+          "height": 46
+        },
+        {
+          "selector": ".meong-battle-secondary",
+          "x": 34.5,
+          "y": 576,
+          "width": 251,
+          "height": 46
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "screen": "banner-list",
+      "geometry": [
+        {
+          "selector": "h1",
+          "x": 16,
+          "y": 106,
+          "width": 358,
+          "height": 35,
+          "font": "Pretendard, sans-serif"
+        },
+        {
+          "selector": ".v3-admin-banner-summary",
+          "x": 16,
+          "y": 202,
+          "width": 358,
+          "height": 44,
+          "font": "Pretendard, sans-serif"
+        },
+        {
+          "selector": ".v10-banner-art",
+          "x": 16,
+          "y": 268,
+          "width": 358,
+          "height": 179.90625,
+          "font": "Pretendard, sans-serif"
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "screen": "shortage",
+      "geometry": [
+        {
+          "selector": "h1",
+          "x": 16,
+          "y": 88,
+          "width": 358,
+          "height": 36
+        },
+        {
+          "selector": ".meong-battle-shortage>img",
+          "x": 115,
+          "y": 190,
+          "width": 160,
+          "height": 160
+        },
+        {
+          "selector": ".meong-battle-shortage>p",
+          "x": 16,
+          "y": 384,
+          "width": 358,
+          "height": 54
+        },
+        {
+          "selector": ".meong-battle-primary",
+          "x": 69.5,
+          "y": 478,
+          "width": 251,
+          "height": 46
+        },
+        {
+          "selector": ".meong-battle-secondary",
+          "x": 69.5,
+          "y": 540,
+          "width": 251,
+          "height": 46
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "screen": "banner-list",
+      "geometry": [
+        {
+          "selector": "h1",
+          "x": 541,
+          "y": 106,
+          "width": 358,
+          "height": 35,
+          "font": "Pretendard, sans-serif"
+        },
+        {
+          "selector": ".v3-admin-banner-summary",
+          "x": 541,
+          "y": 202,
+          "width": 358,
+          "height": 44,
+          "font": "Pretendard, sans-serif"
+        },
+        {
+          "selector": ".v10-banner-art",
+          "x": 541,
+          "y": 268,
+          "width": 358,
+          "height": 179.90625,
+          "font": "Pretendard, sans-serif"
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "screen": "shortage",
+      "geometry": [
+        {
+          "selector": "h1",
+          "x": 541,
+          "y": 88,
+          "width": 358,
+          "height": 36
+        },
+        {
+          "selector": ".meong-battle-shortage>img",
+          "x": 640,
+          "y": 190,
+          "width": 160,
+          "height": 160
+        },
+        {
+          "selector": ".meong-battle-shortage>p",
+          "x": 541,
+          "y": 384,
+          "width": 358,
+          "height": 54
+        },
+        {
+          "selector": ".meong-battle-primary",
+          "x": 594.5,
+          "y": 478,
+          "width": 251,
+          "height": 46
+        },
+        {
+          "selector": ".meong-battle-secondary",
+          "x": 594.5,
+          "y": 540,
+          "width": 251,
+          "height": 46
+        }
+      ]
+    }
+  ]
+}

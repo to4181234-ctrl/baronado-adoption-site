@@ -1,0 +1,104 @@
+/* Stage 10: shared Figma card face and approved report/export interactions. */
+.v3-go-site .v6-public-post .v10-post-sparkle{position:absolute;pointer-events:none;z-index:1;max-width:none;object-fit:contain}
+.v3-go-site .v6-public-post .v10-post-sparkle-top{left:calc(50% + 41px);top:75px;width:200px;height:200px}
+.v3-go-site .v6-public-post .v10-post-sparkle-bottom{left:calc(50% - 205px);top:455px;width:157px;height:157px}
+.v3-go-site .v6-public-post .v10-post-sound{position:absolute;right:25px;top:20px;width:20px;height:20px;border:0;background:none;padding:0;z-index:3;cursor:pointer}
+.v3-go-site .v6-public-post .v10-post-sound img{display:block;width:20px;height:20px;object-fit:contain}
+.v3-go-site .v6-public-post .v6-post-author,.v3-go-site .v6-public-post .v6-post-date{left:-5.03px}
+.v3-go-site .v6-public-post .v6-post-actions{row-gap:22px;margin-top:37.19px}
+.v3-go-site .v6-public-post h1{left:-1px}
+.v3-go-site .v6-public-post .v6-report{margin-top:26px}
+.go-card-graphic{display:block;width:100%;height:100%;position:absolute;inset:0;overflow:hidden}
+.meong-battle-card>.go-card-graphic{pointer-events:none}
+.v10-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.v10-report-screen{position:fixed;z-index:180;top:42px;bottom:0;left:50%;transform:translateX(-50%);width:min(390px,100vw);box-sizing:border-box;overflow-y:auto;background:#fff;padding:16px;color:#181713;text-align:left}
+.v10-report-screen .v10-report-back{display:block;height:18px;padding:0;border:0;background:none;font:400 12px/18px 'Pretendard',sans-serif;color:inherit}
+.v10-report-screen h2{margin:18px 0 31px;font:500 24px/36px 'Gmarket Sans',sans-serif}
+.v10-report-screen fieldset{display:grid;gap:20px;margin:0;padding:0;border:0}
+.v10-report-option{position:relative;display:flex;align-items:center;justify-content:center;gap:3px;box-sizing:border-box;min-height:46px;margin:0;border:1px solid #eae4d9;border-radius:8px;font:700 14px/21px 'Pretendard',sans-serif;cursor:pointer}
+.v10-report-option input{position:absolute;opacity:0;width:1px;height:1px}
+.v10-report-option:has(input:focus-visible){outline:2px solid #181713;outline-offset:3px}
+.v10-report-details textarea{display:block;box-sizing:border-box;width:calc(100% - 2px);height:92px;border:0;border-radius:0;background:#f9f7f1;resize:vertical;padding:16px 13px;font:400 12px/18px 'Pretendard',sans-serif;margin:2px 0 0}
+.v10-report-submit{width:100%;height:46px;margin-top:28px;border:0;border-radius:8px;background:#f7d94d;color:#181713;font:700 14px/21px 'Pretendard',sans-serif;cursor:pointer}
+.v10-report-submit:disabled{opacity:.45;cursor:default}
+.go-title-editor{font-family:'Pretendard',sans-serif;color:#181713}
+.go-title-editor input{width:100%;box-sizing:border-box;min-height:44px}
+.go-title-editor small{display:block;text-align:right;margin:6px 0 16px}
+.go-title-editor .go-primary{background:#fade40;color:#181713}
+/* Export popup: Figma 173:7731, viewport-centered with scrolling on small devices. */
+.go-export-dialog{box-sizing:border-box;width:345px!important;max-width:calc(100vw - 32px)!important;max-height:calc(100dvh - 64px);overflow-y:auto;border-radius:8px;padding:28px 31px!important;font-family:'Pretendard',sans-serif;color:#181713}
+.go-export-dialog h2{font:700 24px/36px 'MonaS12',sans-serif;text-align:center;margin:0 0 20px}
+.go-export-dialog .go-export-preview{display:block;width:154px;max-width:100%;height:auto;aspect-ratio:166/265;margin:0 auto 36px;border:0;border-radius:0;object-fit:contain;box-shadow:none}
+.go-export-dialog .go-export-actions{display:grid;grid-template-columns:1fr;gap:16px}
+.go-export-dialog .go-export-actions>button{box-sizing:border-box;min-height:46px;border:1px solid #eae4d9;border-radius:8px;background:#fff;color:#181713;font:400 14px/21px 'Pretendard',sans-serif;padding:10px}
+.go-export-dialog .go-export-actions>button:first-child{border:0;background:#fade40}
+.go-export-dialog .go-export-actions .go-copy-link{min-height:32px;border:0;background:none;text-decoration:underline}
+.go-export-dialog .go-note{font:400 12px/18px 'Pretendard',sans-serif;margin:12px 0 0}
+.go-review-reports{margin-top:10px;font-size:12px;color:#181713}
+.go-review-reports summary{cursor:pointer}
+.go-review-reports section{padding:12px 0;border-bottom:1px solid #eae4d9}
+.go-review-reports p{white-space:pre-wrap;overflow-wrap:anywhere}
+.go-review-reports time{font-size:11px;color:#747474}
+.go-review-reports button{padding:8px;margin-top:8px}
+/* Also used by completion/viewer portals outside .v3-go-site. */
+.go-card-entry .go-card.go-card-v3{position:relative!important;display:block!important;width:100%!important;aspect-ratio:166/265!important;height:auto!important;min-height:0!important;padding:0!important;border:0!important;border-radius:0!important;background:#fff!important;overflow:hidden!important}
+
+/* Figma 173:7571: shortage is a complete state, not a warning within the picker. */
+.v3-go-app .meong-battle-shortage{padding:15px 0 40px;text-align:center;font-family:'MonaS12',sans-serif}
+.v3-go-app .meong-battle-shortage h1{font:700 24px/36px 'MonaS12',sans-serif;margin:0 0 66px;letter-spacing:0}
+.v3-go-app .meong-battle-shortage>img{display:block;width:160px;height:160px;margin:0 auto}
+.v3-go-app .meong-battle-shortage>p{font:400 18px/27px 'MonaS12',sans-serif;margin:34px 0 40px}
+.v3-go-app .meong-battle-shortage>a{width:min(100%,251px);height:46px;font:400 14px/21px 'MonaS12',sans-serif;border-radius:8px;margin:0 auto}
+.v3-go-app .meong-battle-shortage>a+a{margin-top:16px;background:#fff;border:1px solid #eae4d9}
+/* Shared authenticated admin header: Figma 44px row, no duplicated session bar. */
+.site-shell:has(.v3-header-admin){font-family:'Pretendard',sans-serif;background:#fff}
+.v3-header-admin{border:0!important}.v3-header-admin .v3-header-inner{height:45px;border-bottom:1px solid #e7e0d6;margin:0 auto;padding:0;max-width:358px;gap:0}
+.v3-header-admin .v3-brand{font:700 14px/21px 'Pretendard',sans-serif}
+.v10-admin-logout{margin-left:auto;border:0;background:transparent;padding:0;color:#1d1c18;font:400 12px/18px 'Pretendard',sans-serif}
+@media(max-width:389px){.v3-header-admin .v3-header-inner{margin:0 16px}}
+.v3-admin-banner-page .v3-admin-banner-wrap{padding:0 16px 40px}
+.v10-admin-back{display:flex;height:45px;align-items:center;color:#77736a;font:400 12px/18px 'Pretendard',sans-serif}
+.v3-admin-banner-wrap>header{margin:0 -16px 24px;height:88px;padding:16px;min-height:0}
+.v3-admin-banner-wrap>header p{margin:4px 0 0}
+.v3-admin-banner-summary{height:44px;margin:0 0 22px}.v3-admin-banner-summary button{width:173px;height:44px;padding:0}
+.v3-admin-banner-summary strong{font:600 14px/21px 'Pretendard',sans-serif}
+.v3-admin-banner-record{border:0;padding:0;margin:0 0 16px}
+.v10-banner-art{width:100%;aspect-ratio:390/196;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fae04b}
+.v10-banner-art img{width:100%;height:100%;object-fit:cover;display:block}
+.v10-banner-art.is-logo img{width:82%;height:auto;object-fit:contain}
+.v3-admin-banner-record h2{font:700 18px/27px 'Pretendard',sans-serif;margin:24px 0 0}
+.v3-admin-banner-record dl{margin:0}.v3-admin-banner-record dl>div{display:grid;grid-template-columns:114px minmax(0,1fr);gap:8px;min-height:48px;border-bottom:1px solid #e7e0d6;align-items:center}
+.v3-admin-banner-record dt{font:500 13px/20px 'Pretendard',sans-serif;color:#77736a}.v3-admin-banner-record dd{margin:0;font:400 13px/20px 'Pretendard',sans-serif;overflow-wrap:anywhere}
+.v3-admin-banner-record .v3-admin-banner-actions{margin:16px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:16px 12px}
+.v3-admin-banner-record .v3-admin-banner-actions button{height:44px;padding:0;background:white;border-color:#e7e0d6}
+.v3-admin-banner-wrap .v10-banner-save{height:44px;padding:0;width:100%;background:#fae04b;border-color:#fae04b}
+.v10-banner-note{font:400 12px/18px 'Pretendard',sans-serif;color:#77736a;margin:16px 0 0}.v10-banner-note+.v10-banner-note{margin-top:16px}
+.v3-admin-banner-editor{display:flex;flex-direction:column;gap:0;padding:0;margin:0;background:white}
+.v3-admin-banner-editor>.v10-banner-art{margin:0 0 24px}.v3-admin-banner-editor>button{height:44px;padding:0;width:100%}
+.v3-admin-banner-editor>small{font:400 12px/18px 'Pretendard',sans-serif;color:#77736a;margin:12px 0 0}
+.v3-admin-banner-editor>label{font:600 13px/20px 'Pretendard',sans-serif;display:grid;gap:8px;margin:24px 0 0}
+.v3-admin-banner-editor input:not([type=checkbox]),.v3-admin-banner-editor select{height:48px;background:#faf8f3;border:0;border-radius:5px;padding:0 12px;font:400 14px/21px 'Pretendard',sans-serif;min-width:0;width:100%}
+.v3-admin-banner-editor input:disabled{opacity:.6}.v3-admin-banner-editor>label+small{margin-top:8px}
+.v3-admin-banner-editor>label+button{margin-top:24px}.v3-admin-banner-editor .v3-admin-banner-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 0}
+.v10-banner-preview-scrim{position:fixed;inset:0;z-index:120;background:#0007;display:flex;align-items:center;justify-content:center;padding:16px}
+.v10-banner-preview-scrim>section{width:min(390px,100%);padding:16px;background:white;border-radius:8px;font:14px/21px 'Pretendard',sans-serif;overflow-wrap:anywhere}
+.v10-banner-preview-scrim button{display:block;margin:0 0 16px auto}
+.v10-admin-content{max-width:390px;margin:auto;padding:0 16px 40px;color:#1d1c18;font-family:'Pretendard',sans-serif}
+.v10-admin-content button,.v10-admin-content select{font-family:inherit;color:inherit;cursor:pointer}.v10-admin-content button:disabled{opacity:.45;cursor:not-allowed}
+.v10-admin-content button{height:44px;border:1px solid #e7e0d6;border-radius:6px;background:white;font-size:14px;font-weight:600}
+.v10-admin-content .v10-admin-back{height:45px;border:0;border-radius:0;font-size:12px;font-weight:400;padding:0;background:none}
+.v10-admin-heading{height:88px;margin:0 -16px 24px;background:#fae04b;padding:16px}.v10-admin-heading h1{margin:0;font:700 23px/35px 'Pretendard',sans-serif}.v10-admin-heading p{margin:4px 0 0;font:400 12px/18px 'Pretendard',sans-serif}
+.v10-admin-search{display:grid;grid-template-columns:minmax(0,1fr) 83px;gap:12px;margin:0 0 18px}.v10-admin-search input{width:100%;min-width:0;height:46px;background:#faf8f3;border:0;border-radius:5px;padding:0 12px;font:400 14px/21px 'Pretendard',sans-serif}
+.v10-admin-filters{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}.v10-admin-filters select{height:44px;border:1px solid #e7e0d6;border-radius:6px;background:white;min-width:0;text-align:center;font:600 14px/21px 'Pretendard',sans-serif}
+.v10-admin-tabs{display:grid;grid-template-columns:repeat(3,1fr);height:46px;margin-bottom:16px}.v10-admin-tabs button{height:46px;border:0;border-bottom:2px solid #e7e0d6;border-radius:0;font-size:13px;font-weight:400;color:#77736a}.v10-admin-tabs button.active{border-color:#fae04b;color:#1d1c18;font-weight:700}
+.v10-admin-card-total{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;height:44px}.v10-admin-card-total strong{font-size:13px;font-weight:600}.v10-admin-card-total button{width:127px}
+.v10-admin-card-list>article{display:flex;align-items:start;gap:8px;border-bottom:1px solid #e7e0d6;margin:0 0 19px;padding:0 0 15px;min-height:96px}
+.v10-admin-card-list .v10-admin-card-row{display:flex;gap:16px;flex:1;width:100%;min-width:0;border:0;border-radius:0;height:auto;padding:0;text-align:left;background:none;font-weight:400}
+.v10-admin-card-row>img{width:80px;height:80px;object-fit:cover;border-radius:4px;flex:none}.v10-admin-card-row>span{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}.v10-admin-card-row strong{font:600 15px/23px 'Pretendard',sans-serif;margin:0 0 2px;overflow-wrap:anywhere}.v10-admin-card-row small{font:400 12px/18px 'Pretendard',sans-serif;color:#77736a}.v10-admin-card-row small+small{font-size:11px;line-height:17px}.v10-admin-card-row>b{font-size:20px;line-height:30px;font-weight:400;color:#77736a}
+.v10-admin-pager{display:grid;grid-template-columns:84px 1fr 84px;gap:12px;align-items:center;text-align:center;font-size:13px;margin:4px 0 20px}.v10-admin-stats-link{width:100%}.v10-admin-note{font:400 12px/18px 'Pretendard',sans-serif;color:#77736a;margin:16px 0 0}
+.v10-admin-bulk{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px;font-size:12px}.v10-admin-bulk button{padding:0 10px;background:#fff1ed;color:#b43e31}
+.v10-admin-detail-photo{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:4px}.v10-admin-detail h2{font:700 24px/36px 'Pretendard',sans-serif;margin:24px 0 0}.v10-admin-detail dl{margin:0}.v10-admin-detail dl>div{display:grid;grid-template-columns:114px minmax(0,1fr);gap:8px;align-items:center;min-height:48px;border-bottom:1px solid #e7e0d6}.v10-admin-detail dt{font:500 13px/20px 'Pretendard',sans-serif;color:#77736a}.v10-admin-detail dd{margin:0;font:400 13px/20px 'Pretendard',sans-serif;overflow-wrap:anywhere}.v10-admin-detail h3{font:600 14px/21px 'Pretendard',sans-serif;background:#f4ecd7;padding:7px 12px;margin:24px 0 0}
+.v10-admin-detail-actions{display:grid;gap:16px;margin-top:24px}.v10-admin-detail-actions .is-danger{background:#fff1ed;border-color:#fff1ed;color:#b43e31}.v10-admin-hide{display:grid;gap:16px;margin-top:24px;padding:16px;background:#faf8f3}.v10-admin-hide label{display:grid;gap:8px;font-size:13px}.v10-admin-hide select,.v10-admin-hide textarea{width:100%;min-height:44px;border:1px solid #e7e0d6;font:14px 'Pretendard',sans-serif}.v10-admin-hide>div{display:flex;gap:12px}.v10-admin-hide>div>button{flex:1}
+
+.v3-admin-banner-record dl>div:first-child{min-height:44px}
+.v3-go-site:has(.meong-battle-shortage) .v3-member-greet,.v3-go-site:has(.meong-battle-shortage) .v3-header-logout{font-family:'Pretendard',sans-serif!important;font-size:13px!important;font-weight:500;line-height:19.5px}
