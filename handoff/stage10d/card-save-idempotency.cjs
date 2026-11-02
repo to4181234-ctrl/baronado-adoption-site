@@ -16,6 +16,7 @@ const backend=http.createServer(async(req,res)=>{
  else if(u.pathname.endsWith('/dogs'))rows=[{id:dog,category:'adoption',adopted:false}];
  else if(u.pathname.endsWith('/go_cards')){
   if(req.method==='POST'){
+   if(!body.image_path||!objects.has(body.image_path))return reply(res,400,{code:'23502',message:'image_path must reference the uploaded object'});
    if(failInsert)return reply(res,500,{code:'XX000',message:'fixture insert failed'});
    if(cards.has(body.id))return reply(res,409,{code:'23505',message:'duplicate'});
    await new Promise(r=>setTimeout(r,100));const row={...body,captured_at:new Date().toISOString()};cards.set(body.id,row);

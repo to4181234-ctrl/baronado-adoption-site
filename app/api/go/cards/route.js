@@ -107,7 +107,7 @@ export async function POST(request) {
     savedPath = uploadPath;
     // One go_cards row is also the public post via go_card_index; status approved publishes immediately.
     savedPath = null;
-    const { data, error } = await db.from('go_cards').insert({ id:cardId, dog_id: dogId, member_id: member.id, image_path: savedPath, photo_style: 'original', status:'approved', title: title.trim(), description: title.trim(), ...drawGoCardRatings(randomInt) }).select('id,captured_at').single();
+    const { data, error } = await db.from('go_cards').insert({ id:cardId, dog_id: dogId, member_id: member.id, image_path: uploadPath, photo_style: 'original', status:'approved', title: title.trim(), description: title.trim(), ...drawGoCardRatings(randomInt) }).select('id,captured_at').single();
     if (error) {
       // A lost insert response must not delete an image belonging to a committed card.
       const completed = await replay();
