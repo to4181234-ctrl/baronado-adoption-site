@@ -22,11 +22,26 @@ export async function GET(request) {
    order: url.searchParams.get('order') === 'oldest' ? 'oldest' : 'newest'
   });
   const db=adminDatabase();
+  // Count distinct eligible dogs without relying on one page of cards.
+  // Two species are enough for the battle-eligibility decision.
+  let available=db.from('go_cards').select('dog_id').eq('status','approved');
+  if(mine)available=available.eq('member_id',member.id);
+  const firstKind=await available.limit(1);
+  if(firstKind.error)throw firstKind.error;
+  let eligibleDogKinds=0;
+  if(firstKind.data?.length){
+   eligibleDogKinds=1;
+   let other=db.from('go_cards').select('dog_id').eq('status','approved').neq('dog_id',firstKind.data[0].dog_id);
+   if(mine)other=other.eq('member_id',member.id);
+   const secondKind=await other.limit(1);
+   if(secondKind.error)throw secondKind.error;
+   if(secondKind.data?.length)eligibleDogKinds=2;
+  }
   const ids=result.cards.map(c=>c.id);
   const rows=ids.length?await db.from('go_battle_card_stats').select('card_id,power,charm,element').in('card_id',ids):{data:[],error:null};
   if (rows.error) throw rows.error;
   const byId=new Map((rows.data||[]).map(s=>[s.card_id,s]));
-  return Response.json({...result,cards:result.cards.map(c=>({...c,battle:byId.get(c.id)||null}))},{headers:noCache});
+  return Response.json({...result,eligibleDogKinds,cards:result.cards.map(c=>({...c,battle:byId.get(c.id)||null}))},{headers:noCache});
  } catch { return goError('멍배틀 카드를 불러오지 못했어요.',500); }
 }
 

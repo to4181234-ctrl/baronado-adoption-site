@@ -1,9 +1,18 @@
+import './figma-local-fonts.css';
 import './globals.css';
 import './v3.css';
 import './v3-camera.css';
 import './figma-accuracy.css';
 import './figma-accuracy-details.css';
 import './figma-annotations-patch.css';
+import './figma-album-fidelity.css';
+import './figma-public-fidelity.css';
+import './figma-meonggo-account.css';
+import './figma-stage5-album.css';
+import './figma-stage6-public.css';
+import './figma-stage7-discovery-camera.css';
+import './figma-stage8-battle.css';
+import './figma-stage9-admin.css';
 
 export const metadata = {
   metadataBase: new URL('https://baronado-adoption-site-8sm2.vercel.app'),
@@ -16,12 +25,10 @@ export default function RootLayout({ children }) {
     <html lang="ko">
       <head>
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous"/>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"/>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/GmarketSans/subsets/GmarketSans-dynamic-subset.css"/>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MonadABXY/mona-font/web/monas.css"/>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css"/>
       </head>
       <body>{children}</body>
     </html>
   );
 }
+
+import './figma-stage10-final.css';

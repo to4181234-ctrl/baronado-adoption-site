@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { hashSecret, verifySecret, nicknameKey, passwordCheck } from '../lib/server/goAuth.js';
 
 test('nicknames normalize consistently and reject whitespace/markup', () => {
-  assert.deepEqual(nicknameKey('  Happy_Dog '), { nickname: 'Happy_Dog', key: 'happy_dog' });
+  assert.deepEqual(nicknameKey('  HappyDog '), { nickname: 'HappyDog', key: 'happydog' });
+  assert.throws(() => nicknameKey('Happy_Dog')); // Nine characters exceed the 2–8 limit.
   assert.throws(() => nicknameKey('<script>'));
   assert.throws(() => nicknameKey('이 름'));
 });

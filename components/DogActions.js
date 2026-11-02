@@ -9,13 +9,15 @@ function ActionIcon({ kind }) {
   return <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20V4m-7 7 7-7 7 7" /></svg>;
 }
 
-export default function DogActions({ dog = null, allowInquiry = false, hidden = false }) {
+export default function DogActions({ dog = null, allowInquiry = false, hidden = false, pageCategory = null }) {
   const [contactOpen, setContactOpen] = useState(false);
   const [message, setMessage] = useState('');
-  const canInquire = dog ? dog.category === 'adoption' && !dog.adopted : allowInquiry;
+  const canInquire = dog ? true : allowInquiry; // Figma: resident and adopted detail keep the inquiry action.
+  const source = dog ? 'dog' : pageCategory === 'resident' ? 'residents' : 'home';
+  const inquiryLabel = dog?.category === 'resident' ? '상주견 문의' : dog?.adopted ? '기타 문의' : '입양 문의';
 
   const share = async () => {
-    recordShareClick(dog ? 'dog' : allowInquiry ? 'home' : 'residents', dog?.id);
+    recordShareClick(source, dog?.id);
     const data = { url: window.location.href };
     try {
       if (navigator.share) {
@@ -41,7 +43,7 @@ export default function DogActions({ dog = null, allowInquiry = false, hidden = 
   };
 
   const openInquiry = () => {
-    recordInquiryClick(dog ? 'dog' : 'home', dog?.id);
+    recordInquiryClick(source, dog?.id);
     setContactOpen(true);
   };
 
@@ -50,7 +52,7 @@ export default function DogActions({ dog = null, allowInquiry = false, hidden = 
       <button type="button" className="floating-action-btn" onClick={share} title="현재 페이지 공유" aria-label="현재 페이지 공유">
         <ActionIcon kind="share" /><span>공유</span>
       </button>
-      {canInquire && <button type="button" className="floating-action-btn inquiry" onClick={openInquiry} title="입양 문의 전화" aria-label="입양 문의 전화">
+      {canInquire && <button type="button" className="floating-action-btn inquiry" onClick={openInquiry} title="문의 전화" aria-label="문의 전화">
         <ActionIcon kind="phone" /><span>문의</span>
       </button>}
       <button type="button" className="floating-action-btn" onClick={scrollToTop} title="맨 위로 이동" aria-label="맨 위로 이동">
@@ -59,8 +61,8 @@ export default function DogActions({ dog = null, allowInquiry = false, hidden = 
     </div>}
     {message && !hidden && <div className="floating-action-message" role="status" onClick={() => setMessage('')}>{message}</div>}
     {contactOpen && <div className="image-modal contact-backdrop" onClick={() => setContactOpen(false)}>
-      <div className="contact-dialog" role="dialog" aria-modal="true" aria-label={dog ? `${dog.name} 입양 문의 전화번호` : '입양 문의 전화번호'} onClick={event => event.stopPropagation()}>
-        <div className="contact-heading"><h2>{dog ? `${dog.name} 입양 문의` : '입양 문의'}</h2><button type="button" onClick={() => setContactOpen(false)} aria-label="문의 창 닫기">×</button></div>
+      <div className="contact-dialog" role="dialog" aria-modal="true" aria-label={dog ? `${dog.name} ${inquiryLabel} 전화번호` : '문의 전화번호'} onClick={event => event.stopPropagation()}>
+        <div className="contact-heading"><h2>{dog ? `${dog.name} ${inquiryLabel}` : '문의'}</h2><button type="button" onClick={() => setContactOpen(false)} aria-label="문의 창 닫기">×</button></div>
         <p>전화할 곳을 선택해주세요.</p>
         <a href="tel:0312131080"><span>매장</span><strong>031-213-1080</strong><span aria-hidden="true">전화 ↗</span></a>
         <a href="tel:01047271081"><span>대표</span><strong>010-4727-1081</strong><span aria-hidden="true">전화 ↗</span></a>

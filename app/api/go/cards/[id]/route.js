@@ -11,9 +11,10 @@ export async function PATCH(request, { params }) {
   const { id } = await params; if (!validId(id)) return goError('카드를 확인해주세요.');
   let edit;
   try { edit=validatePostEdit(await request.json()); } catch(error) { return goError(error.message||'수정 내용을 확인해주세요.'); }
-  if(edit.editContent&&!validId(edit.dogId))return goError('멍멍이를 확인해주세요.');
-  const {error}=await adminDatabase().rpc('go_edit_owned_card',{p_member:member.id,p_card:id,p_edit_content:edit.editContent,p_edit_ratings:edit.editRatings,p_title:edit.title,p_description:edit.description,p_dog:edit.dogId,p_cuteness:edit.ratings.cuteness,p_charm:edit.ratings.charm,p_affection:edit.ratings.affection});
-  if(error)return goError(error.message?.includes('owned card')?'내 카드를 찾지 못했어요.':'게시물 수정에 실패했어요.',error.message?.includes('owned card')?404:400);
+  // Only title is writable. Keep ownership on the actual UPDATE.
+  const {data:updated,error}=await adminDatabase().from('go_cards').update({title:edit.title}).eq('id',id).eq('member_id',member.id).select('id').maybeSingle();
+  if(error)return goError('제목 수정에 실패했어요.',500);
+  if(!updated)return goError('내 카드를 찾지 못했어요.',404);
   const card=await loadGoCard(id,member);
   return Response.json({card,ratings:card?.ratings},{headers:{'Cache-Control':'no-store'}});
 }

@@ -3,7 +3,7 @@ import { goError,goMember } from '../../../../../../lib/server/goAuth.js';
 export const dynamic='force-dynamic';
 export async function GET(request,{params}){
  const {id}=await params;if(!validId(id))return goError('카드를 확인해주세요.',404);
- const member=await goMember(request);const db=adminDatabase();
+ const member=await goMember(request);if(!member)return goError('로그인이 필요해요.',401);const db=adminDatabase();
  const {data:card,error}=await db.from('go_cards').select('member_id,status,image_path').eq('id',id).maybeSingle();
  if(error)return goError('사진을 불러오지 못했어요.',500);
  if(!card||(card.status!=='approved'&&card.member_id!==member?.id))return goError('사진을 찾지 못했어요.',404);

@@ -1,12 +1,28 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createCompletionSound,completionSoundEnabled} from '../lib/goCompletionSound.js';
-test('completion sound does not fetch before opting in and never waits to play if unavailable',async()=>{
- let requests=0,plays=0;const originalFetch=globalThis.fetch;
- globalThis.document={visibilityState:'visible'};
- globalThis.window={AudioContext:class {currentTime=0;state='running';resume(){return Promise.resolve();}close(){return Promise.resolve();}decodeAudioData(){return Promise.resolve({});}createBufferSource(){return {connect(){},start(){plays++;},stop(){}};}}};
- globalThis.fetch=async()=>{requests++;return {ok:true,arrayBuffer:async()=>new ArrayBuffer(0)}};
- try{const sound=createCompletionSound();sound.play();assert.equal(requests,0);assert.equal(plays,0);await sound.prepare();await sound.prepare();assert.equal(requests,1);sound.play();assert.equal(plays,1);document.visibilityState='hidden';sound.play();assert.equal(plays,1);sound.dispose();document.visibilityState='visible';sound.play();assert.equal(plays,1);}finally{globalThis.fetch=originalFetch;delete globalThis.window;delete globalThis.document;}
-});
 
-test("sound defaults to on and remembers an explicit off choice",()=>{assert.equal(completionSoundEnabled(null),true);assert.equal(completionSoundEnabled("on"),true);assert.equal(completionSoundEnabled("off"),false);});
+test('approved audio plays once per request and respects off, hidden and disposal states', async()=>{
+ const keys=['document','window','Audio','localStorage'];
+ const originals=new Map(keys.map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)]));
+ let plays=0,created=0,saved='off';
+ Object.assign(globalThis,{document:{hidden:false},window:{},Audio:class {
+  constructor(src){created++;assert.match(src,/SFX_19_Card_Acquired\.mp3$/);}
+  pause(){} play(){plays++;return Promise.resolve();}
+ }});
+ Object.defineProperty(globalThis,'localStorage',{configurable:true,value:{getItem:()=>saved}});
+ try {
+  const sound=createCompletionSound();sound.play();assert.equal(created,0);
+  saved='on';await sound.prepare();await sound.prepare();assert.equal(created,1);
+  sound.play();assert.equal(plays,1);
+  document.hidden=true;sound.play();assert.equal(plays,1);
+  document.hidden=false;
+  const delayed=sound.play(.01);saved='off';await delayed;assert.equal(plays,1);
+  Object.defineProperty(globalThis,'localStorage',{configurable:true,get(){throw new Error('Storage denied');}});
+  assert.doesNotThrow(()=>sound.play());assert.equal(plays,2);
+  sound.dispose();sound.play();assert.equal(plays,2);
+ } finally {for(const key of keys){const original=originals.get(key);if(original)Object.defineProperty(globalThis,key,original);else delete globalThis[key];}}
+});
+test('sound defaults to on and remembers an explicit off choice',()=>{
+ assert.equal(completionSoundEnabled(null),true);assert.equal(completionSoundEnabled('on'),true);assert.equal(completionSoundEnabled('off'),false);
+});

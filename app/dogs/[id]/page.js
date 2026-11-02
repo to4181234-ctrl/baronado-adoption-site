@@ -28,6 +28,8 @@ export default function DogDetailPage() {
   const [activeSection,setActiveSection]=useState('overview');
   const startX = useRef(null);
   const modalStartX = useRef(null);
+  const zoom = useRef({pointers:new Map(),scale:1,x:0,y:0,base:null,wasPinch:false});
+  const [zoomState,setZoomState]=useState({scale:1,x:0,y:0});
   const didSwipe = useRef(false);
 
   useEffect(() => {
@@ -43,15 +45,25 @@ export default function DogDetailPage() {
   }, [dog?.id]);
 
   useEffect(()=>{if(!dog)return;const ids=dog.category===CATEGORY_RESIDENT?['overview','information']:['overview','information','shelter','records'];const update=()=>{let active='overview';for(const id of ids){const el=document.getElementById(id==='records'?'v3-dog-records':'v3-detail-'+id);if(el&&el.getBoundingClientRect().top<=180)active=id;}setActiveSection(active);};update();window.addEventListener('scroll',update,{passive:true});return()=>window.removeEventListener('scroll',update);},[dog?.id,dog?.category]);
-  useEffect(()=>{if(!modalOpen)return;const prior=document.body.style.overflow;document.body.style.overflow='hidden';const escape=e=>{if(e.key==='Escape')setModalOpen(false);};window.addEventListener('keydown',escape);return()=>{document.body.style.overflow=prior;window.removeEventListener('keydown',escape);};},[modalOpen]);
+  useEffect(()=>{if(!modalOpen)return;const prior=document.body.style.overflow;document.body.style.overflow='hidden';const escape=e=>{if(e.key==='Escape'){setModalOpen(false);zoom.current={pointers:new Map(),scale:1,x:0,y:0,base:null,wasPinch:false};setZoomState({scale:1,x:0,y:0});}};window.addEventListener('keydown',escape);return()=>{document.body.style.overflow=prior;window.removeEventListener('keydown',escape);};},[modalOpen]);
 
   const media = dog ? orderedDogMedia(dog.images || [], dogVideoMedia(dog.profile, process.env.NEXT_PUBLIC_SUPABASE_URL)) : [];
   const current = media[index];
   const hasMedia = media.length > 0;
+  const profile=dog?getDogProfile(dog):{};
+  const resident=dog?.category===CATEGORY_RESIDENT;
+  const fieldGroups=dog?[
+    {name:'기본 정보',keys:resident?['breed','vaccinations']:['breed','vaccinations','toilet']},
+    {name:'성격과 취향',keys:['personality','charm','likes','dislikes']},
+    ...(!resident?[{name:'히스토리와 가족',keys:['history','recommended_home','ideal_family']}]:[]),
+  ].map(group=>({...group,fields:group.keys.map(key=>PROFILE_FIELDS.find(f=>f.key===key)).filter(f=>f&&Boolean(profile[f.key]))})).filter(g=>g.fields.length):[];
   const backHref = dog?.category === CATEGORY_RESIDENT ? '/residents' : '/';
 
+  const resetZoom=()=>{zoom.current={pointers:new Map(),scale:1,x:0,y:0,base:null,wasPinch:false};setZoomState({scale:1,x:0,y:0});};
+  const closeImage=()=>{setModalOpen(false);resetZoom();};
   const move = (direction) => {
     if (!hasMedia) return;
+    resetZoom();
     setIndex((prev) => (prev + direction + media.length) % media.length);
   };
 
@@ -73,22 +85,43 @@ export default function DogDetailPage() {
     startX.current = null;
   };
 
-  const onModalPointerDown = (event) => {
-    modalStartX.current = event.clientX;
+  // Two-finger pinch / drag preserves the image's natural aspect ratio.
+  const onModalPointerDown = event => {
+    const z=zoom.current;
+    try{event.currentTarget.setPointerCapture(event.pointerId);}catch{}
+    z.pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+    if(z.pointers.size===1){modalStartX.current=event.clientX;z.drag={x:event.clientX,y:event.clientY,origX:z.x,origY:z.y};}
+    if(z.pointers.size===2){
+      z.wasPinch=true;const [a,b]=[...z.pointers.values()];
+      z.base={distance:Math.hypot(a.x-b.x,a.y-b.y)||1,scale:z.scale,x:z.x,y:z.y,cx:(a.x+b.x)/2,cy:(a.y+b.y)/2};
+    }
   };
-
-  const onModalPointerUp = (event) => {
-    if (modalStartX.current === null) return;
-    const diff = event.clientX - modalStartX.current;
-    if (Math.abs(diff) > 35) move(diff < 0 ? 1 : -1);
-    modalStartX.current = null;
+  const onModalPointerMove = event => {
+    const z=zoom.current;if(!z.pointers.has(event.pointerId))return;
+    z.pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+    if(z.pointers.size>=2&&z.base){
+      const [a,b]=[...z.pointers.values()];const next=Math.max(1,Math.min(4,z.base.scale*Math.hypot(a.x-b.x,a.y-b.y)/z.base.distance));
+      z.scale=next;z.x=next>1?z.base.x+((a.x+b.x)/2-z.base.cx):0;z.y=next>1?z.base.y+((a.y+b.y)/2-z.base.cy):0;
+      setZoomState({scale:z.scale,x:z.x,y:z.y});
+    }else if(z.pointers.size===1&&z.scale>1&&z.drag){
+      z.x=z.drag.origX+event.clientX-z.drag.x;z.y=z.drag.origY+event.clientY-z.drag.y;
+      setZoomState({scale:z.scale,x:z.x,y:z.y});
+    }
+  };
+  const onModalPointerUp = event => {
+    const z=zoom.current;
+    if(!z.wasPinch&&z.scale===1&&modalStartX.current!==null&&z.pointers.size===1){
+      const diff=event.clientX-modalStartX.current;if(Math.abs(diff)>35)move(diff<0?1:-1);
+    }
+    z.pointers.delete(event.pointerId);z.base=null;z.drag=null;modalStartX.current=null;
+    if(z.pointers.size===0)z.wasPinch=false;
   };
 
   return (
-    <main className="site-shell v3-site v3-detail-site">
+    <main className={"site-shell v3-site v3-detail-site "+(dog?.category===CATEGORY_RESIDENT?"v3-resident-detail":"v3-adoption-detail")}>
       <SiteHeader />
       <section className="container detail-container has-detail-actions">
-        <div className="v3-detail-banner"><Link className="v3-back" href={backHref}>‹ 뒤로 가기</Link><strong>{dog?.category===CATEGORY_RESIDENT?"상주견 소개":"가족을 찾아요"}</strong></div>
+        <div className="v3-detail-banner"><Link className="v3-back" href={backHref} onClick={event=>{if(typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('from')==='list'&&window.history.length>1){event.preventDefault();window.history.back();}}}>‹ 뒤로 가기</Link><strong>{dog?.category===CATEGORY_RESIDENT?"상주견 소개":"가족을 찾아요"}</strong></div>
 
         {loading && <DogLoading />}
         {error && <div className="message error">{error}</div>}
@@ -104,7 +137,7 @@ export default function DogDetailPage() {
            <header className="v3-detail-identity">
             <h1 className="dog-name">{dog.name}{isDogBirthday(dog)&&<span className="birthday-icon" role="img" aria-label="생일 축하"> 🎉</span>}</h1>
             <p className="meta">{dog.gender} ㅣ 중성화 {dog.neutered?'O':'X'} ㅣ {getAgeInfo(dog).detailDisplay}</p>
-            {getDogBirthDate(dog)&&<p className="arrival-date">생년월일 · {formatDogDate(getDogBirthDate(dog))}</p>}
+            {resident&&getDogBirthDate(dog)&&<p className="arrival-date">생년월일 · {formatDogDate(getDogBirthDate(dog))}</p>}
             {dog.category!==CATEGORY_RESIDENT&&dog.arrived_at&&<p className="arrival-date">바로나도에 온 날 · {formatDogDate(dog.arrived_at)}</p>}
             {dog.category!==CATEGORY_RESIDENT&&dog.adopted&&dog.adopted_at&&<p className="arrival-date">입양 간 날짜 · {formatDogDate(dog.adopted_at)}</p>}
            </header>
@@ -126,13 +159,13 @@ export default function DogDetailPage() {
            </section>
            <section className="v3-detail-properties" id="v3-detail-information">
             <h2>상세 정보</h2>
-            <h3>기본 정보</h3>
-            <div className="v3-detail-properties-table">
-             {PROFILE_FIELDS.filter(field=>dog.category!==CATEGORY_RESIDENT||['breed','vaccinations','personality','likes','dislikes','charm'].includes(field.key)).filter(field=>Boolean(getDogProfile(dog)[field.key])).map(field=><div className="v3-detail-property" key={field.key}><span>{field.label}</span><div>{field.key==='vaccinations'?<VaccinationDetails profile={getDogProfile(dog)}/>:<ExpandableText text={getDogProfile(dog)[field.key]}/>}</div></div>)}
-             {Array.isArray(getDogProfile(dog).extra_questions)&&getDogProfile(dog).extra_questions.filter(x=>x.question&&x.answer).map((x,i)=><div className="v3-detail-property" key={i}><span>{x.question}</span><div>{x.answer}</div></div>)}
-            </div>
+            {fieldGroups.map(group=><div className="v3-detail-property-group" key={group.name}>
+              <h3>{group.name}</h3>
+              <div className="v3-detail-properties-table">{group.fields.map(field=><div className="v3-detail-property" key={field.key}><span>{field.label}</span><div>{field.key==='vaccinations'?<VaccinationDetails profile={profile}/>:<ExpandableText text={profile[field.key]}/>}</div></div>)}</div>
+            </div>)}
+            {Array.isArray(profile.extra_questions)&&profile.extra_questions.some(x=>x.question&&x.answer)&&<div className="v3-detail-property-group"><h3>추가 정보</h3><div className="v3-detail-properties-table">{profile.extra_questions.filter(x=>x.question&&x.answer).map((x,i)=><div className="v3-detail-property" key={i}><span>{x.question}</span><div>{x.answer}</div></div>)}</div></div>}
            </section>
-           {dog.category!==CATEGORY_RESIDENT&&(getDogProfile(dog).shelter_name||getDogProfile(dog).shelter_url)&&<section className="v3-detail-shelter" id="v3-detail-shelter"><h2>보호소</h2><p>{getDogProfile(dog).shelter_name||'보호소 정보 준비 중'}</p>{getShelterUrl(getDogProfile(dog).shelter_url)&&<a href={getShelterUrl(getDogProfile(dog).shelter_url)} target="_blank" rel="noopener noreferrer">보호소 홈페이지 ↗</a>}</section>}
+           {dog.category!==CATEGORY_RESIDENT&&(profile.shelter_name||profile.shelter_url)&&<section className="v3-detail-shelter" id="v3-detail-shelter"><h2>보호소</h2><p>{profile.shelter_name||'보호소 정보 준비 중'}</p>{getShelterUrl(profile.shelter_url)&&<a href={getShelterUrl(profile.shelter_url)} target="_blank" rel="noopener noreferrer">보호소 홈페이지 ↗</a>}</section>}
           </article>
           </>
         )}
@@ -142,14 +175,14 @@ export default function DogDetailPage() {
       {dog && <DogActions dog={dog} hidden={modalOpen} />}
 
       {modalOpen && hasMedia && (
-        <div className="image-modal viewer-modal" onClick={() => setModalOpen(false)}>
-          <button className="modal-close" aria-label="닫기">×</button>
+        <div className="image-modal viewer-modal v3-detail-viewer" role="dialog" aria-modal="true" aria-label="사진 확대 보기" onClick={closeImage}>
+          <button className="modal-close" aria-label="닫기" onClick={event=>{event.stopPropagation();closeImage();}}>×</button>
           {media.length > 1 && (
             <button type="button" className="modal-nav modal-prev" aria-label="이전 미디어" onClick={(event) => { event.stopPropagation(); move(-1); }}>‹</button>
           )}
           {current?.type === 'video'
             ? <video key={current.url} src={current.url} poster={current.poster || undefined} controls preload="none" playsInline onClick={event => event.stopPropagation()} aria-label={`${dog.name} 동영상`} />
-            : <img src={current?.url} alt={`${dog.name} 크게 보기 ${index + 1}`} onClick={(event) => event.stopPropagation()} onPointerDown={onModalPointerDown} onPointerUp={onModalPointerUp} />}
+            : <img src={current?.url} alt={`${dog.name} 크게 보기 ${index + 1}`} draggable={false} style={{transform:`translate(${zoomState.x}px, ${zoomState.y}px) scale(${zoomState.scale})`}} onClick={event=>event.stopPropagation()} onPointerDown={onModalPointerDown} onPointerMove={onModalPointerMove} onPointerUp={onModalPointerUp} onPointerCancel={onModalPointerUp} />}
           {media.length > 1 && <span className="photo-count modal-count" aria-live="polite">{current?.type === 'video' ? '동영상' : '사진'} {index + 1} / {media.length}</span>}
           {media.length > 1 && (
             <button type="button" className="modal-nav modal-next" aria-label="다음 미디어" onClick={(event) => { event.stopPropagation(); move(1); }}>›</button>
