@@ -13,7 +13,7 @@ export default function GoDiscovery({dogs=[],dog=null}){
  useEffect(()=>listenAudioSetting(setSound),[]);
  const t=useRef(null),audio=useRef(null),loggedIn=useRef(false);
  useEffect(()=>{
-  let mounted=true;audio.current=createGameAudio();music.current=createMusicLoop(discoveryMusicFile);
+  let mounted=true;audio.current=createGameAudio();music.current=createMusicLoop(discoveryMusicFile,.12);
   try{setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');}catch{}
   async function checkPopup(){
    if(DISCOVERY_TEST_MODE){setOpen(true);return;}
@@ -42,7 +42,7 @@ export default function GoDiscovery({dogs=[],dog=null}){
   document.addEventListener('visibilitychange',h);
   return()=>{mounted=false;clearTimeout(t.current);audio.current?.dispose();music.current?.dispose();document.removeEventListener('visibilitychange',h);};
  },[]);
- useEffect(()=>{if(!open)return;music.current?.play();const resume=()=>music.current?.play();document.addEventListener('pointerdown',resume);document.addEventListener('keydown',resume);return()=>{music.current?.stop();document.removeEventListener('pointerdown',resume);document.removeEventListener('keydown',resume);};},[open]);
+ useEffect(()=>{if(!open||stage!=='result')return;music.current?.setVolume(.05);music.current?.play();const rise=setTimeout(()=>music.current?.setVolume(.12),1700);return()=>{clearTimeout(rise);music.current?.stop();};},[open,stage]);
  function close(){
   clearTimeout(t.current);audio.current?.stop();setOpen(false);setStage('choice');setChosen(null);
   if(DISCOVERY_TEST_MODE||!hide)return;

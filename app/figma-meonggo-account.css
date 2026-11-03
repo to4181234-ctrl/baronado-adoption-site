@@ -133,8 +133,8 @@
 }
 .v3-go-site .v3-account-settings>.v3-account-save{top:518px}
 .v3-go-site .v3-account-settings .v3-account-withdraw{
-  position:absolute;top:645px;left:16px;right:16px;display:flex;align-items:center;justify-content:center;
-  width:auto;height:44px;margin:0;padding:0;border:0;border-radius:6px;
+  position:absolute;top:645px;left:50%;right:auto;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;
+  width:min(210px,calc(100% - 32px));height:46px;margin:0;padding:0;border:0;border-radius:8px;
   background:#fade40;color:#0d0d0d;
   font-family:"Pretendard",sans-serif;font-size:13px;font-weight:600;line-height:18.85px;
 }
