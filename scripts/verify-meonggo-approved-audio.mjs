@@ -25,6 +25,7 @@ const expected={
   "SFX_19_Card_Acquired.mp3": "4d191782446e4675cb983f73f29816917dd1496c9c19374c6185e7d41bb4d591"
 };
 Object.assign(expected,JSON.parse(readFileSync(join(process.cwd(),'assets','meonggo-bgm-20261103.json'),'utf8')));
+Object.assign(expected,JSON.parse(readFileSync(join(process.cwd(),'assets','meonggo-additional-sfx-20261103.json'),'utf8')));
 const dir=join(process.cwd(),'public','audio','meonggo');
 let failed=0;
 for(const [name,digest] of Object.entries(expected)){

@@ -31,7 +31,7 @@ function Interaction(){
  // Current Figma 173:3556/3634: a five-second quiet period triggers a short side walk.
  useEffect(()=>{
   if(busy||pose!=='front'||typeof document==='undefined'||document.hidden)return;
-  const id=setTimeout(()=>{setPose('side');setWalking(true);},5000);
+  const id=setTimeout(()=>{setPose('side');setWalking(true);audio.current?.play('bark2');},5000);
   return()=>clearTimeout(id);
  },[busy,pose,notice]);
  useEffect(()=>{

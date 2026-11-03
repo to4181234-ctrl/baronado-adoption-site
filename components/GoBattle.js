@@ -45,7 +45,7 @@ function Game(){
    const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,secondId:selected[1].id})});
    const body=await response.json();if(!alive.current)return;
    if(!response.ok){if(response.status===409){setSelected([]);setResult(null);}throw Error(body.error||'대결 결과를 저장하지 못했어요.');}
-   setResult(body.battle);setPhase('result');sounds.current?.play(body.battle.winner==='draw'?'draw':body.battle.winner==='first'?'victory':'defeat');
+   setResult(body.battle);setPhase('result');sounds.current?.play(body.battle.winner==='draw'?'draw':body.battle.winner==='first'?'victory':'defeat');timers.current.push(setTimeout(()=>sounds.current?.play('bark1'),450));
   }catch(e){setError(e.message);setPhase('choose');}
   finally{setMutating(false);}
  },[selected]);
@@ -54,7 +54,7 @@ function Game(){
   if(phase!=='choose'||mutating||selected.length!==2||!selected.every(c=>c.battle))return;
   finished.current=false;requestId.current=crypto.randomUUID();setColliding(false);setError('');setPhase('fight');
   sounds.current?.startMusic();sounds.current?.play('start');
-  timers.current=[setTimeout(()=>sounds.current?.play('appear'),500),setTimeout(()=>setColliding(true),1400),setTimeout(()=>sounds.current?.play('impact'),1595),setTimeout(()=>completeRef.current(),3000)];
+  timers.current=[setTimeout(()=>sounds.current?.play('appear'),500),setTimeout(()=>setColliding(true),1400),...[1848,3275,4750].map(delay=>setTimeout(()=>sounds.current?.play('impact'),delay)),setTimeout(()=>completeRef.current(),7600)];
  };
  const reset=()=>{stop();sounds.current?.startMusic();requestId.current=null;finished.current=false;setPhase('choose');setSelected([]);setResult(null);setColliding(false);setError('');setPage(0);};
  const changeTab=(name)=>{setTab(name);setPage(0);setError('');};

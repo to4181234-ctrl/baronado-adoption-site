@@ -17,7 +17,7 @@ export async function GET(request) {
   const page = Number(url.searchParams.get('page') || '0');
   if (!Number.isInteger(page) || page < 0 || page > 1000) return goError('페이지를 확인해주세요.');
   const result = await loadGoCards({
-   member, mine, page, limit: 4,
+   member, mine, excludeOwn: !mine, page, limit: 4,
    query: String(url.searchParams.get('q') || '').slice(0,80),
    order: url.searchParams.get('order') === 'oldest' ? 'oldest' : 'newest'
   });

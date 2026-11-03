@@ -117,3 +117,15 @@
 
 /* Keep every dog line inside the dialogue frame, including its bark prefix. */
 .v3-interact-figma .v3-machine-dialog>span{top:12px;line-height:16px;max-height:64px;word-break:keep-all;overflow-wrap:anywhere}
+/* Long clash: approach, brace, push against each other, then recoil. */
+.meong-battle-versus.is-colliding .meong-battle-card:first-child{animation:v14-clash-left 5.6s linear both!important}
+.meong-battle-versus.is-colliding .meong-battle-card:nth-child(2){animation:v14-clash-right 5.6s linear both!important}
+.meong-battle-versus.is-colliding:before{animation:v14-clash-light 5.6s linear both}
+.meong-battle-versus.is-colliding:after{animation:v14-clash-star 5.6s linear both}
+.is-colliding .v12-battle-impact span{animation:v14-clash-particles 1.425s .448s steps(8) 3 both}
+@keyframes v14-clash-left{0%{transform:translateX(-12px) rotate(-7deg)}8%,18%,33%,48%,60%{transform:translateX(var(--collision-travel)) rotate(0)}12%,22%,38%,52%,64%{transform:translateX(calc(var(--collision-travel) - 3px)) translateY(-2px) rotate(-1deg)}26%,43%,57%,67%{transform:translateX(calc(var(--collision-travel) + 2px)) translateY(2px) rotate(1deg)}78%{transform:translate(-40px,-24px) rotate(-16deg)}88%{transform:translate(-18px,8px) rotate(-7deg)}100%{transform:none}}
+@keyframes v14-clash-right{0%{transform:translateX(12px) rotate(7deg)}8%,18%,33%,48%,60%{transform:translateX(calc(-1 * var(--collision-travel))) rotate(0)}12%,22%,38%,52%,64%{transform:translateX(calc(-1 * var(--collision-travel) + 3px)) translateY(2px) rotate(1deg)}26%,43%,57%,67%{transform:translateX(calc(-1 * var(--collision-travel) - 2px)) translateY(-2px) rotate(-1deg)}78%{transform:translate(40px,-24px) rotate(16deg)}88%{transform:translate(18px,8px) rotate(7deg)}100%{transform:none}}
+@keyframes v14-clash-light{0%,7%,75%,100%{opacity:0}8%,34%,60%{opacity:.95}16%,42%,68%{opacity:.25}}
+@keyframes v14-clash-star{0%,7%,75%,100%{opacity:0;transform:translate(-50%,-50%) scale(.15) rotate(0)}8%,34%,60%{opacity:1;transform:translate(-50%,-50%) scale(1.15) rotate(20deg)}18%,44%,70%{opacity:.2;transform:translate(-50%,-50%) scale(.55) rotate(80deg)}}
+@keyframes v14-clash-particles{0%{opacity:0;transform:rotate(var(--impact-angle)) translateY(-5px)}10%{opacity:1}100%{opacity:0;transform:rotate(var(--impact-angle)) translateY(calc(-1 * var(--impact-distance))) rotate(180deg)}}
+@media(prefers-reduced-motion:reduce){.meong-battle-versus.is-colliding .meong-battle-card{animation:none!important}}
