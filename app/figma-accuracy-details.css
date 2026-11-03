@@ -60,7 +60,7 @@
 .v3-detail-site .v3-detail-shelter h2{font-size:15px!important;margin:0 0 14px}
 .v3-detail-site .v3-detail-shelter p,.v3-detail-site .v3-detail-shelter a{font-size:12px;line-height:1.8}
 .v3-detail-site .gallery video{height:100%}
-.v3-detail-site .v3-detail-gallery .adopted-badge.detail{position:absolute;top:10px;left:10px}
+.v3-detail-site .v3-detail-gallery .adopted-badge.detail{position:absolute;inset:0}
 /* 390px Figma admin list layout, not old dashboard cards. */
 .v3-admin-list-site .v3-header{border-bottom:1px solid #e7e0d6}
 .v3-admin-list-site .v3-header-inner{height:44px}
@@ -140,3 +140,6 @@
 .v3-go-site .meong-battle-card.is-mini{aspect-ratio:170 / 272!important}
 .v3-go-site .meong-battle-entry>span{margin-left:10px!important}
 .v3-go-site .meong-battle-pager{margin:32px 0 20px!important}
+
+/* Family adoption profiles: always show the full introduction without truncation. */
+.v3-site.v3-adoption-detail .v3-detail-about .expandable-text > .desc{display:block;-webkit-line-clamp:unset;overflow:visible;white-space:pre-wrap}

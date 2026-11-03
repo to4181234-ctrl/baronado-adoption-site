@@ -156,7 +156,7 @@ export default function DogDetailPage() {
            <div className="v3-detail-divider" aria-hidden="true"/>
            <section className="v3-detail-about" id="v3-detail-overview">
             <h2>{dog.name}를 소개합니다</h2>
-            <ExpandableText key={dog.id} limit={resident?Infinity:180} text={getDogProfile(dog).introduction||dog.description||'아직 소개글이 등록되지 않았어요.'} className="desc"/>
+            <ExpandableText key={dog.id} limit={Infinity} text={getDogProfile(dog).introduction||dog.description||'아직 소개글이 등록되지 않았어요.'} className="desc"/>
            </section>
            {hasDetails&&<section className="v3-detail-properties" id="v3-detail-information">
             <h2>상세 정보</h2>
