@@ -3,6 +3,7 @@ import Link from 'next/link';
 import {useEffect,useRef,useState} from 'react';
 import {figmaSprite,FIGMA_DOGS} from '../lib/goV3Game.js';
 import GoPixelChoice from './GoPixelChoice.js';
+import {DISCOVERY_TEST_MODE} from '../lib/goDiscoveryPolicy.js';
 import {listenAudioSetting,createGameAudio,createMusicLoop,discoveryMusicFile,GAME_SOUND_KEY} from '../lib/goV3Audio.js';
 const HIDE_KEY='baronado-go-intro-hide-until',ANON_SEEN_KEY='baronado-go-intro-anon-day',WEEK=7*86400000;
 const koreanDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
@@ -15,6 +16,7 @@ export default function GoDiscovery({dogs=[],dog=null}){
   let mounted=true;audio.current=createGameAudio();music.current=createMusicLoop(discoveryMusicFile);
   try{setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');}catch{}
   async function checkPopup(){
+   if(DISCOVERY_TEST_MODE){setOpen(true);return;}
    try{
     const session=await fetch('/api/go/session',{cache:'no-store'}).then(r=>r.json());
     if(!mounted)return;
@@ -43,7 +45,7 @@ export default function GoDiscovery({dogs=[],dog=null}){
  useEffect(()=>{if(!open)return;music.current?.play();const resume=()=>music.current?.play();document.addEventListener('pointerdown',resume);document.addEventListener('keydown',resume);return()=>{music.current?.stop();document.removeEventListener('pointerdown',resume);document.removeEventListener('keydown',resume);};},[open]);
  function close(){
   clearTimeout(t.current);audio.current?.stop();setOpen(false);setStage('choice');setChosen(null);
-  if(!hide)return;
+  if(DISCOVERY_TEST_MODE||!hide)return;
   if(loggedIn.current){
    fetch('/api/go/settings',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hideWeek'})}).catch(()=>{});
   }else{try{localStorage.setItem(HIDE_KEY,String(Date.now()+WEEK));}catch{}}

@@ -93,3 +93,5 @@
 @keyframes v12-winner-aura{from{opacity:0;transform:scale(.3) rotate(-30deg)}to{opacity:1;transform:scale(1) rotate(0)}}
 @keyframes v12-winner-pop{0%{opacity:0;transform:translateY(18px) scale(.7)}60%{opacity:1;transform:translateY(-6px) scale(1.08)}100%{transform:none}}
 @media(prefers-reduced-motion:reduce){.v3-interact-figma .v3-interact-dog img,.v3-interact-figma .v3-interact-dog.is-walking img,.v3-interact-figma .v3-interact-dog.is-reacting img,.is-colliding .v12-battle-impact span,.meong-battle-versus.is-colliding .meong-battle-card,.meong-battle-result .meong-battle-winner:before,.meong-battle-result .meong-battle-winner img{animation:none!important}.v12-battle-impact{display:none}}
+/* Use the album wordmark typography throughout the shared game header. */
+.v3-go-site .v3-header-go .v3-go-brand{font-family:'MonaS12',sans-serif!important;font-weight:700!important;font-size:12.5797px!important;line-height:1.5!important;letter-spacing:0!important}
