@@ -65,7 +65,7 @@ export default function GoCamera({dog,onDone,onSaved,nickname,firstCard=false}){
    const r=await fetch('/api/go/cards',{method:'POST',body:form});const data=await r.json();if(!r.ok)throw Error(data.error||'카드를 저장하지 못했어요.');
    const current=await fetch('/api/go/cards/'+data.id,{cache:'no-store'}).then(r=>r.json()).catch(()=>({}));
    const card=current.card||{id:data.id,imageUrl:preview,dogName:dog.name,title:title.trim(),nickname:nickname||'멍기록가',capturedAt:data.capturedAt,ratings:null};
-   setSaved(card);setStep('done');onSaved?.(card);
+   setSaved(card);setStep('done');window.dispatchEvent(new CustomEvent('go-v3-music',{detail:'calm'}));onSaved?.(card);
   }catch(e){setError(e.message);}finally{saving.current=false;setBusy(false);}
  }
  return <div className={'v3-capture v3-capture-'+step}>
