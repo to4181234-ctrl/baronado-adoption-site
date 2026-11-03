@@ -15,7 +15,7 @@ function Album({initialDogId=null}){
  const [dogs,setDogs]=useState([]),[loadingDogs,setLoadingDogs]=useState(true),[collection,setCollection]=useState(EMPTY);
  const [error,setError]=useState(''),[ownCards,setOwnCards]=useState([]),[cardTotal,setCardTotal]=useState(0),[cardPage,setCardPage]=useState(0),[order,setOrder]=useState('newest');
  const [camera,setCamera]=useState(null),[collectConfirm,setCollectConfirm]=useState(false),[selection,setSelection]=useState(false),[selectedIds,setSelectedIds]=useState([]),[deleting,setDeleting]=useState(false);
- const [notice,setNotice]=useState(''),[stampBusy,setStampBusy]=useState(false),[showAdopted,setShowAdopted]=useState(false);
+ const [notice,setNotice]=useState(''),[showAdopted,setShowAdopted]=useState(false);
  const dogId=initialDogId;
  const dog=dogs.find(x=>x.id===dogId)||null;
  useEffect(()=>{fetchDogs('adoption').then(setDogs).catch(()=>setError('강아지 목록을 불러오지 못했어요.')).finally(()=>setLoadingDogs(false));},[]);
@@ -36,7 +36,6 @@ function Album({initialDogId=null}){
   setDeleting(true);
   try{const r=await fetch('/api/go/cards',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids:selectedIds})});const d=await r.json();if(!r.ok)throw Error(d.error||'삭제에 실패했어요.');setNotice((d.deletedIds?.length||0)+'개의 카드를 삭제했어요.');setSelectedIds([]);setSelection(false);setCardPage(0);await Promise.all([reloadCards(),reloadCollection()]);}catch(e){setNotice(e.message);}finally{setDeleting(false);}
  }
- async function claim(){if(stampBusy)return;setStampBusy(true);try{const r=await fetch('/api/go/collection',{method:'POST'});const d=await r.json();if(!r.ok)throw Error(d.error);setNotice('완성 스탬프를 받았어요!');reloadCollection();}catch(e){setNotice(e.message);}finally{setStampBusy(false);}}
  function CardList(){return <><div className="v3-card-list">{ownCards.map(card=>selection?<GoCard key={card.id} card={card} member={member} onLogin={openAccount} compact previewStats selectMode selected={selectedIds.includes(card.id)} onSelect={toggle}/>:<GoCard key={card.id} card={card} member={member} onLogin={openAccount} compact previewStats linkToPost onDelete={()=>{reloadCards();reloadCollection();}}/>)}</div><div className="v3-pager"><button disabled={cardPage===0} onClick={()=>setCardPage(x=>x-1)}>〈</button><span>{cardPage+1} / {Math.max(1,Math.ceil(cardTotal/4))}</span><button disabled={(cardPage+1)*4>=cardTotal} onClick={()=>setCardPage(x=>x+1)}>〉</button></div></>;}
  return <>
   {dogId?<div className="v3-album-detail">
@@ -51,7 +50,6 @@ function Album({initialDogId=null}){
     <section className="v3-collection-section"><h2>내 도감</h2><div className="v3-progress-label">도감 수집 {claimed} / {totalDogs}{member&&claimed===0?' (첫 도감을 기다리고 있어요)':''}</div><div className="v3-progress"><span style={{width:(claimed/totalDogs*100)+'%'}}/></div>
      <div className="v3-collection-grid">{orderedDogs.map(name=>{const d=dogs.find(x=>x.name===name),owned=Boolean(d&&member&&(collection.counts?.[d.id]||0)>0);return <Link href={d?'/go/'+d.id:'/go'} className={'v3-collection-tile'+(owned?' unlocked':'')} key={name}><img src={owned?figure(name,true):FIGMA_ALBUM_SHADOW[name]||figure(name,false)} alt={owned?name:'미획득 실루엣'}/><strong>{name}</strong></Link>})}</div></section>
     <section className="v3-battle-home"><h2>멍배틀</h2><Link href="/go/battle" className="v3-battle-shortcut"><img src="/figma-v3/collar.png" alt="픽셀 목줄"/><strong>멍배틀 하러가기 &gt;</strong></Link><div className="v3-pixel-panel"><div className="v10-panel-canvas">{['bg','outer','inner'].map(name=><img key={name} className={'v3-album-panel-layer v3-album-panel-'+name} src={'/figma-v3/album-panel-'+name+'.svg'} alt=""/>)}<div className="v3-panel-content">{!member?<><b>멍배틀을 시작해볼까요?</b><p>서로 다른 멍카드 2장을 모아<br/>대결하고 나만의 전적을 쌓아보세요!</p><button type="button" className="v3-anon-battle-login" onClick={openAccount}><img src="/figma-v3/album-battle-arrow.svg" alt="" aria-hidden="true"/>로그인하고 시작하기</button></>:<><b>멍멍이별 대결 전적</b>{Object.keys(collection.battleRecords||{}).length?<ul className="v11-battle-records">{Object.entries(collection.battleRecords).map(([id,stats])=><li key={id}><span>{dogs.find(d=>d.id===id)?.name||'멍멍이'}</span><span>{stats.wins}승 {stats.draws}무 {stats.losses}패</span></li>)}</ul>:<p>멍배틀을 하고 기록을 쌓아보세요</p>}</>}</div></div></div></section>
-    {member&&collection.progress?.complete&&!collection.progress.claimed&&<button className="v3-yellow-btn" onClick={claim} disabled={stampBusy}>도감 완성 스탬프 받기</button>}
     
   </div>}
   {notice&&<p className="v3-message" role="status">{notice}</p>}{error&&<p className="v3-error" role="alert">{error}</p>}
