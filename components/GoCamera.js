@@ -4,10 +4,12 @@ import GoCard from './GoCard.js';
 import {createGameAudio,GAME_SOUND_KEY} from '../lib/goV3Audio.js';
 import {figmaSprite} from '../lib/goV3Game.js';
 import Link from 'next/link';
+import GoPixelChoice from './GoPixelChoice.js';
+import GoReveal from './GoReveal.js';
 export default function GoCamera({dog,onDone,onSaved,nickname,firstCard=false}){
  const [step,setStep]=useState('intro'),[error,setError]=useState(''),[busy,setBusy]=useState(false);
  const [sound,setSound]=useState(true),[zoom,setZoom]=useState(1),[preview,setPreview]=useState(''),[blob,setBlob]=useState(null),[title,setTitle]=useState('');
- const [saved,setSaved]=useState(null),[scan,setScan]=useState(false),[cameraError,setCameraError]=useState(false);
+ const [saved,setSaved]=useState(null),[scan,setScan]=useState(false),[cameraError,setCameraError]=useState(false),[permissionOpen,setPermissionOpen]=useState(true),[collectReady,setCollectReady]=useState(false);
  const captureFinished=useRef(false),stream=useRef(null),video=useRef(null),guide=useRef(null),audio=useRef(null),timers=useRef([]),mounted=useRef(true),saving=useRef(false);
  const saveRequest=useRef(null);
  useEffect(()=>{mounted.current=true;audio.current=createGameAudio();setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');const onHide=()=>{if(document.hidden)audio.current?.stop()};document.addEventListener('visibilitychange',onHide);return()=>{mounted.current=false;window.dispatchEvent(new CustomEvent('go-v3-music',{detail:'calm'}));timers.current.forEach(clearTimeout);stream.current?.getTracks().forEach(t=>t.stop());audio.current?.dispose();document.removeEventListener('visibilitychange',onHide);};},[]);
@@ -17,7 +19,7 @@ export default function GoCamera({dog,onDone,onSaved,nickname,firstCard=false}){
  function toggleSound(){const value=!sound;setSound(value);localStorage.setItem(GAME_SOUND_KEY,value?'on':'off');window.dispatchEvent(new Event('go-v3-settings-changed'));if(!value)audio.current?.stop();}
  async function openCamera(){
   if(busy)return;
-  setBusy(true);setError('');setCameraError(false);
+  setPermissionOpen(false);setBusy(true);setError('');setCameraError(false);
   try{
    if(!navigator.mediaDevices?.getUserMedia)throw Error('카메라를 지원하지 않는 브라우저예요.');
    const opened=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:1280}}});
@@ -27,8 +29,8 @@ export default function GoCamera({dog,onDone,onSaved,nickname,firstCard=false}){
   finally{setBusy(false);}
  }
  function scale(next){setZoom(Math.min(3,Math.max(1,next)));}
- function retry(){saveRequest.current=null;setBlob(null);setPreview('');setScan(false);setZoom(1);setError('');setCameraError(false);openCamera();}
- function capture(){if(busy||!video.current?.videoWidth)return;captureFinished.current=false;setScan(true);audio.current?.play('shutter');timers.current.push(setTimeout(()=>finishCapture(),100));}
+ function retry(){setCollectReady(false);saveRequest.current=null;setBlob(null);setPreview('');setScan(false);setZoom(1);setError('');setCameraError(false);openCamera();}
+ function capture(){if(busy||scan||!collectReady||!video.current?.videoWidth)return;captureFinished.current=false;setScan(true);audio.current?.play('shutter');timers.current.push(setTimeout(()=>finishCapture(),100));}
  function finishCapture(){
   if(captureFinished.current)return;captureFinished.current=true;
   timers.current.forEach(clearTimeout);timers.current=[];
@@ -63,18 +65,19 @@ export default function GoCamera({dog,onDone,onSaved,nickname,firstCard=false}){
    const r=await fetch('/api/go/cards',{method:'POST',body:form});const data=await r.json();if(!r.ok)throw Error(data.error||'카드를 저장하지 못했어요.');
    const current=await fetch('/api/go/cards/'+data.id,{cache:'no-store'}).then(r=>r.json()).catch(()=>({}));
    const card=current.card||{id:data.id,imageUrl:preview,dogName:dog.name,title:title.trim(),nickname:nickname||'멍기록가',capturedAt:data.capturedAt,ratings:null};
-   setSaved(card);setStep('done');audio.current?.play('acquire');onSaved?.(card);
+   setSaved(card);setStep('done');onSaved?.(card);
   }catch(e){setError(e.message);}finally{saving.current=false;setBusy(false);}
  }
  return <div className={'v3-capture v3-capture-'+step}>
   {step==='intro'&&<div className="v3-capture-live-art v3-capture-permission-intro">
-   <div className="v3-capture-tip"><button onClick={toggleSound}>음원 {sound?'켜짐':'꺼짐'}</button><p>카메라를 켜면 실제 화면에 1:1 가이드가 나타나요.</p></div>
+   <div className="v3-capture-tip"><button onClick={toggleSound} aria-label={sound?'음원 끄기':'음원 켜기'}><img src={'/figma-v3/sound-'+(sound?'on':'off')+'.png'} alt=""/>음원 {sound?'켜짐':'꺼짐'}</button><p>카메라를 켜면 실제 화면에 1:1 가이드가 나타나요.</p></div>
    <div className="v3-camera-square"></div><img className="v3-camera-collar" src="/figma-v3/collar.png" alt="픽셀 목줄"/>
-   <div className="v3-pixel-dialog v3-camera-dialog-box">야생의 {dog.name}가 나타났다!<button onClick={openCamera} disabled={busy}>▶ {busy?'카메라 연결 중…':'수집한다'}</button><button onClick={end}>　도망간다</button></div>
+
   </div>}
-  {step==='live'&&<div className="v3-capture-live-art"><video ref={video} autoPlay muted playsInline className="v3-camera-video" style={{transform:'scale('+zoom+')'}}/><div className="v3-capture-tip"><button onClick={toggleSound}>음원 {sound?'켜짐':'꺼짐'}</button><p>‘네모칸’ 안에 잘 맞춰 수집해주세요</p></div><div ref={guide} className={'v3-camera-square'+(scan?' is-scanning':'')}/><div className="v3-camera-zoom"><button onClick={()=>scale(zoom-.2)}>−</button><button type="button" aria-label="확대 초기화" onClick={()=>scale(1)}>{zoom.toFixed(1)}×</button><button onClick={()=>scale(zoom+.2)}>＋</button></div><img src="/figma-v3/collar.png" alt="" className="v3-camera-collar"/>{scan?<div className="v3-pixel-dialog v3-camera-dialog-box">두근두근! {dog.name}를 수집하고 있어요.<button onClick={finishCapture}>▶ SKIP 후 결과보기</button></div>:<div className="v3-pixel-dialog v3-camera-dialog-box">야생의 {dog.name}가 나타났다!<button onClick={capture}>▶ 수집한다</button><button onClick={end}>　도망간다</button></div>}</div>}
+  {step==='live'&&<div className="v3-capture-live-art"><video ref={video} autoPlay muted playsInline className="v3-camera-video" style={{transform:'scale('+zoom+')'}}/><div className="v3-capture-tip"><button onClick={toggleSound} aria-label={sound?'음원 끄기':'음원 켜기'}><img src={'/figma-v3/sound-'+(sound?'on':'off')+'.png'} alt=""/>음원 {sound?'켜짐':'꺼짐'}</button><p>‘네모칸’ 안에 잘 맞춰 수집해주세요</p></div><div ref={guide} className={'v3-camera-square'+(scan?' is-scanning':'')}/><div className="v3-camera-zoom"><button onClick={()=>scale(zoom-.2)}>−</button><button type="button" aria-label="확대 초기화" onClick={()=>scale(1)}>{zoom.toFixed(1)}×</button><button onClick={()=>scale(zoom+.2)}>＋</button></div><button type="button" className="v3-camera-collar v3-camera-shutter" onClick={capture} disabled={busy||scan||!collectReady} aria-label="사진 촬영"><img src="/figma-v3/collar.png" alt="픽셀 목줄"/></button>{!collectReady?<div className="v3-pixel-dialog v3-camera-dialog-box">야생의 {dog.name}가 나타났다!<GoPixelChoice initial onClick={()=>setCollectReady(true)}>수집한다</GoPixelChoice><GoPixelChoice onClick={end}>도망간다</GoPixelChoice></div>:<button type="button" className="v3-camera-cancel" onClick={end}>도망간다</button>}</div>}
   {step==='edit'&&<div className="v3-capture-edit"><h2>수집한 멍멍이 확인하기</h2><img src={preview} className="v3-capture-photo" alt="촬영한 강아지"/><button className="v3-retry" onClick={restart}>다시 수집 &gt;</button><label>카드 제목<input maxLength={30} value={title} onChange={e=>setTitle(e.target.value)} placeholder={dog.name+'의 소중한 순간'} /></label><small className="v3-capture-title-count">{title.length}/30</small><p>저장하면 모두의 도감에 바로 공개돼요.</p><button className="v3-yellow-btn" disabled={busy||!title.trim()} onClick={save}>{busy?'저장 중…':'카드 저장하고 게시하기'}</button></div>}
-  {step==='done'&&<div className="v3-capture-complete"><h2>멍카드 수집 완료!</h2><div className="v3-complete-card">{saved&&<GoCard card={saved} compact/>}</div><Link className="v3-yellow-btn" href={saved?.id?'/go/posts/'+saved.id:'/go/'+dog.id} onClick={end}>내 카드 보러가기</Link></div>}
+  {step==='done'&&<div className="v3-capture-complete"><h2>멍카드 수집 완료!</h2><div className="v3-complete-card">{saved&&<GoReveal><GoCard card={saved} compact/></GoReveal>}</div><Link className="v3-yellow-btn" href={saved?.id?'/go/posts/'+saved.id:'/go/'+dog.id} onClick={end}>내 카드 보러가기</Link></div>}
+  {permissionOpen&&<div className="v3-camera-permission" role="dialog" aria-modal="true" aria-label="카메라 사용 안내"><div className="v3-pixel-dialog"><p>카메라 사용을 허용하시겠습니까?</p><GoPixelChoice initial onClick={openCamera}>허용하고 시작하기</GoPixelChoice><GoPixelChoice onClick={end}>아직..</GoPixelChoice></div></div>}
   {error&&<div className="v3-camera-error" role="alert"><p>{error}</p>{cameraError&&<><button type="button" onClick={openCamera}>다시 시도</button><button type="button" onClick={end}>도감으로 돌아가기</button></>}</div>}
  </div>;
 }

@@ -3,6 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import GoShell,{useGoSession} from './GoShell.js';
 import GoCard from './GoCard.js';
+import GoReveal from './GoReveal.js';
 import GoCardExport from './GoCardExport.js';
 import GoPostEditor from './GoPostEditor.js';
 import GoReport from './GoReport.js';
@@ -28,10 +29,10 @@ function Post({id}){
    <img className="v10-post-sparkle v10-post-sparkle-bottom" src="/figma-post/sparkle-bottom.svg" alt="" aria-hidden="true"/>
    <button className="v10-post-sound" type="button" onClick={toggleSound} aria-label={sound?'소리 끄기':'소리 켜기'} aria-pressed={sound}><img src={sound?'/figma-post/sound-on.svg':'/figma-v3/sound-off.png'} alt=""/></button>
    <h1>{card.title||card.dogName+'의 기록'}</h1>
-   <div className="v6-post-card"><GoCard key={card.id} card={card} member={member} compact/></div>
+   <div className="v6-post-card"><GoReveal key={card.id}><GoCard card={card} member={member} compact/></GoReveal></div>
    {card.ownerId?<Link className="v6-post-author" href={'/go/recorders/'+card.ownerId}>{card.nickname} 멍기록가</Link>:<span className="v6-post-author">{card.nickname} 멍기록가</span>}
    {date&&<time className="v6-post-date" dateTime={date}>{new Date(date).toLocaleDateString('ko-KR').replace(/\s/g,'').replace(/\.$/,'')}</time>}
-   <div className="v6-post-actions"><button type="button" onClick={toggleLike} disabled={liking} aria-pressed={Boolean(card.liked)}>♡ 좋아요 {card.likeCount||0}</button><button type="button" className="v6-save" onClick={()=>needsLogin()||setExporting(true)}>이미지 저장·공유</button><Link className="v6-dog-link" href={'/dogs/'+card.dogId}>{card.dogName} 소개 보기 ↗</Link></div>
+   <div className="v6-post-actions"><button type="button" onClick={toggleLike} disabled={liking} aria-pressed={Boolean(card.liked)}>{card.liked&&<span className="go-like-burst" aria-hidden="true">♥</span>}♡ 좋아요 {card.likeCount||0}</button><button type="button" className="v6-save" onClick={()=>needsLogin()||setExporting(true)}>이미지 저장·공유</button><Link className="v6-dog-link" href={'/dogs/'+card.dogId}>{card.dogName} 소개 보기 ↗</Link></div>
    {card.ownerId!==member?.id&&<button type="button" className="v6-report" onClick={()=>needsLogin()||setReportOpen(s=>!s)}>신고하기</button>}
    {card.ownerId===member?.id&&<button type="button" className="v6-report" onClick={()=>setEditing(true)}>제목 수정</button>}
    {reportOpen&&<GoReport cardId={card.id} onClose={()=>setReportOpen(false)} onSubmitted={()=>{setReportOpen(false);setNotice('신고가 접수됐어요.');}}/>}

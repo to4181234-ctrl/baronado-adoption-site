@@ -57,6 +57,7 @@ export default function DogDetailPage() {
     {name:'성격과 취향',keys:['personality','charm','likes','dislikes']},
     ...(!resident?[{name:'히스토리와 가족',keys:['history','recommended_home','ideal_family']}]:[]),
   ].map(group=>({...group,fields:group.keys.map(key=>PROFILE_FIELDS.find(f=>f.key===key)).filter(f=>f&&Boolean(profile[f.key]))})).filter(g=>g.fields.length):[];
+  const hasDetails=fieldGroups.length>0||Boolean(profile.extra_questions?.some(x=>x.question&&x.answer));
   const backHref = dog?.category === CATEGORY_RESIDENT ? '/residents' : '/';
 
   const resetZoom=()=>{zoom.current={pointers:new Map(),scale:1,x:0,y:0,base:null,wasPinch:false};setZoomState({scale:1,x:0,y:0});};
@@ -130,7 +131,7 @@ export default function DogDetailPage() {
           <>
           <nav className={'v3-detail-tabs'+(dog.category===CATEGORY_RESIDENT?' is-resident':'')} aria-label="상세 페이지 메뉴">
            <button type="button" className={activeSection==='overview'?'active':''} aria-current={activeSection==='overview'?'location':undefined} onClick={()=>{setActiveSection('overview');document.getElementById('v3-detail-overview')?.scrollIntoView({behavior:'smooth'})}}>소개</button>
-           <button type="button" className={activeSection==='information'?'active':''} aria-current={activeSection==='information'?'location':undefined} onClick={()=>{setActiveSection('information');document.getElementById('v3-detail-information')?.scrollIntoView({behavior:'smooth'})}}>상세 정보</button>
+           {hasDetails&&<button type="button" className={activeSection==='information'?'active':''} aria-current={activeSection==='information'?'location':undefined} onClick={()=>{setActiveSection('information');document.getElementById('v3-detail-information')?.scrollIntoView({behavior:'smooth'})}}>상세 정보</button>}
            {dog.category!==CATEGORY_RESIDENT&&<><button type="button" className={activeSection==='shelter'?'active':''} aria-current={activeSection==='shelter'?'location':undefined} onClick={()=>{setActiveSection('shelter');document.getElementById('v3-detail-shelter')?.scrollIntoView({behavior:'smooth'})}}>보호소</button><button type="button" className={activeSection==='records'?'active':''} aria-current={activeSection==='records'?'location':undefined} onClick={()=>{setActiveSection('records');document.getElementById('v3-dog-records')?.scrollIntoView({behavior:'smooth'})}}>멍기록</button></>}
           </nav>
           <article className="detail-card v3-figma-detail">
@@ -155,16 +156,16 @@ export default function DogDetailPage() {
            <div className="v3-detail-divider" aria-hidden="true"/>
            <section className="v3-detail-about" id="v3-detail-overview">
             <h2>{dog.name}를 소개합니다</h2>
-            <ExpandableText key={dog.id} text={getDogProfile(dog).introduction||dog.description||'아직 소개글이 등록되지 않았어요.'} className="desc"/>
+            <ExpandableText key={dog.id} limit={resident?Infinity:180} text={getDogProfile(dog).introduction||dog.description||'아직 소개글이 등록되지 않았어요.'} className="desc"/>
            </section>
-           <section className="v3-detail-properties" id="v3-detail-information">
+           {hasDetails&&<section className="v3-detail-properties" id="v3-detail-information">
             <h2>상세 정보</h2>
             {fieldGroups.map(group=><div className="v3-detail-property-group" key={group.name}>
               <h3>{group.name}</h3>
-              <div className="v3-detail-properties-table">{group.fields.map(field=><div className="v3-detail-property" key={field.key}><span>{field.label}</span><div>{field.key==='vaccinations'?<VaccinationDetails profile={profile}/>:<ExpandableText text={profile[field.key]}/>}</div></div>)}</div>
+              <div className="v3-detail-properties-table">{group.fields.map(field=><div className="v3-detail-property" key={field.key}><span>{field.label}</span><div>{field.key==='vaccinations'?<VaccinationDetails profile={profile} inline/>:<ExpandableText text={profile[field.key]}/>}</div></div>)}</div>
             </div>)}
             {Array.isArray(profile.extra_questions)&&profile.extra_questions.some(x=>x.question&&x.answer)&&<div className="v3-detail-property-group"><h3>추가 정보</h3><div className="v3-detail-properties-table">{profile.extra_questions.filter(x=>x.question&&x.answer).map((x,i)=><div className="v3-detail-property" key={i}><span>{x.question}</span><div>{x.answer}</div></div>)}</div></div>}
-           </section>
+           </section>}
            {dog.category!==CATEGORY_RESIDENT&&(profile.shelter_name||profile.shelter_url)&&<section className="v3-detail-shelter" id="v3-detail-shelter"><h2>보호소</h2><p>{profile.shelter_name||'보호소 정보 준비 중'}</p>{getShelterUrl(profile.shelter_url)&&<a href={getShelterUrl(profile.shelter_url)} target="_blank" rel="noopener noreferrer">보호소 홈페이지 ↗</a>}</section>}
           </article>
           </>

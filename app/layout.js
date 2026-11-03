@@ -32,3 +32,5 @@ export default function RootLayout({ children }) {
 }
 
 import './figma-stage10-final.css';
+
+import './figma-user-revisions.css';

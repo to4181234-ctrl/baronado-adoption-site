@@ -2,15 +2,16 @@
 import Link from 'next/link';
 import {useEffect,useRef,useState} from 'react';
 import {figmaSprite,FIGMA_DOGS} from '../lib/goV3Game.js';
-import {getGoDialogue} from '../lib/goConfirmedDialogue.js';
-import {createGameAudio,GAME_SOUND_KEY} from '../lib/goV3Audio.js';
+import GoPixelChoice from './GoPixelChoice.js';
+import {createGameAudio,createMusicLoop,albumMusicFile,GAME_SOUND_KEY} from '../lib/goV3Audio.js';
 const HIDE_KEY='baronado-go-intro-hide-until',ANON_SEEN_KEY='baronado-go-intro-anon-day',WEEK=7*86400000;
 const koreanDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 export default function GoDiscovery({dogs=[],dog=null}){
  const [open,setOpen]=useState(false),[stage,setStage]=useState('choice'),[hide,setHide]=useState(false),[sound,setSound]=useState(true),[chosen,setChosen]=useState(null);
+ const music=useRef(null);
  const t=useRef(null),audio=useRef(null),loggedIn=useRef(false);
  useEffect(()=>{
-  let mounted=true;audio.current=createGameAudio();
+  let mounted=true;audio.current=createGameAudio();music.current=createMusicLoop(albumMusicFile);
   try{setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');}catch{}
   async function checkPopup(){
    try{
@@ -36,8 +37,9 @@ export default function GoDiscovery({dogs=[],dog=null}){
   checkPopup();
   const h=()=>{if(document.hidden)audio.current?.stop();};
   document.addEventListener('visibilitychange',h);
-  return()=>{mounted=false;clearTimeout(t.current);audio.current?.dispose();document.removeEventListener('visibilitychange',h);};
+  return()=>{mounted=false;clearTimeout(t.current);audio.current?.dispose();music.current?.dispose();document.removeEventListener('visibilitychange',h);};
  },[]);
+ useEffect(()=>{if(!open)return;music.current?.play();const resume=()=>music.current?.play();document.addEventListener('pointerdown',resume);document.addEventListener('keydown',resume);return()=>{music.current?.stop();document.removeEventListener('pointerdown',resume);document.removeEventListener('keydown',resume);};},[open]);
  function close(){
   clearTimeout(t.current);audio.current?.stop();setOpen(false);setStage('choice');setChosen(null);
   if(!hide)return;
@@ -51,10 +53,10 @@ export default function GoDiscovery({dogs=[],dog=null}){
  return open&&<div className="v3-discovery-backdrop v3-discovery-figma" onClick={close} role="presentation"><section className="v3-discovery-modal" role="dialog" aria-modal="true" aria-label="첫 방문 멍멍GO! 발견" onClick={e=>e.stopPropagation()}>
   <button className="v3-discovery-close" aria-label="닫기" onClick={close}>×</button>
   <h2><img className="v3-discovery-figma-title" src="/figma-v3/discovery-title.svg" alt="멍멍GO!"/></h2>
-  <div className="v3-discovery-stage">
+  <div className={'v3-discovery-stage v3-discovery-stage-'+stage}>
    {stage==='choice'?<div className="v3-collars">{[0,1,2].map(i=><button type="button" key={i} onClick={()=>reveal(i)} aria-label={'목줄 '+(i+1)+' 선택'}><img src="/figma-v3/collar.png" alt="픽셀 목줄"/></button>)}</div>:stage==='reveal'?<img className="v3-discovery-reveal" src="/figma-v3/collar.png" alt="강아지를 찾는 중"/>:<img className="v3-discovery-reveal v3-discovery-result" src={figmaSprite(chosen?.name||'뽀실')} alt={chosen?.name||'강아지'}/>}
   </div>
-  <div className="v3-discovery-dialog">{['bg','outer','inner'].map(n=><img key={n} className={'v3-discovery-dialog-layer v3-discovery-dialog-'+n} src={'/figma-v3/discovery-dialog-'+n+'.svg'} alt=""/>)}<div className="v3-discovery-dialog-content">{stage==='choice'?<>오늘의 멍멍이는 누구일까요?<button onClick={()=>reveal(0)}><img className="v3-discovery-arrow" src="/figma-v3/discovery-select-arrow.svg" alt=""/>하나 고른다</button><button onClick={close}>　도망간다</button></>:stage==='reveal'?<>두근두근! 누구일까요?<button onClick={finish}>▶ SKIP 후 결과보기</button></>:<>야생의 {chosen?.name||'멍멍이'}가 나타났다!<p className="v3-discovery-confirmed-line">{getGoDialogue(chosen?.name,0,'discovery')}</p><Link href={chosen?'/go/'+chosen.id:'/go'} onClick={close}>▶ 멍멍GO!하러가기</Link><Link href="/" onClick={close}>　가족을 찾아요 둘러보기</Link></>}</div></div>
+  <div className="v3-discovery-dialog">{['bg','outer','inner'].map(n=><img key={n} className={'v3-discovery-dialog-layer v3-discovery-dialog-'+n} src={'/figma-v3/discovery-dialog-'+n+'.svg'} alt=""/>)}<div className="v3-discovery-dialog-content">{stage==='choice'?<>오늘의 멍멍이는 누구일까요?<GoPixelChoice onClick={()=>reveal(0)} initial>하나 고른다</GoPixelChoice><GoPixelChoice onClick={close}>도망간다</GoPixelChoice></>:stage==='reveal'?<>두근두근! 누구일까요?<GoPixelChoice onClick={finish} initial>SKIP 후 결과보기</GoPixelChoice></>:<>야생의 {chosen?.name||'멍멍이'}가 나타났다!<GoPixelChoice href={chosen?'/go/'+chosen.id:'/go'} onClick={close} initial>멍멍GO!하러가기</GoPixelChoice><GoPixelChoice href="/" onClick={close}>가족을 찾아요 둘러보기</GoPixelChoice></>}</div></div>
   <div className="v3-discovery-bottom"><label><input type="checkbox" checked={hide} onChange={e=>setHide(e.target.checked)}/> 7일간 보지 않기</label><button onClick={toggle} aria-label="사운드 켜기/끄기"><img src={'/figma-v3/sound-'+(sound?'on':'off')+'.png'} alt={sound?'소리 켜짐':'소리 꺼짐'}/></button></div>
  </section></div>;
 }

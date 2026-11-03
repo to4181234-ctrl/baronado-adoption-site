@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import GoPixelChoice from './GoPixelChoice.js';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {fetchDogs} from '../lib/dogs.js';
 import {figmaSprite,FIGMA_DOGS,gameElement} from '../lib/goV3Game.js';
@@ -49,7 +50,7 @@ function Album({initialDogId=null}){
     <section className="v3-profile-head"><div className="v3-profile-avatar"><img className={!member?'v3-profile-anon-silhouette':undefined} src={member?figmaSprite(member.avatarDog||'구름',member.avatarDog?'front':'shadow'):'/figma-v3/album-shadow-buddy.svg'} alt={member?'프로필 캐릭터':'미획득 실루엣'}/></div><div>{member?<><h1>{member.nickname}</h1><p>멍기록가</p><small>{member.profileBio||'자기소개가 없습니다.'}</small><Link href="/go/profile"><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>프로필 수정</Link><Link href={'/go/recorders/'+member.id}><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>내 프로필 미리보기</Link></>:<><h1 className="v3-anon-heading">멍기록가를 기다리는중!</h1><p>멍기록가</p><small className="v3-anon-lede">로그인하고 나만의 멍멍 도감 채우기</small><button type="button" className="v3-profile-login" onClick={openAccount}><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>로그인하고 시작하기</button><button type="button" className="v3-profile-login" onClick={openAccount}><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>로그인하고 시작하기</button></>}</div></section>
     <section className="v3-collection-section"><h2>내 도감</h2><div className="v3-progress-label">도감 수집 {claimed} / {totalDogs}{member&&claimed===0?' (첫 도감을 기다리고 있어요)':''}</div><div className="v3-progress"><span style={{width:(claimed/totalDogs*100)+'%'}}/></div>
      <div className="v3-collection-grid">{orderedDogs.map(name=>{const d=dogs.find(x=>x.name===name),owned=Boolean(d&&member&&(collection.counts?.[d.id]||0)>0);return <Link href={d?'/go/'+d.id:'/go'} className={'v3-collection-tile'+(owned?' unlocked':'')} key={name}><img src={owned?figure(name,true):FIGMA_ALBUM_SHADOW[name]||figure(name,false)} alt={owned?name:'미획득 실루엣'}/><strong>{name}</strong></Link>})}</div></section>
-    <section className="v3-battle-home"><h2>멍배틀</h2><Link href="/go/battle" className="v3-battle-shortcut"><img src="/figma-v3/collar.png" alt="픽셀 목줄"/><strong>멍배틀 하러가기 &gt;</strong></Link><div className="v3-pixel-panel"><div className="v10-panel-canvas">{['bg','outer','inner'].map(name=><img key={name} className={'v3-album-panel-layer v3-album-panel-'+name} src={'/figma-v3/album-panel-'+name+'.svg'} alt=""/>)}<div className="v3-panel-content">{!member?<><b>멍배틀을 시작해볼까요?</b><p>서로 다른 멍카드 2장을 모아<br/>대결하고 나만의 전적을 쌓아보세요!</p><button type="button" className="v3-anon-battle-login" onClick={openAccount}><img src="/figma-v3/album-battle-arrow.svg" alt="" aria-hidden="true"/>로그인하고 시작하기</button></>:<><b>멍멍이별 대결 전적</b><p>{claimed?'나의 멍멍이 카드로 대결 기록을 쌓아보세요.':'멍배틀을 하고 기록을 쌓아보세요'}</p></>}</div></div></div></section>
+    <section className="v3-battle-home"><h2>멍배틀</h2><Link href="/go/battle" className="v3-battle-shortcut"><img src="/figma-v3/collar.png" alt="픽셀 목줄"/><strong>멍배틀 하러가기 &gt;</strong></Link><div className="v3-pixel-panel"><div className="v10-panel-canvas">{['bg','outer','inner'].map(name=><img key={name} className={'v3-album-panel-layer v3-album-panel-'+name} src={'/figma-v3/album-panel-'+name+'.svg'} alt=""/>)}<div className="v3-panel-content">{!member?<><b>멍배틀을 시작해볼까요?</b><p>서로 다른 멍카드 2장을 모아<br/>대결하고 나만의 전적을 쌓아보세요!</p><button type="button" className="v3-anon-battle-login" onClick={openAccount}><img src="/figma-v3/album-battle-arrow.svg" alt="" aria-hidden="true"/>로그인하고 시작하기</button></>:<><b>멍멍이별 대결 전적</b>{Object.keys(collection.battleRecords||{}).length?<ul className="v11-battle-records">{Object.entries(collection.battleRecords).map(([id,stats])=><li key={id}><span>{dogs.find(d=>d.id===id)?.name||'멍멍이'}</span><span>{stats.wins}승 {stats.draws}무 {stats.losses}패</span></li>)}</ul>:<p>멍배틀을 하고 기록을 쌓아보세요</p>}</>}</div></div></div></section>
     {member&&collection.progress?.complete&&!collection.progress.claimed&&<button className="v3-yellow-btn" onClick={claim} disabled={stampBusy}>도감 완성 스탬프 받기</button>}
     
   </div>}
@@ -61,8 +62,8 @@ function Album({initialDogId=null}){
   <div className="v3-discovery-dialog">
    {['bg','outer','inner'].map(n=><img key={n} className={'v3-discovery-dialog-layer v3-discovery-dialog-'+n} src={'/figma-v3/discovery-dialog-'+n+'.svg'} alt=""/>)}
    <div className="v3-discovery-dialog-content">멍카드 수집 할 준비 되셨나요?
-    <button onClick={()=>{setCollectConfirm(false);setCamera(dog);}}>▶ 네</button>
-    <button onClick={()=>setCollectConfirm(false)}>　아직..</button>
+    <GoPixelChoice initial onClick={()=>{setCollectConfirm(false);setCamera(dog);}}>네</GoPixelChoice>
+    <GoPixelChoice onClick={()=>setCollectConfirm(false)}>아직..</GoPixelChoice>
    </div>
   </div>
  </section></div>}

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import GoPixelChoice from './GoPixelChoice.js';
 import { useCallback, useEffect, useState } from 'react';
 import { fetchDogs } from '../lib/dogs.js';
 import { figmaSprite, gameElement } from '../lib/goV3Game.js';
@@ -249,8 +250,8 @@ export default function GoDogAlbum({ dogId }) {
         <div className="v3-discovery-dialog">
           {['bg', 'outer', 'inner'].map(n => <img key={n} className={'v3-discovery-dialog-layer v3-discovery-dialog-' + n} src={'/figma-v3/discovery-dialog-' + n + '.svg'} alt=""/>)}
           <div className="v3-discovery-dialog-content">멍카드 수집 할 준비 되셨나요?
-            <button onClick={() => { setCollectConfirm(false); setCameraOpen(true); }}>▶ 네</button>
-            <button onClick={() => setCollectConfirm(false)}>아직..</button>
+            <GoPixelChoice initial onClick={() => { setCollectConfirm(false); setCameraOpen(true); }}>네</GoPixelChoice>
+            <GoPixelChoice onClick={() => setCollectConfirm(false)}>아직..</GoPixelChoice>
           </div>
         </div>
       </section>

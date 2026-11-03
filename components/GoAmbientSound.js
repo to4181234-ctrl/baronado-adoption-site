@@ -4,9 +4,9 @@ import {usePathname} from 'next/navigation';
 import {audioEnabled,albumMusicFile,cameraMusicFile} from '../lib/goV3Audio.js';
 
 // Exactly one BGM element; it survives transitions inside MeongGO.
-// Never starts merely because a page rendered or loaded.
+// Attempts playback on entry and retries after a gesture if the browser blocks autoplay.
 let player=null,mode='album',activated=false;
-function music(){if(!player){player=new Audio(albumMusicFile);player.loop=true;player.volume=.20;}return player;}
+function music(){if(!player){player=new Audio(albumMusicFile);player.loop=true;player.volume=.48;}return player;}
 function pause(){player?.pause();}
 function switchTo(next){mode=next==='camera'?'camera':'album';const node=music(),src=mode==='camera'?cameraMusicFile:albumMusicFile;if(!node.src.endsWith(src)){node.pause();node.src=src;node.load();}if(activated&&audioEnabled()&&!document.hidden)node.play().catch(()=>{});}
 export default function GoAmbientSound(){
@@ -14,7 +14,8 @@ export default function GoAmbientSound(){
  useEffect(()=>{
   const allowed=pathname?.startsWith('/go')&&!pathname.startsWith('/go/battle')&&!pathname.startsWith('/go/community')&&!pathname.startsWith('/go/settings')&&!pathname.startsWith('/go/profile')&&!pathname.startsWith('/go/avatar')&&!pathname.startsWith('/go/recorders');
   if(!allowed){pause();return;}
-  // Album/interaction page: only an explicit in-page gesture unlocks the album loop.
+  activated=true;switchTo(mode);
+  // Retry when the browser permits audio after an in-page gesture.
   function gesture(e){
    if(!e.target?.closest?.('.v3-go-app')||e.target.closest('a[href^="/go/"]')||e.target.closest('.v3-album-collect')||e.target.closest('.v3-camera-close'))return;
    if(!audioEnabled())return;
