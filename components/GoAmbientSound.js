@@ -1,6 +1,7 @@
 'use client';
 import {useEffect} from 'react';
 import {usePathname} from 'next/navigation';
+import {prepareAudioGain} from '../lib/goAudioGain.js';
 import {audioEnabled,albumMusicFile,cameraMusicFile} from '../lib/goV3Audio.js';
 
 // Exactly one BGM element; it survives transitions inside MeongGO.
@@ -8,7 +9,7 @@ import {audioEnabled,albumMusicFile,cameraMusicFile} from '../lib/goV3Audio.js';
 let player=null,mode='album',activated=false;
 function music(){if(!player){player=new Audio(albumMusicFile);player.loop=true;player.volume=.48;}return player;}
 function pause(){player?.pause();}
-function switchTo(next){mode=next==='camera'?'camera':'album';const node=music(),src=mode==='camera'?cameraMusicFile:albumMusicFile;if(!node.src.endsWith(src)){node.pause();node.src=src;node.load();}if(activated&&audioEnabled()&&!document.hidden)node.play().catch(()=>{});}
+function switchTo(next){mode=next==='camera'?'camera':'album';const node=music(),src=mode==='camera'?cameraMusicFile:albumMusicFile;if(!node.src.endsWith(src)){node.pause();node.src=src;node.load();}if(activated&&audioEnabled()&&!document.hidden){prepareAudioGain(node);node.play().catch(()=>{});}}
 export default function GoAmbientSound(){
  const pathname=usePathname();
  useEffect(()=>{
