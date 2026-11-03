@@ -54,9 +54,9 @@ function Game(){
   if(phase!=='choose'||mutating||selected.length!==2||!selected.every(c=>c.battle))return;
   finished.current=false;requestId.current=crypto.randomUUID();setColliding(false);setError('');setPhase('fight');
   sounds.current?.startMusic();sounds.current?.play('start');
-  timers.current=[setTimeout(()=>sounds.current?.play('appear'),500),setTimeout(()=>{setColliding(true);sounds.current?.play('impact');},1400),setTimeout(()=>completeRef.current(),3000)];
+  timers.current=[setTimeout(()=>sounds.current?.play('appear'),500),setTimeout(()=>setColliding(true),1400),setTimeout(()=>sounds.current?.play('impact'),1595),setTimeout(()=>completeRef.current(),3000)];
  };
- const reset=()=>{stop();requestId.current=null;finished.current=false;setPhase('choose');setSelected([]);setResult(null);setColliding(false);setError('');setPage(0);};
+ const reset=()=>{stop();sounds.current?.startMusic();requestId.current=null;finished.current=false;setPhase('choose');setSelected([]);setResult(null);setColliding(false);setError('');setPage(0);};
  const changeTab=(name)=>{setTab(name);setPage(0);setError('');};
  const [first,second]=selected;
  const winner=result?.winner==='first'?first:result?.winner==='second'?second:null;

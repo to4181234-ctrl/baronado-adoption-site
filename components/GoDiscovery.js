@@ -50,8 +50,9 @@ export default function GoDiscovery({dogs=[],dog=null}){
    fetch('/api/go/settings',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hideWeek'})}).catch(()=>{});
   }else{try{localStorage.setItem(HIDE_KEY,String(Date.now()+WEEK));}catch{}}
  }
- function reveal(i){if(stage!=='choice')return;const list=Array.isArray(dogs)?dogs.filter(d=>FIGMA_DOGS.includes(d.name)):[];const d=list.length?list[Math.floor(Math.random()*list.length)]:dog||null;setChosen(d);setStage('reveal');audio.current?.play('collar');audio.current?.schedule('discover',200);t.current=setTimeout(()=>{setStage('result');audio.current?.stop();},2000);}
- function finish(){clearTimeout(t.current);if(stage==='result')return;setStage('result');audio.current?.stop();}
+ function showResult(){setStage('result');audio.current?.play('discover');audio.current?.schedule('bark1',350);}
+ function reveal(i){if(stage!=='choice')return;const list=Array.isArray(dogs)?dogs.filter(d=>FIGMA_DOGS.includes(d.name)):[];const d=list.length?list[Math.floor(Math.random()*list.length)]:dog||null;setChosen(d);setStage('reveal');audio.current?.play('collar');t.current=setTimeout(showResult,2000);}
+ function finish(){clearTimeout(t.current);if(stage==='result')return;showResult();}
  function toggle(){const next=!sound;setSound(next);try{localStorage.setItem(GAME_SOUND_KEY,next?'on':'off');window.dispatchEvent(new Event('go-v3-settings-changed'));}catch{}if(!next)audio.current?.stop();}
  return open&&<div className="v3-discovery-backdrop v3-discovery-figma" onClick={close} role="presentation"><section className="v3-discovery-modal" role="dialog" aria-modal="true" aria-label="첫 방문 멍멍GO! 발견" onClick={e=>e.stopPropagation()}>
   <button className="v3-discovery-close" aria-label="닫기" onClick={close}>×</button>

@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createSfxTransport} from '../lib/goSfxTransport.js';
-function fixture({deferDecode=false}={}){
+function fixture({deferDecode=false,deferResume=false}={}){
  const listeners=new Map(),windowListeners=new Map(),started=[],stopped=[],downloads=[];let finishDecode,enabled=true,now=1000;
  const doc={hidden:false,addEventListener(t,f){if(!listeners.has(t))listeners.set(t,new Set());listeners.get(t).add(f);},removeEventListener(t,f){listeners.get(t)?.delete(f);}};
- class Context{state='suspended';destination={};resume(){this.state='running';return Promise.resolve();}decodeAudioData(){return deferDecode?new Promise(r=>{finishDecode=r;}):Promise.resolve({duration:.5});}createGain(){return {gain:{value:1},connect(){},disconnect(){}};}createBufferSource(){const s={connect(){},disconnect(){},start(){started.push(s);},stop(){stopped.push(s);}};return s;}}
+ class Context{state='suspended';destination={};resume(){if(deferResume)return new Promise(resolve=>setTimeout(()=>{this.state='running';resolve();},5));this.state='running';return Promise.resolve();}decodeAudioData(){return deferDecode?new Promise(r=>{finishDecode=r;}):Promise.resolve({duration:.5});}createGain(){return {gain:{value:1},connect(){},disconnect(){}};}createBufferSource(){const s={connect(){},disconnect(){},start(){started.push(s);},stop(){stopped.push(s);}};return s;}}
  const win={document:doc,AudioContext:Context,addEventListener(t,f){if(!windowListeners.has(t))windowListeners.set(t,new Set());windowListeners.get(t).add(f);},removeEventListener(t,f){windowListeners.get(t)?.delete(f);}};
  const previous={window:globalThis.window,document:globalThis.document,fetch:globalThis.fetch};globalThis.window=win;globalThis.document=doc;globalThis.fetch=async file=>{downloads.push(file);return {ok:true,arrayBuffer:async()=>new ArrayBuffer(4)};};
  const audio=createSfxTransport({files:{start:'/start.mp3',appear:'/appear.mp3',victory:'/victory.mp3'},enabled:()=>enabled,clock:()=>now});
@@ -24,4 +24,8 @@ test('mute stops all active sounds; hidden and disposed players cannot replay ol
 });
 test('stopping cancels scheduled cues and duplicate rapid taps are ignored',async()=>{
  const f=fixture();try{f.gesture();assert.equal(await f.audio.play('start'),true);assert.equal(await f.audio.play('start'),false);f.audio.schedule('victory',5);f.audio.stop();await new Promise(r=>setTimeout(r,15));assert.equal(f.started.length,1);}finally{f.restore();}
+});
+
+test('the first iOS gesture waits for the suspended context to resume before playing',async()=>{
+ const f=fixture({deferResume:true});try{f.gesture();assert.equal(await f.audio.play('start'),true);assert.equal(f.started.length,1);}finally{f.restore();}
 });

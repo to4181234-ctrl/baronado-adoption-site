@@ -9,7 +9,7 @@ import GoShell,{useGoSession} from './GoShell.js';
 const MOTIONS={snack:{name:'간식',pose:'feed',message:'냠냠! 맛있는 간식 고마워~',audio:'snack'},praise:{name:'칭찬',pose:'praise',message:'멍멍! 칭찬해줘서 신나요!',audio:'praise'},play:{name:'놀이',pose:'play',message:'같이 노니까 너무 신나요!',audio:'play'}};
 function Interaction(){
  const {id}=useParams(),router=useRouter(),{member,ready,openAccount}=useGoSession();
- const [dog,setDog]=useState(null),[status,setStatus]=useState(null),[pose,setPose]=useState('front'),[notice,setNotice]=useState('멍멍!\n(안녕! 자는게 아니라\n생각중이었어~)'),[visibleNotice,setVisibleNotice]=useState(''),[walking,setWalking]=useState(false),[busy,setBusy]=useState(false),[now,setNow]=useState(Date.now()),[sound,setSound]=useState(true),[error,setError]=useState('');
+ const [dog,setDog]=useState(null),[status,setStatus]=useState(null),[pose,setPose]=useState('front'),[notice,setNotice]=useState(''),[visibleNotice,setVisibleNotice]=useState(''),[walking,setWalking]=useState(false),[busy,setBusy]=useState(false),[now,setNow]=useState(Date.now()),[sound,setSound]=useState(true),[error,setError]=useState('');
  const audio=useRef(null),timer=useRef(null),barks=useRef(0),typeTimer=useRef(null),interacted=useRef(false);
  useEffect(()=>listenAudioSetting(setSound),[]);
  useEffect(()=>{const id=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(id);},[]);
@@ -49,9 +49,9 @@ function Interaction(){
   typeTimer.current=setInterval(()=>{step+=chunk;setVisibleNotice(message.slice(0,step));if(step>=message.length)clearInterval(typeTimer.current);},40);
   return()=>clearInterval(typeTimer.current);
  },[notice]);
- useEffect(()=>{interacted.current=false;fetchDog(id).then(setDog).catch(()=>setError('강아지 정보를 불러오지 못했어요.'));},[id]);
+ useEffect(()=>{interacted.current=false;setNotice('');setDog(null);setStatus(null);fetchDog(id).then(setDog).catch(()=>setError('강아지 정보를 불러오지 못했어요.'));},[id]);
  useEffect(()=>{if(!ready||!member)return;fetch('/api/go/interaction?dogId='+encodeURIComponent(id)).then(r=>r.json()).then(setStatus).catch(()=>setError('친밀도를 불러오지 못했어요.'));},[id,ready,member?.id]);
- useEffect(()=>{if(!interacted.current && dog?.name){const line=getGoDialogue(dog.name,status?.level,'greeting');if(line)setNotice(line);}},[dog?.name,status?.level]);
+ useEffect(()=>{if(!interacted.current && dog?.name){const line=getGoDialogue(dog.name,0,'discovery');if(line){setNotice(line);audio.current?.play('bark1');}}},[dog?.name]);
  useEffect(()=>{audio.current=createGameAudio();setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');const hide=()=>{if(document.hidden)audio.current?.stop()};document.addEventListener('visibilitychange',hide);return()=>{clearTimeout(timer.current);clearInterval(typeTimer.current);audio.current?.dispose();document.removeEventListener('visibilitychange',hide);};},[]);
  function soundToggle(){const next=!sound;setSound(next);localStorage.setItem(GAME_SOUND_KEY,next?'on':'off');window.dispatchEvent(new Event('go-v3-settings-changed'));if(!next)audio.current?.stop();}
  function bark(){if(busy)return;setWalking(false);setPose('front');audio.current?.play('bark'+(barks.current+1));barks.current=(barks.current+1)%3;interacted.current=true;setNotice(getGoDialogue(dog?.name,status?.level,'greeting')||dog?.name+'가 반갑게 짖었어요!');}
@@ -63,7 +63,7 @@ function Interaction(){
   if(status?.actions?.[action]?.nextAt&&Date.now()<Date.parse(status.actions[action].nextAt)){setError('30분 뒤에 다시 이용할 수 있어요.');return;}
   setBusy(true);setWalking(false);setPose('front');setError('');
   try{const r=await fetch('/api/go/interaction',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dogId:id,action})});const d=await r.json();if(!r.ok)throw Error(d.error||'교감에 실패했어요.');
-   const m=MOTIONS[action];interacted.current=true;setPose(m.pose);setNotice(getGoDialogue(dog?.name,d.level??status?.level,action)||m.message);audio.current?.play(m.audio);
+   const m=MOTIONS[action];interacted.current=true;setPose(m.pose);setNotice(getGoDialogue(dog?.name,status?.level,action)||m.message);audio.current?.play(m.audio);audio.current?.schedule('bark'+(barks.current+1),250);barks.current=(barks.current+1)%3;
    setStatus(old=>({...old,level:d.level,actions:{...old.actions,[action]:{remaining:d.remaining,nextAt:d.availableAt}}}));
    timer.current=setTimeout(()=>{setPose('front');setBusy(false);},2000);
   }catch(e){setError(e.message);setBusy(false);}

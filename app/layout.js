@@ -13,6 +13,7 @@ import './figma-stage6-public.css';
 import './figma-stage7-discovery-camera.css';
 import './figma-stage8-battle.css';
 import './figma-stage9-admin.css';
+import GoAudioFeedback from '../components/GoAudioFeedback.js';
 
 export const metadata = {
   metadataBase: new URL('https://baronado-adoption-site-8sm2.vercel.app'),
@@ -26,7 +27,7 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous"/>
       </head>
-      <body>{children}</body>
+      <body><GoAudioFeedback/>{children}</body>
     </html>
   );
 }

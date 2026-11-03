@@ -1,7 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
-import GoLoading from './GoLoading.js';
 
 // Figma 173:11010: show the newest two public photos, not collectible-card faces.
 export default function GoDogRecords({dog}){
@@ -21,7 +20,7 @@ export default function GoDogRecords({dog}){
     <strong>{card.title||`${dog.name}의 순간`}</strong>
     <small>{card.nickname||'익명의'} 멍기록가</small>
   </Link>)}</div>
-  {loading&&<GoLoading compact label="멍기록을 불러오는 중이에요."/>}
+  {loading&&<p className="go-empty" role="status">멍기록을 불러오는 중이에요.</p>}
   {error&&<p className="go-error" role="status">{error} <button type="button" className="go-text-button" onClick={()=>setRetry(x=>x+1)}>다시 보기</button></p>}
   {!loading&&!error&&!cards.length&&<p className="go-empty">아직 공개된 멍기록이 없어요.</p>}
   <Link className="go-dog-record-link" href="/go/community">모두의 도감 보러가기</Link>
