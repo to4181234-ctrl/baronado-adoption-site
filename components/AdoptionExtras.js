@@ -7,6 +7,17 @@ export default function AdoptionExtras({ form, setForm }) {
 
   return <>
     <fieldset className="profile-editor">
+      <legend>강아지 자기소개</legend>
+      <label>
+        <span className="label">자기소개 글</span>
+        <textarea className="field" rows={5} maxLength={3500}
+          value={profile.introduction || ''}
+          onChange={event => setProfile({ introduction: event.target.value })}
+          placeholder="강아지를 소개하는 글을 입력해주세요." />
+      </label>
+      <p className="small-note">‘○○를 소개합니다’ 아래에 표시되는 글이에요.</p>
+    </fieldset>
+    <fieldset className="profile-editor">
       <legend>보호소 정보</legend>
       <label><span className="label">보호소 이름</span>
         <input className="field" value={profile.shelter_name || ''} onChange={event => setProfile({ shelter_name: event.target.value })} />
