@@ -2,6 +2,7 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import GoShell,{useGoSession} from './GoShell.js';
+import {listenAudioSetting} from '../lib/goV3Audio.js';
 import {createBattleSound,BATTLE_SOUND_KEY} from '../lib/goBattleSound.js';
 import './GoBattle.css';
 import GoCardFace from './GoCardFace.js';
@@ -20,9 +21,9 @@ function Game(){
  const [selected,setSelected]=useState([]),[phase,setPhase]=useState('choose');
  const [colliding,setColliding]=useState(false),[result,setResult]=useState(null),[mutating,setMutating]=useState(false);
  const [soundEnabled,setSoundEnabled]=useState(false),[soundReady,setSoundReady]=useState(false);
- const sounds=useRef(null),timers=useRef([]),requestId=useRef(null),finished=useRef(false);
+ const sounds=useRef(null),timers=useRef([]),requestId=useRef(null),finished=useRef(false),alive=useRef(true);
  const stop=useCallback(()=>{timers.current.forEach(clearTimeout);timers.current=[];sounds.current?.stop();},[]);
- useEffect(()=>{sounds.current=createBattleSound();setSoundEnabled(localStorage.getItem(BATTLE_SOUND_KEY)!=='off');setSoundReady(true);const hidden=()=>{if(document.hidden)sounds.current?.stop();};document.addEventListener('visibilitychange',hidden);return()=>{stop();sounds.current?.dispose();document.removeEventListener('visibilitychange',hidden);};},[stop]);
+ useEffect(()=>{alive.current=true;sounds.current=createBattleSound();const unsubscribe=listenAudioSetting(setSoundEnabled);setSoundEnabled(localStorage.getItem(BATTLE_SOUND_KEY)!=='off');setSoundReady(true);const hidden=()=>{if(document.hidden)sounds.current?.stop();};document.addEventListener('visibilitychange',hidden);return()=>{alive.current=false;unsubscribe();stop();sounds.current?.dispose();document.removeEventListener('visibilitychange',hidden);};},[stop]);
  useEffect(()=>{if(soundReady)sounds.current?.setMuted(!soundEnabled);},[soundEnabled,soundReady]);
  useEffect(()=>{if(!ready||!member){setData(initial);return;}const ctl=new AbortController();setLoading(true);setError('');const qs=new URLSearchParams({mine:tab==='mine'?'1':'0',q:searched,order,page:String(page)});
  fetch('/api/go/battle?'+qs,{cache:'no-store',signal:ctl.signal}).then(r=>r.json().then(j=>{if(!r.ok)throw Error(j.error||'카드를 불러오지 못했어요.');return j;})).then(j=>setData(j)).catch(e=>{if(!ctl.signal.aborted)setError(e.message);}).finally(()=>{if(!ctl.signal.aborted)setLoading(false);});
@@ -42,7 +43,7 @@ function Game(){
   setMutating(true);sounds.current?.stop();
   try{
    const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,secondId:selected[1].id})});
-   const body=await response.json();
+   const body=await response.json();if(!alive.current)return;
    if(!response.ok){if(response.status===409){setSelected([]);setResult(null);}throw Error(body.error||'대결 결과를 저장하지 못했어요.');}
    setResult(body.battle);setPhase('result');sounds.current?.play(body.battle.winner==='draw'?'draw':body.battle.winner==='first'?'victory':'defeat');
   }catch(e){setError(e.message);setPhase('choose');}
@@ -76,7 +77,7 @@ function Game(){
    {loading?<p className="meong-battle-empty">카드를 불러오는 중이에요.</p>:data.cards.length?<div className="meong-battle-grid">{data.cards.map(c=><div className="meong-battle-entry" key={c.id}><BattleCard card={c} onSelect={()=>choose(c)} selected={selected.some(v=>v.id===c.id)}/><span>{c.nickname} 멍기록가</span><small>{c.capturedAt?new Date(c.capturedAt).toLocaleDateString('ko-KR'):''}</small></div>)}</div>:<div className="meong-battle-empty">표시할 카드가 없어요. {tab==='mine'?'카드를 수집하러 가볼까요?':''}</div>}
    {data.total>4&&<div className="meong-battle-pager"><button disabled={page===0||loading} onClick={()=>setPage(p=>p-1)}>‹ 이전</button><span>{page+1}</span><button disabled={!data.hasMore||loading} onClick={()=>setPage(p=>p+1)}>다음 ›</button></div>}
   </>}
-  {phase==='fight'&&<section className="meong-battle-fight"><h1>두근두근, 멍배틀!</h1><div className={'meong-battle-versus'+(colliding?' is-colliding':'')}><BattleCard card={first} mini/><BattleCard card={second} mini/></div><strong>VS</strong><button className="meong-battle-primary" disabled={mutating} onClick={()=>completeRef.current()}>{mutating?'결과 기록 중…':'SKIP 후 결과보기'}</button></section>}
+  {phase==='fight'&&<section className="meong-battle-fight"><h1>두근두근, 멍배틀!</h1><div className={'meong-battle-versus'+(colliding?' is-colliding':'')}><BattleCard card={first} mini/><BattleCard card={second} mini/><div className="v12-battle-impact" aria-hidden="true">{Array.from({length:12},(_,i)=><span key={i} style={{'--impact-angle':(i*30)+'deg','--impact-distance':(i%2?135:185)+'px'}}/> )}</div></div><strong>VS</strong><button className="meong-battle-primary" disabled={mutating} onClick={()=>completeRef.current()}>{mutating?'결과 기록 중…':'SKIP 후 결과보기'}</button></section>}
   {phase==='result'&&result&&<section className="meong-battle-result"><h1>이번 대결 승자는..</h1><div className="meong-battle-winner">{winner?<img src={sprite(winner)} alt={winner.dogName}/>:<><img src={sprite(first)} alt={first.dogName}/><img src={sprite(second)} alt={second.dogName}/></>}</div><h2>{winner?winner.dogName+' 카드 승리!':'막상막하!'}</h2><p>{winner?'이번 카드의 상성이 한 수 위였어요.':'두 카드의 매력을 가릴 수 없어요'}</p><div className="meong-battle-score">{first.dogName} {result.first_power+result.first_charm} + 상성 {result.first_bonus} → {result.first_score}<br/>{second.dogName} {result.second_power+result.second_charm} + 상성 {result.second_bonus} → {result.second_score}</div><button className="meong-battle-primary" onClick={reset}>다른 카드로 대결</button><Link className="meong-battle-secondary" href="/go">도감으로</Link></section>}
   </>}
  </div>;

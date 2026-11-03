@@ -4,8 +4,6 @@ import {readFileSync,existsSync} from 'node:fs';
 import {join} from 'node:path';
 
 const expected={
-  "BGM_02_Album_Original_Chiptune_Loop.mp3": "f967b87eac0329c35cf13c67464616ae95de10d4251dc938b401743c82c6e803",
-  "BGM_03_Camera_Original_Suspense_Loop.mp3": "7729a09f6bf0ac31b3e83f625110e66bd19d09b1d6252d4f04ff88b72f1d4428",
   "SFX_01_Card_Appear.mp3": "647531f8ee9119f271543edeb67e6f25dfe5b59991a7e3df6f1c477451eebf0d",
   "SFX_02_Card_Select.mp3": "65e6cbff8e3694251a37a5249bfb0352ef3894db77e1361f94d7586f51ce21dc",
   "SFX_03_Card_Deselect.mp3": "9de857b90b8568cf282781bc7a784d715fec189d664c4c7df5106a9dd0a8960d",

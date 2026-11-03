@@ -27,6 +27,6 @@ export default function PublicHero({banners=[]}){
     {s.href?<a href={s.href} tabIndex={active===i?0:-1} aria-label={s.alt||'배너 바로가기'}><img src={s.image} alt={s.alt||''}/></a>:<img src={s.image} alt={s.alt||''}/>}
    </div>)}
   </div>
-  <div className="v3-hero-dots" aria-label="배너 선택">{slides.map((s,i)=><button key={s.id||i} type="button" aria-label={`${i+1}번째 배너`} aria-current={active===i?'true':undefined} onClick={()=>setActive(i)}/>)}</div>
+  {slides.length>1&&<div className="v3-hero-dots" aria-label="배너 선택">{slides.map((s,i)=><button key={s.id||i} type="button" aria-label={`${i+1}번째 배너`} aria-current={active===i?'true':undefined} onClick={()=>setActive(i)}/>)}</div>}
  </section>;
 }

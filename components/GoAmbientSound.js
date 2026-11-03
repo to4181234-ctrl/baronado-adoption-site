@@ -1,36 +1,21 @@
 'use client';
 import {useEffect} from 'react';
 import {usePathname} from 'next/navigation';
-import {prepareAudioGain} from '../lib/goAudioGain.js';
-import {audioEnabled,albumMusicFile,cameraMusicFile} from '../lib/goV3Audio.js';
-
-// Exactly one BGM element; it survives transitions inside MeongGO.
-// Attempts playback on entry and retries after a gesture if the browser blocks autoplay.
-let player=null,mode='album',activated=false;
-function music(){if(!player){player=new Audio(albumMusicFile);player.loop=true;player.volume=.48;}return player;}
-function pause(){player?.pause();}
-function switchTo(next){mode=next==='camera'?'camera':'album';const node=music(),src=mode==='camera'?cameraMusicFile:albumMusicFile;if(!node.src.endsWith(src)){node.pause();node.src=src;node.load();}if(activated&&audioEnabled()&&!document.hidden){prepareAudioGain(node);node.play().catch(()=>{});}}
+import {createMusicLoop} from '../lib/goV3Audio.js';
+import {goMusicFile} from '../lib/goMusicCatalog.js';
+// One route-owned player; unavailable selected tracks stay silent, without requesting missing files.
 export default function GoAmbientSound(){
  const pathname=usePathname();
  useEffect(()=>{
-  const allowed=pathname?.startsWith('/go')&&!pathname.startsWith('/go/battle')&&!pathname.startsWith('/go/community')&&!pathname.startsWith('/go/settings')&&!pathname.startsWith('/go/profile')&&!pathname.startsWith('/go/avatar')&&!pathname.startsWith('/go/recorders');
-  if(!allowed){pause();return;}
-  activated=true;switchTo(mode);
-  // Retry when the browser permits audio after an in-page gesture.
-  function gesture(e){
-   if(!e.target?.closest?.('.v3-go-app')||e.target.closest('a[href^="/go/"]')||e.target.closest('.v3-album-collect')||e.target.closest('.v3-camera-close'))return;
-   if(!audioEnabled())return;
-   activated=true;switchTo(mode);
-  }
-  function change(e){if(e?.detail==='stop'){pause();mode='album';return;}if(e?.detail==='camera'||e?.detail==='calm'){if(e.detail==='camera')activated=true;switchTo(e.detail);}}
-  function settings(){if(!audioEnabled())pause();else if(activated&&!document.hidden)music().play().catch(()=>{});}
-  function visibility(){if(document.hidden)pause();else settings();}
-  document.addEventListener('pointerdown',gesture,{passive:true});
-  document.addEventListener('keydown',gesture);
-  document.addEventListener('visibilitychange',visibility);
+  const allowed=pathname?.startsWith('/go')&&!['/go/battle','/go/settings','/go/profile','/go/avatar','/go/withdraw'].some(p=>pathname.startsWith(p));
+  if(!allowed)return;
+  let player=null,mode='album',activated=false;
+  function changeMode(next){mode=next;player?.dispose();player=createMusicLoop(goMusicFile(mode));if(activated)player.play();}
+  function gesture(){activated=true;if(!player)changeMode(mode);else player.play();}
+  function change(event){if(event.detail==='stop'){player?.stop();return;}if(event.detail==='camera'||event.detail==='calm')changeMode(event.detail==='camera'?'camera':'album');}
+  document.addEventListener('click',gesture,{passive:true});document.addEventListener('keydown',gesture);
   window.addEventListener('go-v3-music',change);
-  window.addEventListener('go-v3-settings-changed',settings);
-  return()=>{document.removeEventListener('pointerdown',gesture);document.removeEventListener('keydown',gesture);document.removeEventListener('visibilitychange',visibility);window.removeEventListener('go-v3-music',change);window.removeEventListener('go-v3-settings-changed',settings);pause();};
+  return()=>{player?.dispose();document.removeEventListener('click',gesture);document.removeEventListener('keydown',gesture);window.removeEventListener('go-v3-music',change);};
  },[pathname]);
  return null;
 }

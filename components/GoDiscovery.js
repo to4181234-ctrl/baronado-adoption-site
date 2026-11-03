@@ -3,15 +3,16 @@ import Link from 'next/link';
 import {useEffect,useRef,useState} from 'react';
 import {figmaSprite,FIGMA_DOGS} from '../lib/goV3Game.js';
 import GoPixelChoice from './GoPixelChoice.js';
-import {createGameAudio,createMusicLoop,albumMusicFile,GAME_SOUND_KEY} from '../lib/goV3Audio.js';
+import {listenAudioSetting,createGameAudio,createMusicLoop,discoveryMusicFile,GAME_SOUND_KEY} from '../lib/goV3Audio.js';
 const HIDE_KEY='baronado-go-intro-hide-until',ANON_SEEN_KEY='baronado-go-intro-anon-day',WEEK=7*86400000;
 const koreanDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 export default function GoDiscovery({dogs=[],dog=null}){
  const [open,setOpen]=useState(false),[stage,setStage]=useState('choice'),[hide,setHide]=useState(false),[sound,setSound]=useState(true),[chosen,setChosen]=useState(null);
  const music=useRef(null);
+ useEffect(()=>listenAudioSetting(setSound),[]);
  const t=useRef(null),audio=useRef(null),loggedIn=useRef(false);
  useEffect(()=>{
-  let mounted=true;audio.current=createGameAudio();music.current=createMusicLoop(albumMusicFile);
+  let mounted=true;audio.current=createGameAudio();music.current=createMusicLoop(discoveryMusicFile);
   try{setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off');}catch{}
   async function checkPopup(){
    try{
@@ -47,8 +48,8 @@ export default function GoDiscovery({dogs=[],dog=null}){
    fetch('/api/go/settings',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hideWeek'})}).catch(()=>{});
   }else{try{localStorage.setItem(HIDE_KEY,String(Date.now()+WEEK));}catch{}}
  }
- function reveal(i){if(stage!=='choice')return;const list=Array.isArray(dogs)?dogs.filter(d=>FIGMA_DOGS.includes(d.name)):[];const d=list.length?list[Math.floor(Math.random()*list.length)]:dog||null;setChosen(d);setStage('reveal');audio.current?.play('collar');audio.current?.schedule('discover',200);t.current=setTimeout(()=>{setStage('result');audio.current?.stop();audio.current?.play('bark1');},2000);}
- function finish(){clearTimeout(t.current);if(stage==='result')return;setStage('result');audio.current?.stop();audio.current?.play('bark1');}
+ function reveal(i){if(stage!=='choice')return;const list=Array.isArray(dogs)?dogs.filter(d=>FIGMA_DOGS.includes(d.name)):[];const d=list.length?list[Math.floor(Math.random()*list.length)]:dog||null;setChosen(d);setStage('reveal');audio.current?.play('collar');audio.current?.schedule('discover',200);t.current=setTimeout(()=>{setStage('result');audio.current?.stop();},2000);}
+ function finish(){clearTimeout(t.current);if(stage==='result')return;setStage('result');audio.current?.stop();}
  function toggle(){const next=!sound;setSound(next);try{localStorage.setItem(GAME_SOUND_KEY,next?'on':'off');window.dispatchEvent(new Event('go-v3-settings-changed'));}catch{}if(!next)audio.current?.stop();}
  return open&&<div className="v3-discovery-backdrop v3-discovery-figma" onClick={close} role="presentation"><section className="v3-discovery-modal" role="dialog" aria-modal="true" aria-label="첫 방문 멍멍GO! 발견" onClick={e=>e.stopPropagation()}>
   <button className="v3-discovery-close" aria-label="닫기" onClick={close}>×</button>

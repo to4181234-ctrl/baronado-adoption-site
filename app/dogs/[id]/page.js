@@ -129,7 +129,7 @@ export default function DogDetailPage() {
 
         {dog && (
           <>
-          <nav className={'v3-detail-tabs'+(dog.category===CATEGORY_RESIDENT?' is-resident':'')} aria-label="상세 페이지 메뉴">
+          <nav className={'v3-detail-tabs'+(dog.category===CATEGORY_RESIDENT?' is-resident':'')+(dog.category===CATEGORY_RESIDENT&&!hasDetails?' is-intro-only':'')} aria-label="상세 페이지 메뉴">
            <button type="button" className={activeSection==='overview'?'active':''} aria-current={activeSection==='overview'?'location':undefined} onClick={()=>{setActiveSection('overview');document.getElementById('v3-detail-overview')?.scrollIntoView({behavior:'smooth'})}}>소개</button>
            {hasDetails&&<button type="button" className={activeSection==='information'?'active':''} aria-current={activeSection==='information'?'location':undefined} onClick={()=>{setActiveSection('information');document.getElementById('v3-detail-information')?.scrollIntoView({behavior:'smooth'})}}>상세 정보</button>}
            {dog.category!==CATEGORY_RESIDENT&&<><button type="button" className={activeSection==='shelter'?'active':''} aria-current={activeSection==='shelter'?'location':undefined} onClick={()=>{setActiveSection('shelter');document.getElementById('v3-detail-shelter')?.scrollIntoView({behavior:'smooth'})}}>보호소</button><button type="button" className={activeSection==='records'?'active':''} aria-current={activeSection==='records'?'location':undefined} onClick={()=>{setActiveSection('records');document.getElementById('v3-dog-records')?.scrollIntoView({behavior:'smooth'})}}>멍기록</button></>}
@@ -162,7 +162,7 @@ export default function DogDetailPage() {
             <h2>상세 정보</h2>
             {fieldGroups.map(group=><div className="v3-detail-property-group" key={group.name}>
               <h3>{group.name}</h3>
-              <div className="v3-detail-properties-table">{group.fields.map(field=><div className="v3-detail-property" key={field.key}><span>{field.label}</span><div>{field.key==='vaccinations'?<VaccinationDetails profile={profile} inline/>:<ExpandableText text={profile[field.key]}/>}</div></div>)}</div>
+              <div className="v3-detail-properties-table">{group.fields.map(field=><div className="v3-detail-property" key={field.key}><span>{field.key==='ideal_family'?<>이 아이에게<br/>필요한 가족</>:field.label}</span><div>{field.key==='vaccinations'?<VaccinationDetails profile={profile} inline/>:<ExpandableText text={profile[field.key]}/>}</div></div>)}</div>
             </div>)}
             {Array.isArray(profile.extra_questions)&&profile.extra_questions.some(x=>x.question&&x.answer)&&<div className="v3-detail-property-group"><h3>추가 정보</h3><div className="v3-detail-properties-table">{profile.extra_questions.filter(x=>x.question&&x.answer).map((x,i)=><div className="v3-detail-property" key={i}><span>{x.question}</span><div>{x.answer}</div></div>)}</div></div>}
            </section>}

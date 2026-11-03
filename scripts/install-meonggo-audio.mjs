@@ -1,6 +1,6 @@
-// Install only the 21 original, approved MP3s from the exact handoff archive.
+// Install the 19 SFX approved in the latest handoff; former BGM selections are retired.
 // Built-in Node.js ZIP decoder: no external unzip binaries or extra dependencies.
-import {readFileSync,mkdirSync,writeFileSync} from 'node:fs';
+import {readFileSync,mkdirSync,writeFileSync,existsSync,unlinkSync} from 'node:fs';
 import {join,basename} from 'node:path';
 import {createHash} from 'node:crypto';
 import {inflateRawSync} from 'node:zlib';
@@ -17,7 +17,7 @@ for(let p=zip.length-22;p>=Math.max(0,zip.length-65557);p--){
 if(eocd<0)throw new Error('ZIP central directory missing');
 const count=read16(eocd+10);
 let p=read32(eocd+16),written=0;
-const allowed=/^(?:BGM_0[23]_[A-Za-z0-9_]+|SFX_(?:0[1-9]|1[0-9])_[A-Za-z0-9_]+)\.mp3$/;
+const allowed=/^SFX_(?:0[1-9]|1[0-9])_[A-Za-z0-9_]+\.mp3$/;
 const out=join(process.cwd(),'public','audio','meonggo');
 mkdirSync(out,{recursive:true});
 for(let i=0;i<count;i++){
@@ -36,5 +36,6 @@ for(let i=0;i<count;i++){
  writeFileSync(join(out,nameOnly),bytes);
  written++;
 }
-if(written!==21)throw new Error('Expected 21 individual approved MP3s, received '+written);
+if(written!==19)throw new Error('Expected 19 individual approved SFX, received '+written);
+for(const name of ['BGM_02_Album_Original_Chiptune_Loop.mp3','BGM_03_Camera_Original_Suspense_Loop.mp3']){const path=join(out,name);if(existsSync(path))unlinkSync(path);}
 console.log('Installed '+written+' approved MeongGO MP3s from verified source ZIP.');

@@ -1,0 +1,220 @@
+{
+  "schema": "baronado-meonggo-audio-handoff-v1",
+  "updated_at": "2026-11-03",
+  "selected_tracks": [
+    {
+      "track_id": "BGM-01",
+      "title": "Pallet Town",
+      "game": "Pokémon Blue/Red",
+      "filename": "BGM_01_Pokemon_Pallet_Town.mp3",
+      "stage_proposal": "내 도감·모두의 도감·픽셀 교감",
+      "stage_confirmed": false,
+      "selected": true,
+      "file_in_bundle": false,
+      "source": "https://gamethemesongs.com/game/Pokemon%20BlueRed",
+      "license_status": "공개 사이트 사용·재배포 권한 미확인: 사용 허락 전 파일 탑재·재생 금지"
+    },
+    {
+      "track_id": "BGM-02",
+      "title": "Wild Pokémon Battle",
+      "game": "Pokémon Blue/Red",
+      "filename": "BGM_02_Pokemon_Wild_Pokemon_Battle.mp3",
+      "stage_proposal": "강아지 발견·수집",
+      "stage_confirmed": false,
+      "selected": true,
+      "file_in_bundle": false,
+      "source": "https://gamethemesongs.com/game/Pokemon%20BlueRed",
+      "license_status": "공개 사이트 사용·재배포 권한 미확인: 사용 허락 전 파일 탑재·재생 금지"
+    },
+    {
+      "track_id": "BGM-03",
+      "title": "Trainer Battle",
+      "game": "Pokémon Blue/Red",
+      "filename": "BGM_03_Pokemon_Trainer_Battle.mp3",
+      "stage_proposal": "멍배틀",
+      "stage_confirmed": false,
+      "selected": true,
+      "file_in_bundle": false,
+      "source": "https://gamethemesongs.com/game/Pokemon%20BlueRed",
+      "license_status": "공개 사이트 사용·재배포 권한 미확인: 사용 허락 전 파일 탑재·재생 금지"
+    },
+    {
+      "track_id": "BGM-04",
+      "title": "Lavender Town",
+      "game": "Pokémon Blue/Red",
+      "filename": "BGM_04_Pokemon_Lavender_Town.mp3",
+      "stage_proposal": "미지정 (촬영 화면은 배치 제안만 가능)",
+      "stage_confirmed": false,
+      "selected": true,
+      "file_in_bundle": false,
+      "source": "https://gamethemesongs.com/game/Pokemon%20BlueRed",
+      "license_status": "공개 사이트 사용·재배포 권한 미확인: 사용 허락 전 파일 탑재·재생 금지"
+    }
+  ],
+  "sfx_assets": [
+    {
+      "file": "SFX_01_Card_Appear.mp3",
+      "trigger": "카드 등장",
+      "group": "멍배틀",
+      "duration_s": 0.408,
+      "size_bytes": 6956,
+      "sha256": "647531f8ee9119f271543edeb67e6f25dfe5b59991a7e3df6f1c477451eebf0d"
+    },
+    {
+      "file": "SFX_02_Card_Select.mp3",
+      "trigger": "카드 선택",
+      "group": "멍배틀",
+      "duration_s": 0.216,
+      "size_bytes": 3884,
+      "sha256": "65e6cbff8e3694251a37a5249bfb0352ef3894db77e1361f94d7586f51ce21dc"
+    },
+    {
+      "file": "SFX_03_Card_Deselect.mp3",
+      "trigger": "카드 선택 취소",
+      "group": "멍배틀",
+      "duration_s": 0.24,
+      "size_bytes": 4268,
+      "sha256": "9de857b90b8568cf282781bc7a784d715fec189d664c4c7df5106a9dd0a8960d"
+    },
+    {
+      "file": "SFX_04_Two_Cards_Ready.mp3",
+      "trigger": "카드 2장 선택 완료",
+      "group": "멍배틀",
+      "duration_s": 0.36,
+      "size_bytes": 6188,
+      "sha256": "d5b2099edd8983df541b919c478ea82465ebb12629e3e64af1a8286a5057ed98"
+    },
+    {
+      "file": "SFX_05_Battle_Start.mp3",
+      "trigger": "멍배틀 시작",
+      "group": "멍배틀",
+      "duration_s": 0.504,
+      "size_bytes": 8492,
+      "sha256": "6f20eeef3b08c9277dd8c1589314a52809a30a26e5676fff08ad717108b5e9d4"
+    },
+    {
+      "file": "SFX_06_Battle_Impact.mp3",
+      "trigger": "충돌 연출",
+      "group": "멍배틀",
+      "duration_s": 0.384,
+      "size_bytes": 6572,
+      "sha256": "a460a3545c8dcd357a88bb94e1e92c563ebdede3474a9723b4a81cf0e750f3b1"
+    },
+    {
+      "file": "SFX_07_Battle_Victory.mp3",
+      "trigger": "승리 확정",
+      "group": "멍배틀",
+      "duration_s": 1.032,
+      "size_bytes": 16940,
+      "sha256": "9448b07c9a51e1fac44049adf323309bb985893b48a797042e2837580e04122b"
+    },
+    {
+      "file": "SFX_08_Battle_Draw.mp3",
+      "trigger": "무승부 확정",
+      "group": "멍배틀",
+      "duration_s": 0.672,
+      "size_bytes": 11180,
+      "sha256": "2ed8515fe2e8c2f27fa7fab543c1c3cb0e084e8c1e19b10e5d889fc4bb76bc4b"
+    },
+    {
+      "file": "SFX_09_Battle_Defeat.mp3",
+      "trigger": "패배 확정",
+      "group": "멍배틀",
+      "duration_s": 0.984,
+      "size_bytes": 12140,
+      "sha256": "5d7080b53708cac28be1e5270d27aa25358576593236c9bd6216c9b7b99dfff8"
+    },
+    {
+      "file": "SFX_10_Collar_Select.mp3",
+      "trigger": "목줄 선택",
+      "group": "발견·교감·촬영",
+      "duration_s": 0.287,
+      "size_bytes": 6313,
+      "sha256": "f7e67a9bf049281c7c99d4cda200aa530cadf749755e7ea377d1b61dc0acade6"
+    },
+    {
+      "file": "SFX_11_Dog_Discover.mp3",
+      "trigger": "강아지 발견 애니메이션",
+      "group": "발견·교감·촬영",
+      "duration_s": 0.731,
+      "size_bytes": 15195,
+      "sha256": "545067c8ccf704227657a578bc5078f5705a382cab2ae87e35f3805150337a85"
+    },
+    {
+      "file": "SFX_12_Bark_Variant_01.mp3",
+      "trigger": "짖기 1",
+      "group": "발견·교감·촬영",
+      "duration_s": 0.366,
+      "size_bytes": 7880,
+      "sha256": "30ae78288f777d0f252424d03b7fce5a0b6b44e535af5badd806d645f2f6ecb2"
+    },
+    {
+      "file": "SFX_13_Bark_Variant_02.mp3",
+      "trigger": "짖기 2",
+      "group": "발견·교감·촬영",
+      "duration_s": 0.366,
+      "size_bytes": 7880,
+      "sha256": "11752c641e79d29c8d3b6b305785162551e6a250d81b2f9e09dddc8b51e519bf"
+    },
+    {
+      "file": "SFX_14_Bark_Variant_03.mp3",
+      "trigger": "짖기 3",
+      "group": "발견·교감·촬영",
+      "duration_s": 0.392,
+      "size_bytes": 8403,
+      "sha256": "6455fd4472a94b59a6bb2eea234ec5d9be6282abf24cf54898cc1ca1195a447c"
+    },
+    {
+      "file": "SFX_15_Dog_Snack.mp3",
+      "trigger": "간식",
+      "group": "발견·교감·촬영",
+      "duration_s": 0.313,
+      "size_bytes": 6835,
+      "sha256": "bc286997fa1ab3f125d6a5eb109769dbc210d24d944dc1292ed3aa58e95d4e10"
+    },
+    {
+      "file": "SFX_16_Dog_Praise.mp3",
+      "trigger": "칭찬",
+      "group": "발견·교감·촬영",
+      "duration_s": 0.496,
+      "size_bytes": 10493,
+      "sha256": "6b203f8f194629a0691d824fef7eb2956fc72e07e140ed1507962fa88a1e01a7"
+    },
+    {
+      "file": "SFX_17_Dog_Play.mp3",
+      "trigger": "놀이",
+      "group": "발견·교감·촬영",
+      "duration_s": 0.313,
+      "size_bytes": 6835,
+      "sha256": "dc257bc97155f5a176fb4a9a9a3ad43d2869203a5e77c999fcfe28f8775cc888"
+    },
+    {
+      "file": "SFX_18_Camera_Shutter.mp3",
+      "trigger": "카메라 셔터",
+      "group": "발견·교감·촬영",
+      "duration_s": 0.235,
+      "size_bytes": 5268,
+      "sha256": "7ab80cc490981f25274e26f89f265f3255b3783fc47046a99c4cec241ad6f1ec"
+    },
+    {
+      "file": "SFX_19_Card_Acquired.mp3",
+      "trigger": "카드 서버 저장 완료",
+      "group": "발견·교감·촬영",
+      "duration_s": 0.967,
+      "size_bytes": 19897,
+      "sha256": "4d191782446e4675cb983f73f29816917dd1496c9c19374c6185e7d41bb4d591"
+    }
+  ],
+  "sfx_count": 19,
+  "preview_count": 4,
+  "pokemon_bgm_audio_included": false,
+  "sfx_original_user_supplied_zip_sha256": "805d12eeedba2ae157aabf5e5d0ae1b1a3a3d40bb1e227174dcfbd3dea1c4702",
+  "prior_bgm_excluded": [
+    "BGM_02_Album_Original_Chiptune_Loop.mp3",
+    "BGM_03_Camera_Original_Suspense_Loop.mp3"
+  ],
+  "five_stage_source_zip": "바로나도_멍멍GO_개별도감_카드관리_5차_2026-11-02.zip",
+  "five_stage_source_url": "https://drive.google.com/file/d/1mLb1F0y32YSghoEqA_R1Qv_P_WDvoaye/view",
+  "verify_sfx_sha256": true,
+  "no_project_code_modifications": true
+}

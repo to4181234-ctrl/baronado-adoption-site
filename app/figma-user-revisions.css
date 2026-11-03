@@ -15,20 +15,6 @@
 .v3-discovery-stage-reveal:before,.v3-discovery-stage-result:before{content:'';position:absolute;width:150px;height:150px;background:repeating-conic-gradient(from 0deg,transparent 0 23deg,#ffe477cc 24deg 28deg,transparent 29deg 45deg);animation:v11-discovery-burst 1s steps(7) both;pointer-events:none}
 .v3-discovery-stage-reveal:after{content:'✦';position:absolute;font-size:80px;color:#fff4a6;filter:drop-shadow(0 0 12px #ffc12d);animation:v11-flash .8s steps(5) both;pointer-events:none}
 .v3-discovery-stage img{position:relative;z-index:1}
-/* A square and controls occupy distinct grid rows, including short mobile viewports. */
-.v3-capture-intro .v3-capture-live-art,.v3-capture-live .v3-capture-live-art{box-sizing:border-box;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto auto;align-items:center;justify-items:center;gap:12px;padding:54px 16px 24px;height:100dvh;min-height:560px;max-height:none;isolation:isolate}
-.v3-capture-live-art .v3-capture-tip{grid-row:1;position:relative;inset:auto;justify-self:stretch;z-index:3}
-.v3-capture-live-art .v3-capture-tip>button{gap:5px}
-.v3-capture-tip>button img{width:18px;height:18px;object-fit:contain;image-rendering:pixelated}
-.v3-capture-live-art .v3-camera-square{position:relative;grid-row:2;inset:auto;transform:none;width:min(100%,calc(100dvh - 340px));height:auto;max-height:none;aspect-ratio:1;box-sizing:border-box;align-self:center}
-.v3-capture-live-art .v3-camera-zoom{position:relative;grid-row:3;inset:auto;align-self:center}
-.v3-capture-live-art .v3-camera-collar{position:relative;grid-row:4;inset:auto;align-self:center;width:95px;height:65px;margin:0;z-index:3}
-.v3-camera-shutter{padding:0;border:0;background:transparent;cursor:pointer;touch-action:manipulation}
-.v3-camera-shutter img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
-.v3-camera-shutter:active{transform:scale(.92)}
-.v3-camera-shutter:focus-visible{outline:3px solid #ffe04b;outline-offset:4px}
-.v3-capture-live-art .v3-camera-dialog-box{position:relative;grid-row:5;inset:auto;width:100%;max-width:none;margin:0;box-sizing:border-box}
-.v3-camera-cancel{position:relative;grid-row:5;z-index:3;border:0;background:#fff;padding:8px 18px;color:#111;font-family:'MonaS12',sans-serif}
 .v3-camera-permission{position:absolute;inset:0;z-index:20;background:#0009;display:grid;place-items:center;padding:24px}
 .v3-camera-permission>.v3-pixel-dialog{width:100%;background:white;padding:18px;color:#111}
 .v3-camera-panel:has(.v3-capture-live)>.v3-camera-close,.v3-camera-panel:has(.v3-capture-intro)>.v3-camera-close{color:white;text-shadow:0 1px 3px black}
@@ -44,10 +30,6 @@
 .v6-post-actions>button,.go-like-button,.go-viewer-like{position:relative;overflow:visible}
 .v11-battle-records{list-style:none;margin:8px 0 0;padding:0;font:12px/1.8 'MonaS12',sans-serif}
 .v11-battle-records li{display:flex;justify-content:space-between;gap:12px}
-.v3-battle-home .v3-pixel-panel:has(.v11-battle-records){height:auto;min-height:200px;background:#fff;border:5px double #111;padding:17px 20px}
-.v3-battle-home .v3-pixel-panel:has(.v11-battle-records) .v10-panel-canvas{position:static;width:auto;height:auto;transform:none}
-.v3-battle-home .v3-pixel-panel:has(.v11-battle-records) .v3-album-panel-layer{display:none}
-.v3-battle-home .v3-pixel-panel:has(.v11-battle-records) .v3-panel-content{position:static}
 .meong-battle-versus{position:relative;isolation:isolate}
 .meong-battle-versus.is-colliding:before{content:'';position:absolute;inset:-15%;z-index:4;pointer-events:none;background:radial-gradient(circle,#fff 0%,#fff6ba 12%,#ffc64b99 25%,transparent 55%);animation:v11-impact-flash .7s steps(7) both}
 .meong-battle-versus.is-colliding:after{content:'✦';position:absolute;left:50%;top:35%;color:#ffe04a;text-shadow:0 0 20px #fff;font-size:100px;z-index:5;pointer-events:none;animation:v11-impact-star .8s steps(7) both}
@@ -64,5 +46,50 @@
 @media(prefers-reduced-motion:reduce){.go-inline-reveal-stage,.go-inline-flash,.go-inline-spark,.v10-post-sparkle,.go-like-burst,.v3-discovery-stage:before,.v3-discovery-stage:after,.meong-battle-versus.is-colliding,.meong-battle-versus.is-colliding:before,.meong-battle-versus.is-colliding:after{animation:none!important}.go-inline-flash,.go-inline-spark,.go-like-burst,.meong-battle-versus.is-colliding:before,.meong-battle-versus.is-colliding:after{display:none}}
 
 @media(max-width:370px){.v3-discovery-figma .v3-discovery-dialog{left:8.4%;width:83%}.v3-discovery-figma .v3-discovery-dialog-bg,.v3-discovery-figma .v3-discovery-dialog-outer{width:99%}.v3-discovery-figma .v3-discovery-dialog-inner{width:95%}.v3-discovery-figma .v3-discovery-dialog-content{left:18px;right:12px;font-size:12px!important}.v3-discovery-figma .v3-discovery-dialog-content .v3-pixel-choice{font-size:12px!important}}
-.v3-capture-live .v3-camera-square{width:min(100%,calc(100dvh - 350px))}
-.v3-capture-live-art:has(.v3-camera-dialog-box) .v3-camera-square{width:min(100%,max(100px,calc(100dvh - 440px)))}
+
+/* Follow-up UI annotations, 2026-11-03: retain original artwork and controls. */
+.v3-site.v3-detail-site .v3-detail-tabs.is-intro-only{display:flex;justify-content:center;grid-template-columns:none}
+.v3-site.v3-detail-site .v3-detail-tabs.is-intro-only>button{flex:none;width:130px;max-width:100%}
+.v3-site.v3-detail-site #v3-dog-records{margin-top:40px}
+.v3-site.v3-detail-site .v3-detail-property>span{word-break:keep-all;line-height:1.6}
+.v3-go-site .v5-has-cards .v5-album-dog-picture img{top:3px;left:15.674px;width:74px;height:74px}
+.v3-capture-intro .v3-capture-live-art,.v3-capture-live .v3-capture-live-art{box-sizing:border-box;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;align-items:center;justify-items:center;gap:12px;padding:52px 16px 20px;height:100dvh;min-height:460px;max-height:none;isolation:isolate}
+.v3-capture-live-art .v3-capture-tip{grid-row:1;position:relative;inset:auto;justify-self:stretch;z-index:3;margin:0;text-align:left}
+.v3-capture-live-art .v3-capture-tip>button{gap:5px;justify-content:flex-start;width:max-content}
+.v3-capture-tip>button img{width:18px;height:18px;object-fit:contain;image-rendering:pixelated}
+.v3-camera-guide-space{grid-row:2;position:relative;width:100%;height:100%;min-height:0;container-type:size;display:grid;place-items:center;z-index:2;pointer-events:none}
+.v3-capture-live-art .v3-camera-square{position:relative;inset:auto;transform:none;width:min(100%,calc(100dvh - 230px));height:auto;aspect-ratio:1;box-sizing:border-box;max-height:none;margin:0}
+@supports(width:1cqh){.v3-capture-live-art .v3-camera-square{width:min(100cqw,100cqh)}}
+.v3-capture-live-art .v3-camera-zoom{position:relative;grid-row:3;inset:auto;justify-self:center;align-self:center;margin:0;z-index:3}
+.v3-capture-live-art .v3-camera-collar{position:relative;grid-row:4;inset:auto;justify-self:center;align-self:center;width:95px;height:65px;margin:0;z-index:3}
+.v3-camera-shutter{padding:0;border:0;background:transparent;cursor:pointer;touch-action:manipulation}
+.v3-camera-shutter img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.v3-camera-shutter:active{transform:translateY(2px)}
+.v3-camera-shutter:focus-visible{outline:3px solid #ffe04b;outline-offset:4px}
+.v3-go-site .v3-album-figma .v3-battle-home .v3-pixel-panel:has(.v11-battle-records){height:auto!important;min-height:162px!important;aspect-ratio:auto;container-type:normal;overflow:visible}
+.v3-go-site .v3-album-figma .v3-pixel-panel:has(.v11-battle-records) .v10-panel-canvas{position:relative;width:100%;height:auto;min-height:162px;transform:none}
+.v3-go-site .v3-album-figma .v3-pixel-panel:has(.v11-battle-records) .v3-album-panel-layer{display:block;height:100%;width:100%;inset:0;object-fit:fill}
+.v3-go-site .v3-album-figma .v3-pixel-panel:has(.v11-battle-records) .v3-album-panel-inner{inset:8px;width:calc(100% - 16px);height:calc(100% - 16px)}
+.v3-go-site .v3-album-figma .v3-pixel-panel:has(.v11-battle-records) .v3-panel-content{position:relative;inset:auto;padding:24px 28px}
+.v3-interact-figma .v3-interact-dog img{animation:v12-dog-idle 3s steps(1,end) infinite}
+.v3-interact-figma .v3-interact-dog.is-walking img{animation:v12-dog-walk 2s steps(1,end) both!important}
+.v3-interact-figma .v3-interact-dog.is-reacting img{animation:v12-dog-react .65s steps(1,end) 3!important}
+@keyframes v12-dog-idle{0%,100%{transform:translate(0,0)}25%{transform:translate(3px,-4px)}50%{transform:translate(-3px,0)}75%{transform:translate(0,-3px)}}
+@keyframes v12-dog-walk{0%,100%{transform:translate(0,0)}15%{transform:translate(12px,-6px)}35%{transform:translate(26px,3px)}50%{transform:translate(26px,-7px) scaleX(-1)}70%{transform:translate(-14px,4px) scaleX(-1)}90%{transform:translate(-8px,-5px)}}
+@keyframes v12-dog-react{0%,100%{transform:translate(0,0)}25%{transform:translate(-8px,-10px)}50%{transform:translate(0,0)}75%{transform:translate(8px,-7px)}}
+.v12-battle-impact{position:absolute;inset:0;pointer-events:none;z-index:6}
+.v12-battle-impact span{position:absolute;left:50%;top:45%;width:10px;height:10px;opacity:0;background:#ffd543;box-shadow:0 0 0 2px #fff4b3,0 0 12px #ffcb32}
+.is-colliding .v12-battle-impact span{animation:v12-impact-particles .9s steps(8) both;transform-origin:center}
+.meong-battle-versus.is-colliding:before{animation:v12-impact-light .9s steps(7) both}
+.meong-battle-versus.is-colliding .meong-battle-card:first-child{animation:v12-lunge-left .65s steps(6) both;transform-origin:center}
+.meong-battle-versus.is-colliding .meong-battle-card:nth-child(2){animation:v12-lunge-right .65s steps(6) both;transform-origin:center}
+.meong-battle-result .meong-battle-winner{position:relative;isolation:isolate}
+.meong-battle-result .meong-battle-winner:before{content:'';position:absolute;inset:-20px;z-index:-1;background:repeating-conic-gradient(#ffe37b99 0deg 12deg,transparent 12deg 30deg);mask-image:radial-gradient(circle,#000 10%,transparent 65%);animation:v12-winner-aura 1s ease-out both}
+.meong-battle-result .meong-battle-winner img{animation:v12-winner-pop .7s steps(7) both}
+@keyframes v12-impact-particles{0%{opacity:0;transform:rotate(var(--impact-angle)) translateY(-5px)}20%{opacity:1}100%{opacity:0;transform:rotate(var(--impact-angle)) translateY(calc(-1 * var(--impact-distance))) rotate(180deg)}}
+@keyframes v12-impact-light{0%,100%{opacity:0}20%,65%{opacity:.9}40%{opacity:.1}}
+@keyframes v12-lunge-left{0%{transform:translateX(0) rotate(0)}30%{transform:translate(22px,-10px) rotate(6deg)}55%{transform:translate(-9px,3px) rotate(-4deg)}100%{transform:none}}
+@keyframes v12-lunge-right{0%{transform:translateX(0) rotate(0)}30%{transform:translate(-22px,-10px) rotate(-6deg)}55%{transform:translate(9px,3px) rotate(4deg)}100%{transform:none}}
+@keyframes v12-winner-aura{from{opacity:0;transform:scale(.3) rotate(-30deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes v12-winner-pop{0%{opacity:0;transform:translateY(18px) scale(.7)}60%{opacity:1;transform:translateY(-6px) scale(1.08)}100%{transform:none}}
+@media(prefers-reduced-motion:reduce){.v3-interact-figma .v3-interact-dog img,.v3-interact-figma .v3-interact-dog.is-walking img,.v3-interact-figma .v3-interact-dog.is-reacting img,.is-colliding .v12-battle-impact span,.meong-battle-versus.is-colliding .meong-battle-card,.meong-battle-result .meong-battle-winner:before,.meong-battle-result .meong-battle-winner img{animation:none!important}.v12-battle-impact{display:none}}
