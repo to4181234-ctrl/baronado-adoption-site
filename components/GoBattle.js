@@ -65,14 +65,14 @@ function Game(){
  const prepare=async(id=null,random=false)=>{
   if(!selected[0]||opponentBusy)return;
   stop();finished.current=false;requestId.current=null;preparedId.current=null;preparedToken.current=null;
-  setResult(null);setImpactBeat(0);setOpponentBusy(true);setError('');
+  setImpactBeat(0);setOpponentBusy(true);setError('');
   try{
    const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'prepare',firstId:selected[0].id,opponentId:id,randomMember:random})});
    const body=await response.json();
    if(!response.ok)throw Error(body.error||'상대 카드를 선정하지 못했어요.');
    if(!body.battleId||!body.matchToken||!body.card||!body.opponent)throw Error('배틀 선정 정보를 확인하지 못했어요.');
    preparedId.current=body.battleId;preparedToken.current=body.matchToken;
-   setOpponent(body.opponent);setSlotName('멍기록가 찾는 중…');setRandomOpponent(random);setSelected([selected[0],body.card]);
+   setResult(null);setOpponent(body.opponent);setSlotName('멍기록가 찾는 중…');setRandomOpponent(random);setSelected([selected[0],body.card]);
    setRevealStage(random?'nickname':'shuffle');setRevealed(false);setPhase('reveal');
    sounds.current?.play('select');
   }catch(e){setError(e.message);}
@@ -86,7 +86,7 @@ function Game(){
   try{
    const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,secondId:selected[1].id,matchToken:preparedToken.current})});
    const body=await response.json();if(!alive.current)return;
-   if(!response.ok){if(response.status===409){setSelected([]);setResult(null);}throw Error(body.error||'대결 결과를 저장하지 못했어요.');}
+   if(!response.ok)throw Error(body.error||'대결 결과를 저장하지 못했어요.');
    setResult(body.battle);setPhase('result');sounds.current?.play(body.battle.winner==='draw'?'draw':body.battle.winner==='first'?'victory':'defeat');timers.current.push(setTimeout(()=>sounds.current?.play('bark1'),450));
   }catch(e){
    setError(e.message);setSelected(list=>list.slice(0,1));setResult(null);
