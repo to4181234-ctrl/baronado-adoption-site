@@ -35,7 +35,7 @@
 }
 .v3-go-site .v3-account-figma .v3-account-login-required>.v3-account-save{top:270px}
 .v3-go-site .v3-account-figma .v3-message{position:absolute;top:610px;left:16px;right:16px;margin:0;font-size:12px;line-height:18px}
-.v3-go-site .v3-account-settings .v3-message{top:575px}
+.v3-go-site .v3-account-settings .v3-message{top:642px}
 /* Profile edit: original editable bounds, not CSS guessed margins. */
 .v3-go-site .v3-account-profile .v3-profile-edit-portrait{
   position:absolute;top:109px;left:50%;transform:translateX(-50%);
@@ -104,7 +104,9 @@
 }
 .v3-go-site .v3-account-settings .v3-account-setting-sound{top:152px}
 .v3-go-site .v3-account-settings .v3-account-setting-sound::after{top:90px}
-.v3-go-site .v3-account-settings .v3-account-setting-popup{top:274px;height:106px}
+.v3-go-site .v3-account-settings .v3-account-setting-vibration{top:257px}
+.v3-go-site .v3-account-settings .v3-account-setting-vibration::after{top:90px}
+.v3-go-site .v3-account-settings .v3-account-setting-popup{top:366px;height:106px}
 .v3-go-site .v3-account-settings .v3-account-setting-popup::after{top:105px}
 .v3-go-site .v3-account-settings .v3-account-setting-row>strong{
   position:absolute;left:0;top:0;font-family:"Pretendard",sans-serif;
@@ -127,13 +129,13 @@
 }
 .v3-go-site .v3-account-settings .v3-account-reset:disabled{opacity:.5}
 .v3-go-site .v3-account-settings>.v3-settings-note{
-  position:absolute;left:16px;right:16px;top:413px;margin:0!important;
+  position:absolute;left:16px;right:16px;top:494px;margin:0!important;
   font-family:"Pretendard",sans-serif;font-size:12px!important;line-height:18px!important;
   font-weight:400;color:#817b70!important;
 }
-.v3-go-site .v3-account-settings>.v3-account-save{top:518px}
+.v3-go-site .v3-account-settings>.v3-account-save{top:585px}
 .v3-go-site .v3-account-settings .v3-account-withdraw{
-  position:absolute;top:645px;left:50%;right:auto;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;
+  position:absolute;top:700px;left:50%;right:auto;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;
   width:min(210px,calc(100% - 32px));height:46px;margin:0;padding:0;border:0;border-radius:8px;
   background:#fade40;color:#0d0d0d;
   font-family:"Pretendard",sans-serif;font-size:13px;font-weight:600;line-height:18.85px;
