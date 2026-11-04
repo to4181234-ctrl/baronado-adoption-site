@@ -131,3 +131,128 @@
  .meong-battle-phase-fight .meong-battle-versus{gap:calc((100vw - 32px)*.115)}
  .meong-battle-phase-fight .meong-battle-card.is-mini{width:calc((100vw - 32px)*.41);height:auto;aspect-ratio:146/232;flex-basis:calc((100vw - 32px)*.41)}
 }
+
+/* 멍배틀 진행 중 연출만 강화 — 카드 원본/선택/결과 화면은 유지. */
+.meong-battle-phase-fight .meong-battle-versus{
+ position:relative;isolation:isolate;overflow:visible;
+}
+.meong-battle-phase-fight .meong-battle-fighter{
+ position:relative;flex:0 0 146px;width:146px;height:232px;
+ will-change:transform;
+}
+.meong-battle-phase-fight .meong-battle-fighter>.meong-battle-card.is-mini{
+ position:relative;width:100%;height:100%;max-width:none;display:block;
+}
+.meong-battle-ghost{
+ position:absolute;inset:0;pointer-events:none;opacity:0;filter:blur(2px);
+ will-change:transform,opacity;
+}
+.meong-battle-ghost .go-card-graphic{display:block;width:100%;height:100%}
+.meong-battle-versus.is-rushing .is-first{animation:meong-rush-left .29s ease-in-out infinite alternate}
+.meong-battle-versus.is-rushing .is-second{animation:meong-rush-right .29s ease-in-out infinite alternate}
+.meong-battle-versus.is-rushing .ghost-near{opacity:.35;transform:translateX(-16px) rotate(-4deg)}
+.meong-battle-versus.is-rushing .ghost-far{opacity:.17;transform:translateX(-33px) rotate(-8deg);filter:blur(4px)}
+.meong-battle-versus.is-rushing .is-second .ghost-near{transform:translateX(16px) rotate(4deg)}
+.meong-battle-versus.is-rushing .is-second .ghost-far{transform:translateX(33px) rotate(8deg)}
+.meong-battle-versus.is-colliding{animation:meong-arena-shake .13s linear infinite}
+.meong-battle-versus.is-colliding .is-first{animation:meong-clash-left .45s ease-in-out infinite}
+.meong-battle-versus.is-colliding .is-second{animation:meong-clash-right .45s ease-in-out infinite}
+.meong-battle-versus.is-colliding .ghost-near{opacity:.3;transform:translateX(-20px) rotate(-7deg)}
+.meong-battle-versus.is-colliding .ghost-far{opacity:.15;transform:translateX(-37px);filter:blur(5px)}
+.meong-battle-versus.is-colliding .is-second .ghost-near{transform:translateX(20px) rotate(7deg)}
+.meong-battle-versus.is-colliding .is-second .ghost-far{transform:translateX(37px)}
+.meong-battle-versus.is-slowing .is-first{animation:meong-brake-left 1.15s cubic-bezier(.12,.68,.2,1) both}
+.meong-battle-versus.is-slowing .is-second{animation:meong-brake-right 1.15s cubic-bezier(.12,.68,.2,1) both}
+.meong-battle-versus.is-slowing .meong-battle-ghost{opacity:0;transition:opacity .3s}
+.meong-battle-versus.is-rushing::before,.meong-battle-versus.is-rushing::after{
+ content:"";position:absolute;top:8%;bottom:8%;width:25px;z-index:-1;
+ background:repeating-linear-gradient(180deg,transparent 0 16px,#e1c13580 17px 20px,transparent 22px 41px);
+ filter:blur(2px);opacity:.7;animation:meong-speed-stripes .29s linear infinite;
+}
+.meong-battle-versus.is-rushing::before{left:5%}
+.meong-battle-versus.is-rushing::after{right:5%;animation-direction:reverse}
+.v12-battle-impact{
+ position:absolute;left:50%;top:48%;width:0;height:0;
+ pointer-events:none;z-index:3;opacity:0;
+}
+.meong-battle-versus.is-colliding .v12-battle-impact{opacity:1}
+.v12-battle-impact::before{
+ content:"";position:absolute;left:-34px;top:-34px;width:68px;height:68px;
+ border:4px solid #fade40;border-radius:50%;
+ background:radial-gradient(circle,#fff9a9 0%,#fade4099 38%,transparent 70%);
+ transform:scale(.2);opacity:0;
+}
+.meong-battle-versus.is-colliding .v12-battle-impact::before{
+ animation:meong-flash .45s ease-out infinite;
+}
+.v12-battle-impact span{
+ position:absolute;left:-3px;top:-10px;width:6px;height:20px;
+ border-radius:2px;background:#fade40;box-shadow:1px 1px 0 #181713;
+ opacity:0;
+}
+.meong-battle-versus.is-colliding .v12-battle-impact span{
+ animation:meong-spark .45s ease-out infinite;
+ animation-delay:calc(var(--spark-index,0)*0ms);
+}
+@keyframes meong-rush-left{
+ from{transform:translate3d(-18px,1px,0) rotate(-11deg) scale(.97)}
+ to{transform:translate3d(51px,-7px,0) rotate(12deg) scale(1.07)}
+}
+@keyframes meong-rush-right{
+ from{transform:translate3d(18px,-1px,0) rotate(11deg) scale(.97)}
+ to{transform:translate3d(-51px,7px,0) rotate(-12deg) scale(1.07)}
+}
+@keyframes meong-clash-left{
+ 0%,100%{transform:translateX(-14px) rotate(-9deg)}
+ 33%{transform:translateX(56px) rotate(13deg) scale(1.07)}
+ 48%{transform:translateX(48px) rotate(-8deg) scale(.96)}
+ 72%{transform:translateX(-3px) rotate(-14deg)}
+}
+@keyframes meong-clash-right{
+ 0%,100%{transform:translateX(14px) rotate(9deg)}
+ 33%{transform:translateX(-56px) rotate(-13deg) scale(1.07)}
+ 48%{transform:translateX(-48px) rotate(8deg) scale(.96)}
+ 72%{transform:translateX(3px) rotate(14deg)}
+}
+@keyframes meong-brake-left{
+ 0%{transform:translateX(42px) rotate(10deg) scale(1.06)}
+ 50%{transform:translateX(-14px) rotate(-6deg)}
+ 75%{transform:translateX(7px) rotate(3deg)}
+ 100%{transform:translateX(0) rotate(0)}
+}
+@keyframes meong-brake-right{
+ 0%{transform:translateX(-42px) rotate(-10deg) scale(1.06)}
+ 50%{transform:translateX(14px) rotate(6deg)}
+ 75%{transform:translateX(-7px) rotate(-3deg)}
+ 100%{transform:translateX(0) rotate(0)}
+}
+@keyframes meong-arena-shake{
+ 0%,100%{translate:0 0}25%{translate:-3px 2px}75%{translate:3px -2px}
+}
+@keyframes meong-flash{
+ 0%{transform:scale(.2);opacity:0}
+ 30%{transform:scale(1);opacity:.95}
+ 100%{transform:scale(1.8);opacity:0}
+}
+@keyframes meong-spark{
+ 0%{transform:rotate(var(--impact-angle)) translateY(0) scale(.3);opacity:0}
+ 30%{opacity:1}
+ 100%{transform:rotate(var(--impact-angle)) translateY(calc(var(--impact-distance) * -.45)) scale(.6);opacity:0}
+}
+@keyframes meong-speed-stripes{to{background-position:0 43px}}
+@media(max-width:365px){
+ .meong-battle-phase-fight .meong-battle-fighter{
+  width:calc((100vw - 32px)*.41);height:auto;aspect-ratio:146/232;
+  flex-basis:calc((100vw - 32px)*.41);
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .meong-battle-versus.is-rushing .meong-battle-fighter,
+ .meong-battle-versus.is-colliding .meong-battle-fighter,
+ .meong-battle-versus.is-slowing .meong-battle-fighter,
+ .meong-battle-versus.is-colliding,
+ .meong-battle-versus.is-colliding .v12-battle-impact::before,
+ .meong-battle-versus.is-colliding .v12-battle-impact span{animation:none!important;transform:none!important}
+ .meong-battle-ghost,.v12-battle-impact,
+ .meong-battle-versus.is-rushing::before,.meong-battle-versus.is-rushing::after{display:none!important}
+}
