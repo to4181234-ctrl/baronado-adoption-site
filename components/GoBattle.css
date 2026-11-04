@@ -275,3 +275,46 @@
  .meong-battle-versus.is-impact .v12-battle-impact span{animation:none!important;transform:none!important;translate:none!important}
  .meong-battle-ghost,.v12-battle-impact,.meong-battle-versus::before,.meong-battle-versus::after{display:none!important}
 }
+
+/* New opponent list and random card reveal: scoped to the battle route only. */
+.meong-battle-back{border:0;background:none;padding:0 0 18px;font-size:12px;color:#817b70}
+.meong-battle-random{width:100%;min-height:48px;margin:9px 0 20px;border:2px solid #181713;background:#fade40;font-size:14px;font-weight:700;border-radius:6px}
+.meong-battle-random:disabled{opacity:.5}
+.meong-battle-opponent-count{font-size:11px;color:#817b70;margin:0 0 12px}
+.meong-battle-opponent-list{display:flex;flex-direction:column;border-top:1px solid #e8e4dd}
+.meong-battle-opponent-list>button{width:100%;display:flex;align-items:center;gap:12px;padding:13px 4px;background:#fff;border:0;border-bottom:1px solid #e8e4dd;text-align:left;min-height:72px}
+.meong-battle-opponent-list>button:disabled{opacity:.55}
+.meong-battle-avatar{width:44px;height:44px;display:grid;place-items:center;border:2px solid #181713;background:#fff6ce;font-size:23px;flex-shrink:0}
+.meong-battle-opponent-info{display:flex;flex:1;min-width:0;flex-direction:column;gap:6px}
+.meong-battle-opponent-info strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meong-battle-opponent-info small{font-family:Pretendard,sans-serif;font-size:11px;color:#817b70}
+.meong-battle-opponent-arrow{font-size:11px;white-space:nowrap}
+.meong-battle-reveal{text-align:center}
+.meong-battle-reveal h1{text-align:left}
+.meong-battle-reveal .meong-battle-hint{text-align:left}
+.meong-battle-reveal-scene{height:340px;display:grid;place-items:center;perspective:800px;overflow:visible}
+.meong-battle-flip-card{width:188px;aspect-ratio:240/384;position:relative;transform-style:preserve-3d}
+.meong-battle-card-back,.meong-battle-reveal-face{position:absolute;inset:0;backface-visibility:hidden}
+.meong-battle-card-back{border:5px solid #181713;background:#fade40;display:grid;place-items:center;font-family:"MonaS12",sans-serif;font-size:68px;font-weight:900;box-shadow:inset 0 0 0 8px #fff3b2}
+.meong-battle-reveal-face{transform:rotateY(180deg)}
+.meong-battle-reveal-face .go-card-graphic{width:100%;height:100%}
+.meong-battle-reveal-scene.is-shuffle .meong-battle-flip-card{animation:meong-card-shuffle .6s ease-in-out both}
+.meong-battle-reveal-scene.is-selected .meong-battle-flip-card{animation:meong-card-pick .4s ease-out both}
+.meong-battle-reveal-scene.is-flip .meong-battle-flip-card,.meong-battle-reveal-scene.is-shown .meong-battle-flip-card{transform:rotateY(180deg)}
+.meong-battle-reveal-scene.is-flip .meong-battle-flip-card{animation:meong-card-flip .4s ease-in-out both}
+.meong-battle-reveal-scene.is-shown .meong-battle-flip-card{animation:meong-card-arrive .4s ease-out both}
+.meong-battle-nickname-slot{display:grid;gap:14px;justify-items:center;animation:meong-name-slot .8s steps(8,end) both}
+.meong-battle-nickname-slot span{font-size:13px;color:#817b70}
+.meong-battle-nickname-slot strong{font-size:23px}
+.meong-battle-reveal-name{display:grid;gap:6px;margin:0 0 20px;font-size:17px}
+.meong-battle-reveal-name span{font-size:12px;color:#817b70}
+.meong-battle-reveal .meong-battle-secondary{margin-top:12px}
+.meong-battle-fight-opponent,.meong-battle-result-opponent{text-align:center;font-size:12px;color:#817b70;margin:0 0 14px}
+.meong-battle-result-opponent{margin:0 0 20px}
+.meong-battle-result .meong-battle-secondary{margin-top:12px}
+@keyframes meong-card-shuffle{0%{transform:translateX(-24px) rotate(-9deg)}20%{transform:translateX(23px) rotate(8deg)}40%{transform:translateX(-19px) rotate(-6deg)}60%{transform:translateX(17px) rotate(6deg)}80%{transform:translateX(-7px)}100%{transform:none}}
+@keyframes meong-card-pick{0%{transform:translateY(12px) scale(.97)}55%{transform:translateY(-12px) scale(1.06)}100%{transform:none}}
+@keyframes meong-card-flip{from{transform:rotateY(0)}to{transform:rotateY(180deg)}}
+@keyframes meong-card-arrive{0%{transform:rotateY(180deg) scale(.93)}50%{transform:rotateY(180deg) scale(1.08)}100%{transform:rotateY(180deg)}}
+@keyframes meong-name-slot{0%{transform:translateY(-15px);opacity:.2}50%{transform:translateY(7px);opacity:1}100%{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.meong-battle-reveal-scene *{animation:none!important}}
