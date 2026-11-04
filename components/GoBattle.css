@@ -298,12 +298,15 @@
 .meong-battle-card-back{border:5px solid #181713;background:#fade40;display:grid;place-items:center;font-family:"MonaS12",sans-serif;font-size:68px;font-weight:900;box-shadow:inset 0 0 0 8px #fff3b2}
 .meong-battle-reveal-face{transform:rotateY(180deg)}
 .meong-battle-reveal-face .go-card-graphic{width:100%;height:100%}
-.meong-battle-reveal-scene.is-shuffle .meong-battle-flip-card{animation:meong-card-shuffle .6s ease-in-out both}
-.meong-battle-reveal-scene.is-selected .meong-battle-flip-card{animation:meong-card-pick .4s ease-out both}
+.meong-battle-reveal-scene.is-shuffle .meong-battle-flip-card{animation:meong-card-shuffle .75s ease-in-out both}
+.meong-battle-reveal-scene.is-selected .meong-battle-flip-card{animation:meong-card-pick .47s ease-out both}
 .meong-battle-reveal-scene.is-flip .meong-battle-flip-card,.meong-battle-reveal-scene.is-shown .meong-battle-flip-card{transform:rotateY(180deg)}
-.meong-battle-reveal-scene.is-flip .meong-battle-flip-card{animation:meong-card-flip .4s ease-in-out both}
-.meong-battle-reveal-scene.is-shown .meong-battle-flip-card{animation:meong-card-arrive .4s ease-out both}
-.meong-battle-nickname-slot{display:grid;gap:14px;justify-items:center;animation:meong-name-slot .8s steps(8,end) both}
+.meong-battle-reveal-scene.is-flip .meong-battle-flip-card{animation:meong-card-flip .48s ease-in-out both}
+.meong-battle-reveal-scene.is-shown .meong-battle-flip-card{animation:meong-card-arrive .48s ease-out both}
+.meong-battle-nickname-slot{display:grid;gap:14px;justify-items:center;animation:meong-name-slot .55s ease-out both}
+.meong-battle-nickname-slot.is-locked{animation:meong-nickname-lock .4s cubic-bezier(.2,.8,.2,1) both}
+.meong-battle-nickname-slot.is-locked strong{color:#181713}
+@keyframes meong-nickname-lock{0%{transform:scale(.94)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
 .meong-battle-nickname-slot span{font-size:13px;color:#817b70}
 .meong-battle-nickname-slot strong{font-size:23px}
 .meong-battle-reveal-name{display:grid;gap:6px;margin:0 0 20px;font-size:17px}

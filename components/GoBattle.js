@@ -122,19 +122,36 @@ function Game(){
   if(phase!=='reveal')return;
   let cancelled=false;const list=[];
   const after=(fn,ms)=>list.push(setTimeout(()=>{if(!cancelled)fn();},ms));
+  // Reveal pacing: let players read the opponent's nickname before the card flips.
+  // Existing three-hit collision timing starts only after this sequence completes.
+  const NICKNAME_SPIN_MS=1150;
+  const NICKNAME_HOLD_MS=500;
+  const CARD_REVEAL={pick:750,flip:1220,shown:1700,fight:2550};
   let slotTimer=null;
   if(randomOpponent){
    const names=opponents.members.map(m=>m.nickname).filter(Boolean);
    let index=0;
-   slotTimer=setInterval(()=>setSlotName(names.length?names[index++%names.length]:'멍기록가 찾는 중…'),95);
-   after(()=>{clearInterval(slotTimer);slotTimer=null;setSlotName(opponent?.nickname||'멍기록가');setRevealStage('shuffle');},800);
+   const advance=()=>setSlotName(names.length?names[index++%names.length]:'멍기록가 찾는 중…');
+   advance();
+   slotTimer=setInterval(advance,140);
+   after(()=>{
+    clearInterval(slotTimer);
+    slotTimer=setInterval(advance,230);
+   },750);
+   after(()=>{
+    clearInterval(slotTimer);slotTimer=null;
+    setSlotName(opponent?.nickname||'멍기록가');
+    setRevealStage('nickname-locked');
+    sounds.current?.play('ready');
+   },NICKNAME_SPIN_MS);
+   after(()=>setRevealStage('shuffle'),NICKNAME_SPIN_MS+NICKNAME_HOLD_MS);
   }
-  const offset=randomOpponent?800:0;
-  after(()=>{setRevealStage('selected');sounds.current?.play('select');vibrateBattleHit(1);},offset+600);
-  after(()=>{setRevealStage('flip');sounds.current?.play('appear');},offset+1000);
-  after(()=>{setRevealStage('shown');setRevealed(true);sounds.current?.play('ready');vibrateBattleHit(1);},offset+1400);
-  // Start the existing three-impact fight automatically after the reveal settles.
-  after(()=>startRef.current?.(),offset+1850);
+  const offset=randomOpponent?NICKNAME_SPIN_MS+NICKNAME_HOLD_MS:0;
+  after(()=>{setRevealStage('selected');sounds.current?.play('select');vibrateBattleHit(1);},offset+CARD_REVEAL.pick);
+  after(()=>{setRevealStage('flip');sounds.current?.play('appear');},offset+CARD_REVEAL.flip);
+  after(()=>{setRevealStage('shown');setRevealed(true);sounds.current?.play('ready');vibrateBattleHit(1);},offset+CARD_REVEAL.shown);
+  // Hold the revealed card long enough to read its name before the existing battle.
+  after(()=>startRef.current?.(),offset+CARD_REVEAL.fight);
   return()=>{cancelled=true;list.forEach(clearTimeout);if(slotTimer!==null)clearInterval(slotTimer);};
  },[phase,randomOpponent,opponent?.id]);
 
@@ -169,9 +186,9 @@ function Game(){
   </section>}
   {phase==='reveal'&&<section className="meong-battle-reveal">
    <h1>어떤 멍멍이가 등장할까요?</h1>
-   <p className="meong-battle-hint">{revealStage==='nickname'?'랜덤 멍기록가를 찾는 중이에요.':opponent?.nickname+' 멍기록가의 출전 카드'}</p>
+   <p className="meong-battle-hint">{revealStage==='nickname'?'랜덤 멍기록가를 찾는 중이에요.':revealStage==='nickname-locked'?'대결할 멍기록가가 결정됐어요!':opponent?.nickname+' 멍기록가의 출전 카드'}</p>
    <div className={'meong-battle-reveal-scene is-'+revealStage} aria-live="polite">
-    {revealStage==='nickname'?<div className="meong-battle-nickname-slot"><span>랜덤 상대를 고르는 중…</span><strong>{slotName}</strong></div>:<div className="meong-battle-flip-card">
+    {(revealStage==='nickname'||revealStage==='nickname-locked')?<div className={'meong-battle-nickname-slot'+(revealStage==='nickname-locked'?' is-locked':'')}><span>{revealStage==='nickname'?'랜덤 상대를 고르는 중…':'대결 상대 결정!'}</span><strong>{slotName}</strong></div>:<div className="meong-battle-flip-card">
      <div className="meong-battle-card-back" aria-hidden={revealed}>?</div>
      <div className="meong-battle-reveal-face" aria-hidden={!revealed}><GoCardFace card={selected[1]}/></div>
     </div>}
