@@ -20,7 +20,7 @@ function Game(){
  const [order,setOrder]=useState('newest'),[page,setPage]=useState(0);
  const [data,setData]=useState(initial),[loading,setLoading]=useState(true),[error,setError]=useState('');
  const [selected,setSelected]=useState([]),[phase,setPhase]=useState('choose');
- const [strikeStage,setStrikeStage]=useState('windup'),[impactBeat,setImpactBeat]=useState(0),[result,setResult]=useState(null),[mutating,setMutating]=useState(false);
+ const [impactBeat,setImpactBeat]=useState(0),[result,setResult]=useState(null),[mutating,setMutating]=useState(false);
  const [soundEnabled,setSoundEnabled]=useState(false),[soundReady,setSoundReady]=useState(false);
  const sounds=useRef(null),timers=useRef([]),requestId=useRef(null),finished=useRef(false),alive=useRef(true);
  const stop=useCallback(()=>{timers.current.forEach(clearTimeout);timers.current=[];sounds.current?.stop();stopBattleVibration();},[]);
@@ -30,18 +30,24 @@ function Game(){
  fetch('/api/go/battle?'+qs,{cache:'no-store',signal:ctl.signal}).then(r=>r.json().then(j=>{if(!r.ok)throw Error(j.error||'카드를 불러오지 못했어요.');return j;})).then(j=>setData(j)).catch(e=>{if(!ctl.signal.aborted)setError(e.message);}).finally(()=>{if(!ctl.signal.aborted)setLoading(false);});
  return()=>ctl.abort();},[ready,member?.id,tab,searched,order,page]);
  const choose=(card)=>{
-  if(phase!=='choose'||!card.battle)return;
+  if(phase!=='choose')return;
   const old=selected.some(c=>c.id===card.id);
   if(old){setSelected(list=>list.filter(c=>c.id!==card.id));sounds.current?.play('deselect');return;}
+  if(!card.battle||card.status!=='approved'){setError('승인된 멍카드만 배틀에 사용할 수 있어요.');return;}
   if(selected.length===2){setError('카드는 2장까지만 선택할 수 있어요. 기존 선택을 해제해주세요.');return;}
   if(selected.some(c=>c.dogId===card.dogId)){setError('서로 다른 강아지 카드를 골라주세요.');return;}
+  const choosingMine=card.ownerId===member?.id;
+  if(selected.some(c=>(c.ownerId===member?.id)===choosingMine)){
+   setError(choosingMine?'내 카드는 한 장만 선택할 수 있어요. 모두의 카드에서 상대 카드를 골라주세요.':'상대 카드도 한 장만 선택할 수 있어요. 내 카드에서 한 장을 골라주세요.');
+   return;
+  }
   setError('');setSelected(list=>[...list,card]);
   sounds.current?.play(selected.length===1?'ready':'select');
  };
  const complete=useCallback(async()=>{
   if(finished.current||!requestId.current)return;
   finished.current=true;timers.current.forEach(clearTimeout);timers.current=[];
-  setImpactBeat(0);setStrikeStage('settle');stopBattleVibration();
+  setImpactBeat(0);stopBattleVibration();
   setMutating(true);sounds.current?.stop();
   try{
    const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,secondId:selected[1].id})});
@@ -53,39 +59,37 @@ function Game(){
  },[selected]);
  const completeRef=useRef(complete);completeRef.current=complete;
  const start=()=>{
-  if(phase!=='choose'||mutating||selected.length!==2||!selected.every(c=>c.battle))return;
-  finished.current=false;requestId.current=crypto.randomUUID();setStrikeStage('windup');setImpactBeat(0);setError('');setPhase('fight');
+  if(phase!=='choose'||mutating||selected.length!==2||!selected.every(c=>c.battle&&c.status==='approved'))return;
+  if(selected.filter(c=>c.ownerId===member?.id).length!==1){setError('내 카드 한 장과 다른 사람의 카드 한 장을 선택해주세요.');return;}
+  finished.current=false;requestId.current=crypto.randomUUID();setImpactBeat(0);setError('');setPhase('fight');
   sounds.current?.startMusic();sounds.current?.play('start');
-  // A separate charge, impact and recoil for each hit. Audio/haptics start at the collision keyframe.
+  // One continuous 4.28 s animation: retreat → accelerate → impact → hit-stop → recoil.
+  // Sound, flash and haptics follow the same three contact frames (21.5%, 46%, 71.3%).
   const hit=level=>{setImpactBeat(level);sounds.current?.playImpact(level);vibrateBattleHit(level);};
   timers.current=[
    setTimeout(()=>sounds.current?.play('appear'),300),
-   setTimeout(()=>setStrikeStage('strike-1'),650),
    setTimeout(()=>hit(1),920),
-   setTimeout(()=>setImpactBeat(0),1090),
-   setTimeout(()=>setStrikeStage('strike-2'),1700),
-   setTimeout(()=>hit(2),1910),
-   setTimeout(()=>setImpactBeat(0),2130),
-   setTimeout(()=>setStrikeStage('strike-3'),2830),
-   setTimeout(()=>hit(3),2970),
-   setTimeout(()=>setImpactBeat(0),3270),
-   setTimeout(()=>setStrikeStage('settle'),3530),
-   setTimeout(()=>completeRef.current(),4230)
+   setTimeout(()=>setImpactBeat(0),1110),
+   setTimeout(()=>hit(2),1970),
+   setTimeout(()=>setImpactBeat(0),2220),
+   setTimeout(()=>hit(3),3050),
+   setTimeout(()=>setImpactBeat(0),3370),
+   setTimeout(()=>completeRef.current(),4280)
   ];
  };
- const reset=()=>{stop();sounds.current?.startMusic();requestId.current=null;finished.current=false;setPhase('choose');setSelected([]);setResult(null);setStrikeStage('windup');setImpactBeat(0);setError('');setPage(0);};
+ const reset=()=>{stop();sounds.current?.startMusic();requestId.current=null;finished.current=false;setPhase('choose');setSelected([]);setResult(null);setImpactBeat(0);setError('');setPage(0);};
  const changeTab=(name)=>{setTab(name);setPage(0);setError('');};
  const [first,second]=selected;
  const winner=result?.winner==='first'?first:result?.winner==='second'?second:null;
  const spriteMap={'깡지':'dog-kangji.png','버디':'dog-buddy.png','뽀실':'dog-pposil.png','구름':'dog-gureum.png','오레오':'dog-oreo.png'};
  const sprite=c=>spriteMap[c?.dogName]?'/figma-preview/'+spriteMap[c.dogName]:c?.imageUrl;
- const insufficient=phase==='choose'&&!loading&&!error&&!searched&&tab==='all'&&data.eligibleDogKinds<2;
+ const insufficient=phase==='choose'&&!loading&&!error&&!searched&&tab==='all'&&data.eligibleDogKinds<1;
  return <div className={"meong-battle-app meong-battle-phase-"+phase}>
   
   {!ready?<p role="status">도감을 준비하고 있어요.</p>:!member?<section className="meong-battle-login"><h2>멍배틀을 시작해볼까요?</h2><p>서로 다른 멍카드 2장을 모아 대결하고 나만의 전적을 쌓아보세요!</p><button onClick={openAccount}>로그인하고 시작하기</button></section>:<>
-  {insufficient?<section className="meong-battle-shortage" role="status"><h1>새로운 멍멍이를 만나볼까요?</h1><img src="/figma-battle/insufficient-kangji.svg" alt="깡지 픽셀 캐릭터"/><p>서로 다른 강아지 카드<br/>2장이 있어야 대결할 수 있어요.</p><Link className="meong-battle-primary" href="/go">카드 수집하러가기</Link><Link className="meong-battle-secondary" href="/go">도감으로</Link></section>:phase==='choose'&&<>
-   <h1>멍배틀</h1><p className="meong-battle-hint">서로 다른 강아지 카드 2장을 골라주세요</p>
-   <button className="meong-battle-start-link" disabled={selected.length!==2||mutating} onClick={start}>선택한 2장으로 멍배틀하기 &gt;</button>
+  {insufficient?<section className="meong-battle-shortage" role="status"><h1>새로운 멍멍이를 만나볼까요?</h1><img src="/figma-battle/insufficient-kangji.svg" alt="깡지 픽셀 캐릭터"/><p>내 카드와 다른 사람의 카드가<br/>각 한 장씩 있어야 대결할 수 있어요.</p><Link className="meong-battle-primary" href="/go">카드 수집하러가기</Link><Link className="meong-battle-secondary" href="/go">도감으로</Link></section>:phase==='choose'&&<>
+   <h1>멍배틀</h1><p className="meong-battle-hint">내 카드 1장과 다른 사람의 카드 1장을 골라주세요</p>
+   <button className="meong-battle-start-link" disabled={selected.length!==2||selected.filter(c=>c.ownerId===member?.id).length!==1||mutating} onClick={start}>선택한 2장으로 멍배틀하기 &gt;</button>
    <div className="meong-battle-tabs"><button className={tab==='mine'?'active':''} onClick={()=>changeTab('mine')}>내 카드</button><button className={tab==='all'?'active':''} onClick={()=>changeTab('all')}>모두의 카드</button><span>선택 {selected.length}/2</span></div>
    <form className="meong-battle-search" onSubmit={e=>{e.preventDefault();setPage(0);setSearched(query);}}><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="제목·작성자·강아지 이름"/><button type="submit">검색</button></form>
    <div className="meong-battle-sort">등록 순서 | <button onClick={()=>{setPage(0);setOrder(x=>x==='newest'?'oldest':'newest');}}>{order==='newest'?'최신순':'오래된순'}⌄</button><span>전체 {data.total}장</span></div>
@@ -94,7 +98,7 @@ function Game(){
    {loading?<p className="meong-battle-empty">카드를 불러오는 중이에요.</p>:data.cards.length?<div className="meong-battle-grid">{data.cards.map(c=><div className="meong-battle-entry" key={c.id}><BattleCard card={c} onSelect={()=>choose(c)} selected={selected.some(v=>v.id===c.id)}/><span>{c.nickname} 멍기록가</span><small>{c.capturedAt?new Date(c.capturedAt).toLocaleDateString('ko-KR'):''}</small></div>)}</div>:<div className="meong-battle-empty">표시할 카드가 없어요. {tab==='mine'?'카드를 수집하러 가볼까요?':''}</div>}
    {data.total>4&&<div className="meong-battle-pager"><button disabled={page===0||loading} onClick={()=>setPage(p=>p-1)}>‹ 이전</button><span>{page+1}</span><button disabled={!data.hasMore||loading} onClick={()=>setPage(p=>p+1)}>다음 ›</button></div>}
   </>}
-  {phase==='fight'&&<section className="meong-battle-fight"><h1>두근두근, 멍배틀!</h1><div className={'meong-battle-versus is-'+strikeStage+(impactBeat?' is-impact is-impact-'+impactBeat:'')}><div className="meong-battle-fighter is-first"><div className="meong-battle-ghost ghost-long" aria-hidden="true"><GoCardFace card={first}/></div><div className="meong-battle-ghost ghost-far" aria-hidden="true"><GoCardFace card={first}/></div><div className="meong-battle-ghost ghost-near" aria-hidden="true"><GoCardFace card={first}/></div><BattleCard card={first} mini/></div><div className="meong-battle-fighter is-second"><div className="meong-battle-ghost ghost-long" aria-hidden="true"><GoCardFace card={second}/></div><div className="meong-battle-ghost ghost-far" aria-hidden="true"><GoCardFace card={second}/></div><div className="meong-battle-ghost ghost-near" aria-hidden="true"><GoCardFace card={second}/></div><BattleCard card={second} mini/></div><div className="v12-battle-impact" aria-hidden="true">{Array.from({length:12},(_,i)=><span key={i} style={{'--impact-angle':(i*30)+'deg','--impact-distance':(i%2?135:185)+'px'}}/> )}</div></div><strong>VS</strong><button className="meong-battle-primary" disabled={mutating} onClick={()=>completeRef.current()}>{mutating?'결과 기록 중…':'SKIP 후 결과보기'}</button></section>}
+  {phase==='fight'&&<section className="meong-battle-fight"><h1>두근두근, 멍배틀!</h1><div className={'meong-battle-versus is-battle-running'+(impactBeat?' is-impact is-impact-'+impactBeat:'')}><div className="meong-battle-fighter is-first"><div className="meong-battle-ghost ghost-long" aria-hidden="true"><GoCardFace card={first}/></div><div className="meong-battle-ghost ghost-far" aria-hidden="true"><GoCardFace card={first}/></div><div className="meong-battle-ghost ghost-near" aria-hidden="true"><GoCardFace card={first}/></div><BattleCard card={first} mini/></div><div className="meong-battle-fighter is-second"><div className="meong-battle-ghost ghost-long" aria-hidden="true"><GoCardFace card={second}/></div><div className="meong-battle-ghost ghost-far" aria-hidden="true"><GoCardFace card={second}/></div><div className="meong-battle-ghost ghost-near" aria-hidden="true"><GoCardFace card={second}/></div><BattleCard card={second} mini/></div><div className="v12-battle-impact" aria-hidden="true">{Array.from({length:12},(_,i)=><span key={i} style={{'--impact-angle':(i*30)+'deg','--impact-distance':(i%2?135:185)+'px'}}/> )}</div></div><strong>VS</strong><button className="meong-battle-primary" disabled={mutating} onClick={()=>completeRef.current()}>{mutating?'결과 기록 중…':'SKIP 후 결과보기'}</button></section>}
   {phase==='result'&&result&&<section className="meong-battle-result"><h1>이번 대결 승자는..</h1><div className="meong-battle-winner">{winner?<img src={sprite(winner)} alt={winner.dogName}/>:<><img src={sprite(first)} alt={first.dogName}/><img src={sprite(second)} alt={second.dogName}/></>}</div><h2>{winner?winner.dogName+' 카드 승리!':'막상막하!'}</h2><p>{winner?'이번 카드의 상성이 한 수 위였어요.':'두 카드의 매력을 가릴 수 없어요'}</p><div className="meong-battle-score">{first.dogName} {result.first_power+result.first_charm} + 상성 {result.first_bonus} → {result.first_score}<br/>{second.dogName} {result.second_power+result.second_charm} + 상성 {result.second_bonus} → {result.second_score}</div><button className="meong-battle-primary" onClick={reset}>다른 카드로 대결</button><Link className="meong-battle-secondary" href="/go">도감으로</Link></section>}
   </>}
  </div>;

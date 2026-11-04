@@ -132,108 +132,98 @@
  .meong-battle-phase-fight .meong-battle-card.is-mini{width:calc((100vw - 32px)*.41);height:auto;aspect-ratio:146/232;flex-basis:calc((100vw - 32px)*.41)}
 }
 
-/* 멍배틀 3연타 — Figma 카드와 다른 페이지는 변경하지 않음. */
+/* 멍배틀 연속 3연타: 맞닿음 → 반동 → 뒤로 물러나 힘 모으기 → 재돌진.
+   선택/결과 화면과 Figma 카드 원본에는 영향 없음. */
 .meong-battle-phase-fight .meong-battle-versus{
  position:relative;isolation:isolate;overflow:visible;
- --recoil:11px;--push:25px;--tilt:6deg;--card-scale:1.04;
- --flight-time:540ms;--trail-near:13px;--trail-far:26px;--trail-long:38px;
+ --battle-duration:4280ms;
 }
 .meong-battle-phase-fight .meong-battle-fighter{
+ --direction:1;
  position:relative;flex:0 0 146px;width:146px;height:232px;will-change:transform;
 }
+.meong-battle-phase-fight .meong-battle-fighter.is-second{--direction:-1}
 .meong-battle-phase-fight .meong-battle-fighter>.meong-battle-card.is-mini{
  position:relative;width:100%;height:100%;max-width:none;display:block;
 }
+.meong-battle-versus.is-battle-running .meong-battle-fighter{
+ animation:meong-three-beat-fighter var(--battle-duration) linear both;
+}
 .meong-battle-ghost{
- position:absolute;inset:0;pointer-events:none;opacity:0;will-change:transform,opacity;
+ position:absolute;inset:0;pointer-events:none;opacity:0;will-change:opacity;
 }
 .meong-battle-ghost .go-card-graphic{display:block;width:100%;height:100%}
-.meong-battle-versus.is-strike-1{
- --recoil:11px;--push:25px;--tilt:6deg;--card-scale:1.04;
- --flight-time:540ms;--trail-near:13px;--trail-far:25px;
+.meong-battle-versus .ghost-near{--trail-opacity:.34;filter:blur(1.5px)}
+.meong-battle-versus .ghost-far{--trail-opacity:.17;filter:blur(3px)}
+.meong-battle-versus .ghost-long{--trail-opacity:.1;filter:blur(4px)}
+.meong-battle-versus .is-first .ghost-near{transform:translateX(-13px) rotate(-5deg)}
+.meong-battle-versus .is-first .ghost-far{transform:translateX(-27px) rotate(-7deg)}
+.meong-battle-versus .is-first .ghost-long{transform:translateX(-43px) rotate(-9deg)}
+.meong-battle-versus .is-second .ghost-near{transform:translateX(13px) rotate(5deg)}
+.meong-battle-versus .is-second .ghost-far{transform:translateX(27px) rotate(7deg)}
+.meong-battle-versus .is-second .ghost-long{transform:translateX(43px) rotate(9deg)}
+.meong-battle-versus.is-battle-running .meong-battle-ghost{
+ animation:meong-three-beat-trails var(--battle-duration) linear both;
 }
-.meong-battle-versus.is-strike-2{
- --recoil:16px;--push:34px;--tilt:9deg;--card-scale:1.08;
- --flight-time:420ms;--trail-near:19px;--trail-far:34px;
+.meong-battle-versus.is-battle-running .ghost-long{
+ animation-name:meong-three-final-trail;
 }
-.meong-battle-versus.is-strike-3{
- --recoil:22px;--push:45px;--tilt:13deg;--card-scale:1.11;
- --flight-time:560ms;--trail-near:25px;--trail-far:43px;--trail-long:58px;
-}
-.meong-battle-versus:is(.is-strike-1,.is-strike-2) .is-first{
- animation:meong-three-left var(--flight-time) linear both;
-}
-.meong-battle-versus:is(.is-strike-1,.is-strike-2) .is-second{
- animation:meong-three-right var(--flight-time) linear both;
-}
-.meong-battle-versus.is-strike-3 .is-first{
- animation:meong-final-left var(--flight-time) linear both;
-}
-.meong-battle-versus.is-strike-3 .is-second{
- animation:meong-final-right var(--flight-time) linear both;
-}
-.meong-battle-versus.is-windup .is-first{animation:meong-windup-left .35s ease-in-out infinite alternate}
-.meong-battle-versus.is-windup .is-second{animation:meong-windup-right .35s ease-in-out infinite alternate}
-.meong-battle-versus.is-settle .is-first,
-.meong-battle-versus.is-settle .is-second{animation:meong-settle .38s ease-out both}
-@keyframes meong-windup-left{from{transform:translateX(-3px) rotate(-2deg)}to{transform:translateX(-9px) rotate(-5deg)}}
-@keyframes meong-windup-right{from{transform:translateX(3px) rotate(2deg)}to{transform:translateX(9px) rotate(5deg)}}
-/* Impact at 50%, then freeze the cards briefly before the recoil. */
-@keyframes meong-three-left{
- 0%{transform:translateX(calc(var(--recoil) * -1)) rotate(calc(var(--tilt) * -1)) scale(.98);animation-timing-function:cubic-bezier(.2,.0,.8,.9)}
- 50%{transform:translateX(var(--push)) translateY(-3px) rotate(var(--tilt)) scale(var(--card-scale));animation-timing-function:steps(1,end)}
- 64%{transform:translateX(var(--push)) translateY(-3px) rotate(var(--tilt)) scale(var(--card-scale));animation-timing-function:cubic-bezier(.2,.85,.35,1)}
- 86%{transform:translateX(calc(var(--recoil) * -1.3)) rotate(calc(var(--tilt) * -.8));animation-timing-function:ease-out}
+/* Exactly three collision frames, synced to 920 / 1970 / 3050 ms.
+   Identical transform keyframes after each impact give 70-85 ms hit stops.
+   Continuous recoil and a leaned-back charge remove the dead gap between hits. */
+@keyframes meong-three-beat-fighter{
+ 0%{transform:none;animation-timing-function:ease-out}
+ 8%{transform:translateX(calc(var(--direction) * -13px)) rotate(calc(var(--direction) * -5deg));animation-timing-function:ease-out}
+ 14%{transform:translateX(calc(var(--direction) * -21px)) rotate(calc(var(--direction) * -9deg)) scale(.97);animation-timing-function:ease-in}
+ 17%{transform:translateX(calc(var(--direction) * -23px)) rotate(calc(var(--direction) * -11deg)) scale(.95,.98);animation-timing-function:cubic-bezier(.5,.05,.9,.9)}
+ 21.5%{transform:translateX(calc(var(--direction) * 24px)) translateY(-2px) rotate(calc(var(--direction) * 7deg)) scale(1.05);animation-timing-function:linear}
+ 23.3%{transform:translateX(calc(var(--direction) * 24px)) translateY(-2px) rotate(calc(var(--direction) * 7deg)) scale(1.05);animation-timing-function:cubic-bezier(.16,.65,.3,1)}
+ 31%{transform:translateX(calc(var(--direction) * -19px)) rotate(calc(var(--direction) * -8deg));animation-timing-function:ease-out}
+ 38%{transform:translateX(calc(var(--direction) * -24px)) rotate(calc(var(--direction) * -10deg)) scale(.95,.97);animation-timing-function:ease-in}
+ 41.5%{transform:translateX(calc(var(--direction) * -25px)) rotate(calc(var(--direction) * -12deg)) scale(.94,.97);animation-timing-function:cubic-bezier(.55,.05,.92,.9)}
+ 46%{transform:translateX(calc(var(--direction) * 31px)) translateY(-3px) rotate(calc(var(--direction) * 10deg)) scale(1.09);animation-timing-function:linear}
+ 48%{transform:translateX(calc(var(--direction) * 31px)) translateY(-3px) rotate(calc(var(--direction) * 10deg)) scale(1.09);animation-timing-function:cubic-bezier(.13,.75,.27,1)}
+ 57%{transform:translateX(calc(var(--direction) * -22px)) rotate(calc(var(--direction) * -12deg));animation-timing-function:ease-out}
+ 64%{transform:translateX(calc(var(--direction) * -27px)) rotate(calc(var(--direction) * -13deg)) scale(.93,.96);animation-timing-function:ease-in}
+ 67%{transform:translateX(calc(var(--direction) * -27px)) rotate(calc(var(--direction) * -15deg)) scale(.93,.96);animation-timing-function:cubic-bezier(.62,.04,.95,.85)}
+ 71.3%{transform:translateX(calc(var(--direction) * 40px)) translateY(-5px) rotate(calc(var(--direction) * 14deg)) scale(1.12);animation-timing-function:linear}
+ 73.3%{transform:translateX(calc(var(--direction) * 40px)) translateY(-5px) rotate(calc(var(--direction) * 14deg)) scale(1.12);animation-timing-function:cubic-bezier(.12,.8,.23,1)}
+ 82%{transform:translateX(calc(var(--direction) * -28px)) rotate(calc(var(--direction) * -17deg)) scale(.93);animation-timing-function:ease-out}
+ 92%{transform:translateX(calc(var(--direction) * -5px)) rotate(calc(var(--direction) * -4deg));animation-timing-function:ease-out}
  100%{transform:none}
 }
-@keyframes meong-three-right{
- 0%{transform:translateX(var(--recoil)) rotate(var(--tilt)) scale(.98);animation-timing-function:cubic-bezier(.2,.0,.8,.9)}
- 50%{transform:translateX(calc(var(--push) * -1)) translateY(3px) rotate(calc(var(--tilt) * -1)) scale(var(--card-scale));animation-timing-function:steps(1,end)}
- 64%{transform:translateX(calc(var(--push) * -1)) translateY(3px) rotate(calc(var(--tilt) * -1)) scale(var(--card-scale));animation-timing-function:cubic-bezier(.2,.85,.35,1)}
- 86%{transform:translateX(calc(var(--recoil) * 1.3)) rotate(calc(var(--tilt) * .8));animation-timing-function:ease-out}
- 100%{transform:none}
+@keyframes meong-three-beat-trails{
+ 0%,14%{opacity:0}
+ 19%,21.5%{opacity:var(--trail-opacity)}
+ 26%,41.5%{opacity:0}
+ 44%,46%{opacity:calc(var(--trail-opacity) * 1.13)}
+ 52%,67%{opacity:0}
+ 69%,71.3%{opacity:calc(var(--trail-opacity) * 1.35)}
+ 76%,100%{opacity:0}
 }
-/* 3rd impact: 140ms charge, 84ms hit-stop, then the largest recoil. */
-@keyframes meong-final-left{
- 0%{transform:translateX(calc(var(--recoil) * -1)) rotate(calc(var(--tilt) * -1)) scale(.95);animation-timing-function:cubic-bezier(.3,0,.8,.9)}
- 25%{transform:translateX(var(--push)) translateY(-6px) rotate(var(--tilt)) scale(var(--card-scale));animation-timing-function:steps(1,end)}
- 40%{transform:translateX(var(--push)) translateY(-6px) rotate(var(--tilt)) scale(var(--card-scale));animation-timing-function:cubic-bezier(.13,.8,.25,1)}
- 76%{transform:translateX(-29px) rotate(-16deg) scale(.93);animation-timing-function:ease-out}
- 100%{transform:translateX(0) rotate(0) scale(1)}
+@keyframes meong-three-final-trail{
+ 0%,67%{opacity:0}
+ 69%,71.3%{opacity:.16}
+ 76%,100%{opacity:0}
 }
-@keyframes meong-final-right{
- 0%{transform:translateX(var(--recoil)) rotate(var(--tilt)) scale(.95);animation-timing-function:cubic-bezier(.3,0,.8,.9)}
- 25%{transform:translateX(calc(var(--push) * -1)) translateY(6px) rotate(calc(var(--tilt) * -1)) scale(var(--card-scale));animation-timing-function:steps(1,end)}
- 40%{transform:translateX(calc(var(--push) * -1)) translateY(6px) rotate(calc(var(--tilt) * -1)) scale(var(--card-scale));animation-timing-function:cubic-bezier(.13,.8,.25,1)}
- 76%{transform:translateX(29px) rotate(16deg) scale(.93);animation-timing-function:ease-out}
- 100%{transform:translateX(0) rotate(0) scale(1)}
-}
-@keyframes meong-settle{from{transform:scale(1.03)}to{transform:scale(1)}}
-/* Motion trails and speed lines fade out between hits; never cover the card details. */
-.meong-battle-versus:is(.is-strike-1,.is-strike-2,.is-strike-3) .meong-battle-ghost{
- animation:meong-trail-opacity var(--flight-time) ease-out both;
-}
-.meong-battle-versus .ghost-near{--ghost-opacity:.31;filter:blur(1.5px)}
-.meong-battle-versus .ghost-far{--ghost-opacity:.16;filter:blur(3px)}
-.meong-battle-versus .ghost-long{--ghost-opacity:.09;filter:blur(4px);display:none}
-.meong-battle-versus.is-strike-3 .ghost-long{display:block}
-.meong-battle-versus .is-first .ghost-near{transform:translateX(calc(var(--trail-near) * -1)) rotate(-5deg)}
-.meong-battle-versus .is-first .ghost-far{transform:translateX(calc(var(--trail-far) * -1)) rotate(-7deg)}
-.meong-battle-versus .is-first .ghost-long{transform:translateX(calc(var(--trail-long) * -1)) rotate(-9deg)}
-.meong-battle-versus .is-second .ghost-near{transform:translateX(var(--trail-near)) rotate(5deg)}
-.meong-battle-versus .is-second .ghost-far{transform:translateX(var(--trail-far)) rotate(7deg)}
-.meong-battle-versus .is-second .ghost-long{transform:translateX(var(--trail-long)) rotate(9deg)}
-@keyframes meong-trail-opacity{0%{opacity:0}13%,60%{opacity:var(--ghost-opacity)}100%{opacity:0}}
-.meong-battle-versus:is(.is-strike-1,.is-strike-2,.is-strike-3)::before,
-.meong-battle-versus:is(.is-strike-1,.is-strike-2,.is-strike-3)::after{
+.meong-battle-versus.is-battle-running::before,
+.meong-battle-versus.is-battle-running::after{
  content:"";position:absolute;top:8%;bottom:8%;width:20px;z-index:-1;
  background:repeating-linear-gradient(180deg,transparent 0 16px,#e1c1358a 17px 20px,transparent 22px 41px);
- filter:blur(2px);opacity:0;animation:meong-speed-lines var(--flight-time) linear both;
+ filter:blur(2px);opacity:0;animation:meong-three-speed-lines var(--battle-duration) linear both;
 }
-.meong-battle-versus:is(.is-strike-1,.is-strike-2,.is-strike-3)::before{left:4%}
-.meong-battle-versus:is(.is-strike-1,.is-strike-2,.is-strike-3)::after{right:4%;animation-direction:normal}
-@keyframes meong-speed-lines{0%{opacity:0;background-position:0 0}25%,55%{opacity:.8}100%{opacity:0;background-position:0 70px}}
-/* Each impact is a fresh one-shot flash/spark/shake with its own intensity. */
+.meong-battle-versus.is-battle-running::before{left:4%}
+.meong-battle-versus.is-battle-running::after{right:4%}
+@keyframes meong-three-speed-lines{
+ 0%,15%{opacity:0;background-position:0 0}
+ 19%,21.5%{opacity:.55}
+ 26%,41%{opacity:0}
+ 44%,46%{opacity:.68}
+ 53%,67%{opacity:0}
+ 69%,71.3%{opacity:.85}
+ 77%,100%{opacity:0;background-position:0 140px}
+}
+/* Each contact triggers a one-shot flash and vibration, with successively larger shake. */
 .v12-battle-impact{
  position:absolute;left:50%;top:48%;width:0;height:0;pointer-events:none;z-index:3;opacity:0;
 }
@@ -270,27 +260,18 @@
 .meong-battle-versus.is-impact-1{animation:meong-shake-small .13s ease-out both}
 .meong-battle-versus.is-impact-2{animation:meong-shake-medium .18s ease-out both}
 .meong-battle-versus.is-impact-3{animation:meong-shake-heavy .26s ease-out both}
-@keyframes meong-shake-small{
- 0%,100%{translate:0 0}25%{translate:-2px 1px}70%{translate:2px -1px}
-}
-@keyframes meong-shake-medium{
- 0%,100%{translate:0 0}18%,65%{translate:-5px 2px}40%,84%{translate:5px -2px}
-}
-@keyframes meong-shake-heavy{
- 0%,100%{translate:0 0}12%,50%{translate:-9px 4px}30%,72%{translate:9px -4px}88%{translate:-3px 2px}
-}
+@keyframes meong-shake-small{0%,100%{translate:0 0}25%{translate:-2px 1px}70%{translate:2px -1px}}
+@keyframes meong-shake-medium{0%,100%{translate:0 0}18%,65%{translate:-5px 2px}40%,84%{translate:5px -2px}}
+@keyframes meong-shake-heavy{0%,100%{translate:0 0}12%,50%{translate:-9px 4px}30%,72%{translate:9px -4px}88%{translate:-3px 2px}}
 @media(max-width:365px){
  .meong-battle-phase-fight .meong-battle-fighter{
-  width:calc((100vw - 32px)*.41);height:auto;aspect-ratio:146/232;
-  flex-basis:calc((100vw - 32px)*.41);
+  width:calc((100vw - 32px)*.41);height:auto;aspect-ratio:146/232;flex-basis:calc((100vw - 32px)*.41);
  }
- .meong-battle-versus.is-strike-3{--trail-long:38px}
 }
 @media(prefers-reduced-motion:reduce){
  .meong-battle-versus .meong-battle-fighter,
  .meong-battle-versus.is-impact,
  .meong-battle-versus.is-impact .v12-battle-impact::before,
  .meong-battle-versus.is-impact .v12-battle-impact span{animation:none!important;transform:none!important;translate:none!important}
- .meong-battle-ghost,.v12-battle-impact,
- .meong-battle-versus::before,.meong-battle-versus::after{display:none!important}
+ .meong-battle-ghost,.v12-battle-impact,.meong-battle-versus::before,.meong-battle-versus::after{display:none!important}
 }

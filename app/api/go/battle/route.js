@@ -62,12 +62,14 @@ export async function POST(request) {
    if(prior.data.member_id!==member.id)return goError('대결 정보를 확인해주세요.',403);
    return Response.json({battle:prior.data,replayed:true},{headers:noCache});
   }
-  const cards=await db.from('go_cards').select('id,dog_id,status').in('id',[firstId,secondId]);
+  const cards=await db.from('go_cards').select('id,dog_id,status,member_id').in('id',[firstId,secondId]);
   if(cards.error)throw cards.error;
   const byId=new Map((cards.data||[]).map(c=>[c.id,c]));
   const first=byId.get(firstId),second=byId.get(secondId);
   if(!first||!second||first.status!=='approved'||second.status!=='approved')return goError('삭제되거나 비공개 처리된 카드가 있어요.',409);
   if(first.dog_id===second.dog_id)return goError('서로 다른 강아지의 카드를 선택해주세요.',409);
+  if((first.member_id===member.id)===(second.member_id===member.id))
+   return goError('내 카드 한 장과 다른 사람의 카드 한 장을 선택해주세요.',409);
   const stats=await db.from('go_battle_card_stats').select('card_id,power,charm,element').in('card_id',[firstId,secondId]);
   if(stats.error)throw stats.error;
   const byCard=new Map((stats.data||[]).map(s=>[s.card_id,s]));
