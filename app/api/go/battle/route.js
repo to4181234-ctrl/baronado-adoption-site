@@ -2,6 +2,7 @@ import { adminDatabase, validId } from '../../../../lib/server/adminData.js';
 import { goError, goMember, goMutationAllowed } from '../../../../lib/server/goAuth.js';
 import { loadGoCards } from '../../../../lib/server/goCards.js';
 import { battleScore } from '../../../../lib/goBattleRules.js';
+import { verifyBattleTicket } from '../../../../lib/server/goBattleMatch.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -52,7 +53,7 @@ export async function POST(request) {
  if(!member)return goError('로그인이 필요해요.',401);
  let input;
  try { input=await request.json(); } catch { return goError('대결 정보를 확인해주세요.'); }
- const {id,firstId,secondId}=input||{};
+ const {id,firstId,secondId,ticket}=input||{};
  if(!uuid(id)||!validId(firstId)||!validId(secondId)||firstId===secondId)return goError('서로 다른 카드를 선택해주세요.');
  try{
   const db=adminDatabase();
@@ -62,14 +63,18 @@ export async function POST(request) {
    if(prior.data.member_id!==member.id)return goError('대결 정보를 확인해주세요.',403);
    return Response.json({battle:prior.data,replayed:true},{headers:noCache});
   }
+  if(!verifyBattleTicket(ticket,{id,firstId,secondId,memberId:member.id}))return goError('매칭이 만료됐어요. 다시 배틀을 시작해주세요.',409);
   const cards=await db.from('go_cards').select('id,dog_id,status,member_id').in('id',[firstId,secondId]);
   if(cards.error)throw cards.error;
   const byId=new Map((cards.data||[]).map(c=>[c.id,c]));
   const first=byId.get(firstId),second=byId.get(secondId);
-  if(!first||!second||first.status!=='approved'||second.status!=='approved')return goError('삭제되거나 비공개 처리된 카드가 있어요.',409);
+  if(!first||!second||first.status!=='approved'||second.status!=='approved')return goError('관리자에 의해 사용이 제한된 카드가 있어요.',409);
   if(first.dog_id===second.dog_id)return goError('서로 다른 강아지의 카드를 선택해주세요.',409);
-  if((first.member_id===member.id)===(second.member_id===member.id))
-   return goError('내 카드 한 장과 다른 사람의 카드 한 장을 선택해주세요.',409);
+  if(first.member_id!==member.id||second.member_id===member.id)
+   return goError('내 카드와 다른 멍기록가의 카드로만 배틀할 수 있어요.',409);
+  const otherMember=await db.from('go_members').select('id,disabled').eq('id',second.member_id).maybeSingle();
+  if(otherMember.error)throw otherMember.error;
+  if(!otherMember.data||otherMember.data.disabled)return goError('현재 대결할 수 없는 멍기록가예요.',409);
   const stats=await db.from('go_battle_card_stats').select('card_id,power,charm,element').in('card_id',[firstId,secondId]);
   if(stats.error)throw stats.error;
   const byCard=new Map((stats.data||[]).map(s=>[s.card_id,s]));
