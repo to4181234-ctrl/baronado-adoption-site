@@ -107,6 +107,7 @@ function Game(){
    setTimeout(()=>completeRef.current(),4280)
   ];
  };
+ const startRef=useRef(null);startRef.current=start;
  const reset=()=>{stop();sounds.current?.startMusic();requestId.current=null;finished.current=false;setPhase('choose');setSelected([]);setOpponent(null);setResult(null);setImpactBeat(0);setRevealed(false);setError('');setPage(0);setSearched('');setQuery('');};
  const retryOpponent=()=>{stop();setSelected(list=>list.slice(0,1));setOpponent(null);setPhase('opponents');setSearched('');setQuery('');setOpponentPage(0);setError('');};
  useEffect(()=>{
@@ -118,6 +119,8 @@ function Game(){
   after(()=>{setRevealStage('selected');sounds.current?.play('select');},offset+600);
   after(()=>{setRevealStage('flip');sounds.current?.play('appear');},offset+1000);
   after(()=>{setRevealStage('shown');setRevealed(true);sounds.current?.play('ready');},offset+1400);
+  // Start the existing three-impact fight automatically after the reveal settles.
+  after(()=>startRef.current?.(),offset+1850);
   return()=>{cancelled=true;list.forEach(clearTimeout);};
  },[phase,randomOpponent,opponent?.id]);
 
@@ -152,7 +155,7 @@ function Game(){
   </section>}
   {phase==='reveal'&&<section className="meong-battle-reveal">
    <h1>어떤 멍멍이가 등장할까요?</h1>
-   <p className="meong-battle-hint">{opponent?.nickname} 멍기록가의 출전 카드</p>
+   <p className="meong-battle-hint">{revealStage==='nickname'?'랜덤 멍기록가를 찾는 중이에요.':opponent?.nickname+' 멍기록가의 출전 카드'}</p>
    <div className={'meong-battle-reveal-scene is-'+revealStage} aria-live="polite">
     {revealStage==='nickname'?<div className="meong-battle-nickname-slot"><span>멍기록가 찾는 중...</span><strong>{opponent?.nickname}</strong></div>:<div className="meong-battle-flip-card">
      <div className="meong-battle-card-back" aria-hidden={revealed}>?</div>
@@ -160,7 +163,7 @@ function Game(){
     </div>}
    </div>
    {revealed&&<p className="meong-battle-reveal-name"><strong>{selected[1]?.dogName} 등장!</strong><span>{opponent?.nickname} 멍기록가의 카드</span></p>}
-   <button type="button" className="meong-battle-primary" disabled={!revealed||mutating} onClick={start}>{revealed?'멍배틀 시작!':'상대 카드를 고르는 중…'}</button>
+   <button type="button" className="meong-battle-primary" disabled={!revealed||mutating} onClick={start}>{revealed?'바로 멍배틀 시작!':'상대 카드를 고르는 중…'}</button>
    <button type="button" className="meong-battle-secondary" onClick={retryOpponent}>다른 상대 선택</button>
   </section>}
   {phase==='fight'&&<section className="meong-battle-fight"><h1>두근두근, 멍배틀!</h1><p className="meong-battle-fight-opponent">{opponent?.nickname} 멍기록가와 대결!</p><div className={'meong-battle-versus is-battle-running'+(impactBeat?' is-impact is-impact-'+impactBeat:'')}><div className="meong-battle-fighter is-first"><div className="meong-battle-ghost ghost-long" aria-hidden="true"><GoCardFace card={first}/></div><div className="meong-battle-ghost ghost-far" aria-hidden="true"><GoCardFace card={first}/></div><div className="meong-battle-ghost ghost-near" aria-hidden="true"><GoCardFace card={first}/></div><BattleCard card={first} mini/></div><div className="meong-battle-fighter is-second"><div className="meong-battle-ghost ghost-long" aria-hidden="true"><GoCardFace card={second}/></div><div className="meong-battle-ghost ghost-far" aria-hidden="true"><GoCardFace card={second}/></div><div className="meong-battle-ghost ghost-near" aria-hidden="true"><GoCardFace card={second}/></div><BattleCard card={second} mini/></div><div className="v12-battle-impact" aria-hidden="true">{Array.from({length:12},(_,i)=><span key={i} style={{'--impact-angle':(i*30)+'deg','--impact-distance':(i%2?135:185)+'px'}}/> )}</div></div><strong>VS</strong><button className="meong-battle-primary" disabled={mutating} onClick={()=>completeRef.current()}>{mutating?'결과 기록 중…':'SKIP 후 결과보기'}</button></section>}
