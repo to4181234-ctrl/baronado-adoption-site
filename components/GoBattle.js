@@ -7,6 +7,7 @@ import {createBattleSound,BATTLE_SOUND_KEY} from '../lib/goBattleSound.js';
 import './GoBattle.css';
 import GoCardFace from './GoCardFace.js';
 import {vibrateBattleHit,stopBattleVibration} from '../lib/goBattleHaptics.js';
+import {figmaSprite,FIGMA_DOGS} from '../lib/goV3Game.js';
 
 const initial={cards:[],hasMore:false,total:0,eligibleDogKinds:0};
 const emptyOpponents={members:[],total:0,hasMore:false};
@@ -23,11 +24,11 @@ function Game(){
  const [selected,setSelected]=useState([]),[phase,setPhase]=useState('choose');
  const [opponents,setOpponents]=useState(emptyOpponents),[opponent,setOpponent]=useState(null);
  const [randomOpponent,setRandomOpponent]=useState(false),[opponentPage,setOpponentPage]=useState(0);
- const [revealStage,setRevealStage]=useState('shuffle'),[revealed,setRevealed]=useState(false);
+ const [revealStage,setRevealStage]=useState('shuffle'),[revealed,setRevealed]=useState(false),[slotName,setSlotName]=useState('');
  const [opponentBusy,setOpponentBusy]=useState(false);
  const [impactBeat,setImpactBeat]=useState(0),[result,setResult]=useState(null),[mutating,setMutating]=useState(false);
  const [soundEnabled,setSoundEnabled]=useState(false),[soundReady,setSoundReady]=useState(false);
- const sounds=useRef(null),timers=useRef([]),requestId=useRef(null),finished=useRef(false),alive=useRef(true);
+ const sounds=useRef(null),timers=useRef([]),requestId=useRef(null),preparedId=useRef(null),preparedToken=useRef(null),finished=useRef(false),alive=useRef(true);
  const stop=useCallback(()=>{timers.current.forEach(clearTimeout);timers.current=[];sounds.current?.stop();stopBattleVibration();},[]);
  useEffect(()=>{alive.current=true;sounds.current=createBattleSound();const unsubscribe=listenAudioSetting(setSoundEnabled);setSoundEnabled(localStorage.getItem(BATTLE_SOUND_KEY)!=='off');setSoundReady(true);const hidden=()=>{if(document.hidden)sounds.current?.stop();};document.addEventListener('visibilitychange',hidden);return()=>{alive.current=false;unsubscribe();stop();sounds.current?.dispose();document.removeEventListener('visibilitychange',hidden);};},[stop]);
  useEffect(()=>{if(soundReady)sounds.current?.setMuted(!soundEnabled);},[soundEnabled,soundReady]);
@@ -63,12 +64,15 @@ function Game(){
  };
  const prepare=async(id=null,random=false)=>{
   if(!selected[0]||opponentBusy)return;
-  setOpponentBusy(true);setError('');
+  stop();finished.current=false;requestId.current=null;preparedId.current=null;preparedToken.current=null;
+  setResult(null);setImpactBeat(0);setOpponentBusy(true);setError('');
   try{
    const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'prepare',firstId:selected[0].id,opponentId:id,randomMember:random})});
    const body=await response.json();
    if(!response.ok)throw Error(body.error||'상대 카드를 선정하지 못했어요.');
-   setOpponent(body.opponent);setRandomOpponent(random);setSelected([selected[0],body.card]);
+   if(!body.battleId||!body.matchToken||!body.card||!body.opponent)throw Error('배틀 선정 정보를 확인하지 못했어요.');
+   preparedId.current=body.battleId;preparedToken.current=body.matchToken;
+   setOpponent(body.opponent);setSlotName('멍기록가 찾는 중…');setRandomOpponent(random);setSelected([selected[0],body.card]);
    setRevealStage(random?'nickname':'shuffle');setRevealed(false);setPhase('reveal');
    sounds.current?.play('select');
   }catch(e){setError(e.message);}
@@ -80,18 +84,22 @@ function Game(){
   setImpactBeat(0);stopBattleVibration();
   setMutating(true);sounds.current?.stop();
   try{
-   const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,secondId:selected[1].id})});
+   const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,secondId:selected[1].id,matchToken:preparedToken.current})});
    const body=await response.json();if(!alive.current)return;
    if(!response.ok){if(response.status===409){setSelected([]);setResult(null);}throw Error(body.error||'대결 결과를 저장하지 못했어요.');}
    setResult(body.battle);setPhase('result');sounds.current?.play(body.battle.winner==='draw'?'draw':body.battle.winner==='first'?'victory':'defeat');timers.current.push(setTimeout(()=>sounds.current?.play('bark1'),450));
-  }catch(e){setError(e.message);setPhase('choose');}
+  }catch(e){
+   setError(e.message);setSelected(list=>list.slice(0,1));setResult(null);
+   preparedId.current=null;preparedToken.current=null;requestId.current=null;
+   setPhase('opponents');
+  }
   finally{setMutating(false);}
  },[selected]);
  const completeRef=useRef(complete);completeRef.current=complete;
  const start=()=>{
-  if(phase!=='reveal'||mutating||selected.length!==2||!selected.every(c=>c.battle&&c.status==='approved'))return;
+  if(phase!=='reveal'||mutating||!preparedId.current||!preparedToken.current||selected.length!==2||!selected.every(c=>c.battle&&c.status==='approved'))return;
   if(selected[0].ownerId!==member?.id||selected[1].ownerId===member?.id){setError('출전 카드 구성을 확인해주세요.');return;}
-  finished.current=false;requestId.current=crypto.randomUUID();setImpactBeat(0);setError('');setPhase('fight');
+  finished.current=false;requestId.current=preparedId.current;setImpactBeat(0);setError('');setPhase('fight');
   sounds.current?.startMusic();sounds.current?.play('start');
   // One continuous 4.28 s animation: retreat → accelerate → impact → hit-stop → recoil.
   // Sound, flash and haptics follow the same three contact frames (21.5%, 46%, 71.3%).
@@ -108,20 +116,26 @@ function Game(){
   ];
  };
  const startRef=useRef(null);startRef.current=start;
- const reset=()=>{stop();sounds.current?.startMusic();requestId.current=null;finished.current=false;setPhase('choose');setSelected([]);setOpponent(null);setResult(null);setImpactBeat(0);setRevealed(false);setError('');setPage(0);setSearched('');setQuery('');};
- const retryOpponent=()=>{stop();setSelected(list=>list.slice(0,1));setOpponent(null);setPhase('opponents');setSearched('');setQuery('');setOpponentPage(0);setError('');};
+ const reset=()=>{stop();sounds.current?.startMusic();requestId.current=null;preparedId.current=null;preparedToken.current=null;finished.current=false;setPhase('choose');setSelected([]);setOpponent(null);setResult(null);setImpactBeat(0);setRevealed(false);setError('');setPage(0);setSearched('');setQuery('');};
+ const retryOpponent=()=>{stop();preparedId.current=null;preparedToken.current=null;requestId.current=null;setSelected(list=>list.slice(0,1));setOpponent(null);setPhase('opponents');setSearched('');setQuery('');setOpponentPage(0);setError('');};
  useEffect(()=>{
   if(phase!=='reveal')return;
   let cancelled=false;const list=[];
   const after=(fn,ms)=>list.push(setTimeout(()=>{if(!cancelled)fn();},ms));
-  if(randomOpponent){after(()=>setRevealStage('shuffle'),800);}
+  let slotTimer=null;
+  if(randomOpponent){
+   const names=opponents.members.map(m=>m.nickname).filter(Boolean);
+   let index=0;
+   slotTimer=setInterval(()=>setSlotName(names.length?names[index++%names.length]:'멍기록가 찾는 중…'),95);
+   after(()=>{clearInterval(slotTimer);slotTimer=null;setSlotName(opponent?.nickname||'멍기록가');setRevealStage('shuffle');},800);
+  }
   const offset=randomOpponent?800:0;
-  after(()=>{setRevealStage('selected');sounds.current?.play('select');},offset+600);
+  after(()=>{setRevealStage('selected');sounds.current?.play('select');vibrateBattleHit(1);},offset+600);
   after(()=>{setRevealStage('flip');sounds.current?.play('appear');},offset+1000);
-  after(()=>{setRevealStage('shown');setRevealed(true);sounds.current?.play('ready');},offset+1400);
+  after(()=>{setRevealStage('shown');setRevealed(true);sounds.current?.play('ready');vibrateBattleHit(1);},offset+1400);
   // Start the existing three-impact fight automatically after the reveal settles.
   after(()=>startRef.current?.(),offset+1850);
-  return()=>{cancelled=true;list.forEach(clearTimeout);};
+  return()=>{cancelled=true;list.forEach(clearTimeout);if(slotTimer!==null)clearInterval(slotTimer);};
  },[phase,randomOpponent,opponent?.id]);
 
  const [first,second]=selected;
@@ -150,14 +164,14 @@ function Game(){
    <form className="meong-battle-search" onSubmit={e=>{e.preventDefault();setOpponentPage(0);setSearched(query);}}><input aria-label="멍기록가 닉네임 검색" placeholder="멍기록가 닉네임 검색" value={query} onChange={e=>setQuery(e.target.value)}/><button type="submit">검색</button></form>
    <p className="meong-battle-opponent-count">대결 가능한 멍기록가 {opponents.total}명</p>
    {error&&<p className="meong-battle-error" role="alert">{error}</p>}
-   {loading?<p className="meong-battle-empty">멍기록가를 찾는 중이에요.</p>:opponents.members.length?<div className="meong-battle-opponent-list">{opponents.members.map(m=><button type="button" key={m.id} disabled={opponentBusy} onClick={()=>prepare(m.id)}><span className="meong-battle-avatar" aria-hidden="true">🐾</span><span className="meong-battle-opponent-info"><strong>{m.nickname} 멍기록가</strong><small>대결 가능 카드 {m.cardCount}장</small></span><span className="meong-battle-opponent-arrow">선택 ›</span></button>)}</div>:<div className="meong-battle-empty">대결 가능한 멍기록가가 없어요.</div>}
+   {loading?<p className="meong-battle-empty">멍기록가를 찾는 중이에요.</p>:opponents.members.length?<div className="meong-battle-opponent-list">{opponents.members.map(m=><button type="button" key={m.id} disabled={opponentBusy} onClick={()=>prepare(m.id)}><span className="meong-battle-avatar" aria-hidden="true">{FIGMA_DOGS.includes(m.avatarDog)?<img src={figmaSprite(m.avatarDog,'front')} alt=""/>:'🐾'}</span><span className="meong-battle-opponent-info"><strong>{m.nickname} 멍기록가</strong><small>대결 가능 카드 {m.cardCount}장</small></span><span className="meong-battle-opponent-arrow">선택 ›</span></button>)}</div>:<div className="meong-battle-empty">대결 가능한 멍기록가가 없어요.</div>}
    {opponents.total>12&&<div className="meong-battle-pager"><button disabled={opponentPage===0||loading} onClick={()=>setOpponentPage(p=>p-1)}>‹ 이전</button><span>{opponentPage+1}</span><button disabled={!opponents.hasMore||loading} onClick={()=>setOpponentPage(p=>p+1)}>다음 ›</button></div>}
   </section>}
   {phase==='reveal'&&<section className="meong-battle-reveal">
    <h1>어떤 멍멍이가 등장할까요?</h1>
    <p className="meong-battle-hint">{revealStage==='nickname'?'랜덤 멍기록가를 찾는 중이에요.':opponent?.nickname+' 멍기록가의 출전 카드'}</p>
    <div className={'meong-battle-reveal-scene is-'+revealStage} aria-live="polite">
-    {revealStage==='nickname'?<div className="meong-battle-nickname-slot"><span>멍기록가 찾는 중...</span><strong>{opponent?.nickname}</strong></div>:<div className="meong-battle-flip-card">
+    {revealStage==='nickname'?<div className="meong-battle-nickname-slot"><span>랜덤 상대를 고르는 중…</span><strong>{slotName}</strong></div>:<div className="meong-battle-flip-card">
      <div className="meong-battle-card-back" aria-hidden={revealed}>?</div>
      <div className="meong-battle-reveal-face" aria-hidden={!revealed}><GoCardFace card={selected[1]}/></div>
     </div>}
@@ -167,7 +181,10 @@ function Game(){
    <button type="button" className="meong-battle-secondary" onClick={retryOpponent}>다른 상대 선택</button>
   </section>}
   {phase==='fight'&&<section className="meong-battle-fight"><h1>두근두근, 멍배틀!</h1><p className="meong-battle-fight-opponent">{opponent?.nickname} 멍기록가와 대결!</p><div className={'meong-battle-versus is-battle-running'+(impactBeat?' is-impact is-impact-'+impactBeat:'')}><div className="meong-battle-fighter is-first"><div className="meong-battle-ghost ghost-long" aria-hidden="true"><GoCardFace card={first}/></div><div className="meong-battle-ghost ghost-far" aria-hidden="true"><GoCardFace card={first}/></div><div className="meong-battle-ghost ghost-near" aria-hidden="true"><GoCardFace card={first}/></div><BattleCard card={first} mini/></div><div className="meong-battle-fighter is-second"><div className="meong-battle-ghost ghost-long" aria-hidden="true"><GoCardFace card={second}/></div><div className="meong-battle-ghost ghost-far" aria-hidden="true"><GoCardFace card={second}/></div><div className="meong-battle-ghost ghost-near" aria-hidden="true"><GoCardFace card={second}/></div><BattleCard card={second} mini/></div><div className="v12-battle-impact" aria-hidden="true">{Array.from({length:12},(_,i)=><span key={i} style={{'--impact-angle':(i*30)+'deg','--impact-distance':(i%2?135:185)+'px'}}/> )}</div></div><strong>VS</strong><button className="meong-battle-primary" disabled={mutating} onClick={()=>completeRef.current()}>{mutating?'결과 기록 중…':'SKIP 후 결과보기'}</button></section>}
-  {phase==='result'&&result&&<section className="meong-battle-result"><h1>이번 대결 승자는..</h1><div className="meong-battle-winner">{winner?<img src={sprite(winner)} alt={winner.dogName}/>:<><img src={sprite(first)} alt={first.dogName}/><img src={sprite(second)} alt={second.dogName}/></>}</div><h2>{winner?winner.dogName+' 카드 승리!':'막상막하!'}</h2><p>{winner?'이번 카드의 상성이 한 수 위였어요.':'두 카드의 매력을 가릴 수 없어요'}</p><div className="meong-battle-score">{first.dogName} {result.first_power+result.first_charm} + 상성 {result.first_bonus} → {result.first_score}<br/>{second.dogName} {result.second_power+result.second_charm} + 상성 {result.second_bonus} → {result.second_score}</div><p className="meong-battle-result-opponent">{opponent?.nickname} 멍기록가와의 대결</p><button className="meong-battle-primary" onClick={retryOpponent}>같은 내 카드로 다시 대결</button><button className="meong-battle-secondary" onClick={reset}>다른 내 카드 선택</button><Link className="meong-battle-secondary" href="/go">도감으로</Link></section>}
+  {phase==='result'&&result&&<section className="meong-battle-result"><h1>이번 대결 승자는..</h1><div className="meong-battle-winner">{winner?<img src={sprite(winner)} alt={winner.dogName}/>:<><img src={sprite(first)} alt={first.dogName}/><img src={sprite(second)} alt={second.dogName}/></>}</div><h2>{winner?winner.dogName+' 카드 승리!':'막상막하!'}</h2><p>{winner?'이번 카드의 상성이 한 수 위였어요.':'두 카드의 매력을 가릴 수 없어요'}</p><div className="meong-battle-score">{first.dogName} {result.first_power+result.first_charm} + 상성 {result.first_bonus} → {result.first_score}<br/>{second.dogName} {result.second_power+result.second_charm} + 상성 {result.second_bonus} → {result.second_score}</div><p className="meong-battle-result-opponent">{opponent?.nickname} 멍기록가와의 대결</p>
+    {error&&<p className="meong-battle-error" role="alert">{error}</p>}
+    <button className="meong-battle-primary" onClick={()=>prepare(opponent?.id)} disabled={opponentBusy}>{opponentBusy?'상대 카드 선택 중…':'같은 멍기록가와 재대결'}</button>
+    <button className="meong-battle-secondary" onClick={retryOpponent}>다른 멍기록가와 대결</button><button className="meong-battle-secondary" onClick={reset}>다른 내 카드 선택</button><Link className="meong-battle-secondary" href="/go">도감으로</Link></section>}
   </>}
  </div>;
 }

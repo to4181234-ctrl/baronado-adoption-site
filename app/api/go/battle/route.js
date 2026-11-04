@@ -1,5 +1,6 @@
+import {randomInt,randomUUID,timingSafeEqual} from 'node:crypto';
 import { adminDatabase, validId } from '../../../../lib/server/adminData.js';
-import { goError, goMember, goMutationAllowed } from '../../../../lib/server/goAuth.js';
+import { goError, goMember, goMutationAllowed, scopedSignature } from '../../../../lib/server/goAuth.js';
 import { loadGoCards } from '../../../../lib/server/goCards.js';
 import { battleScore } from '../../../../lib/goBattleRules.js';
 
@@ -7,16 +8,31 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const uuid = x => typeof x === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(x);
 const noCache = { 'Cache-Control': 'no-store' };
+const MATCH_TTL_MS=10*60*1000;
+function matchToken(id,memberId,firstId,secondId,expires){
+ const message=[id,memberId,firstId,secondId,expires].join(':');
+ return String(expires)+'.'+scopedSignature(message,'meonggo-random-opponent-v1');
+}
+function validMatchToken(value,id,memberId,firstId,secondId){
+ if(typeof value!=='string'||value.length>128)return false;
+ const expires=Number(value.split('.')[0]);
+ if(!Number.isSafeInteger(expires)||expires<Date.now()||expires>Date.now()+MATCH_TTL_MS)return false;
+ const expected=Buffer.from(matchToken(id,memberId,firstId,secondId,expires));
+ const actual=Buffer.from(value);
+ return actual.length===expected.length&&timingSafeEqual(actual,expected);
+}
 // Cards uploaded by members are visible by default; only the existing approved status
 // and battle stats determine whether they can join a battle. No public/private flag.
 async function eligibleOpponents(db,member,ownDogId){
  const cards=[];
+ let complete=false;
  for(let offset=0;offset<10000;offset+=500){
   let q=db.from('go_card_index').select('id,member_id,nickname,dog_id').eq('status','approved').neq('member_id',member.id).order('id').range(offset,offset+499);
   if(ownDogId)q=q.neq('dog_id',ownDogId);
   const r=await q;if(r.error)throw r.error;
-  cards.push(...(r.data||[]));if((r.data||[]).length<500)break;
+  cards.push(...(r.data||[]));if((r.data||[]).length<500){complete=true;break;}
  }
+ if(!complete)throw Error('대결 가능한 카드가 많아 목록을 확인하지 못했어요.');
  const valid=[];
  for(let i=0;i<cards.length;i+=250){
   const batch=cards.slice(i,i+250);
@@ -30,14 +46,21 @@ async function eligibleOpponents(db,member,ownDogId){
   const entry=members.get(card.member_id)||{id:card.member_id,nickname:card.nickname||'멍기록가',cardCount:0};
   entry.cardCount++;members.set(card.member_id,entry);
  }
- return {cards:valid,members:[...members.values()].sort((a,b)=>a.nickname.localeCompare(b.nickname,'ko'))};
+ // Use existing account profiles only. Disabled recorders cannot be matched.
+ const profiles=new Map(),memberIds=[...members.keys()];
+ for(let i=0;i<memberIds.length;i+=100){
+  const result=await db.from('go_members').select('id,nickname,avatar_dog')
+   .in('id',memberIds.slice(i,i+100)).eq('disabled',false);
+  if(result.error)throw result.error;
+  for(const profile of result.data||[])profiles.set(profile.id,profile);
+ }
+ const enabled=[...members.values()].filter(m=>profiles.has(m.id)).map(m=>{
+  const p=profiles.get(m.id);
+  return {...m,nickname:p.nickname,avatarDog:p.avatar_dog||null};
+ }).sort((a,b)=>a.nickname.localeCompare(b.nickname,'ko'));
+ return {cards:valid.filter(c=>profiles.has(c.member_id)),members:enabled};
 }
-function randomIndex(max){
- if(max<=1)return 0;
- const buf=new Uint32Array(1);const ceiling=Math.floor(0x100000000/max)*max;
- do{crypto.getRandomValues(buf)}while(buf[0]>=ceiling);
- return buf[0]%max;
-}
+function randomIndex(max){return max<=1?0:randomInt(max);}
 
 export async function GET(request) {
  try {
@@ -114,16 +137,21 @@ export async function POST(request) {
    const picked=pool[randomIndex(pool.length)];
    const found=await loadGoCards({member,id:picked.id,limit:1});
    if(!found.cards[0]?.battle)return goError('상대 카드를 다시 선택해주세요.',409);
-   return Response.json({opponent:members.find(m=>m.id===target),card:found.cards[0]},{headers:noCache});
+   const battleId=randomUUID(),expires=Date.now()+MATCH_TTL_MS;
+   return Response.json({
+    opponent:members.find(m=>m.id===target),card:found.cards[0],
+    battleId,matchToken:matchToken(battleId,member.id,firstId,picked.id,expires)
+   },{headers:noCache});
   }catch{return goError('상대 카드를 준비하지 못했어요.',500);}
  }
  if(!uuid(id)||!validId(firstId)||!validId(secondId)||firstId===secondId)return goError('서로 다른 카드를 선택해주세요.');
+ if(!validMatchToken(input?.matchToken,id,member.id,firstId,secondId))return goError('배틀 준비 정보가 만료됐어요. 상대를 다시 선택해주세요.',403);
  try{
   const db=adminDatabase();
   const prior=await db.from('go_battles').select('*').eq('id',id).maybeSingle();
   if(prior.error)throw prior.error;
   if(prior.data) {
-   if(prior.data.member_id!==member.id)return goError('대결 정보를 확인해주세요.',403);
+   if(prior.data.member_id!==member.id||prior.data.first_card_id!==firstId||prior.data.second_card_id!==secondId)return goError('대결 정보를 확인해주세요.',403);
    return Response.json({battle:prior.data,replayed:true},{headers:noCache});
   }
   const cards=await db.from('go_cards').select('id,dog_id,status,member_id').in('id',[firstId,secondId]);
@@ -151,7 +179,7 @@ export async function POST(request) {
   if(saved.error)throw saved.error;
   const checked=await db.from('go_battles').select('*').eq('id',id).single();
   if(checked.error)throw checked.error;
-  if(checked.data.member_id!==member.id)return goError('대결 정보를 확인해주세요.',403);
+  if(checked.data.member_id!==member.id||checked.data.first_card_id!==firstId||checked.data.second_card_id!==secondId)return goError('대결 정보를 확인해주세요.',403);
   return Response.json({battle:checked.data},{status:201,headers:noCache});
  }catch{return goError('대결 기록을 저장하지 못했어요.',500);}
 }

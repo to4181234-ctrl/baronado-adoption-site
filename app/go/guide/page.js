@@ -10,7 +10,7 @@ const steps=[
  ['01 만나기','힌트에서 강아지의 이야기를 살펴봐요.'],
  ['02 기록하기','직접 촬영하면 새로운 카드를 얻어요.'],
  ['03 교감하기','간식·칭찬·놀이로 친밀도를 쌓아요.'],
- ['04 멍배틀','다른 강아지 카드 2장으로 대결해요.']
+ ['04 멍배틀','내 카드를 고르고 다른 멍기록가에게 도전해요.']
 ];
 export default function Page(){
  return <GoShell active="guide"><article className="v3-guide v3-guide-figma">
