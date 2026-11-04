@@ -6,6 +6,7 @@ import {listenAudioSetting} from '../lib/goV3Audio.js';
 import {createBattleSound,BATTLE_SOUND_KEY} from '../lib/goBattleSound.js';
 import './GoBattle.css';
 import GoCardFace from './GoCardFace.js';
+import {vibrateBattleHit,stopBattleVibration} from '../lib/goBattleHaptics.js';
 
 const initial={cards:[],hasMore:false,total:0,eligibleDogKinds:0};
 function BattleCard({card,selected,onSelect,disabled=false,mini=false}){
@@ -19,10 +20,10 @@ function Game(){
  const [order,setOrder]=useState('newest'),[page,setPage]=useState(0);
  const [data,setData]=useState(initial),[loading,setLoading]=useState(true),[error,setError]=useState('');
  const [selected,setSelected]=useState([]),[phase,setPhase]=useState('choose');
- const [colliding,setColliding]=useState(false),[slowing,setSlowing]=useState(false),[result,setResult]=useState(null),[mutating,setMutating]=useState(false);
+ const [strikeStage,setStrikeStage]=useState('windup'),[impactBeat,setImpactBeat]=useState(0),[result,setResult]=useState(null),[mutating,setMutating]=useState(false);
  const [soundEnabled,setSoundEnabled]=useState(false),[soundReady,setSoundReady]=useState(false);
  const sounds=useRef(null),timers=useRef([]),requestId=useRef(null),finished=useRef(false),alive=useRef(true);
- const stop=useCallback(()=>{timers.current.forEach(clearTimeout);timers.current=[];sounds.current?.stop();},[]);
+ const stop=useCallback(()=>{timers.current.forEach(clearTimeout);timers.current=[];sounds.current?.stop();stopBattleVibration();},[]);
  useEffect(()=>{alive.current=true;sounds.current=createBattleSound();const unsubscribe=listenAudioSetting(setSoundEnabled);setSoundEnabled(localStorage.getItem(BATTLE_SOUND_KEY)!=='off');setSoundReady(true);const hidden=()=>{if(document.hidden)sounds.current?.stop();};document.addEventListener('visibilitychange',hidden);return()=>{alive.current=false;unsubscribe();stop();sounds.current?.dispose();document.removeEventListener('visibilitychange',hidden);};},[stop]);
  useEffect(()=>{if(soundReady)sounds.current?.setMuted(!soundEnabled);},[soundEnabled,soundReady]);
  useEffect(()=>{if(!ready||!member){setData(initial);return;}const ctl=new AbortController();setLoading(true);setError('');const qs=new URLSearchParams({mine:tab==='mine'?'1':'0',q:searched,order,page:String(page)});
@@ -40,6 +41,7 @@ function Game(){
  const complete=useCallback(async()=>{
   if(finished.current||!requestId.current)return;
   finished.current=true;timers.current.forEach(clearTimeout);timers.current=[];
+  setImpactBeat(0);setStrikeStage('settle');stopBattleVibration();
   setMutating(true);sounds.current?.stop();
   try{
    const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,secondId:selected[1].id})});
@@ -52,11 +54,26 @@ function Game(){
  const completeRef=useRef(complete);completeRef.current=complete;
  const start=()=>{
   if(phase!=='choose'||mutating||selected.length!==2||!selected.every(c=>c.battle))return;
-  finished.current=false;requestId.current=crypto.randomUUID();setColliding(false);setSlowing(false);setError('');setPhase('fight');
+  finished.current=false;requestId.current=crypto.randomUUID();setStrikeStage('windup');setImpactBeat(0);setError('');setPhase('fight');
   sounds.current?.startMusic();sounds.current?.play('start');
-  timers.current=[setTimeout(()=>sounds.current?.play('appear'),300),setTimeout(()=>setColliding(true),1650),...[1780,2250,2730].map(delay=>setTimeout(()=>sounds.current?.play('impact'),delay)),setTimeout(()=>setSlowing(true),3000),setTimeout(()=>completeRef.current(),4350)];
+  // A separate charge, impact and recoil for each hit. Audio/haptics start at the collision keyframe.
+  const hit=level=>{setImpactBeat(level);sounds.current?.playImpact(level);vibrateBattleHit(level);};
+  timers.current=[
+   setTimeout(()=>sounds.current?.play('appear'),300),
+   setTimeout(()=>setStrikeStage('strike-1'),650),
+   setTimeout(()=>hit(1),920),
+   setTimeout(()=>setImpactBeat(0),1090),
+   setTimeout(()=>setStrikeStage('strike-2'),1700),
+   setTimeout(()=>hit(2),1910),
+   setTimeout(()=>setImpactBeat(0),2130),
+   setTimeout(()=>setStrikeStage('strike-3'),2830),
+   setTimeout(()=>hit(3),2970),
+   setTimeout(()=>setImpactBeat(0),3270),
+   setTimeout(()=>setStrikeStage('settle'),3530),
+   setTimeout(()=>completeRef.current(),4230)
+  ];
  };
- const reset=()=>{stop();sounds.current?.startMusic();requestId.current=null;finished.current=false;setPhase('choose');setSelected([]);setResult(null);setColliding(false);setSlowing(false);setError('');setPage(0);};
+ const reset=()=>{stop();sounds.current?.startMusic();requestId.current=null;finished.current=false;setPhase('choose');setSelected([]);setResult(null);setStrikeStage('windup');setImpactBeat(0);setError('');setPage(0);};
  const changeTab=(name)=>{setTab(name);setPage(0);setError('');};
  const [first,second]=selected;
  const winner=result?.winner==='first'?first:result?.winner==='second'?second:null;
@@ -77,7 +94,7 @@ function Game(){
    {loading?<p className="meong-battle-empty">카드를 불러오는 중이에요.</p>:data.cards.length?<div className="meong-battle-grid">{data.cards.map(c=><div className="meong-battle-entry" key={c.id}><BattleCard card={c} onSelect={()=>choose(c)} selected={selected.some(v=>v.id===c.id)}/><span>{c.nickname} 멍기록가</span><small>{c.capturedAt?new Date(c.capturedAt).toLocaleDateString('ko-KR'):''}</small></div>)}</div>:<div className="meong-battle-empty">표시할 카드가 없어요. {tab==='mine'?'카드를 수집하러 가볼까요?':''}</div>}
    {data.total>4&&<div className="meong-battle-pager"><button disabled={page===0||loading} onClick={()=>setPage(p=>p-1)}>‹ 이전</button><span>{page+1}</span><button disabled={!data.hasMore||loading} onClick={()=>setPage(p=>p+1)}>다음 ›</button></div>}
   </>}
-  {phase==='fight'&&<section className="meong-battle-fight"><h1>두근두근, 멍배틀!</h1><div className={'meong-battle-versus'+(slowing?' is-slowing':colliding?' is-colliding':' is-rushing')}><div className="meong-battle-fighter is-first"><div className="meong-battle-ghost ghost-far" aria-hidden="true"><GoCardFace card={first}/></div><div className="meong-battle-ghost ghost-near" aria-hidden="true"><GoCardFace card={first}/></div><BattleCard card={first} mini/></div><div className="meong-battle-fighter is-second"><div className="meong-battle-ghost ghost-far" aria-hidden="true"><GoCardFace card={second}/></div><div className="meong-battle-ghost ghost-near" aria-hidden="true"><GoCardFace card={second}/></div><BattleCard card={second} mini/></div><div className="v12-battle-impact" aria-hidden="true">{Array.from({length:12},(_,i)=><span key={i} style={{'--impact-angle':(i*30)+'deg','--impact-distance':(i%2?135:185)+'px'}}/> )}</div></div><strong>VS</strong><button className="meong-battle-primary" disabled={mutating} onClick={()=>completeRef.current()}>{mutating?'결과 기록 중…':'SKIP 후 결과보기'}</button></section>}
+  {phase==='fight'&&<section className="meong-battle-fight"><h1>두근두근, 멍배틀!</h1><div className={'meong-battle-versus is-'+strikeStage+(impactBeat?' is-impact is-impact-'+impactBeat:'')}><div className="meong-battle-fighter is-first"><div className="meong-battle-ghost ghost-long" aria-hidden="true"><GoCardFace card={first/></div><div className="meong-battle-ghost ghost-far" aria-hidden="true"><GoCardFace card={first}/></div><div className="meong-battle-ghost ghost-near" aria-hidden="true"><GoCardFace card={first}/></div><BattleCard card={first} mini/></div><div className="meong-battle-fighter is-second"><div className="meong-battle-ghost ghost-long" aria-hidden="true"><GoCardFace card={second/></div><div className="meong-battle-ghost ghost-far" aria-hidden="true"><GoCardFace card={second}/></div><div className="meong-battle-ghost ghost-near" aria-hidden="true"><GoCardFace card={second}/></div><BattleCard card={second} mini/></div><div className="v12-battle-impact" aria-hidden="true">{Array.from({length:12},(_,i)=><span key={i} style={{'--impact-angle':(i*30)+'deg','--impact-distance':(i%2?135:185)+'px'}}/> )}</div></div><strong>VS</strong><button className="meong-battle-primary" disabled={mutating} onClick={()=>completeRef.current()}>{mutating?'결과 기록 중…':'SKIP 후 결과보기'}</button></section>}
   {phase==='result'&&result&&<section className="meong-battle-result"><h1>이번 대결 승자는..</h1><div className="meong-battle-winner">{winner?<img src={sprite(winner)} alt={winner.dogName}/>:<><img src={sprite(first)} alt={first.dogName}/><img src={sprite(second)} alt={second.dogName}/></>}</div><h2>{winner?winner.dogName+' 카드 승리!':'막상막하!'}</h2><p>{winner?'이번 카드의 상성이 한 수 위였어요.':'두 카드의 매력을 가릴 수 없어요'}</p><div className="meong-battle-score">{first.dogName} {result.first_power+result.first_charm} + 상성 {result.first_bonus} → {result.first_score}<br/>{second.dogName} {result.second_power+result.second_charm} + 상성 {result.second_bonus} → {result.second_score}</div><button className="meong-battle-primary" onClick={reset}>다른 카드로 대결</button><Link className="meong-battle-secondary" href="/go">도감으로</Link></section>}
   </>}
  </div>;

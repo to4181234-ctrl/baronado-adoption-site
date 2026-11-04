@@ -6,6 +6,7 @@ import {fetchDogs} from '../lib/dogs.js';
 import GoShell,{useGoSession} from './GoShell.js';
 import {figmaSprite,FIGMA_DOGS} from '../lib/goV3Game.js';
 import {GAME_SOUND_KEY} from '../lib/goV3Audio.js';
+import {BATTLE_VIBRATION_KEY,battleVibrationEnabled,stopBattleVibration} from '../lib/goBattleHaptics.js';
 
 // The avatar and text are one unsaved profile edit. Never PATCH the profile in the avatar picker.
 const AVATAR_DRAFT_KEY='meonggo-avatar-pending';
@@ -21,12 +22,12 @@ function SettingsContent(){
  const pathname=usePathname()||'/go/settings';
  const tab=pathname.endsWith('/profile')?'profile':pathname.endsWith('/avatar')?'avatar':'settings';
  const {member,ready,openAccount}=useGoSession();
- const [sound,setSound]=useState(true),[popup,setPopup]=useState(true);
+ const [sound,setSound]=useState(true),[vibration,setVibration]=useState(true),[popup,setPopup]=useState(true);
  const [bio,setBio]=useState(''),[nickname,setNickname]=useState(''),[avatar,setAvatar]=useState(null);
  const [owned,setOwned]=useState([]),[busy,setBusy]=useState(false),[msg,setMsg]=useState('');
  const [initializedMember,setInitializedMember]=useState(null);
 
- useEffect(()=>{try{setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off')}catch{}},[]);
+ useEffect(()=>{try{setSound(localStorage.getItem(GAME_SOUND_KEY)!=='off')}catch{}setVibration(battleVibrationEnabled());},[]);
  useEffect(()=>{
   if(!ready||!member)return;
   let alive=true;
@@ -77,8 +78,10 @@ function SettingsContent(){
    // Sound is a browser preference. Account popup is a separate, server-side preference.
    if(member){const r=await fetch('/api/go/settings',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'save',popupEnabled:popup})});const d=await r.json();if(!r.ok)throw Error(d.error||'팝업 설정을 저장하지 못했어요.')}
    localStorage.setItem(GAME_SOUND_KEY,sound?'on':'off');
+   localStorage.setItem(BATTLE_VIBRATION_KEY,vibration?'on':'off');
+   if(!vibration)stopBattleVibration();
    window.dispatchEvent(new Event('go-v3-settings-changed'));
-   setMsg(member?'설정을 저장했어요.':'이 브라우저의 소리 설정을 저장했어요.');
+   setMsg(member?'설정을 저장했어요.':'이 브라우저의 소리·진동 설정을 저장했어요.');
   }catch(e){setMsg(e.message||'설정을 저장하지 못했어요.')}finally{setBusy(false)}
  }
  async function resetPopupHide(){
@@ -102,11 +105,15 @@ function SettingsContent(){
     <strong>소리</strong><button type="button" aria-pressed={sound} onClick={()=>setSound(x=>!x)}>{sound?'켜짐':'꺼짐'}</button>
     <small>첫 터치 후 발견·카드 완성·배틀 효과음 재생</small>
    </div>
+   <div className="v3-account-setting-row v3-account-setting-vibration">
+    <strong>진동</strong><button type="button" aria-pressed={vibration} onClick={()=>setVibration(x=>!x)}>{vibration?'켜짐':'꺼짐'}</button>
+    <small>멍배틀 충돌 시 진동 · 지원되는 기기에서만 작동</small>
+   </div>
    <div className="v3-account-setting-row v3-account-setting-popup">
     <strong>첫 방문 팝업</strong><button type="button" aria-pressed={popup} disabled={!member||busy} onClick={()=>setPopup(x=>!x)}>{popup?'켜짐':'꺼짐'}</button>
     <button className="v3-account-reset" type="button" disabled={!member||busy} onClick={resetPopupHide}>7일 숨김 해제</button>
    </div>
-   <p className="v3-settings-note">소리 설정은 이 브라우저에 저장돼요.<br/>팝업 노출과 7일 숨김은 계정 기준으로 적용돼요.</p>
+   <p className="v3-settings-note">소리·진동 설정은 이 브라우저에 저장돼요.<br/>팝업 노출과 7일 숨김은 계정 기준으로 적용돼요.</p>
    <button type="button" className="v3-account-save" disabled={busy} onClick={saveSettings}>{busy?'저장 중…':'저장'}</button>
    <Link href={member?'/go/withdraw':'/go/settings'} onClick={member?undefined:(e)=>{e.preventDefault();openAccount()}} className="v3-account-withdraw">회원 탈퇴</Link>
   </>:profile?<>
