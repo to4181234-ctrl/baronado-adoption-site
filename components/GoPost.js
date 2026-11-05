@@ -4,6 +4,7 @@ import Link from 'next/link';
 import GoShell,{useGoSession} from './GoShell.js';
 import GoCard from './GoCard.js';
 import GoReveal from './GoReveal.js';
+import {postSparkleSrc} from './GoElementSparkles.js';
 import GoCardExport from './GoCardExport.js';
 import GoPostEditor from './GoPostEditor.js';
 import GoReport from './GoReport.js';
@@ -25,11 +26,11 @@ function Post({id}){
   {error&&<p className="v6-status" role="alert">{error}</p>}
   {loading&&<p role="status">카드를 불러오는 중이에요.</p>}
   {!loading&&card&&<>
-   <img className="v10-post-sparkle v10-post-sparkle-top" src="/figma-post/sparkle-top.svg" alt="" aria-hidden="true"/>
-   <img className="v10-post-sparkle v10-post-sparkle-bottom" src="/figma-post/sparkle-bottom.svg" alt="" aria-hidden="true"/>
+   <img className="v10-post-sparkle v10-post-sparkle-top" src={postSparkleSrc("top",card)} alt="" aria-hidden="true"/>
+   <img className="v10-post-sparkle v10-post-sparkle-bottom" src={postSparkleSrc("bottom",card)} alt="" aria-hidden="true"/>
    <button className="v10-post-sound" type="button" onClick={toggleSound} aria-label={sound?'소리 끄기':'소리 켜기'} aria-pressed={sound}><img src={sound?'/figma-post/sound-on.svg':'/figma-v3/sound-off.png'} alt=""/></button>
    <h1>{card.title||card.dogName+'의 기록'}</h1>
-   <div className="v6-post-card"><GoReveal key={card.id}><GoCard card={card} member={member} compact/></GoReveal></div>
+   <div className="v6-post-card"><GoReveal key={card.id} card={card}><GoCard card={card} member={member} compact/></GoReveal></div>
    {card.ownerId?<Link className="v6-post-author" href={'/go/recorders/'+card.ownerId}>{card.nickname} 멍기록가</Link>:<span className="v6-post-author">{card.nickname} 멍기록가</span>}
    {date&&<time className="v6-post-date" dateTime={date}>{new Date(date).toLocaleDateString('ko-KR').replace(/\s/g,'').replace(/\.$/,'')}</time>}
    <div className="v6-post-actions"><button type="button" onClick={toggleLike} disabled={liking} aria-pressed={Boolean(card.liked)}>{card.liked&&<span className="go-like-burst" aria-hidden="true">♥</span>}♡ 좋아요 {card.likeCount||0}</button><button type="button" className="v6-save" onClick={()=>needsLogin()||setExporting(true)}>이미지 저장·공유</button><Link className="v6-dog-link" href={'/dogs/'+card.dogId}>{card.dogName} 소개 보기 ↗</Link></div>

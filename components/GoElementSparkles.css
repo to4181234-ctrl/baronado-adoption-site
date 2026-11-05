@@ -1,0 +1,25 @@
+/* Attribute-colored pixel sparkle bursts. Existing Figma shape SVGs only. */
+.go-element-sparkles{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:visible;isolation:isolate}
+.go-element-sparkles>img{position:absolute;display:block;max-width:none;object-fit:contain;image-rendering:pixelated;opacity:0;transform:translate(-50%,-50%) scale(.25);animation:go-element-pixel-spark .7s steps(7,end) both}
+@keyframes go-element-pixel-spark{
+ 0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}
+ 24%{opacity:1;transform:translate(-50%,-50%) scale(.85)}
+ 45%{opacity:1;transform:translate(-50%,-50%) scale(1.22)}
+ 70%{opacity:.85;transform:translate(-50%,-50%) scale(1)}
+ 100%{opacity:0;transform:translate(-50%,-50%) scale(.35)}
+}
+/* Only the broad central flash is replaced. Card entry, sound, and outer Figma stars stay. */
+.go-inline-reveal-stage>.go-element-sparkles{z-index:4;inset:-4%}
+.go-cinematic-stage>.go-element-sparkles{z-index:3;inset:12% 11%}
+.go-cinematic-stage>.go-element-sparkles>img{animation-duration:.8s}
+.go-completion-screen .go-cinematic-card{box-shadow:0 0 0 2px #ffe7a5a0,0 16px 40px #0006}
+/* Battle: only win/draw and completed opponent-card flip get these icons. */
+.meong-battle-result .meong-battle-winner>.go-element-sparkles{z-index:2;inset:-19px -22px}
+/* Existing winner-img bounce targets every img; don't let it override the effect sprites. */
+.meong-battle-result .meong-battle-winner>.go-element-sparkles>img{animation:go-element-pixel-spark .7s steps(7,end) both;max-width:none;max-height:none;object-fit:contain;opacity:0}
+.meong-battle-reveal-scene>.go-element-sparkles{inset:15px 5px;z-index:4}
+.meong-battle-reveal-scene>.go-element-sparkles>img{animation-duration:.6s}
+@media(prefers-reduced-motion:reduce){
+ .go-element-sparkles{display:none!important}
+ .go-element-sparkles>img{animation:none!important}
+}

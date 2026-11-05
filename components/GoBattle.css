@@ -344,3 +344,6 @@
  .meong-battle-reveal-scene.is-shuffle .meong-battle-flip-card::before,
  .meong-battle-reveal-scene.is-shuffle .meong-battle-flip-card::after{animation:none!important}
 }
+
+/* Replace only the result-screen radiating yellow rays. Keep Figma layout and winner pop. */
+.meong-battle-phase-result .meong-battle-winner::before{display:none!important}
