@@ -13,10 +13,14 @@
 .go-cinematic-stage>.go-element-sparkles{z-index:3;inset:12% 11%}
 .go-cinematic-stage>.go-element-sparkles>img{animation-duration:.8s}
 .go-completion-screen .go-cinematic-card{box-shadow:0 0 0 2px #ffe7a5a0,0 16px 40px #0006}
-/* Battle: only win/draw and completed opponent-card flip get these icons. */
+/* Battle: winner's attribute for win/loss; both attributes for a draw. The opponent-card flip stays one-shot. */
 .meong-battle-result .meong-battle-winner>.go-element-sparkles{z-index:2;inset:-19px -22px}
 /* Existing winner-img bounce targets every img; don't let it override the effect sprites. */
 .meong-battle-result .meong-battle-winner>.go-element-sparkles>img{animation:go-element-pixel-spark .7s steps(7,end) both;max-width:none;max-height:none;object-fit:contain;opacity:0}
+/* A win or loss keeps sparkling until its result screen unmounts. Draw remains a one-shot. */
+.meong-battle-result .meong-battle-winner>.go-element-sparkles.is-result-loop>img{
+ animation:go-element-pixel-spark 1.8s steps(7,end) infinite both;
+}
 .meong-battle-reveal-scene>.go-element-sparkles{inset:15px 5px;z-index:4}
 .meong-battle-reveal-scene>.go-element-sparkles>img{animation-duration:.6s}
 @media(prefers-reduced-motion:reduce){
