@@ -17,13 +17,36 @@
 .meong-battle-result .meong-battle-winner>.go-element-sparkles{z-index:2;inset:-19px -22px}
 /* Existing winner-img bounce targets every img; don't let it override the effect sprites. */
 .meong-battle-result .meong-battle-winner>.go-element-sparkles>img{animation:go-element-pixel-spark .7s steps(7,end) both;max-width:none;max-height:none;object-fit:contain;opacity:0}
-/* A win or loss keeps sparkling until its result screen unmounts. Draw remains a one-shot. */
+/* Win/loss: stagger individual Figma sprites across the full loop, rather than
+   flashing all eight at nearly the same time. CSS ends when the result unmounts.
+   The draw and all other effect surfaces keep their existing one-shot timing. */
 .meong-battle-result .meong-battle-winner>.go-element-sparkles.is-result-loop>img{
- animation:go-element-pixel-spark 1.8s steps(7,end) infinite both;
+ animation:go-battle-result-twinkle 2.4s steps(8,end) infinite both;
 }
+@keyframes go-battle-result-twinkle{
+ 0%,100%{opacity:.17;transform:translate(-50%,-50%) scale(.65)}
+ 18%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}
+ 38%{opacity:.85;transform:translate(-50%,-50%) scale(.95)}
+ 60%{opacity:.17;transform:translate(-50%,-50%) scale(.65)}
+}
+/* The sprites have inline one-shot delays. These result-only offsets intentionally
+   override them so at least one star is bright throughout the 2.4s cycle. */
+.meong-battle-result .meong-battle-winner>.go-element-sparkles.is-result-loop>img:nth-child(1){animation-delay:0s!important}
+.meong-battle-result .meong-battle-winner>.go-element-sparkles.is-result-loop>img:nth-child(2){animation-delay:-.3s!important}
+.meong-battle-result .meong-battle-winner>.go-element-sparkles.is-result-loop>img:nth-child(3){animation-delay:-.6s!important}
+.meong-battle-result .meong-battle-winner>.go-element-sparkles.is-result-loop>img:nth-child(4){animation-delay:-.9s!important}
+.meong-battle-result .meong-battle-winner>.go-element-sparkles.is-result-loop>img:nth-child(5){animation-delay:-1.2s!important}
+.meong-battle-result .meong-battle-winner>.go-element-sparkles.is-result-loop>img:nth-child(6){animation-delay:-1.5s!important}
+.meong-battle-result .meong-battle-winner>.go-element-sparkles.is-result-loop>img:nth-child(7){animation-delay:-1.8s!important}
+.meong-battle-result .meong-battle-winner>.go-element-sparkles.is-result-loop>img:nth-child(8){animation-delay:-2.1s!important}
 .meong-battle-reveal-scene>.go-element-sparkles{inset:15px 5px;z-index:4}
 .meong-battle-reveal-scene>.go-element-sparkles>img{animation-duration:.6s}
 @media(prefers-reduced-motion:reduce){
  .go-element-sparkles{display:none!important}
  .go-element-sparkles>img{animation:none!important}
+ /* Reduced-motion users see a static version, never forced motion. */
+ .meong-battle-result .meong-battle-winner>.go-element-sparkles.is-result-loop{display:block!important}
+ .meong-battle-result .meong-battle-winner>.go-element-sparkles.is-result-loop>img{
+  animation:none!important;opacity:.65!important;transform:translate(-50%,-50%) scale(.9)!important
+ }
 }
