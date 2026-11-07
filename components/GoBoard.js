@@ -13,7 +13,7 @@ function Board(){
  const {member}=useGoSession();
  const [state,setState]=useState({text:'',query:'',order:'newest',page:0,scroll:0});
  const [initialized,setInitialized]=useState(false),[posts,setPosts]=useState([]),[total,setTotal]=useState(0),[loading,setLoading]=useState(true),[error,setError]=useState('');
- const requestRef=useRef(0),restoreScroll=useRef(null);
+ const requestRef=useRef(0),restoreScroll=useRef(null),listStartRef=useRef(null);
  useEffect(()=>{const saved=restoreBoard();restoreScroll.current=saved.scroll;setState(saved);setInitialized(true);},[]);
  const {text,query,order,page}=state;
  const load=useCallback(async(signal,requestId)=>{
@@ -34,19 +34,33 @@ function Board(){
  const maxPage=Math.max(1,Math.ceil(total/PAGE_SIZE));
  useEffect(()=>{if(initialized&&!loading&&page>=maxPage&&page>0)setState(s=>({...s,page:maxPage-1}));},[initialized,loading,page,maxPage]);
  function rememberPosition(){try{sessionStorage.setItem(STORAGE_KEY,JSON.stringify({...state,scroll:window.scrollY}));}catch{}}
+ function goToPage(target){
+  const nextPage=Math.max(0,Math.min(maxPage-1,target));
+  if(nextPage===page)return;
+  restoreScroll.current=null;
+  setState(s=>({...s,page:nextPage}));
+  const anchor=listStartRef.current;
+  if(anchor)window.scrollTo({top:Math.max(0,Math.round(window.scrollY+anchor.getBoundingClientRect().top-24)),behavior:'instant'});
+ }
  return <section className="v6-public-board" aria-label="모두의 도감 게시물">
   <form className="v6-public-search" role="search" onSubmit={e=>{e.preventDefault();restoreScroll.current=null;setState(s=>({...s,query:s.text.trim(),page:0}));}}>
    <input aria-label="게시물 검색" value={text} maxLength={80} onChange={e=>setState(s=>({...s,text:e.target.value}))} placeholder="제목·작성자·강아지 이름"/>
    <button type="submit">검색</button>
   </form>
-  <div className="v6-public-toolbar"><label>등록 순서ㅣ <select aria-label="등록 순서" value={order} onChange={e=>{restoreScroll.current=null;setState(s=>({...s,order:e.target.value,page:0}));}}><option value="newest">최신순</option><option value="oldest">오래된순</option></select></label><span aria-live="polite">{query?'검색 결과':'전체 게시물'} {total}건</span></div>
+  <div className="v6-public-toolbar" ref={listStartRef}><label>등록 순서ㅣ <select aria-label="등록 순서" value={order} onChange={e=>{restoreScroll.current=null;setState(s=>({...s,order:e.target.value,page:0}));}}><option value="newest">최신순</option><option value="oldest">오래된순</option></select></label><span aria-live="polite">{query?'검색 결과':'전체 게시물'} {total}건</span></div>
   {error&&<p className="v6-public-message" role="alert">{error} <button type="button" onClick={()=>{const controller=new AbortController();load(controller.signal,++requestRef.current);}}>다시 시도</button></p>}
   {loading?<p className="v6-public-message" role="status">모두의 도감을 불러오고 있어요.</p>:!error&&posts.length?<div className="v6-public-grid">{posts.map(card=><article className="v6-public-item" key={card.id} onClickCapture={e=>{if(e.target.closest('a[href]'))rememberPosition();}}>
     <GoCard card={card} member={member} compact linkToPost/>
     {card.ownerId?<Link href={'/go/recorders/'+card.ownerId} onClick={rememberPosition} className="v6-public-author">{card.nickname} 멍기록가</Link>:<span className="v6-public-author">{card.nickname} 멍기록가</span>}
     <time dateTime={card.createdAt||card.capturedAt}>{(card.createdAt||card.capturedAt)?new Date(card.createdAt||card.capturedAt).toLocaleDateString('ko-KR'):''}</time>
    </article>)}</div>:!error&&<div className="v6-public-message" role="status"><p>{query?'검색 결과가 없어요.':'아직 공개된 카드가 없어요.'}</p>{query&&<button type="button" onClick={()=>setState(s=>({...s,query:'',text:'',page:0}))}>검색어 지우기</button>}</div>}
-  {!loading&&!error&&total>0&&<nav className="v6-public-pager" aria-label="게시물 페이지"><button type="button" disabled={page===0} onClick={()=>setState(s=>({...s,page:s.page-1}))} aria-label="이전 페이지"><img src="/figma-v3/list-pager-prev.svg" alt=""/></button><span>{page+1} / {maxPage}</span><button type="button" disabled={page+1>=maxPage} onClick={()=>setState(s=>({...s,page:s.page+1}))} aria-label="다음 페이지"><img src="/figma-v3/list-pager-next.svg" alt=""/></button></nav>}
+  {!loading&&!error&&total>0&&<nav className="v6-public-pager" aria-label="게시물 페이지">
+   <button type="button" className="v6-public-jump" disabled={page===0} onClick={()=>goToPage(0)} aria-label="첫 페이지"><img src="/figma-v3/list-pager-prev.svg" alt=""/><img src="/figma-v3/list-pager-prev.svg" alt=""/></button>
+   <button type="button" disabled={page===0} onClick={()=>goToPage(page-1)} aria-label="이전 페이지"><img src="/figma-v3/list-pager-prev.svg" alt=""/></button>
+   <span aria-live="polite">{page+1} / {maxPage}</span>
+   <button type="button" disabled={page+1>=maxPage} onClick={()=>goToPage(page+1)} aria-label="다음 페이지"><img src="/figma-v3/list-pager-next.svg" alt=""/></button>
+   <button type="button" className="v6-public-jump" disabled={page+1>=maxPage} onClick={()=>goToPage(maxPage-1)} aria-label="마지막 페이지"><img src="/figma-v3/list-pager-next.svg" alt=""/><img src="/figma-v3/list-pager-next.svg" alt=""/></button>
+  </nav>}
  </section>;
 }
 export default function GoBoard(){return <GoShell active="community"><Board/></GoShell>;}

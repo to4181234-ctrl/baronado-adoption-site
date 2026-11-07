@@ -75,3 +75,14 @@
 .v3-go-site .v6-public-item .go-card-ratings{position:absolute;left:9.6386%;right:9.6386%;top:74.717%;border:0!important;gap:4px!important}
 .v3-go-site .v6-public-item .go-card-ratings>div{color:#000}
 .v3-go-site .v6-public-item .go-card-information{position:absolute;left:6.0241%;right:9.6386%;bottom:5.283%;border:0!important;margin:0!important}
+
+
+/* 모두의 도감 페이지네이션: existing Figma chevrons, with first/last navigation. */
+.v3-go-site .v6-public-pager{gap:4px}
+.v3-go-site .v6-public-pager button{
+ width:44px;height:44px;min-width:44px;min-height:44px;
+}
+.v3-go-site .v6-public-pager button.v6-public-jump{
+ display:flex;align-items:center;justify-content:center;gap:1px;
+}
+.v3-go-site .v6-public-pager>span{min-width:65px;text-align:center}
