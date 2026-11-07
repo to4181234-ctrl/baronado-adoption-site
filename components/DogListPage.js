@@ -6,7 +6,6 @@ import {getAgeInfo} from '../lib/dogProfile';
 import {recordVisit} from '../lib/siteAnalytics';
 import SiteHeader from './SiteHeader';
 import DogActions from './DogActions';
-import GoDiscovery from './GoDiscovery';
 import PublicHero from './PublicHero';
 const PAGE_SIZE=4;
 const ORDER_CHOICES=[['newest','최신순'],['oldest','오래된순']];
@@ -45,6 +44,5 @@ export default function DogListPage({title,category}){
   </section>
   {sheet&&<div className="v3-filter-backdrop" onClick={()=>setSheet(null)} role="presentation"><section className="v3-filter-sheet" role="dialog" aria-modal="true" aria-label={sheet==='adoption'?'입양 상태 선택':'등록 순서 선택'} onClick={e=>e.stopPropagation()}><h2>{sheet==='adoption'?'입양 상태':'등록 순서'}</h2>{(sheet==='adoption'?ADOPTION_CHOICES:ORDER_CHOICES).map(([value,label])=><button type="button" key={value} className="v3-filter-option" aria-pressed={(sheet==='adoption'?filter:order)===value} onClick={()=>{if(sheet==='adoption')setFilter(value);else setOrder(value);setPage(0);setSheet(null)}}>{label}{(sheet==='adoption'?filter:order)===value&&<span aria-hidden="true">✓</span>}</button>)}</section></div>}
   <DogActions allowInquiry pageCategory={category}/>
-  {!resident&&<GoDiscovery dogs={dogs} dog={dogs[0]}/>}
  </main>;
 }

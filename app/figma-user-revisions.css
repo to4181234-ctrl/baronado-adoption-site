@@ -129,3 +129,6 @@
 @keyframes v14-clash-star{0%,7%,75%,100%{opacity:0;transform:translate(-50%,-50%) scale(.15) rotate(0)}8%,34%,60%{opacity:1;transform:translate(-50%,-50%) scale(1.15) rotate(20deg)}18%,44%,70%{opacity:.2;transform:translate(-50%,-50%) scale(.55) rotate(80deg)}}
 @keyframes v14-clash-particles{0%{opacity:0;transform:rotate(var(--impact-angle)) translateY(-5px)}10%{opacity:1}100%{opacity:0;transform:rotate(var(--impact-angle)) translateY(calc(-1 * var(--impact-distance))) rotate(180deg)}}
 @media(prefers-reduced-motion:reduce){.meong-battle-versus.is-colliding .meong-battle-card{animation:none!important}}
+
+/* Daily discovery lives only on the MeongGO landing screen; keep its original Figma logo and modal layout. */
+.v3-discovery-figma .v3-discovery-modal>h2 .v3-discovery-daily-title{position:absolute;top:44px;left:0;right:0;display:block;text-align:center;font-family:'MonaS12',sans-serif;font-size:16px;font-weight:700;line-height:23px;letter-spacing:0;color:#181713;white-space:nowrap}
