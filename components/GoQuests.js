@@ -75,6 +75,6 @@ export default function GoQuests({ compact = false }) {
       {ready && <button type="button" onClick={openAccount}>로그인하고 시작하기</button>}
     </div>}
     {compact && <Link className="go-quest-all-link" href="/go/quests">퀘스트 자세히 보기 ›</Link>}
-    <p className="go-quest-caption">{GO_STAGE2_UI_ENABLED?'2차 출시 퀘스트 3종 · 최대 퀘스트 보상 50C':'1차 출시 퀘스트 2종 · 최대 퀘스트 보상 40C'}</p>
+    <p className="go-quest-caption">{GO_STAGE3_UI_ENABLED?'3차 출시 퀘스트 4종 · 최대 퀘스트 보상 60C':GO_STAGE2_UI_ENABLED?'2차 출시 퀘스트 3종 · 최대 퀘스트 보상 50C':'1차 출시 퀘스트 2종 · 최대 퀘스트 보상 40C'}</p>
   </section>;
 }
