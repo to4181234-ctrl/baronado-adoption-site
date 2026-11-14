@@ -113,3 +113,6 @@
   position:relative!important;z-index:10!important;isolation:isolate;
   display:block!important;clear:both;width:100%!important;
 }
+
+/* All card graphics are decorative within a parent button, so only the button owns the hit target. */
+.friend-pvp .go-card-graphic,.friend-pvp .go-card-graphic *{pointer-events:none!important}
