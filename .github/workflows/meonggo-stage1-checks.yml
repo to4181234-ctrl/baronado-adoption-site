@@ -1,0 +1,36 @@
+# Stage 1 development checks. This workflow never deploys to production.
+name: MeongGO stage 1 checks
+
+on:
+  push:
+    branches:
+      - feat/meonggo-stage1-coins-20261114
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  stage1-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - name: Validate new coin rules and server syntax
+        run: |
+          node --test tests/go-coins.test.mjs
+          node --check lib/goCoins.js
+          node --check app/api/go/coins/route.js
+          node --check app/api/go/interaction/route.js
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Next.js production build
+        run: npm run build
