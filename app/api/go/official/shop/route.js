@@ -1,6 +1,6 @@
-import {adminDatabase,validId} from '../../../../lib/server/adminData.js';
-import {goError,goMember,goMutationAllowed} from '../../../../lib/server/goAuth.js';
-import {goStage2ServerEnabled} from '../../../../lib/goOfficial.js';
+import {adminDatabase,validId} from '../../../../../lib/server/adminData.js';
+import {goError,goMember,goMutationAllowed} from '../../../../../lib/server/goAuth.js';
+import {goStage2ServerEnabled} from '../../../../../lib/goOfficial.js';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export async function POST(request){
