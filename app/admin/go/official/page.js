@@ -3,6 +3,7 @@ import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
 import AdminGuard from '../../../../components/AdminGuard.js';
 import SiteHeader from '../../../../components/SiteHeader.js';
+import GoCardFace from '../../../../components/GoCardFace.js';
 import {GO_STAGE2_UI_ENABLED} from '../../../../components/GoOfficialAlbum.js';
 
 const slots=[1,2,3,4,5,6];
@@ -151,6 +152,11 @@ function OfficialEditor(){
                 transform:'scale('+currentValues.zoom+')'}:undefined}/>:
               <span>사진을 등록해주세요</span>}
           </div>
+          {activeSlot<=5&&savedAsset?.imageUrl&&<div className="go-official-admin-card-face">
+            <GoCardFace card={{dogName:dog?.name||'강아지',nickname:'바로나도',
+              imageUrl:savedAsset.imageUrl,capturedAt:null,battle:{power:0,charm:0}}}/>
+            <small>Figma 카드 프레임 미리보기 · 파워/매력은 사용자가 획득할 때 결정돼요.</small>
+          </div>}
           {draft&&<>
             <label>새 이미지 파일
               <input type="file" accept="image/jpeg,image/png,image/webp"
