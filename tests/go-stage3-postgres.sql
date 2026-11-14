@@ -104,10 +104,35 @@ BEGIN
   WHERE room_id IN (v_room2,v_room3,v_room4);
  IF v_count<>0 THEN RAISE EXCEPTION 'abandoned room created match history'; END IF;
 
+ -- Official photo card (not HIDDEN) enters the same private match as camera cards.
+ INSERT INTO public.go_official_owned(member_id,dog_id,slot,power,charm)
+  VALUES(h,d_h,1,4,5);
+ SELECT public.go_pvp_create(h) INTO v;
+ v_room2:=(v->>'roomId')::uuid;
+ SELECT public.go_pvp_join(g,v_room2::text) INTO v;
+ SELECT public.go_pvp_action(h,v_room2,'select','official',d_h,6::smallint) INTO v;
+ IF (v->>'ok')::boolean IS DISTINCT FROM false THEN
+  RAISE EXCEPTION 'HIDDEN card slot 6 was admitted into PvP'; END IF;
+ SELECT public.go_pvp_action(h,v_room2,'select','official',d_h,1::smallint) INTO v;
+ IF (v->>'ok')::boolean IS DISTINCT FROM true THEN
+  RAISE EXCEPTION 'official photo card could not be selected: %',v; END IF;
+ SELECT public.go_pvp_action(g,v_room2,'select','camera',card_g,NULL) INTO v;
+ SELECT public.go_pvp_action(h,v_room2,'ready') INTO v;
+ SELECT public.go_pvp_action(g,v_room2,'ready') INTO v;
+ SELECT public.go_pvp_snapshot(g,v_room2) INTO v;
+ IF v->'otherCard'->>'kind'<>'official' OR
+    (v->>'hostScore')::integer<>9 THEN
+  RAISE EXCEPTION 'official card not in final snapshot or mismatched score: %',v; END IF;
+ SELECT count(*) INTO v_count FROM public.go_coin_transactions
+  WHERE member_id IN(h,g) AND event_type='quest_battle';
+ IF v_count<>2 THEN RAISE EXCEPTION 'official battle granted second daily quest'; END IF;
+
  -- Existing camera cards can be deleted while history remains.
  DELETE FROM public.go_cards WHERE id IN (card_h,card_g);
  SELECT count(*) INTO v_count FROM public.go_pvp_records WHERE room_id=v_room;
- IF v_count<>4 THEN RAISE EXCEPTION 'card deletion erased PvP record'; END IF;
+ IF v_count<>4 THEN RAISE EXCEPTION 'card deletion erased earlier PvP record'; END IF;
+ SELECT count(*) INTO v_count FROM public.go_pvp_records WHERE room_id=v_room2;
+ IF v_count<>2 THEN RAISE EXCEPTION 'official card battle record was erased'; END IF;
  IF has_table_privilege('authenticated','public.go_pvp_rooms','SELECT')
  OR has_table_privilege('anon','public.go_pvp_rounds','SELECT')
  OR has_function_privilege('authenticated','public.go_pvp_action(uuid,uuid,text,text,uuid,smallint)','EXECUTE')
