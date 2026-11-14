@@ -59,6 +59,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f supabase/proposals/meonggo_stage1_coins_REVIEW_NOT_APPLIED.sql
           psql -v ON_ERROR_STOP=1 -f supabase/proposals/meonggo_stage1_visit_REVIEW_NOT_APPLIED.sql
           psql -v ON_ERROR_STOP=1 -f tests/go-stage1-postgres.sql
+          bash tests/go-stage1-concurrency.sh
       - name: Install locked dependencies
         run: npm ci
       - name: Next.js production build
