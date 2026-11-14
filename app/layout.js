@@ -37,3 +37,5 @@ import './figma-stage10-final.css';
 import './figma-user-revisions.css';
 
 import './meonggo-stage1.css';
+
+import './meonggo-stage2.css';

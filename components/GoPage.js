@@ -10,6 +10,7 @@ import GoCamera from './GoCamera.js';
 import GoCard from './GoCard.js';
 import GoDiscovery from './GoDiscovery.js';
 import GoQuests from './GoQuests.js';
+import GoOfficialAlbum,{GO_STAGE2_UI_ENABLED} from './GoOfficialAlbum.js';
 const EMPTY={counts:{},covers:{},progress:null,standing:null,ready:false};
 const FIGMA_ALBUM_SHADOW = {깡지:'/figma-v3/album-shadow-kangji.svg',버디:'/figma-v3/album-shadow-buddy.svg',뽀실:'/figma-v3/album-shadow-pposil.svg',구름:'/figma-v3/album-shadow-gureum.svg',오레오:'/figma-v3/album-shadow-oreo.svg'};
 function Album({initialDogId=null}){
@@ -71,4 +72,16 @@ function Album({initialDogId=null}){
   {camera&&<div className="v3-camera-backdrop" role="presentation"><section className="v3-camera-panel" role="dialog" aria-modal="true" aria-label="멍멍이 카드 촬영"><button className="v3-camera-close" onClick={()=>setCamera(null)} aria-label="카메라 닫기">×</button><GoCamera dog={camera} nickname={member?.nickname} standing={collection.standing} firstCard={!collection.counts?.[camera.id]} onSaved={()=>{reloadCards();reloadCollection();}} onDone={()=>setCamera(null)}/></section></div>}
  </>;
 }
-export default function GoPage({dogId=null}){return <GoShell active="album" albumDetail={Boolean(dogId)}>{dogId?<GoDogAlbum dogId={dogId}/>:<><Album initialDogId={null}/><GoQuests compact/></>}</GoShell>}
+function GoStage2Tabs({dogId}){
+ const [tab,setTab]=useState('official');
+ if(!GO_STAGE2_UI_ENABLED)return dogId?<GoDogAlbum dogId={dogId}/>:<><Album initialDogId={null}/><GoQuests compact/></>;
+ return <div className="go-stage2-shell">
+  <nav className="go-stage2-tabs" aria-label="멍카드 도감 구분">
+   <button type="button" aria-pressed={tab==='official'} onClick={()=>setTab('official')}>유기견 도감</button>
+   <button type="button" aria-pressed={tab==='mine'} onClick={()=>setTab('mine')}>나만의 카드</button>
+  </nav>
+  {tab==='official'?<GoOfficialAlbum dogId={dogId}/>:dogId?<GoDogAlbum dogId={dogId}/>:<Album initialDogId={null}/>}
+  {!dogId&&<GoQuests compact/>}
+ </div>;
+}
+export default function GoPage({dogId=null}){return <GoShell active="album" albumDetail={Boolean(dogId)}><GoStage2Tabs dogId={dogId}/></GoShell>}

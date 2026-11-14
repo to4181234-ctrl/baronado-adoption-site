@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useGoSession } from './GoShell.js';
 import { useGoCoins } from './GoCoins.js';
+import { GO_STAGE2_UI_ENABLED } from './GoOfficialAlbum.js';
 
 export default function GoQuests({ compact = false }) {
   const { member, ready, openAccount } = useGoSession();
@@ -23,7 +24,13 @@ export default function GoQuests({ compact = false }) {
       completed: Boolean(coins.daily?.visitQuestDone),
       href: '/go/visit'
     }
-  ].sort((a, b) => Number(a.completed) - Number(b.completed));
+  ];
+  if(GO_STAGE2_UI_ENABLED)tasks.push({
+    id:'draw',title:'오늘의 무료 공식 멍카드 뽑기',coins:10,
+    caption:'오늘의 첫 공식 멍카드 뽑기로 10C를 받아요.',
+    completed:Boolean(coins.daily?.drawQuestDone),href:'/go'
+  });
+  tasks.sort((a,b)=>Number(a.completed)-Number(b.completed));
 
   const done = tasks.filter(item => item.completed).length;
   return <section className={'go-quest-section' + (compact ? ' go-quest-compact' : '')}
@@ -33,9 +40,9 @@ export default function GoQuests({ compact = false }) {
         <h2>오늘의 퀘스트</h2>
         <p>매일 자정에 새로운 퀘스트를 시작해요.</p>
       </div>
-      <b>{member ? done : 0} / 2</b>
+      <b>{member ? done : 0} / {tasks.length}</b>
     </header>
-    <div className="go-quest-progress" aria-label={'완료한 퀘스트 ' + done + '/2'}>
+    <div className="go-quest-progress" aria-label={'완료한 퀘스트 ' + done + '/' + tasks.length}>
       <span style={{ width: (member ? done / 2 * 100 : 0) + '%' }} />
     </div>
     {member ? <>
@@ -52,7 +59,7 @@ export default function GoQuests({ compact = false }) {
             <b>+{task.coins}C</b>
             {task.completed ?
               <button type="button" onClick={() => setNotice('오늘 이미 완료한 퀘스트예요.')}>완료</button> :
-              <Link href={task.href}>{task.id === 'visit' ? '인증하기' : '돌보러가기'} ›</Link>}
+              <Link href={task.href}>{task.id === 'visit' ? '인증하기' : task.id==='draw'?'뽑으러가기':'돌보러가기'} ›</Link>}
           </div>
         </article>)}
       </div>
@@ -62,6 +69,6 @@ export default function GoQuests({ compact = false }) {
       {ready && <button type="button" onClick={openAccount}>로그인하고 시작하기</button>}
     </div>}
     {compact && <Link className="go-quest-all-link" href="/go/quests">퀘스트 자세히 보기 ›</Link>}
-    <p className="go-quest-caption">1차 출시 퀘스트 2종 · 매일 최대 퀘스트 보상 40C</p>
+    <p className="go-quest-caption">{GO_STAGE2_UI_ENABLED?'2차 출시 퀘스트 3종 · 최대 퀘스트 보상 50C':'1차 출시 퀘스트 2종 · 최대 퀘스트 보상 40C'}</p>
   </section>;
 }
