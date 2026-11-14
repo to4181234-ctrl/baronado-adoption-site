@@ -94,12 +94,12 @@ BEGIN
  SELECT public.go_pvp_join(g,v_room3::text) INTO v;
  UPDATE public.go_pvp_rooms SET ready_deadline=now()-interval '1 second' WHERE id=v_room3;
  SELECT public.go_pvp_action(h,v_room3,'sync') INTO v;
- IF (v->>'ok')::boolean IS DISTINCT FROM false THEN RAISE EXCEPTION 'two-minute ready deadline ignored'; END IF;
+ IF (v->>'ok')::boolean IS DISTINCT FROM true OR v->>'status'<>'cancelled' THEN RAISE EXCEPTION 'two-minute ready deadline ignored: %',v; END IF;
  SELECT public.go_pvp_create(h) INTO v;v_room4:=(v->>'roomId')::uuid;
  SELECT public.go_pvp_join(g,v_room4::text) INTO v;
  UPDATE public.go_pvp_rooms SET host_seen_at=now()-interval '31 seconds' WHERE id=v_room4;
  SELECT public.go_pvp_action(g,v_room4,'sync') INTO v;
- IF (v->>'ok')::boolean IS DISTINCT FROM false THEN RAISE EXCEPTION '30-second disconnect not cancelled'; END IF;
+ IF (v->>'ok')::boolean IS DISTINCT FROM true OR v->>'status'<>'cancelled' THEN RAISE EXCEPTION '30-second disconnect not cancelled: %',v; END IF;
  SELECT count(*) INTO v_count FROM public.go_pvp_records
   WHERE room_id IN (v_room2,v_room3,v_room4);
  IF v_count<>0 THEN RAISE EXCEPTION 'abandoned room created match history'; END IF;
