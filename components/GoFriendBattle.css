@@ -96,3 +96,20 @@
   position:relative!important;z-index:10!important;isolation:isolate;
   display:block!important;clear:both;width:100%!important;
 }
+
+/* Result faces use the same Figma SVG. Do not allow those large painted
+   image elements to occlude the rematch or finish controls on mobile. */
+.friend-pvp-result-cards{
+  position:relative;z-index:0;isolation:isolate;
+  contain:layout paint;overflow:hidden;
+}
+.friend-pvp-result-cards .go-card-graphic{
+  position:static!important;display:block!important;width:100%!important;
+  max-width:100%!important;height:auto!important;aspect-ratio:166/265!important;
+  pointer-events:none;
+}
+.friend-pvp-result>.meong-battle-primary,
+.friend-pvp-result>.meong-battle-secondary{
+  position:relative!important;z-index:10!important;isolation:isolate;
+  display:block!important;clear:both;width:100%!important;
+}
