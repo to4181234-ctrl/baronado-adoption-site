@@ -78,10 +78,10 @@ BEGIN
  -- Camera quota starts only from stage-two creations, excluding prior camera posts.
  FOR i IN 1..3 LOOP
   v_id:=gen_random_uuid();
-  SELECT public.go_camera_create_limited(m2,v_id,d2,'촬영 '||i,'user/new.webp',3,4,2) INTO r;
+  SELECT public.go_camera_create_limited(m2,v_id,d2,'촬영 '||i,'user/new.webp',3::smallint,4::smallint,2::smallint) INTO r;
   IF (r->>'ok')::boolean IS DISTINCT FROM true THEN RAISE EXCEPTION 'camera quota rejected early: %',r; END IF;
  END LOOP;
- SELECT public.go_camera_create_limited(m2,gen_random_uuid(),d2,'네 번째','user/new.webp',3,4,2) INTO r;
+ SELECT public.go_camera_create_limited(m2,gen_random_uuid(),d2,'네 번째','user/new.webp',3::smallint,4::smallint,2::smallint) INTO r;
  IF (r->>'ok')::boolean IS DISTINCT FROM false THEN RAISE EXCEPTION 'camera daily limit missing: %',r; END IF;
  SELECT count(*) INTO v_count FROM public.go_cards WHERE member_id=m2;
  IF v_count<>3 THEN RAISE EXCEPTION 'camera quota mutated unexpected cards'; END IF;
