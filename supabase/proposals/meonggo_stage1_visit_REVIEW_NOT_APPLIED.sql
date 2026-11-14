@@ -5,7 +5,7 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS public.go_visit_requests (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   member_id uuid NOT NULL REFERENCES public.go_members(id) ON DELETE CASCADE,
-  code text NOT NULL UNIQUE CHECK (code ~ '^[0-9]{6}$',
+  code text NOT NULL UNIQUE CHECK (code ~ '^[0-9]{6}$'),
   status text NOT NULL DEFAULT 'pending'
     CHECK(status IN ('pending','approved','rejected','cancelled','expired','reversed')),
   created_at timestamptz NOT NULL DEFAULT now(),
