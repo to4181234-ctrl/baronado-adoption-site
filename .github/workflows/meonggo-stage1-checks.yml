@@ -1,6 +1,5 @@
-# Stage 1 development checks. This workflow never deploys to production.
+# Isolated stage-one checks; NEVER applies migration to production.
 name: MeongGO stage 1 checks
-
 on:
   push:
     branches:
@@ -13,7 +12,21 @@ permissions:
 jobs:
   stage1-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: stage1_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d stage1_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - name: Checkout without persisted credentials
         uses: actions/checkout@v4
@@ -24,12 +37,28 @@ jobs:
         with:
           node-version: '24'
           cache: 'npm'
-      - name: Validate new coin rules and server syntax
+      - name: Validate new stage-one input rules and server syntax
         run: |
-          node --test tests/go-coins.test.mjs
+          node --test tests/go-coins.test.mjs tests/go-visit.test.mjs
           node --check lib/goCoins.js
+          node --check lib/goVisit.js
           node --check app/api/go/coins/route.js
           node --check app/api/go/interaction/route.js
+          node --check app/api/go/visit/route.js
+          node --check app/api/admin/go/visit/route.js
+      - name: Verify migration proposals against ephemeral PostgreSQL 17
+        env:
+          PGHOST: localhost
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: stage1_ci
+        run: |
+          psql -v ON_ERROR_STOP=1 -f tests/fixtures/go-stage1-postgres.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261031_meonggo_pixel_affinity.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/proposals/meonggo_stage1_coins_REVIEW_NOT_APPLIED.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/proposals/meonggo_stage1_visit_REVIEW_NOT_APPLIED.sql
+          psql -v ON_ERROR_STOP=1 -f tests/go-stage1-postgres.sql
       - name: Install locked dependencies
         run: npm ci
       - name: Next.js production build
