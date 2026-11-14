@@ -113,7 +113,7 @@ BEGIN
  SELECT count(*) INTO v_open FROM public.go_pvp_rooms
  WHERE host_id=p_member AND status='waiting' AND invite_expires_at>now();
  IF v_open>=3 THEN RETURN jsonb_build_object('ok',false,'error','대기 중인 초대방은 최대 3개까지 만들 수 있어요.'); END IF;
- v_code:=upper(encode(gen_random_bytes(6),'hex'));
+ v_code:=upper(substr(replace(gen_random_uuid()::text,'-',''),1,12));
  INSERT INTO public.go_pvp_rooms(invite_code,host_id) VALUES(v_code,p_member) RETURNING id INTO v_id;
  INSERT INTO public.go_pvp_rounds(room_id,round_number) VALUES(v_id,1);
  RETURN jsonb_build_object('ok',true,'roomId',v_id,'inviteCode',v_code);
