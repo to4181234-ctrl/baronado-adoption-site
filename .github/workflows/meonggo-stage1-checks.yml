@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feat/meonggo-stage1-coins-20261114
+      - feat/meonggo-stage3-friend-pvp-20261114
   pull_request:
 
 permissions:
