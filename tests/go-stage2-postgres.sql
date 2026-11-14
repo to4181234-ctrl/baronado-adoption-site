@@ -85,6 +85,16 @@ BEGIN
  IF (r->>'ok')::boolean IS DISTINCT FROM false THEN RAISE EXCEPTION 'camera daily limit missing: %',r; END IF;
  SELECT count(*) INTO v_count FROM public.go_cards WHERE member_id=m2;
  IF v_count<>3 THEN RAISE EXCEPTION 'camera quota mutated unexpected cards'; END IF;
+  DELETE FROM public.go_cards WHERE id=(
+    SELECT card_id FROM public.go_camera_daily_creations WHERE member_id=m2 LIMIT 1
+  );
+  SELECT count(*) INTO v_count FROM public.go_camera_daily_creations WHERE member_id=m2;
+  IF v_count<>3 THEN RAISE EXCEPTION 'deleting a camera card restored the daily quota'; END IF;
+  SELECT public.go_camera_create_limited(m2,gen_random_uuid(),d2,'여전히 네 번째',
+    'user/new.webp',3::smallint,4::smallint,2::smallint) INTO r;
+  IF (r->>'ok')::boolean IS DISTINCT FROM false
+    THEN RAISE EXCEPTION 'deleted card incorrectly refunded camera daily quota'; END IF;
+
 
  IF has_table_privilege('authenticated','public.go_official_owned','SELECT') OR
     has_function_privilege('authenticated','public.go_official_purchase(uuid,uuid,uuid)','EXECUTE') THEN
