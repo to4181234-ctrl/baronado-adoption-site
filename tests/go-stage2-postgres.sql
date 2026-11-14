@@ -126,6 +126,9 @@ BEGIN
 
  -- Revoke account memberships and source rows, but a previously issued set
  -- remains protected by a dog-only permanent issuance marker (no member ID).
+ -- Simulate account-withdrawal cleanup: camera posts are deleted first
+ -- because the fixture has a restricted member foreign key on go_cards.
+ DELETE FROM public.go_cards WHERE member_id IN (m,m2);
  DELETE FROM public.go_members WHERE id IN (m,m2);
  SELECT count(*) INTO v_count FROM public.go_official_owned WHERE dog_id=d;
  IF v_count<>0 THEN RAISE EXCEPTION 'test setup did not erase ownership on account deletion'; END IF;
