@@ -14,18 +14,23 @@ export async function GET(request){
   const url=new URL(request.url);
   const rawCode=url.searchParams.get('code');
   const history=url.searchParams.get('history')==='1';
+  const pageValue=url.searchParams.get('page')||'0';
+  if(!/^(0|[1-9][0-9]*)$/.test(pageValue))return fail('페이지를 확인해주세요.',400);
+  const page=Number(pageValue);
+  if(!Number.isSafeInteger(page)||page>300)return fail('페이지를 확인해주세요.',400);
+  const PAGE_SIZE=30;
   const code=rawCode?normalizeVisitCode(rawCode):null;
   if(rawCode && !code)return fail('인증 코드는 영문·숫자 8자리예요.',400);
   try{
     const db=adminDatabase();
     let query=db.from('go_visit_requests')
-      .select('id,member_id,code,status,created_at,expires_at,reviewed_at,rejected_reason')
+      .select('id,member_id,code,status,created_at,expires_at,reviewed_at,rejected_reason',{count:'exact'})
       .order('created_at',{ascending:false})
-      .limit(30);
+      .range(page*PAGE_SIZE,(page+1)*PAGE_SIZE-1);
     if(code)query=query.eq('code',code);
     else if(!history)query=query.eq('status','pending').gt('expires_at',new Date().toISOString());
     else query=query.gte('created_at',new Date(Date.now()-90*86400000).toISOString());
-    const {data,error}=await query;
+    const {data,error,count}=await query;
     if(error)throw error;
     const rows=data||[];
     const memberIds=[...new Set(rows.map(x=>x.member_id))];
@@ -41,7 +46,7 @@ export async function GET(request){
         status:record.status==='pending'&&Date.parse(record.expires_at)<=Date.now()
           ?'expired':record.status
       })),
-      history
+      history,page,total:count??0,hasMore:(count??0)>(page+1)*PAGE_SIZE
     },{headers});
   }catch{return fail('인증 목록을 불러오지 못했어요.',500);}
 }
