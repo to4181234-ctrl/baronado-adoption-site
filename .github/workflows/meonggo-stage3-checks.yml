@@ -56,7 +56,7 @@ jobs:
         run: npm ci
       - name: Node rules and API syntax
         run: |
-          node --test tests/go-coins.test.mjs tests/go-visit.test.mjs tests/go-official-images.test.mjs tests/go-pvp-rules.test.mjs
+          node --test tests/go-coins.test.mjs tests/go-visit.test.mjs tests/go-official-images.test.mjs tests/go-pvp-rules.test.mjs tests/go-pvp-invite.test.mjs
           node --check app/api/go/pvp/route.js
       - name: Next.js production build with all three stage flags enabled
         env:
