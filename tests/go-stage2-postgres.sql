@@ -124,6 +124,18 @@ BEGIN
     THEN RAISE EXCEPTION 'deleted card incorrectly refunded camera daily quota'; END IF;
 
 
+ -- Revoke account memberships and source rows, but a previously issued set
+ -- remains protected by a dog-only permanent issuance marker (no member ID).
+ DELETE FROM public.go_members WHERE id IN (m,m2);
+ SELECT count(*) INTO v_count FROM public.go_official_owned WHERE dog_id=d;
+ IF v_count<>0 THEN RAISE EXCEPTION 'test setup did not erase ownership on account deletion'; END IF;
+ SELECT count(*) INTO v_count FROM public.go_official_issuance_markers WHERE dog_id=d;
+ IF v_count<>1 THEN RAISE EXCEPTION 'past official issuance erased with account deletion'; END IF;
+ SELECT public.go_official_manage(d,'deleteSet',null) INTO r;
+ IF (r->>'ok')::boolean IS DISTINCT FROM false THEN
+  RAISE EXCEPTION 'historically acquired set was deletable after account deletion: %',r;
+ END IF;
+
  IF has_table_privilege('authenticated','public.go_official_owned','SELECT') OR
     has_function_privilege('authenticated','public.go_official_purchase(uuid,uuid,uuid)','EXECUTE') THEN
   RAISE EXCEPTION 'official ownership or shop exposed to client';
