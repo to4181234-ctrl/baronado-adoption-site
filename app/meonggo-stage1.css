@@ -79,3 +79,5 @@
   .go-visit-code{font-size:24px}
 }
 @media(prefers-reduced-motion:reduce){.go-quest-progress span{transition:none}}
+
+.go-visit-admin-badge{display:inline-flex;min-width:20px;height:20px;align-items:center;justify-content:center;margin-left:7px;padding:0 5px;border-radius:999px;background:#fbe04c;border:1px solid #171713;color:#171713;font:700 11px/1 Pretendard,sans-serif;vertical-align:middle}
