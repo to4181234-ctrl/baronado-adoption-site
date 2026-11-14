@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useGoSession } from './GoShell.js';
 import { useGoCoins } from './GoCoins.js';
 import { GO_STAGE2_UI_ENABLED } from './GoOfficialAlbum.js';
+import { GO_STAGE3_UI_ENABLED } from './GoFriendBattle.js';
 
 export default function GoQuests({ compact = false }) {
   const { member, ready, openAccount } = useGoSession();
@@ -30,6 +31,11 @@ export default function GoQuests({ compact = false }) {
     caption:'오늘의 첫 공식 멍카드 뽑기로 10C를 받아요.',
     completed:Boolean(coins.daily?.drawQuestDone),href:'/go'
   });
+  if(GO_STAGE3_UI_ENABLED)tasks.push({
+    id:'battle',title:'오늘의 첫 친구 멍배틀',coins:10,
+    caption:'친구와 1:1 대결을 정상 완료하면 승·무·패 관계없이 10C!',
+    completed:Boolean(coins.daily?.battleQuestDone),href:'/go/battle'
+  });
   tasks.sort((a,b)=>Number(a.completed)-Number(b.completed));
 
   const done = tasks.filter(item => item.completed).length;
@@ -43,7 +49,7 @@ export default function GoQuests({ compact = false }) {
       <b>{member ? done : 0} / {tasks.length}</b>
     </header>
     <div className="go-quest-progress" aria-label={'완료한 퀘스트 ' + done + '/' + tasks.length}>
-      <span style={{ width: (member ? done / 2 * 100 : 0) + '%' }} />
+      <span style={{ width: (member ? done / tasks.length * 100 : 0) + '%' }} />
     </div>
     {member ? <>
       {coins.error && <p className="go-coin-error" role="alert">{coins.error}
@@ -59,7 +65,7 @@ export default function GoQuests({ compact = false }) {
             <b>+{task.coins}C</b>
             {task.completed ?
               <button type="button" onClick={() => setNotice('오늘 이미 완료한 퀘스트예요.')}>완료</button> :
-              <Link href={task.href}>{task.id === 'visit' ? '인증하기' : task.id==='draw'?'뽑으러가기':'돌보러가기'} ›</Link>}
+              <Link href={task.href}>{task.id === 'visit' ? '인증하기' : task.id==='draw'?'뽑으러가기':task.id==='battle'?'배틀하러가기':'돌보러가기'} ›</Link>}
           </div>
         </article>)}
       </div>
