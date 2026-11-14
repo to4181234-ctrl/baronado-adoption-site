@@ -1,3 +1,4 @@
+import {normalizedPvpInvite} from '../../../../lib/goPvpInvite.js';
 import {adminDatabase,validId} from '../../../../lib/server/adminData.js';
 import {goError,goMember,goMutationAllowed} from '../../../../lib/server/goAuth.js';
 
@@ -9,18 +10,6 @@ const enabled=()=>process.env.MEONGGO_STAGE1_COINS_ENABLED==='1' &&
  process.env.MEONGGO_STAGE3_PVP_ENABLED==='1';
 const error=(message,status=400)=>goError(message,status);
 const json=(body,status=200)=>Response.json(body,{status,headers});
-export function normalizedPvpInvite(raw){
- if(typeof raw!=='string'||raw.length>300)return null;
- let value=raw.trim();
- if(/^https?:\/\//i.test(value)){
-  try{
-   const target=new URL(value);
-   if(target.pathname.replace(/\/$/,'')!=='/go/battle')return null;
-   value=target.searchParams.get('room')||'';
-  }catch{return null;}
- }
- return validId(value)||/^[a-f0-9]{12}$/i.test(value)?value:null;
-}
 const noSecret=(card,imageUrl)=>card?({
  kind:card.kind,cardId:card.cardId,slot:card.slot||null,dogId:card.dogId,
  dogName:card.dogName,title:card.title,power:Number(card.power),
