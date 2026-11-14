@@ -85,6 +85,32 @@ BEGIN
  IF (r->>'ok')::boolean IS DISTINCT FROM false THEN RAISE EXCEPTION 'camera daily limit missing: %',r; END IF;
  SELECT count(*) INTO v_count FROM public.go_cards WHERE member_id=m2;
  IF v_count<>3 THEN RAISE EXCEPTION 'camera quota mutated unexpected cards'; END IF;
+
+  -- Stage-two adoption-complete exclusion must not destroy earlier ownership.
+  UPDATE public.dogs SET adopted=true WHERE id=d;
+  INSERT INTO public.go_members(id) VALUES('aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee');
+  SELECT public.go_official_draw('aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee') INTO r;
+  IF (r->>'ok')::boolean IS DISTINCT FROM false THEN
+    RAISE EXCEPTION 'adopted dog appeared in new free draw: %',r; END IF;
+  SELECT public.go_official_purchase('aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
+    d,'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb') INTO r;
+  IF (r->>'ok')::boolean IS DISTINCT FROM false THEN RAISE EXCEPTION 'adopted dog was sold'; END IF;
+  SELECT count(*) INTO v_count FROM public.go_official_hidden WHERE member_id=m AND dog_id=d;
+  IF v_count<>1 THEN RAISE EXCEPTION 'adoption complete removed existing hidden reward'; END IF;
+  UPDATE public.dogs SET adopted=false WHERE id=d;
+
+  -- Publishing and deleting a never-acquired complete set is allowed.
+  SELECT public.go_official_new_draft(d2) INTO v2;
+  FOR i IN 1..6 LOOP
+   INSERT INTO public.go_official_assets(version_id,slot,title,original_path,display_path)
+    VALUES(v2,i,CASE WHEN i=6 THEN '' ELSE '사진 '||i END,
+     'unused/'||i||'-source','unused/'||i||'-render');
+  END LOOP;
+  SELECT public.go_official_manage(d2,'publish',v2) INTO r;
+  IF (r->>'ok')::boolean IS DISTINCT FROM true THEN RAISE EXCEPTION 'unused set publish failed'; END IF;
+  SELECT public.go_official_manage(d2,'deleteSet',null) INTO r;
+  IF (r->>'ok')::boolean IS DISTINCT FROM true THEN RAISE EXCEPTION 'uncollected set delete was wrongly denied'; END IF;
+
   DELETE FROM public.go_cards WHERE id=(
     SELECT card_id FROM public.go_camera_daily_creations WHERE member_id=m2 LIMIT 1
   );
