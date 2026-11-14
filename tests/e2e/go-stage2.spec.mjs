@@ -102,3 +102,29 @@ test('administrator publishes only after previewing all six uploaded assets',asy
  const publish=page.getByRole('button',{name:'6종 일괄 공개하기'});
  await expect(publish).toBeDisabled();
 });
+
+
+test('lost purchase response survives reload and reconciles without another charge',async({page})=>{
+ let purchases=0;
+ await stub(page);
+ await page.route('**/api/go/official/shop**',route=>{
+  const u=new URL(route.request().url());
+  if(route.request().method()==='GET'){
+   expect(u.searchParams.get('requestId')).toMatch(/^[0-9a-f-]{36}$/);
+   return json(route,{ok:true,found:true,dogId:DOG,slot:4,createdAt:'2026-11-14T00:00:00Z'});
+  }
+  purchases++;
+  return route.abort('failed');
+ });
+ page.on('dialog',d=>d.accept());
+ await page.goto('/go');
+ await page.getByRole('button',{name:'200C로 구매하기'}).click();
+ await expect(page.getByRole('button',{name:'이전 구매 결과 확인'})).toBeVisible();
+ expect(purchases).toBe(1);
+ await page.reload();
+ await expect(page.getByRole('button',{name:'이전 구매 결과 확인'})).toBeVisible();
+ await page.getByRole('button',{name:'이전 구매 결과 확인'}).click();
+ await expect(page.getByRole('dialog',{name:'멍카드 구매 결과'})).toBeVisible();
+ expect(purchases).toBe(1);
+ await expect(page.getByRole('button',{name:'이전 구매 결과 확인'})).toHaveCount(0);
+});
