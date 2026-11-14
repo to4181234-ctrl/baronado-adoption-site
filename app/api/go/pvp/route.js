@@ -19,9 +19,13 @@ async function visualCard(db,card){
  if(!card)return null;
  const bucket=card.kind==='official'?'go-official-cards':'go-cards';
  if(!card.imagePath)return noSecret(card,'');
- const {data,error:signError}=await db.storage.from(bucket).createSignedUrl(card.imagePath,900);
- if(signError)throw signError;
- return noSecret(card,data?.signedUrl||'');
+ // A card may be deleted after a round finishes. Keep the immutable
+ // score/history visible even if the old image no longer exists in storage.
+ try{
+  const {data,error:signError}=await db.storage.from(bucket).createSignedUrl(card.imagePath,900);
+  if(signError)return noSecret(card,'');
+  return noSecret(card,data?.signedUrl||'');
+ }catch{return noSecret(card,'');}
 }
 async function readRoom(db,memberId,roomId){
  const {data,error:rpcError}=await db.rpc('go_pvp_snapshot',{p_member:memberId,p_room:roomId});
