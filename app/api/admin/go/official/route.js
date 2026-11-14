@@ -1,3 +1,4 @@
+import sharp from 'sharp';
 import { hasAdminSession, sameOrigin } from '../../../../../lib/server/adminSession.js';
 import { adminDatabase, validId } from '../../../../../lib/server/adminData.js';
 import { GO_OFFICIAL_BUCKET, GO_OFFICIAL_MAX_BYTES, goStage2ServerEnabled,
@@ -24,12 +25,15 @@ const json=(result,status=200)=>Response.json(result,{status,headers});
 async function uploadAsset(db,{dogId,versionId,slot,title,cropX,cropY,zoom,source}){
  const settings=officialPhotoOptions({slot,title,cropX,cropY,zoom});
  const bytes=Buffer.isBuffer(source)?source:Buffer.from(source);
+ const originalFormat=(await sharp(bytes).metadata()).format;
+ const originalMime={jpeg:'image/jpeg',png:'image/png',webp:'image/webp'}[originalFormat];
+ if(!originalMime)throw Error('지원하지 않는 사진 형식이에요.');
  const rendered=await officialPhotoOutput(bytes,slot,settings);
  const paths=officialStoragePaths(dogId,versionId,slot);
  const uploaded=[];
  try{
   for(const [path,contents,contentType] of [
-   [paths.original,bytes,'application/octet-stream'],
+   [paths.original,bytes,originalMime],
    [paths.display,rendered,slot===6?'image/png':'image/webp']
   ]){
     const {error}=await db.storage.from(GO_OFFICIAL_BUCKET)
