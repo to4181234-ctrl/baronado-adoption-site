@@ -80,3 +80,19 @@
 .friend-pvp-history li span{font-size:11px;flex:1}
 .friend-pvp-history li small{font-size:10px;color:#7b7469}
 @media(max-width:350px){.friend-pvp-invite label strong{font-size:19px}.friend-pvp-participants>div>b{font-size:11px}.friend-pvp-card-grid{column-gap:14px}}
+
+/* Mobile hit-target fix: constrain SVG faces to card cells; the ready action
+   must remain clickable even when a long SVG paints beyond its content box. */
+.friend-pvp-prepare .friend-pvp-card-grid{position:relative;isolation:isolate;contain:layout paint;z-index:0}
+.friend-pvp-prepare .friend-pvp-card-grid .friend-pvp-card{
+  position:relative;min-height:0;overflow:hidden;
+}
+.friend-pvp-prepare .friend-pvp-card-grid .go-card-graphic{
+  position:static!important;display:block!important;width:100%!important;
+  max-width:100%!important;height:auto!important;aspect-ratio:166/265!important;
+  pointer-events:none;
+}
+.friend-pvp-prepare>.meong-battle-primary{
+  position:relative!important;z-index:10!important;isolation:isolate;
+  display:block!important;clear:both;width:100%!important;
+}
