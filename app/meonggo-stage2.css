@@ -95,3 +95,7 @@
 .go-official-admin-actions .is-danger,.go-official-admin-delete{background:#fff4f0!important;color:#ac2b1a!important;border-color:#bd675b!important}
 .go-stage2-shell button:focus-visible,.go-official-admin :is(button,select,input):focus-visible{outline:2px solid #947c1f;outline-offset:3px}
 @media(max-width:360px){.go-official-shop{flex-direction:column;align-items:stretch}.go-official-admin-slots button{min-height:65px}.go-official-admin-slots button img{height:45px}}
+
+.go-official-admin-card-face{width:166px;max-width:80%;margin:12px auto;text-align:center}
+.go-official-admin-card-face .go-card-graphic{width:100%;height:auto;display:block}
+.go-official-admin-card-face small{font-size:10px;line-height:1.5;display:block;color:#736d61;margin-top:7px}
