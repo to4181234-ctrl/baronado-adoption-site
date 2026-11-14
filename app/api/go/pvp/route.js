@@ -9,6 +9,18 @@ const enabled=()=>process.env.MEONGGO_STAGE1_COINS_ENABLED==='1' &&
  process.env.MEONGGO_STAGE3_PVP_ENABLED==='1';
 const error=(message,status=400)=>goError(message,status);
 const json=(body,status=200)=>Response.json(body,{status,headers});
+export function normalizedPvpInvite(raw){
+ if(typeof raw!=='string'||raw.length>300)return null;
+ let value=raw.trim();
+ if(/^https?:\/\//i.test(value)){
+  try{
+   const target=new URL(value);
+   if(target.pathname.replace(/\/$/,'')!=='/go/battle')return null;
+   value=target.searchParams.get('room')||'';
+  }catch{return null;}
+ }
+ return validId(value)||/^[a-f0-9]{12}$/i.test(value)?value:null;
+}
 const noSecret=(card,imageUrl)=>card?({
  kind:card.kind,cardId:card.cardId,slot:card.slot||null,dogId:card.dogId,
  dogName:card.dogName,title:card.title,power:Number(card.power),
@@ -142,9 +154,10 @@ export async function POST(request){
    return readRoom(db,member.id,data.roomId);
   }
   if(action==='join'){
-   if(typeof body?.invite!=='string'||body.invite.length>80)return error('초대 코드를 확인해주세요.');
+   const invite=normalizedPvpInvite(body?.invite);
+   if(!invite)return error('초대 링크 또는 코드를 확인해주세요.');
    const {data,error:rpcError}=await db.rpc('go_pvp_join',{
-    p_member:member.id,p_invite:body.invite
+    p_member:member.id,p_invite:invite
    });
    if(rpcError)throw rpcError;
    if(!data?.ok)return json(data,409);
