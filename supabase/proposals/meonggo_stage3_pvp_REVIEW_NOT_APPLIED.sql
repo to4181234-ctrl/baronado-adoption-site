@@ -128,7 +128,7 @@ BEGIN
     NOT public.go_pvp_has_card(p_member) THEN
   RETURN jsonb_build_object('ok',false,'error','로그인 후 멍카드가 1장 이상 있어야 참가할 수 있어요.');
  END IF;
- IF p_invite ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12} THEN
+ IF p_invite ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$' THEN
   SELECT * INTO v_room FROM public.go_pvp_rooms WHERE id=p_invite::uuid FOR UPDATE;
  ELSIF upper(trim(p_invite)) ~ '^[A-F0-9]{12}$' THEN
   SELECT * INTO v_room FROM public.go_pvp_rooms
