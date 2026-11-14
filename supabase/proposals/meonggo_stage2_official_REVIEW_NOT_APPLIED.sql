@@ -50,6 +50,23 @@ CREATE TABLE IF NOT EXISTS public.go_official_owned(
 );
 CREATE INDEX IF NOT EXISTS go_official_owned_by_dog ON public.go_official_owned(dog_id,member_id);
 
+-- Permanent per-dog issuance marker without personal identifiers. User deletion
+-- may erase owned rows, but must NEVER make a once-earned official set deletable.
+CREATE TABLE IF NOT EXISTS public.go_official_issuance_markers(
+ dog_id uuid PRIMARY KEY REFERENCES public.go_official_sets(dog_id) ON DELETE RESTRICT,
+ first_issued_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE OR REPLACE FUNCTION public.go_official_record_issuance()
+RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path=public AS $
+BEGIN
+ INSERT INTO public.go_official_issuance_markers(dog_id) VALUES(NEW.dog_id)
+ ON CONFLICT(dog_id) DO NOTHING;
+ RETURN NEW;
+END;$;
+DROP TRIGGER IF EXISTS go_official_issuance_on_owner ON public.go_official_owned;
+CREATE TRIGGER go_official_issuance_on_owner AFTER INSERT ON public.go_official_owned
+FOR EACH ROW EXECUTE FUNCTION public.go_official_record_issuance();
+
 CREATE TABLE IF NOT EXISTS public.go_official_hidden(
  member_id uuid NOT NULL REFERENCES public.go_members(id) ON DELETE CASCADE,
  dog_id uuid NOT NULL REFERENCES public.go_official_sets(dog_id) ON DELETE RESTRICT,
@@ -97,7 +114,7 @@ ALTER TABLE public.go_coin_transactions ADD CONSTRAINT go_coin_transactions_even
 DO $rls$DECLARE t text; BEGIN
  FOREACH t IN ARRAY ARRAY[
  'go_official_sets','go_official_versions','go_official_assets',
- 'go_official_owned','go_official_hidden','go_official_daily_draws',
+ 'go_official_owned','go_official_issuance_markers','go_official_hidden','go_official_daily_draws',
  'go_official_purchases','go_camera_daily_creations'
  ] LOOP
   EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY',t);
@@ -105,6 +122,9 @@ DO $rls$DECLARE t text; BEGIN
   EXECUTE format('GRANT SELECT,INSERT,UPDATE,DELETE ON public.%I TO service_role',t);
  END LOOP;
 END$rls$;
+REVOKE EXECUTE ON FUNCTION public.go_official_record_issuance()
+ FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.go_official_record_issuance() TO service_role;
 
 CREATE OR REPLACE FUNCTION public.go_official_new_draft(p_dog uuid)
 RETURNS uuid LANGUAGE plpgsql SECURITY INVOKER SET search_path=public AS $$
@@ -159,7 +179,8 @@ BEGIN
   IF NOT FOUND THEN RETURN jsonb_build_object('ok',false,'error','초안이 없어요.'); END IF;
   RETURN jsonb_build_object('ok',true,'status','discarded');
  ELSIF p_action='deleteSet' THEN
-  SELECT EXISTS(SELECT 1 FROM public.go_official_owned WHERE dog_id=p_dog)
+  SELECT EXISTS(SELECT 1 FROM public.go_official_issuance_markers WHERE dog_id=p_dog)
+      OR EXISTS(SELECT 1 FROM public.go_official_owned WHERE dog_id=p_dog)
       OR EXISTS(SELECT 1 FROM public.go_official_hidden WHERE dog_id=p_dog)
       OR EXISTS(SELECT 1 FROM public.go_official_daily_draws WHERE dog_id=p_dog)
       OR EXISTS(SELECT 1 FROM public.go_official_purchases WHERE dog_id=p_dog)
