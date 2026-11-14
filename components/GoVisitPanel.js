@@ -1,7 +1,6 @@
 'use client';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { enqueueGoCoinNotice } from '../lib/goCoinNotices.js';
 import { useGoSession } from './GoShell.js';
 import { useGoCoins } from './GoCoins.js';
 import { VISIT_REJECTION_REASONS } from '../lib/goVisit.js';
@@ -32,7 +31,6 @@ export default function GoVisitPanel() {
       if (!response.ok) throw Error(data.error || '인증 내역을 불러오지 못했어요.');
       const nextStatus = data.request?.status || null;
       if (previousStatus.current === 'pending' && nextStatus === 'approved') {
-        enqueueGoCoinNotice(30);
         window.dispatchEvent(new Event('go-coins-changed'));
       }
       previousStatus.current = nextStatus;
