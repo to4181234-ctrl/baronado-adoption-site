@@ -22,7 +22,7 @@ BEGIN
 
  -- Guarantee store selects the last missing slot and grants HIDDEN permanently.
  INSERT INTO public.go_official_owned(member_id,dog_id,slot,power,charm)
-  SELECT m,d,i,3,3 FROM generate_series(1,4) s(i);
+  SELECT m,d,s.slot_index,3,3 FROM generate_series(1,4) AS s(slot_index);
  UPDATE public.go_coin_wallets SET balance=500 WHERE member_id=m;
  SELECT public.go_official_purchase(m,d,'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa') INTO r;
  IF (r->>'ok')::boolean IS DISTINCT FROM true OR (r->>'slot')::int<>5
