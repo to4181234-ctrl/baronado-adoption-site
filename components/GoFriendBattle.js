@@ -238,7 +238,7 @@ export default function GoFriendBattle(){
      </div>
      {room.status!=='cancelled'&&<button type="button" disabled={busy}
       onClick={()=>{if(window.confirm('대결방을 나갈까요? 준비 중인 라운드는 기록되지 않아요.'))
-       mutate({action:'leave'}).then(clearRoom);}}>방 나가기</button>}
+       mutate({action:'leave',roomId:room.roomId}).then(result=>{if(result)clearRoom();});}}>방 나가기</button>}
     </div>
     <div className="friend-pvp-participants">
      <div><span>나</span><b>{room.role==='host'?room.hostName:room.guestName}</b>
@@ -327,7 +327,7 @@ export default function GoFriendBattle(){
        {room.otherRematch&&!room.myRematch&&
         <p role="status">친구가 재대결을 신청했어요. 위 버튼으로 수락할 수 있어요.</p>}
        <button type="button" className="meong-battle-secondary"
-        onClick={()=>mutate({action:'leave',roomId:room.roomId}).then(clearRoom)}>
+        onClick={()=>mutate({action:'leave',roomId:room.roomId}).then(result=>{if(result)clearRoom();})}>
         대결 마치기</button>
       </>}
      </section>}
