@@ -3,15 +3,15 @@
 set -euo pipefail
 psql -v ON_ERROR_STOP=1 <<'SQL' >/dev/null
 INSERT INTO public.go_members(id,nickname)
- VALUES('44444444-4444-4444-8444-444444444444','동시 호스트'),
-       ('44444444-4444-4444-8444-555555555555','동시 게스트');
+ VALUES('44444444-4444-4444-8444-888888888888','동시 호스트'),
+       ('44444444-4444-4444-8444-999999999999','동시 게스트');
 INSERT INTO public.go_cards(member_id,dog_id,status,title,image_path,photo_style,description,cuteness,charm,affection)
  VALUES
- ('44444444-4444-4444-8444-444444444444','22222222-2222-4222-8222-222222222222','approved','동시 호스트 카드','race-host.webp','original','동시',3,3,3),
- ('44444444-4444-4444-8444-555555555555','99999999-9999-4999-8999-999999999999','approved','동시 게스트 카드','race-guest.webp','original','동시',3,3,3);
+ ('44444444-4444-4444-8444-888888888888','22222222-2222-4222-8222-222222222222','approved','동시 호스트 카드','race-host.webp','original','동시',3,3,3),
+ ('44444444-4444-4444-8444-999999999999','99999999-9999-4999-8999-999999999999','approved','동시 게스트 카드','race-guest.webp','original','동시',3,3,3);
 SQL
-host='44444444-4444-4444-8444-444444444444'
-guest='44444444-4444-4444-8444-555555555555'
+host='44444444-4444-4444-8444-888888888888'
+guest='44444444-4444-4444-8444-999999999999'
 room_json=$(psql -Atq -c "SELECT public.go_pvp_create('$host');")
 room=$(printf '%s' "$room_json" | jq -r '.roomId')
 code=$(printf '%s' "$room_json" | jq -r '.inviteCode')
