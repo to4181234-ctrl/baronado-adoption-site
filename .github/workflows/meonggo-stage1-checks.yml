@@ -40,7 +40,7 @@ jobs:
           cache: 'npm'
       - name: Validate new stage-one input rules and server syntax
         run: |
-          node --test tests/go-coins.test.mjs tests/go-visit.test.mjs
+          node --test tests/go-coins.test.mjs tests/go-visit.test.mjs tests/go-coin-notices.test.mjs
           node --check lib/goCoins.js
           node --check lib/goVisit.js
           node --check app/api/go/coins/route.js
