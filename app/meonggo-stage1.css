@@ -1,0 +1,81 @@
+/* MeongGO 2.0, stage 1 additions. Scoped to new components only.
+   Existing user-approved Figma frames and components keep their rules. */
+.v3-header-go:has(.go-coin-trigger) .v3-header-inner {gap:9px;padding-inline:12px}
+.v3-header-go .go-coin-trigger{display:inline-flex;align-items:center;justify-content:center;gap:3px;flex-shrink:0;min-height:27px;padding:2px 5px;background:#fffdf0;border:1px solid #b9a34a;color:#181610;font-size:10px;line-height:1;font-weight:750;white-space:nowrap}
+.v3-header-go .go-coin-trigger>span{width:16px;height:16px;border:1px solid #7f6918;border-radius:50%;display:grid;place-items:center;background:#fbe04c;font-size:10px;font-weight:900}
+.v3-header-go .go-coin-trigger>b{font-size:10px;font-weight:750;font-variant-numeric:tabular-nums}
+.v3-header-go:has(.go-coin-trigger) .v3-member-greet{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:93px}
+.go-coin-trigger:focus-visible,.go-quest-section :focus-visible,.go-visit-screen :focus-visible,.go-coin-sheet :focus-visible{outline:2px solid #171713;outline-offset:3px}
+.go-coin-notice{position:fixed;top:54px;right:max(12px,calc((100vw - 390px)/2 + 12px));z-index:210;background:#fbe04c;border:2px solid #161616;color:#171713;padding:8px 13px;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;box-shadow:3px 3px 0 #161616;pointer-events:none}
+.go-coin-backdrop{position:fixed;inset:0;z-index:190;background:#0008;display:flex;align-items:end;justify-content:center}
+.go-coin-sheet{display:flex;flex-direction:column;width:min(100%,450px);height:70dvh;min-height:320px;background:#fff;border-top:2px solid #171713;color:#171713;box-shadow:0 -4px 18px #0002;padding:16px 16px 0}
+.go-coin-sheet-header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.go-coin-sheet-header h2{margin:0;font-size:18px!important;line-height:1.45;font-weight:800}
+.go-coin-sheet-header button{border:0;background:transparent;font-size:26px;line-height:1;width:32px;height:32px}
+.go-coin-sheet-caption{font-size:11px;color:#777369;margin:4px 0 15px}
+.go-coin-filters{display:flex;gap:8px;border-bottom:1px solid #e6e0d6;padding-bottom:12px}
+.go-coin-filters button{font-size:12px;padding:7px 13px;border:1px solid #e4ded2;background:white;color:#171713}
+.go-coin-filters button[aria-pressed="true"]{border-color:#171713;background:#fbe04c;font-weight:800}
+.go-coin-history-list{flex:1;overflow:auto;overscroll-behavior:contain;padding:8px 0 max(14px,env(safe-area-inset-bottom))}
+.go-coin-transaction{border-bottom:1px solid #eeeae2}
+.go-coin-transaction>button{border:0;width:100%;background:white;display:flex;align-items:center;justify-content:space-between;text-align:left;gap:10px;padding:15px 3px}
+.go-coin-transaction strong{display:block;font-size:13px;font-weight:730}
+.go-coin-transaction small{display:block;font-size:10px;color:#877f73;margin-top:4px}
+.go-coin-transaction b{font-size:15px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.go-coin-transaction b.is-positive{color:#91710e}
+.go-coin-transaction-extra{margin:0;padding:0 4px 10px;font-size:11px;color:#776c5c}
+.go-coin-empty{padding:26px 0;text-align:center;color:#756c60;font-size:12px}
+.go-coin-error{padding:9px 10px;background:#fff0ed;color:#9e3528;font-size:12px;line-height:1.6;margin:8px 0}
+.go-coin-error button{display:inline-block;margin-left:8px;background:#fff;border:1px solid #b37f76;padding:3px 7px;font-size:11px}
+.go-coin-more{display:block;width:100%;padding:10px 0;background:#fff;border:1px solid #dfd9cf;margin:12px 0;font-size:12px}
+.go-quest-section{width:100%;margin:0 auto;background:#fff;padding:22px 16px 28px;max-width:390px;border-top:1px solid #ece6da}
+.go-quest-section.go-quest-compact{margin-top:18px}
+.go-quest-heading{display:flex;align-items:start;justify-content:space-between;gap:12px}
+.go-quest-heading h2{font-size:19px!important;margin:0;font-weight:800}
+.go-quest-heading p{font-size:11px;color:#726b62;margin:7px 0 11px}
+.go-quest-heading>b{display:inline-block;padding:6px 10px;background:#fbe04c;border:1px solid #171713;font-size:13px;font-weight:780;white-space:nowrap;font-variant-numeric:tabular-nums}
+.go-quest-progress{height:7px;background:#ede8df;overflow:hidden;margin:5px 0 14px}
+.go-quest-progress span{display:block;height:100%;background:#e3ba19;transition:width .2s ease}
+.go-quest-items{display:grid;gap:11px}
+.go-quest-item{padding:14px;background:#fffefa;border:1px solid #e8e1d7;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.go-quest-item>div:first-child{flex:1;min-width:0}
+.go-quest-item strong{display:block;font-size:13px;font-weight:800}
+.go-quest-item small{display:block;margin-top:5px;font-size:10px;color:#776f64;line-height:1.55}
+.go-quest-item-action{display:grid;gap:8px;justify-items:end;flex-shrink:0}
+.go-quest-item-action>b{font-size:12px;color:#967a0c}
+.go-quest-item-action>a,.go-quest-item-action>button,.go-quest-login button{display:inline-flex;align-items:center;justify-content:center;background:#fbe04c;border:1px solid #171713;padding:7px 9px;font-size:11px;color:#171713;font-weight:700;white-space:nowrap}
+.go-quest-item-action>button{color:#655d50;background:#f1efe9;border-color:#e7e0d6}
+.go-quest-loading,.go-quest-note,.go-quest-caption,.go-visit-tip{font-size:11px;color:#777066;line-height:1.6}
+.go-quest-loading{margin:5px 0 10px}
+.go-quest-caption{margin:15px 0 0}
+.go-quest-note{background:#fff9d2;padding:6px;margin:10px 0}
+.go-quest-all-link{display:inline-block;font-size:12px;font-weight:700;margin-top:13px}
+.go-quest-page{max-width:390px;margin:0 auto;padding:22px 16px 38px}
+.go-quest-page .go-quest-section{padding:16px 0;border:0}
+.go-quest-page .v3-back{font-size:12px}
+.go-quest-login{padding:10px 0}
+.go-quest-login p{font-size:12px;margin:10px 0}
+.go-visit-screen{max-width:390px;padding:26px 16px 46px;margin:0 auto}
+.go-visit-screen .v3-back{font-size:12px}
+.go-visit-screen h1{font-size:23px!important;font-weight:800;line-height:1.4;margin:18px 0 9px}
+.go-visit-lead{font-size:13px;line-height:1.65;color:#555046;margin:0 0 19px}
+.go-visit-reward{display:flex;align-items:center;justify-content:space-between;border:1px solid #e7d999;background:#fffbe7;padding:11px 14px;margin-bottom:15px}
+.go-visit-reward span{font-size:12px;font-weight:700}
+.go-visit-reward b{font-size:17px}
+.go-visit-box{padding:22px 15px;text-align:center;border:1px solid #e9e2d5;background:#fff}
+.go-visit-box h2{font-size:16px!important;margin:0 0 17px;font-weight:780}
+.go-visit-box p{font-size:12px;color:#655d52;line-height:1.6;margin:15px 0}
+.go-visit-box small{font-size:10px;color:#877d6f}
+.go-visit-box>button{border:1px solid #171713;background:#fbe04c;padding:10px 14px;font-weight:750;font-size:12px;min-height:38px}
+.go-visit-box>button:disabled{opacity:.55;cursor:not-allowed}
+.go-visit-box>button.go-visit-cancel{background:#fff;border-color:#b9b3a8;margin-top:8px}
+.go-visit-code{display:block;width:100%;padding:14px 0;margin:5px 0;background:#fbe04c;border:2px solid #161616;letter-spacing:.13em;font-size:28px;font-weight:900;font-variant-numeric:tabular-nums}
+.go-visit-countdown{font-size:16px!important;color:#171713!important;font-weight:800!important;font-variant-numeric:tabular-nums}
+.go-visit-tip{margin-top:17px;color:#766e64}
+@media(max-width:370px){
+  .v3-header-go:has(.go-coin-trigger) .v3-member-greet{display:none}
+  .go-coin-sheet{padding-inline:12px}
+  .go-quest-item{padding:10px}
+  .go-visit-code{font-size:24px}
+}
+@media(prefers-reduced-motion:reduce){.go-quest-progress span{transition:none}}
