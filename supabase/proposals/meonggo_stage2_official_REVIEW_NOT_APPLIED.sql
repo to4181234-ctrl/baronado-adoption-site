@@ -57,12 +57,12 @@ CREATE TABLE IF NOT EXISTS public.go_official_issuance_markers(
  first_issued_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE OR REPLACE FUNCTION public.go_official_record_issuance()
-RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path=public AS $
+RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path=public AS $$
 BEGIN
  INSERT INTO public.go_official_issuance_markers(dog_id) VALUES(NEW.dog_id)
  ON CONFLICT(dog_id) DO NOTHING;
  RETURN NEW;
-END;$;
+END;$$;
 DROP TRIGGER IF EXISTS go_official_issuance_on_owner ON public.go_official_owned;
 CREATE TRIGGER go_official_issuance_on_owner AFTER INSERT ON public.go_official_owned
 FOR EACH ROW EXECUTE FUNCTION public.go_official_record_issuance();
