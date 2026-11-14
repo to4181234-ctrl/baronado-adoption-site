@@ -31,7 +31,7 @@ export async function GET(request) {
       .select('balance').eq('member_id', member.id).maybeSingle();
     const dailyQuery = db.from('go_coin_transactions')
       .select('event_type').eq('member_id', member.id).eq('local_day', today)
-      .in('event_type', ['care', 'quest_care', 'quest_draw']);
+      .in('event_type', ['care', 'quest_care', 'quest_draw', 'quest_battle']);
     const koreaMidnight = new Date(today + 'T00:00:00+09:00').toISOString();
     const visitsQuery = db.from('go_visit_requests')
       .select('id').eq('member_id', member.id)
@@ -48,7 +48,8 @@ export async function GET(request) {
         careRewards: entries.filter(row => row.event_type === 'care').length,
         careQuestDone: entries.some(row => row.event_type === 'quest_care'),
         visitQuestDone: Boolean(visits.data?.length),
-        drawQuestDone: entries.some(row => row.event_type === 'quest_draw')
+        drawQuestDone: entries.some(row => row.event_type === 'quest_draw'),
+        battleQuestDone: entries.some(row => row.event_type === 'quest_battle')
       }
     };
 

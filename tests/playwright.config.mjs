@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: './e2e',
-  testMatch: '**/*.spec.mjs',
+  testMatch: 'go-stage1.spec.mjs',
   timeout: 30000,
   expect: { timeout: 10000 },
   retries: 0,

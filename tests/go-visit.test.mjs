@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeVisitCode, isVisitRequestWindow, validVisitDecision } from '../lib/goVisit.js';
 
-test('visit code is 8 hexadecimal characters and is case-normalized', () => {
-  assert.equal(normalizeVisitCode(' a1b2c3d4 '),'A1B2C3D4');
-  for (const value of ['ABCDEFGH','AAAAAA','',null,'A1B2C3D4DROP']) {
+test('visit code is exactly six numeric digits', () => {
+  assert.equal(normalizeVisitCode(' 012345 '),'012345');
+  for (const value of ['A1B2C3','ABCDEFGH','12345','1234567','',null,'123456DROP']) {
     assert.equal(normalizeVisitCode(value),null);
   }
 });

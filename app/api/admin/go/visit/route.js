@@ -20,7 +20,7 @@ export async function GET(request){
   if(!Number.isSafeInteger(page)||page>300)return fail('페이지를 확인해주세요.',400);
   const PAGE_SIZE=30;
   const code=rawCode?normalizeVisitCode(rawCode):null;
-  if(rawCode && !code)return fail('인증 코드는 영문·숫자 8자리예요.',400);
+  if(rawCode && !code)return fail('인증 코드는 숫자 6자리예요.',400);
   try{
     const db=adminDatabase();
     let query=db.from('go_visit_requests')

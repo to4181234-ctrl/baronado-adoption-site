@@ -5,7 +5,7 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS public.go_visit_requests (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   member_id uuid NOT NULL REFERENCES public.go_members(id) ON DELETE CASCADE,
-  code text NOT NULL UNIQUE CHECK (code ~ '^[A-F0-9]{8}$'),
+  code text NOT NULL UNIQUE CHECK (code ~ '^[0-9]{6}$'),
   status text NOT NULL DEFAULT 'pending'
     CHECK(status IN ('pending','approved','rejected','cancelled','expired','reversed')),
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -92,7 +92,7 @@ BEGIN
   END IF;
 
   FOR v_attempt IN 1..5 LOOP
-    v_code := upper(substr(replace(gen_random_uuid()::text,'-',''),1,8));
+    v_code := lpad((floor(random()*1000000))::integer::text,6,'0');
     INSERT INTO public.go_visit_requests(member_id,code)
     VALUES(p_member_id,v_code) ON CONFLICT(code) DO NOTHING
     RETURNING id INTO v_id;

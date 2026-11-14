@@ -74,8 +74,8 @@ function VisitReview(){
       <form className="v10-admin-search" onSubmit={e=>{
         e.preventDefault();setCode(codeInput.trim().toUpperCase());setPage(0);setSelected(null);
       }}>
-        <input aria-label="8자리 방문 인증 코드 검색" placeholder="인증 코드 8자리"
-          maxLength={8} value={codeInput} onChange={e=>setCodeInput(e.target.value)}/>
+        <input aria-label="숫자 6자리 방문 인증 코드 검색" placeholder="인증 코드 숫자 6자리"
+          maxLength={6} value={codeInput} onChange={e=>setCodeInput(e.target.value)}/>
         <button type="submit">검색</button>
       </form>
       <div className="v10-admin-tabs" role="group" aria-label="인증 상태 보기">
