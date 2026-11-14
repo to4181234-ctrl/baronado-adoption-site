@@ -57,8 +57,19 @@ jobs:
           node --check app/api/go/official/shop/route.js
           node --check app/api/go/official/hidden/route.js
           node --check app/api/admin/go/official/route.js
+          node --check app/api/go/official/camera/route.js
+          node --check app/api/go/cards/route.js
       - name: Next production build with first two stages enabled
         env:
           NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED: '1'
           NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED: '1'
         run: npm run build
+      - name: Install Chromium for stage-two UI test
+        run: |
+          npm install --no-save --package-lock=false @playwright/test@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Test stage-two mobile official album, shop and admin screens
+        env:
+          NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED: '1'
+          NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED: '1'
+        run: npx playwright test --config=tests/playwright-stage2.config.mjs
