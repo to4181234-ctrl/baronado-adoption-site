@@ -1,0 +1,78 @@
+name: MeongGO stage 3 friend PvP (review-only)
+on:
+  push:
+    branches: [feat/meonggo-stage3-friend-pvp-20261114]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  friend-pvp:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: meonggo3_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d meonggo3_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Verify stage 1, 2, 3 SQL only in disposable Postgres
+        env:
+          PGHOST: localhost
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: meonggo3_ci
+        run: |
+          psql -v ON_ERROR_STOP=1 -f tests/fixtures/go-stage1-postgres.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261031_meonggo_pixel_affinity.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/proposals/meonggo_stage1_coins_REVIEW_NOT_APPLIED.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/proposals/meonggo_stage1_visit_REVIEW_NOT_APPLIED.sql
+          psql -v ON_ERROR_STOP=1 -f tests/go-stage1-postgres.sql
+          bash tests/go-stage1-concurrency.sh
+          psql -v ON_ERROR_STOP=1 -f tests/fixtures/go-stage2-postgres.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261031_meonggo_battle.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/proposals/meonggo_stage2_official_REVIEW_NOT_APPLIED.sql
+          psql -v ON_ERROR_STOP=1 -f tests/go-stage2-postgres.sql
+          psql -v ON_ERROR_STOP=1 -f tests/fixtures/go-stage3-postgres.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/proposals/meonggo_stage3_pvp_REVIEW_NOT_APPLIED.sql
+          psql -v ON_ERROR_STOP=1 -f tests/go-stage3-postgres.sql
+      - name: Install dependencies
+        run: npm ci
+      - name: Node rules and API syntax
+        run: |
+          node --test tests/go-coins.test.mjs tests/go-visit.test.mjs tests/go-official-images.test.mjs tests/go-pvp-rules.test.mjs
+          node --check app/api/go/pvp/route.js
+      - name: Next.js production build with all three stage flags enabled
+        env:
+          NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED: '1'
+          NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED: '1'
+          NEXT_PUBLIC_MEONGGO_STAGE3_PVP_ENABLED: '1'
+          MEONGGO_STAGE1_COINS_ENABLED: '1'
+          MEONGGO_STAGE2_OFFICIAL_ENABLED: '1'
+          MEONGGO_STAGE3_PVP_ENABLED: '1'
+        run: npm run build
+      - name: Install headless Chromium
+        run: |
+          npm install --no-save --package-lock=false @playwright/test@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Stage three mobile two-player UI tests
+        env:
+          NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED: '1'
+          NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED: '1'
+          NEXT_PUBLIC_MEONGGO_STAGE3_PVP_ENABLED: '1'
+        run: npx playwright test --config=tests/playwright-stage3.config.mjs
