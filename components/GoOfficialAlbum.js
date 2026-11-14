@@ -111,12 +111,15 @@ export default function GoOfficialAlbum({dogId=null}){
   }catch(e){setError(e.message+' 동일한 구매 요청으로 다시 확인할 수 있어요.');}
   finally{setBusy(false);}
  }
+ async function openHidden(dogId){
+  setOpened({dogId,slot:6});
+  try{await mutate({action:'seen',dogId,slot:6});await refresh();}catch{}
+ }
  async function peekHidden(){
   if(!hiddenDog)return;
   const dog=catalog.dogs.find(d=>d.dogId===hiddenDog);
   if(!dog?.hidden.unlocked)return;
-  try{await mutate({action:'seen',dogId:hiddenDog,slot:6});await refresh();}catch{}
-  setHiddenDog(null);setOpened({dogId:dog.dogId,slot:6});
+  setHiddenDog(null);await openHidden(dog.dogId);
  }
  const openedDog=(catalog.dogs||[]).find(d=>d.dogId===opened?.dogId);
  const openedData=opened?.slot===6?openedDog?.hidden:openedDog?.slots.find(s=>s.slot===opened?.slot);
@@ -177,7 +180,7 @@ export default function GoOfficialAlbum({dogId=null}){
       <div className={'go-official-hidden '+(dog.hidden.unlocked?'is-open':'')}>
         <div className="go-official-hidden-art">
           {dog.hidden.unlocked&&dog.hidden.imageUrl?
-            <button type="button" onClick={()=>setOpened({dogId:dog.dogId,slot:6})}>
+            <button type="button" onClick={()=>openHidden(dog.dogId)}>
               <img src={dog.hidden.imageUrl} alt={dog.name+' HIDDEN 특별 일러스트'}/>
               {dog.hidden.new&&<span className="go-official-new">NEW</span>}
             </button>:<span aria-hidden="true">HIDDEN ?</span>}
