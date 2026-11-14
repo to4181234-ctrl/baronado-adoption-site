@@ -17,7 +17,7 @@ export async function GET(request){
   const [setsResult,dogsResult]=await Promise.all([
     db.from('go_official_sets').select('dog_id,current_version,paused')
       .not('current_version','is',null),
-    db.from('dogs').select('id,name,adopted').eq('category','adoption')
+    db.from('dogs').select('id,name,adopted,created_at').eq('category','adoption')
   ]);
   if(setsResult.error||dogsResult.error)throw Error('official catalog');
   const sets=setsResult.data||[];
@@ -68,7 +68,7 @@ export async function GET(request){
    const cards=owned.filter(x=>x.dog_id===s.dog_id);
    const special=hidden.find(x=>x.dog_id===s.dog_id);
    return {
-    dogId:s.dog_id,name:dog.name,adopted:dog.adopted,paused:s.paused,
+    dogId:s.dog_id,name:dog.name,adopted:dog.adopted,createdAt:dog.created_at,paused:s.paused,
     available:!dog.adopted&&!s.paused,
     collected:cards.length,missing:5-cards.length,
     slots:Array.from({length:5},(_,i)=>{
