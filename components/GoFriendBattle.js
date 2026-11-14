@@ -223,7 +223,7 @@ export default function GoFriendBattle(){
      if(invite.trim())mutate({action:'join',invite:invite.trim()});}}>
      <label htmlFor="pvp-code">친구에게 받은 초대 코드</label>
      <div><input id="pvp-code" value={invite} onChange={e=>setInvite(e.target.value)}
-      maxLength={80} placeholder="12자리 초대 코드 또는 방 링크" autoComplete="off"/>
+      maxLength={300} placeholder="12자리 초대 코드 또는 방 링크" autoComplete="off"/>
       <button type="submit" disabled={busy||!invite.trim()}>참가하기</button></div>
     </form>
     <p className="friend-pvp-help">초대는 30분 동안 유효하며, 참가 후에는 2분 안에 카드 준비를 완료해야 해요.</p>
