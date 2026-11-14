@@ -104,3 +104,7 @@
 .go-official-hidden-tile{position:relative;aspect-ratio:166/265;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;border:2px solid #d3bf73!important;background:#fcf5ce!important;padding:4px!important;width:100%;min-width:0}
 .go-official-hidden-tile img{display:block;object-fit:contain;width:100%;flex:1;min-height:0}
 .go-official-hidden-tile strong{display:block;padding:8px 0;font:800 11px/1.3 'MonaS12',sans-serif;color:#6e5720;text-align:center}
+
+.go-official-pending-purchase{border:1px solid #a78c42;background:#fff8de;padding:12px;margin:13px 0}
+.go-official-pending-purchase p{font-size:11px;line-height:1.6;margin:0 0 10px;color:#50442c}
+.go-official-pending-purchase button{padding:8px 12px;background:#f7d94d;border:1px solid #181713;font:700 12px Pretendard,sans-serif}
