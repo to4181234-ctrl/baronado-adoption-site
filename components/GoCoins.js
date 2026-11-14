@@ -1,6 +1,6 @@
 'use client';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { subscribeGoCoinNotices } from '../lib/goCoinNotices.js';
+import { subscribeGoCoinNotices, enqueueGoCoinNotice } from '../lib/goCoinNotices.js';
 
 export const GO_STAGE1_UI_ENABLED = process.env.NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED === '1';
 const CoinsContext = createContext(null);
@@ -29,7 +29,8 @@ export function GoCoinProvider({ member, children }) {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [notice, setNotice] = useState(null);
   const requestRef = useRef(0);
-  const refresh = useCallback(async () => {
+  const balanceRef = useRef({ memberId: null, balance: null });
+  const refresh = useCallback(async ({ suppressNotice = false } = {}) => {
     if (!GO_STAGE1_UI_ENABLED || !member?.id) return;
     const requestId = ++requestRef.current;
     setLoading(true);
@@ -38,6 +39,12 @@ export function GoCoinProvider({ member, children }) {
       const data = await response.json();
       if (!response.ok) throw Error(data.error || '멍코인 정보를 가져오지 못했어요.');
       if (requestId === requestRef.current) {
+        const prior = balanceRef.current;
+        if (!suppressNotice && prior.memberId === member.id && Number.isSafeInteger(prior.balance) &&
+          Number.isSafeInteger(data.balance) && data.balance !== prior.balance) {
+          enqueueGoCoinNotice(data.balance - prior.balance);
+        }
+        balanceRef.current = { memberId: member.id, balance: data.balance };
         setState(data);
         setError('');
       }
@@ -52,13 +59,16 @@ export function GoCoinProvider({ member, children }) {
     if (!GO_STAGE1_UI_ENABLED) return;
     if (!member?.id) {
       ++requestRef.current;
+      balanceRef.current = { memberId: null, balance: null };
       setState(EMPTY);
       setHistoryOpen(false);
       setError('');
       return;
     }
+    balanceRef.current = { memberId: member.id, balance: null };
+    setState(EMPTY);
     refresh();
-    const changed = () => refresh();
+    const changed = event => refresh({ suppressNotice: Boolean(event?.detail?.notified) });
     const focus = () => { if (document.visibilityState === 'visible') refresh(); };
     window.addEventListener('go-coins-changed', changed);
     window.addEventListener('focus', focus);
@@ -68,10 +78,16 @@ export function GoCoinProvider({ member, children }) {
       const shifted = Date.now() + 9 * 3600000;
       return 86400000 - shifted % 86400000 + 200;
     }
-    const timeout = window.setTimeout(() => refresh(), timeUntilKoreaMidnight());
+    let midnightTimer;
+    const planMidnight = () => { midnightTimer = window.setTimeout(() => { refresh(); planMidnight(); }, timeUntilKoreaMidnight()); };
+    planMidnight();
+    const poll = window.setInterval(() => {
+      if (document.visibilityState === 'visible') refresh();
+    }, 15000);
     return () => {
       ++requestRef.current;
-      window.clearTimeout(timeout);
+      window.clearTimeout(midnightTimer);
+      window.clearInterval(poll);
       window.removeEventListener('go-coins-changed', changed);
       window.removeEventListener('focus', focus);
       document.removeEventListener('visibilitychange', focus);
