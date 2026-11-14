@@ -39,7 +39,8 @@ export default function GoOfficialAlbum({dogId=null}){
   // Collected dogs before uncollected; no change to preexisting camera album order.
   return all.slice().sort((a,b)=>{
    const owned=Number(b.collected>0)-Number(a.collected>0);
-   return owned||a.name.localeCompare(b.name,'ko')*(order==='oldest'?-1:1);
+   const at=Date.parse(a.createdAt||0)||0,bt=Date.parse(b.createdAt||0)||0;
+   return owned||(order==='oldest'?at-bt:bt-at)||a.name.localeCompare(b.name,'ko');
   });
  },[catalog.dogs,filter,order,dogId]);
  const activeDogs=(catalog.dogs||[]).filter(d=>!d.adopted);
@@ -147,7 +148,7 @@ export default function GoOfficialAlbum({dogId=null}){
       <button type="button" key={key} aria-pressed={filter===key}
         onClick={()=>setFilter(key)}>{label}</button>)}</nav>
     <select value={order} onChange={e=>setOrder(e.target.value)} aria-label="도감 정렬">
-      <option value="newest">이름순</option><option value="oldest">이름 역순</option>
+      <option value="newest">최신 등록순</option><option value="oldest">오래된순</option>
     </select>
   </div>}
   {error&&<div className="go-official-alert" role="alert">{error}
@@ -159,7 +160,7 @@ export default function GoOfficialAlbum({dogId=null}){
    </p>:<div className="go-official-dogs">{selected.map(dog=>
     <section className="go-official-dog" key={dog.dogId}>
       <div className="go-official-dog-title"><div>
-        <h3>{dog.name}{dog.adopted&&<small>입양 완료</small>}</h3>
+        <h3>{dog.name}{(dog.slots.some(c=>c.new)||dog.hidden.new)&&<b className="go-official-new-dog">NEW</b>}{dog.adopted&&<small>입양 완료</small>}</h3>
         <p>공식 사진 {dog.collected} / 5종 {dog.paused&&'· 공개 중지'}</p>
       </div>
         <Link href={'/go/'+dog.dogId}>강아지 도감 ›</Link>
@@ -176,15 +177,18 @@ export default function GoOfficialAlbum({dogId=null}){
         </button>:<div key={card.slot} className="go-official-locked"
            aria-label={dog.name+' 미보유 카드 '+card.slot+'번'}>
            <span>?</span><small>{card.slot} / 5</small>
-        </div>)}</div>
+        </div>)}
+        {dog.hidden.unlocked&&dog.hidden.imageUrl?
+         <button type="button" className="go-official-hidden-tile"
+           onClick={()=>openHidden(dog.dogId)} aria-label={dog.name+' HIDDEN 특별 일러스트 열기'}>
+           <img src={dog.hidden.imageUrl} alt={dog.name+' HIDDEN 특별 일러스트'}/>
+           <strong>HIDDEN</strong>{dog.hidden.new&&<b className="go-official-new">NEW</b>}
+         </button>:
+         <div className="go-official-locked go-official-hidden-tile" aria-label={dog.name+' 미해금 HIDDEN'}>
+           <span>?</span><strong>HIDDEN</strong>
+         </div>}
+      </div>
       <div className={'go-official-hidden '+(dog.hidden.unlocked?'is-open':'')}>
-        <div className="go-official-hidden-art">
-          {dog.hidden.unlocked&&dog.hidden.imageUrl?
-            <button type="button" onClick={()=>openHidden(dog.dogId)}>
-              <img src={dog.hidden.imageUrl} alt={dog.name+' HIDDEN 특별 일러스트'}/>
-              {dog.hidden.new&&<span className="go-official-new">NEW</span>}
-            </button>:<span aria-hidden="true">HIDDEN ?</span>}
-        </div>
         <div><strong>HIDDEN · 숨겨진 사생활</strong>
           <p>{dog.hidden.unlocked?'특별 일러스트 해금 완료':'공식 사진 5종 수집 시 무료 해금'}</p>
         </div>
