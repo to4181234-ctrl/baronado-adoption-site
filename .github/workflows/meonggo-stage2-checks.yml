@@ -1,7 +1,7 @@
 name: MeongGO stage 2 (review-only)
 on:
   push:
-    branches: [feat/meonggo-stage2-official-cards-20261114]
+    branches: [feat/meonggo-stage2-official-cards-20261114, feat/meonggo-stage3-friend-pvp-20261114]
   pull_request:
 permissions:
   contents: read
