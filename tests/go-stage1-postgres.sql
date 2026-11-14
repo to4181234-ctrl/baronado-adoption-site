@@ -37,7 +37,7 @@ BEGIN
   SELECT count(*) INTO n FROM public.go_coin_transactions WHERE member_id=m;
   IF n<>6 THEN RAISE EXCEPTION 'expected 5 cares + 1 quest, got %',n; END IF;
 
-  INSERT INTO public.go_visit_requests(member_id,code) VALUES(m,'A1B2C3D4')
+  INSERT INTO public.go_visit_requests(member_id,code) VALUES(m,'123456')
   RETURNING id INTO v_id;
   SELECT public.go_review_visit(v_id,'approve',null) INTO r;
   IF (r->>'coinsAdded')::integer<>30 OR (r->>'balance')::integer<>90
@@ -51,7 +51,7 @@ BEGIN
   SELECT balance INTO n FROM public.go_coin_wallets WHERE member_id=m;
   IF n<>60 THEN RAISE EXCEPTION 'post reversal wallet expected 60, got %',n; END IF;
 
-  INSERT INTO public.go_visit_requests(member_id,code) VALUES(m,'B1B2C3D4')
+  INSERT INTO public.go_visit_requests(member_id,code) VALUES(m,'234567')
   RETURNING id INTO v2_id;
   SELECT public.go_review_visit(v2_id,'approve',null) INTO r;
   IF (r->>'coinsAdded')::integer<>30
