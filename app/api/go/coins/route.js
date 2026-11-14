@@ -31,10 +31,14 @@ export async function GET(request) {
       .select('balance').eq('member_id', member.id).maybeSingle();
     const dailyQuery = db.from('go_coin_transactions')
       .select('event_type').eq('member_id', member.id).eq('local_day', today)
-      .in('event_type', ['care', 'quest_care', 'quest_visit']);
+      .in('event_type', ['care', 'quest_care']);
+    const visitsQuery = db.from('go_visit_requests')
+      .select('created_at').eq('member_id', member.id)
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false }).limit(10);
 
-    const [wallet, daily] = await Promise.all([walletQuery, dailyQuery]);
-    if (wallet.error || daily.error) throw new Error('coin read failed');
+    const [wallet, daily, visits] = await Promise.all([walletQuery, dailyQuery, visitsQuery]);
+    if (wallet.error || daily.error || visits.error) throw new Error('coin read failed');
 
     const entries = daily.data || [];
     const response = {
@@ -43,7 +47,7 @@ export async function GET(request) {
       daily: {
         careRewards: entries.filter(row => row.event_type === 'care').length,
         careQuestDone: entries.some(row => row.event_type === 'quest_care'),
-        visitQuestDone: entries.some(row => row.event_type === 'quest_visit')
+        visitQuestDone: (visits.data || []).some(row => koreaDay(row.created_at) === today)
       }
     };
 
