@@ -12,7 +12,7 @@ permissions:
 jobs:
   stage1-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 30
     services:
       postgres:
         image: postgres:17
@@ -62,5 +62,16 @@ jobs:
           bash tests/go-stage1-concurrency.sh
       - name: Install locked dependencies
         run: npm ci
-      - name: Next.js production build
+      - name: Next.js production build with stage-one UI enabled
+        env:
+          NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED: '1'
         run: npm run build
+      - name: Install pinned Playwright in ephemeral runner
+        run: |
+          npm install --no-save --package-lock=false @playwright/test@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Test mobile stage-one screens using isolated mocked APIs
+        env:
+          NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED: '1'
+        run: npx playwright test --config=tests/playwright.config.mjs
+
