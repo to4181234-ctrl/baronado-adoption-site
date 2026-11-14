@@ -19,6 +19,27 @@ export default function GoOfficialAlbum({dogId=null}){
  const [result,setResult]=useState(null),[opened,setOpened]=useState(null),[pending,setPending]=useState(null),[hiddenDog,setHiddenDog]=useState(null);
  const [shopResult,setShopResult]=useState(null),[message,setMessage]=useState('');
  const purchaseRef=useRef(null);
+ const [pendingPurchase,setPendingPurchase]=useState(null);
+ useEffect(()=>{
+  purchaseRef.current=null;setPendingPurchase(null);
+  if(!member?.id)return;
+  try{
+   const stored=JSON.parse(localStorage.getItem('meonggo2:pending:'+member.id)||'null');
+   if(stored && /^[0-9a-f-]{36}$/i.test(stored.dogId||'') &&
+      /^[0-9a-f-]{36}$/i.test(stored.requestId||'')){
+    purchaseRef.current=stored;setPendingPurchase(stored);
+   }
+  }catch{}
+ },[member?.id]);
+ const rememberPurchase=item=>{
+  purchaseRef.current=item;setPendingPurchase(item);
+  if(member?.id)try{localStorage.setItem('meonggo2:pending:'+member.id,JSON.stringify(item));}catch{}
+ };
+ const forgetPurchase=()=>{
+  purchaseRef.current=null;setPendingPurchase(null);
+  if(member?.id)try{localStorage.removeItem('meonggo2:pending:'+member.id);}catch{}
+ };
+
  const refresh=useCallback(async()=>{
   if(!GO_STAGE2_UI_ENABLED)return;
   try{
@@ -90,26 +111,59 @@ export default function GoOfficialAlbum({dogId=null}){
    await refresh();
   }catch(e){setError(e.message);}finally{setBusy(false);}
  }
+ async function purchaseOnce(details){
+  const r=await fetch('/api/go/official/shop',{method:'POST',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify(details)});
+  const data=await r.json();
+  if(!r.ok||!data.ok)throw Error(data.error||'결과 확인에 실패했어요.');
+  return data;
+ }
+ async function confirmPurchased(data,details,wasRecovered=false){
+  forgetPurchase();
+  setShopResult({dogId:details.dogId,slot:data.slot,
+    hiddenUnlocked:Boolean(data.hiddenUnlocked)});
+  if(data.hiddenUnlocked)setHiddenDog(details.dogId);
+  if(data.coinsSpent)enqueueGoCoinNotice(-data.coinsSpent);
+  window.dispatchEvent(new CustomEvent('go-coins-changed',{
+    detail:{notified:!wasRecovered&&Boolean(data.coinsSpent)}
+  }));
+  await refresh();
+ }
  async function buy(dog){
   if(!member){openAccount();return;}
   if(busy||!dog?.available||!dog.missing)return;
+  if(pendingPurchase){setError('확인되지 않은 이전 구매가 있어요. 먼저 구매 결과를 확인해주세요.');return;}
   if((coins?.balance??0)<200){setError('멍코인이 부족해요. 돌보기와 퀘스트로 코인을 모아보세요.');return;}
   if(!window.confirm(dog.name+'의 미보유 공식 사진 카드 1종을 200C로 구매할까요?'))return;
+  const details={dogId:dog.dogId,requestId:crypto.randomUUID()};
+  rememberPurchase(details);
   setBusy(true);setError('');setMessage('');
-  if(!purchaseRef.current||purchaseRef.current.dogId!==dog.dogId)
-   purchaseRef.current={dogId:dog.dogId,requestId:crypto.randomUUID()};
   try{
-   const r=await fetch('/api/go/official/shop',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(purchaseRef.current)});
-   const data=await r.json();
-   if(!r.ok||!data.ok)throw Error(data.error||'결과 확인에 실패했어요.');
-   purchaseRef.current=null;
-   setShopResult({dogId:dog.dogId,slot:data.slot,hiddenUnlocked:data.hiddenUnlocked});
-   if(data.hiddenUnlocked)setHiddenDog(dog.dogId);
-   if(data.coinsSpent)enqueueGoCoinNotice(-data.coinsSpent);
-   window.dispatchEvent(new CustomEvent('go-coins-changed',{detail:{notified:!data.replayed}}));
-   await refresh();
-  }catch(e){setError(e.message+' 동일한 구매 요청으로 다시 확인할 수 있어요.');}
+   const data=await purchaseOnce(details);
+   await confirmPurchased(data,details);
+  }catch(e){
+   setError(e.message+' 구매 결과가 확실하지 않다면 위의 이전 구매 확인 버튼을 눌러주세요.');
+  }finally{setBusy(false);}
+ }
+ async function recoverPurchase(){
+  if(!member||!pendingPurchase||busy)return;
+  setBusy(true);setError('');
+  const details=pendingPurchase;
+  try{
+   const response=await fetch('/api/go/official/shop?requestId='+
+     encodeURIComponent(details.requestId),{cache:'no-store'});
+   const receipt=await response.json();
+   if(!response.ok||!receipt.ok)throw Error(receipt.error||'결과를 확인하지 못했어요.');
+   if(receipt.found){
+    await confirmPurchased({slot:receipt.slot,hiddenUnlocked:false,coinsSpent:0},
+      details,true);
+    setMessage('이전 구매가 정상 완료된 것을 확인했어요. 코인을 중복 차감하지 않았어요.');
+    return;
+   }
+   if(!window.confirm('이전 구매는 완료되지 않았어요. 같은 요청 번호로 200C 구매를 다시 처리할까요?'))return;
+   const result=await purchaseOnce(details);
+   await confirmPurchased(result,details);
+  }catch(e){setError(e.message+' 이전 구매 요청을 유지하고 있어요. 잠시 뒤 다시 확인해주세요.');}
   finally{setBusy(false);}
  }
  async function openHidden(dogId){
@@ -151,6 +205,11 @@ export default function GoOfficialAlbum({dogId=null}){
       <option value="newest">최신 등록순</option><option value="oldest">오래된순</option>
     </select>
   </div>}
+  {member&&pendingPurchase&&<section className="go-official-pending-purchase" role="status">
+    <p>이전에 진행한 공식 멍카드 구매의 결과를 확인하지 못했어요.
+      중복 결제를 막기 위해 새로운 구매보다 먼저 상태를 확인해주세요.</p>
+    <button type="button" disabled={busy} onClick={recoverPurchase}>이전 구매 결과 확인</button>
+  </section>}
   {error&&<div className="go-official-alert" role="alert">{error}
     <button type="button" onClick={refresh}>새로고침</button></div>}
   {message&&<p className="go-official-success" role="status">{message}</p>}
