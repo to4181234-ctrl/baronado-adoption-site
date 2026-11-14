@@ -4,12 +4,13 @@ import { subscribeGoCoinNotices, enqueueGoCoinNotice } from '../lib/goCoinNotice
 
 export const GO_STAGE1_UI_ENABLED = process.env.NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED === '1';
 const CoinsContext = createContext(null);
-const EMPTY = { balance: 0, daily: { careRewards: 0, careQuestDone: false, visitQuestDone: false,drawQuestDone:false } };
+const EMPTY = { balance: 0, daily: { careRewards: 0, careQuestDone: false, visitQuestDone: false,drawQuestDone:false,battleQuestDone:false } };
 const TYPES = {
   care: '강아지 돌보기',
   quest_care: '일일 퀘스트 · 첫 돌보기',
   quest_visit: '일일 퀘스트 · 방문 인증',
   quest_draw: '일일 퀘스트 · 무료 뽑기',
+  quest_battle: '일일 퀘스트 · 첫 친구 멍배틀',
   visit_reversal: '방문 인증 승인 취소',
   store_purchase: '멍카드 상점 구매'
 };
