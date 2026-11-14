@@ -51,6 +51,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f tests/fixtures/go-stage3-postgres.sql
           psql -v ON_ERROR_STOP=1 -f supabase/proposals/meonggo_stage3_pvp_REVIEW_NOT_APPLIED.sql
           psql -v ON_ERROR_STOP=1 -f tests/go-stage3-postgres.sql
+          bash tests/go-stage3-concurrency.sh
       - name: Install dependencies
         run: npm ci
       - name: Node rules and API syntax
