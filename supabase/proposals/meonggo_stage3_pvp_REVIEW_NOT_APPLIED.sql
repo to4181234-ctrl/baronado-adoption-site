@@ -160,7 +160,7 @@ DECLARE v_room public.go_pvp_rooms%ROWTYPE;v_round public.go_pvp_rounds%ROWTYPE;
  v_host_name text;v_guest_name text;v_other_id uuid;
 BEGIN
  SELECT * INTO v_room FROM public.go_pvp_rooms WHERE id=p_room;
- IF NOT FOUND OR p_member NOT IN (v_room.host_id,v_room.guest_id) THEN
+ IF NOT FOUND OR (p_member IS DISTINCT FROM v_room.host_id AND p_member IS DISTINCT FROM v_room.guest_id) THEN
   RETURN jsonb_build_object('ok',false,'error','참가한 방만 확인할 수 있어요.');
  END IF;
  v_role:=CASE WHEN p_member=v_room.host_id THEN 'host' ELSE 'guest' END;
@@ -221,7 +221,7 @@ DECLARE v_room public.go_pvp_rooms%ROWTYPE;v_round public.go_pvp_rounds%ROWTYPE;
  v_host_name text;v_guest_name text;
 BEGIN
  SELECT * INTO v_room FROM public.go_pvp_rooms WHERE id=p_room FOR UPDATE;
- IF NOT FOUND OR p_member NOT IN(v_room.host_id,v_room.guest_id) THEN
+ IF NOT FOUND OR (p_member IS DISTINCT FROM v_room.host_id AND p_member IS DISTINCT FROM v_room.guest_id) THEN
   RETURN jsonb_build_object('ok',false,'error','참가자만 대결을 변경할 수 있어요.');
  END IF;
  IF NOT EXISTS(SELECT 1 FROM public.go_members WHERE id=p_member AND NOT disabled) THEN
