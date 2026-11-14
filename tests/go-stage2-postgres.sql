@@ -89,12 +89,14 @@ BEGIN
   -- Stage-two adoption-complete exclusion must not destroy earlier ownership.
   UPDATE public.dogs SET adopted=true WHERE id=d;
   INSERT INTO public.go_members(id) VALUES('aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee');
+  INSERT INTO public.go_coin_wallets(member_id,balance)
+   VALUES('aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',500);
   SELECT public.go_official_draw('aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee') INTO r;
   IF (r->>'ok')::boolean IS DISTINCT FROM false THEN
     RAISE EXCEPTION 'adopted dog appeared in new free draw: %',r; END IF;
   SELECT public.go_official_purchase('aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
     d,'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb') INTO r;
-  IF (r->>'ok')::boolean IS DISTINCT FROM false THEN RAISE EXCEPTION 'adopted dog was sold'; END IF;
+  IF (r->>'ok')::boolean IS DISTINCT FROM false OR (r->>'error') NOT LIKE '%구매할 수 없는%' THEN RAISE EXCEPTION 'adopted dog was sold or reason misidentified: %',r; END IF;
   SELECT count(*) INTO v_count FROM public.go_official_hidden WHERE member_id=m AND dog_id=d;
   IF v_count<>1 THEN RAISE EXCEPTION 'adoption complete removed existing hidden reward'; END IF;
   UPDATE public.dogs SET adopted=false WHERE id=d;
