@@ -244,7 +244,10 @@ BEGIN
   UPDATE public.go_pvp_rooms SET status='cancelled',updated_at=now() WHERE id=p_room;
   RETURN jsonb_build_object('ok',true,'status','cancelled');
  END IF;
- IF v_room.status='cancelled' THEN RETURN jsonb_build_object('ok',false,'error','대결이 종료됐어요. 새로운 방을 만들어주세요.'); END IF;
+ IF v_room.status='cancelled' THEN
+  IF p_action='sync' THEN RETURN jsonb_build_object('ok',true,'status','cancelled'); END IF;
+  RETURN jsonb_build_object('ok',false,'error','대결이 종료됐어요. 새로운 방을 만들어주세요.');
+ END IF;
  IF v_host THEN
   UPDATE public.go_pvp_rooms SET host_seen_at=now(),updated_at=now() WHERE id=p_room;
  ELSE
