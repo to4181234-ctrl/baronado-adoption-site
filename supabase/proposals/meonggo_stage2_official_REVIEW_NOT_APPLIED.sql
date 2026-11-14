@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS public.go_official_purchases(
 CREATE TABLE IF NOT EXISTS public.go_camera_daily_creations(
  member_id uuid NOT NULL REFERENCES public.go_members(id) ON DELETE CASCADE,
  local_day date NOT NULL,
- card_id uuid NOT NULL UNIQUE REFERENCES public.go_cards(id) ON DELETE RESTRICT,
+ card_id uuid NOT NULL UNIQUE, -- ledger ID remains even after owner deletes camera card
  PRIMARY KEY(member_id,local_day,card_id)
 );
 CREATE INDEX IF NOT EXISTS go_camera_daily_idx
