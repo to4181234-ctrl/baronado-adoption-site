@@ -29,7 +29,7 @@ test('official album is separate from original camera cards and locks unseen pho
  await page.goto('/go');
  await expect(page.getByRole('button',{name:'유기견 도감'})).toBeVisible();
  await expect(page.getByRole('button',{name:'나만의 카드'})).toBeVisible();
- await expect(page.locator('.go-official-locked')).toHaveCount(5);
+ await expect(page.locator('.go-official-locked')).toHaveCount(6);
  await expect(page.getByRole('button',{name:'무료 뽑기'})).toBeVisible();
  await expect(page.getByRole('heading',{name:'오늘의 퀘스트'})).toBeVisible();
  await expect(page.locator('.go-quest-item')).toHaveCount(3);
@@ -50,7 +50,7 @@ test('first daily official draw grants an unseen photo with quest reward',async(
  await page.goto('/go');
  await page.getByRole('button',{name:'무료 뽑기'}).click();
  await expect(page.getByRole('dialog',{name:'무료 뽑기 결과'})).toBeVisible();
- await expect(page.locator('.go-official-locked')).toHaveCount(4);
+ await expect(page.locator('.go-official-locked')).toHaveCount(5);
  await page.getByRole('dialog',{name:'무료 뽑기 결과'}).getByRole('button',{name:'확인'}).click();
  await expect(page.getByRole('button',{name:'오늘 뽑기 완료'})).toBeDisabled();
 });
