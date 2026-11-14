@@ -1,0 +1,97 @@
+/* Stage 2: scope all changes to new official-card collection/admin only.
+   Official faces reuse the Figma 166x265 SVG frame and 134x132 photo region. */
+.go-stage2-shell{width:100%;max-width:390px;margin:auto;color:#181713}
+.go-stage2-tabs{display:flex;padding:12px 16px 0;gap:7px;background:#fff}
+.go-stage2-tabs button{flex:1;padding:11px 7px;border:1px solid #e9e1d4;background:#faf8f2;font-family:'MonaS12',sans-serif;font-size:13px;color:#181713}
+.go-stage2-tabs button[aria-pressed=true]{background:#f7d94d;border-color:#151515;font-weight:700}
+.go-official-album{padding:18px 16px 46px;font-family:'MonaS12',Pretendard,sans-serif}
+.go-official-heading h2{font:700 21px/1.5 'MonaS12',sans-serif;margin:0}
+.go-official-heading>p{font-size:11px;line-height:1.6;color:#777268;margin:8px 0 14px}
+.go-official-progress{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin:9px 0}
+.go-official-progress b{font-size:13px}
+.go-official-progress-bar{width:100%;height:9px;background:#ebe6df;overflow:hidden}
+.go-official-progress-bar span{height:100%;display:block;background:#f4d24b}
+.go-official-draw{border:1px solid #ded6c5;background:#fffef7;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;margin:16px 0}
+.go-official-draw span{font-size:12px;font-weight:700}
+.go-official-draw small{display:block;margin-top:4px;font-size:10px;font-weight:400;line-height:1.4;color:#665f53}
+.go-official-draw button,.go-official-shop button,.go-official-dialog button,.go-official-download,.go-official-admin button:not(.v10-admin-back){
+ font:700 12px/1.5 Pretendard,sans-serif;min-height:35px;border:1px solid #181713;
+ padding:7px 11px;background:#f7d94d;color:#181713;cursor:pointer;
+}
+.go-official-album button:disabled,.go-official-admin button:disabled{opacity:.48;cursor:not-allowed}
+.go-official-filters{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:20px 0 16px}
+.go-official-filters nav{display:flex;gap:5px}
+.go-official-filters button{font-size:11px;border:1px solid #ddd7c9;background:#fff;padding:6px 9px;color:#181713}
+.go-official-filters button[aria-pressed=true]{background:#f7d94d;border-color:#171713;font-weight:700}
+.go-official-filters select{border:1px solid #ddd7c9;background:#fff;color:#181713;font-size:10px;padding:6px 2px;max-width:110px}
+.go-official-empty,.go-official-alert,.go-official-success{padding:14px;font-size:12px;line-height:1.6;background:#f8f7f2;color:#635d54;margin:15px 0}
+.go-official-alert{color:#a43b31;background:#fff0ed}
+.go-official-alert button{border:1px solid #a43b31;background:white;font:inherit;padding:3px 7px;margin-left:9px}
+.go-official-success{background:#fff9dd;color:#50441d}
+.go-official-dogs{display:grid;gap:20px}
+.go-official-dog{border:1px solid #e6e0d5;padding:13px 11px;background:#fff}
+.go-official-dog-title{display:flex;justify-content:space-between;align-items:start;gap:8px;margin-bottom:12px}
+.go-official-dog-title h3{font-size:17px!important;font-weight:700;margin:0 0 3px!important}
+.go-official-dog-title h3 small{margin-left:6px;font-size:9px;color:#7b7369;border:1px solid #e3ded0;padding:2px 4px;vertical-align:3px}
+.go-official-dog-title p{font-size:11px;color:#797165;margin:0}
+.go-official-dog-title a{font-size:10px;white-space:nowrap;margin-top:5px}
+.go-official-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 13px}
+.go-official-card{padding:0!important;border:0!important;display:block;position:relative;text-align:center;background:none!important;min-width:0;color:#181713}
+.go-official-card .go-card-graphic{width:100%;height:auto;aspect-ratio:166/265;display:block}
+.go-official-card>small{display:block;min-height:28px;padding-top:5px;font-size:10px;font-weight:550;line-height:1.4;overflow-wrap:anywhere}
+.go-official-new{position:absolute;z-index:2;right:-3px;top:-3px;background:#f7d94d;color:#171713;border:1px solid #171713;font:800 9px/1 Pretendard,sans-serif;padding:4px}
+.go-official-locked{aspect-ratio:166/265;border:2px dashed #c7bca5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#f7f5ef;color:#8a8378;min-width:0}
+.go-official-locked span{font:800 37px/1 'MonaS12',sans-serif}
+.go-official-locked small{font-size:10px}
+.go-official-hidden{display:flex;gap:12px;border-top:1px solid #eee9df;padding:12px 0;align-items:center}
+.go-official-hidden-art{width:67px;height:67px;background:#f1eee8;border:1px solid #d5cdbc;display:grid;place-items:center;overflow:hidden;flex-shrink:0}
+.go-official-hidden-art>span{font:700 11px 'MonaS12',sans-serif;color:#9f9686}
+.go-official-hidden-art button{display:block;width:100%;height:100%;padding:0;border:0;position:relative}
+.go-official-hidden-art img{width:100%;height:100%;object-fit:contain}
+.go-official-hidden strong{font-size:12px}
+.go-official-hidden p{font-size:10px;color:#81796d;margin:5px 0 0}
+.go-official-shop{border:1px solid #f0de99;background:#fffbe6;padding:11px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.go-official-shop strong{font-size:12px}
+.go-official-shop small{display:block;margin-top:4px;font-size:10px;color:#807260}
+.go-official-shop button{white-space:nowrap;font-size:10px;min-width:106px}
+.go-official-overlay{position:fixed;inset:0;z-index:210;background:#0009;display:grid;place-items:center;padding:15px}
+.go-official-dialog{position:relative;background:#fff;width:min(100%,365px);max-height:90dvh;overflow:auto;border:2px solid #181713;padding:20px 15px;text-align:center;box-shadow:5px 5px 0 #1a1712}
+.go-official-dialog h2{font:700 19px/1.5 'MonaS12',sans-serif!important;margin:5px 0 9px!important}
+.go-official-dialog p{font-size:12px;line-height:1.65;color:#695f53}
+.go-official-dialog-actions{display:flex;justify-content:center;gap:8px;margin-top:16px}
+.go-official-dialog-actions button{flex:1}
+.go-official-compare{display:grid;gap:7px;background:#faf8ed;padding:10px}
+.go-official-compare p{margin:0;color:#171713;font-size:12px}
+.go-official-result-art{width:100px;height:100px;object-fit:cover;display:block;margin:15px auto}
+.go-official-large-card{width:220px;max-width:100%;margin:15px auto}
+.go-official-large-card .go-card-graphic{display:block;width:100%;height:auto}
+.go-official-large-hidden{width:auto;height:auto;max-height:55dvh;max-width:100%;object-fit:contain;margin:12px auto;display:block}
+.go-official-download{display:inline-block;text-decoration:none}
+.go-official-close{position:absolute;top:7px;right:8px;background:#fff!important;border:0!important;font-size:25px!important;min-height:28px!important;padding:0 6px!important}
+.go-official-camera-daily{font-size:11px;text-align:center;margin:5px 0;color:#6f6453}
+.go-official-admin{max-width:600px!important}
+.go-official-admin-dog-label{display:grid;gap:7px;font-size:13px;font-weight:700;margin:15px 0}
+.go-official-admin-dog-label select,.go-official-admin-edit-area input[type=text],.go-official-admin-edit-area input:not([type]),.go-official-admin-edit-area input[type=file]{font-size:12px;border:1px solid #dcd5c8;padding:8px;width:100%;max-width:100%;box-sizing:border-box}
+.go-official-admin-status{background:#fff8e4;padding:12px;border:1px solid #eee0af}
+.go-official-admin-status p{font-size:12px;margin:6px 0}
+.go-official-admin-editor{margin-top:15px;border:1px solid #ebe5da;padding:12px}
+.go-official-admin-editor h2{font-size:18px!important}
+.go-official-admin-slots{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;margin:14px 0}
+.go-official-admin-slots button{padding:2px!important;background:#fff!important;border:1px solid #dcd5c9!important;display:flex;flex-direction:column;min-height:83px;gap:3px;justify-content:center;align-items:center;min-width:0}
+.go-official-admin-slots button.is-selected{border:2px solid #191919!important;background:#fff8db!important}
+.go-official-admin-slots button img{width:100%;height:62px;object-fit:cover}
+.go-official-admin-slots button small{font-size:9px}
+.go-official-admin-edit-area h3{font-size:15px!important;margin:12px 0}
+.go-official-admin-photo-preview{aspect-ratio:134/132;width:min(100%,260px);position:relative;overflow:hidden;display:grid;place-items:center;border:1px dashed #bcb2a2;margin:9px auto 20px;background:#eeeae4}
+.go-official-admin-photo-preview img{width:100%;height:100%;display:block;object-fit:cover;transform-origin:center center}
+.go-official-admin-photo-preview span{font-size:11px;color:#81796c}
+.go-official-admin-edit-area>label{display:block;margin:10px 0;font-size:12px;font-weight:700}
+.go-official-admin-edit-area>label input{display:block;margin-top:7px}
+.go-official-admin-crop{display:grid;gap:8px;padding:10px;background:#faf9f6;margin:12px 0}
+.go-official-admin-crop label{display:grid;font-size:12px;gap:6px}
+.go-official-admin-crop input{width:100%;accent-color:#c9a012}
+.go-official-admin-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}
+.go-official-admin-actions button{flex:1;min-width:110px}
+.go-official-admin-actions .is-danger,.go-official-admin-delete{background:#fff4f0!important;color:#ac2b1a!important;border-color:#bd675b!important}
+.go-stage2-shell button:focus-visible,.go-official-admin :is(button,select,input):focus-visible{outline:2px solid #947c1f;outline-offset:3px}
+@media(max-width:360px){.go-official-shop{flex-direction:column;align-items:stretch}.go-official-admin-slots button{min-height:65px}.go-official-admin-slots button img{height:45px}}
