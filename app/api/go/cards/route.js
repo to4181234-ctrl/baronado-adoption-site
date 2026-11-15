@@ -105,7 +105,27 @@ export async function POST(request) {
       throw upload.error;
     }
     savedPath = uploadPath;
-    // One go_cards row is also the public post via go_card_index; status approved publishes immediately.
+    // Stage-two daily limit counts only newly issued camera cards.
+    // All legacy cards remain intact and are excluded from the new quota.
+    if(process.env.MEONGGO_STAGE1_COINS_ENABLED==='1' &&
+       process.env.MEONGGO_STAGE2_OFFICIAL_ENABLED==='1'){
+      const ratings=drawGoCardRatings(randomInt);
+      const {data:created,error:rpcError}=await db.rpc('go_camera_create_limited',{
+        p_member:member.id,p_id:cardId,p_dog:dogId,p_title:title.trim(),
+        p_image:uploadPath,p_cuteness:ratings.cuteness,p_charm:ratings.charm,
+        p_affection:ratings.affection
+      });
+      if(rpcError)throw rpcError;
+      if(!created?.ok){
+        await db.storage.from('go-cards').remove([uploadPath]);
+        savedPath=null;
+        return goError(created?.error||'오늘의 카드 촬영 횟수를 확인해주세요.',409);
+      }
+      savedPath=null;
+      return Response.json({id:created.id,status:'approved',capturedAt:created.capturedAt,
+        remainingToday:created.remaining},{status:201});
+    }
+    // Legacy behavior remains unchanged until stage two is explicitly enabled.
     savedPath = null;
     const { data, error } = await db.from('go_cards').insert({ id:cardId, dog_id: dogId, member_id: member.id, image_path: uploadPath, photo_style: 'original', status:'approved', title: title.trim(), description: title.trim(), ...drawGoCardRatings(randomInt) }).select('id,captured_at').single();
     if (error) {

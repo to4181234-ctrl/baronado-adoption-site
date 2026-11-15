@@ -13,6 +13,14 @@ function AdminContent(){
  const PAGE_SIZE=5;
  const [dogs,setDogs]=useState([]),[loading,setLoading]=useState(true),[error,setError]=useState('');
  const [target,setTarget]=useState(null),[doneMessage,setDoneMessage]=useState('');
+ const [pendingVisits,setPendingVisits]=useState(0);
+ useEffect(()=>{
+  if(process.env.NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED!=='1')return;
+  const controller=new AbortController();
+  fetch('/api/admin/go/visit',{cache:'no-store',signal:controller.signal})
+   .then(r=>r.ok?r.json():null).then(data=>{if(!controller.signal.aborted)setPendingVisits(data?.total||0);}).catch(()=>{});
+  return()=>controller.abort();
+ },[]);
  const [input,setInput]=useState(''),[query,setQuery]=useState(''),[status,setStatus]=useState('all'),[order,setOrder]=useState('newest'),[page,setPage]=useState(0);
  function load(){
   if(!isSupabaseConfigured){setLoading(false);return;}
@@ -32,7 +40,7 @@ function AdminContent(){
  return <main className="site-shell v3-site v3-admin-list-site">
   <SiteHeader/>
   <section className="v3-admin-list">
-   <details className="v3-admin-chooser"><summary>‹ 관리 메뉴</summary><nav><Link href="/admin?category=adoption">가족을 찾아요</Link><Link href="/admin?category=resident">상주견 소개</Link><Link href="/admin/go">멍멍GO! 게시물 관리</Link><Link href="/admin/analytics">방문 통계</Link><Link href="/admin/banners">상단 배너 관리</Link></nav></details>
+   <details className="v3-admin-chooser"><summary>‹ 관리 메뉴</summary><nav><Link href="/admin?category=adoption">가족을 찾아요</Link><Link href="/admin?category=resident">상주견 소개</Link><Link href="/admin/go">멍멍GO! 게시물 관리</Link>{process.env.NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED==='1'&&process.env.NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED==='1'&&<Link href="/admin/go/official">공식 멍카드 관리</Link>}{process.env.NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED==='1'&&<Link href="/admin/go/visit">방문 인증 관리{pendingVisits>0&&<span className="go-visit-admin-badge" aria-label={"승인 대기 "+pendingVisits+"건"}>{pendingVisits}</span>}</Link>}<Link href="/admin/analytics">방문 통계</Link><Link href="/admin/banners">상단 배너 관리</Link></nav></details>
    <header className="v3-admin-list-banner"><h1>{category===CATEGORY_RESIDENT?'상주견 소개 관리':'가족을 찾아요 관리'}</h1><p>사진·정보를 확인하고 등록하거나 수정해요.</p></header>
    <Link className="v3-admin-add" href={'/admin/new?category='+category}>+ 새 강아지 등록</Link>
    <form className="v3-admin-search" onSubmit={e=>{e.preventDefault();setPage(0);setQuery(input.trim())}}><input value={input} placeholder="강아지 이름 검색" aria-label="강아지 이름 검색" onChange={e=>setInput(e.target.value)}/><button type="submit">검색</button></form>

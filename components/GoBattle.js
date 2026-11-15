@@ -9,6 +9,7 @@ import GoCardFace from './GoCardFace.js';
 import GoElementSparkles,{elementForCard} from './GoElementSparkles.js';
 import {vibrateBattleHit,stopBattleVibration} from '../lib/goBattleHaptics.js';
 import {figmaSprite,FIGMA_DOGS} from '../lib/goV3Game.js';
+import GoFriendBattle,{GO_STAGE3_UI_ENABLED} from './GoFriendBattle.js';
 
 const initial={cards:[],hasMore:false,total:0,eligibleDogKinds:0};
 const emptyOpponents={members:[],total:0,hasMore:false};
@@ -207,4 +208,4 @@ function Game(){
   </>}
  </div>;
 }
-export default function GoBattle(){return <GoShell active="battle" title="멍배틀" description="멍카드 두 장으로 즐기는 8비트 대결"><Game/></GoShell>;}
+export default function GoBattle(){return <GoShell active="battle" title="멍배틀" description="멍카드 두 장으로 즐기는 8비트 대결">{GO_STAGE3_UI_ENABLED?<GoFriendBattle/>:<Game/>}</GoShell>;}
