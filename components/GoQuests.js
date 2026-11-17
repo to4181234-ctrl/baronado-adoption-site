@@ -3,8 +3,9 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useGoSession } from './GoShell.js';
 import { useGoCoins } from './GoCoins.js';
-import { GO_STAGE2_UI_ENABLED } from './GoOfficialAlbum.js';
-import { GO_STAGE3_UI_ENABLED } from './GoFriendBattle.js';
+import {isQuestAvailable,visibleQuestRewards} from '../lib/goStage3Quests.js';
+const DRAW_AVAILABLE=process.env.NEXT_PUBLIC_MEONGGO_STAGE4_STORE_ENABLED==='1';
+const BATTLE_AVAILABLE=process.env.NEXT_PUBLIC_MEONGGO_STAGE5_PVP_ENABLED==='1';
 
 export default function GoQuests({ compact = false }) {
   const { member, ready, openAccount } = useGoSession();
@@ -15,7 +16,7 @@ export default function GoQuests({ compact = false }) {
   const tasks = [
     {
       id: 'care', title: '오늘 첫 돌보기', coins: 10,
-      caption: '강아지와 처음 교감하면 10C를 받아요.',
+      caption: '첫 돌보기 퀘스트 +10C, 돌보기 행동은 하루 최대 5회 +10C예요.',
       completed: Boolean(coins.daily?.careQuestDone),
       href: '/go'
     },
@@ -26,12 +27,12 @@ export default function GoQuests({ compact = false }) {
       href: '/go/visit'
     }
   ];
-  if(GO_STAGE2_UI_ENABLED)tasks.push({
+  if(isQuestAvailable('draw',{draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE}))tasks.push({
     id:'draw',title:'오늘의 무료 공식 멍카드 뽑기',coins:10,
     caption:'오늘의 첫 공식 멍카드 뽑기로 10C를 받아요.',
     completed:Boolean(coins.daily?.drawQuestDone),href:'/go'
   });
-  if(GO_STAGE3_UI_ENABLED)tasks.push({
+  if(isQuestAvailable('battle',{draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE}))tasks.push({
     id:'battle',title:'오늘의 첫 친구 멍배틀',coins:10,
     caption:'친구와 1:1 대결을 정상 완료하면 승·무·패 관계없이 10C!',
     completed:Boolean(coins.daily?.battleQuestDone),href:'/go/battle'
@@ -75,6 +76,6 @@ export default function GoQuests({ compact = false }) {
       {ready && <button type="button" onClick={openAccount}>로그인하고 시작하기</button>}
     </div>}
     {compact && <Link className="go-quest-all-link" href="/go/quests">퀘스트 자세히 보기 ›</Link>}
-    <p className="go-quest-caption">{GO_STAGE3_UI_ENABLED?'3차 출시 퀘스트 4종 · 최대 퀘스트 보상 60C':GO_STAGE2_UI_ENABLED?'2차 출시 퀘스트 3종 · 최대 퀘스트 보상 50C':'1차 출시 퀘스트 2종 · 최대 퀘스트 보상 40C'}</p>
+    <p className="go-quest-caption">오늘 이용 가능한 퀘스트 {tasks.length}종 · 퀘스트 완료 보상 최대 {visibleQuestRewards({draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE})}C</p>
   </section>;
 }
