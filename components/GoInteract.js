@@ -6,6 +6,7 @@ import {figmaSprite} from '../lib/goV3Game.js';
 import {getGoDialogue} from '../lib/goConfirmedDialogue.js';
 import {listenAudioSetting,createGameAudio,GAME_SOUND_KEY} from '../lib/goV3Audio.js';
 import GoShell,{useGoSession} from './GoShell.js';
+import {enqueueGoCoinNotice} from '../lib/goCoinNotices.js';
 const MOTIONS={snack:{name:'간식',pose:'feed',message:'냠냠! 맛있는 간식 고마워~',audio:'snack'},praise:{name:'칭찬',pose:'praise',message:'멍멍! 칭찬해줘서 신나요!',audio:'praise'},play:{name:'놀이',pose:'play',message:'같이 노니까 너무 신나요!',audio:'play'}};
 function Interaction(){
  const {id}=useParams(),router=useRouter(),{member,ready,openAccount}=useGoSession();
@@ -65,6 +66,10 @@ function Interaction(){
   try{const r=await fetch('/api/go/interaction',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dogId:id,action})});const d=await r.json();if(!r.ok)throw Error(d.error||'교감에 실패했어요.');
    const m=MOTIONS[action];interacted.current=true;setPose(m.pose);setNotice(getGoDialogue(dog?.name,status?.level,action)||m.message);audio.current?.play(m.audio);audio.current?.schedule('bark'+(barks.current+1),250);barks.current=(barks.current+1)%3;
    setStatus(old=>({...old,level:d.level,actions:{...old.actions,[action]:{remaining:d.remaining,nextAt:d.availableAt}}}));
+   if(Number.isSafeInteger(d.coinsAdded)&&d.coinsAdded>0){
+     enqueueGoCoinNotice(d.coinsAdded);
+     window.dispatchEvent(new CustomEvent('go-coins-changed',{detail:{notified:true}}));
+   }
    timer.current=setTimeout(()=>{setPose('front');setBusy(false);},2000);
   }catch(e){setError(e.message);setBusy(false);}
  }
