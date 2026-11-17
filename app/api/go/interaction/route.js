@@ -27,7 +27,8 @@ export async function POST(request){
  const member=await goMember(request);if(!member)return goError('로그인이 필요해요.',401);
  let body;try{body=await request.json();}catch{return goError('요청을 확인해주세요.');}
  if(!validId(body?.dogId)||!actions.includes(body?.action))return goError('교감 정보를 확인해주세요.');
- try{const db=adminDatabase();const r=await db.rpc('go_do_interaction',{p_member_id:member.id,p_dog_id:body.dogId,p_action:body.action});if(r.error)throw r.error;
+ try{const db=adminDatabase();const procedure=process.env.MEONGGO_STAGE1_COINS_ENABLED==='1'?'go_do_rewarded_interaction':'go_do_interaction';
+  const r=await db.rpc(procedure,{p_member_id:member.id,p_dog_id:body.dogId,p_action:body.action});if(r.error)throw r.error;
   if(!r.data?.ok)return Response.json(r.data||{error:'교감할 수 없어요.'},{status:409,headers:{'Cache-Control':'no-store'}});
   return Response.json(r.data,{headers:{'Cache-Control':'no-store'}});
  }catch{return goError('교감 기록을 저장하지 못했어요.',500);}
