@@ -1,0 +1,118 @@
+/* Stage five. New room controls only; preserve legacy Figma battle assets,
+   sprite layers, sound and 4.28s impact animation. */
+.friend-pvp{font-family:'MonaS12','Pretendard',sans-serif!important;padding:18px 16px 48px!important}
+.friend-pvp *{box-sizing:border-box}
+.friend-pvp-header h1{font:700 24px/1.5 'MonaS12',sans-serif!important;letter-spacing:0!important;margin-bottom:6px!important}
+.friend-pvp-header .meong-battle-hint{margin:0 0 8px}
+.friend-pvp-rules{font:400 10.5px/1.6 'MonaS12',sans-serif;color:#766e62;background:#fbf9ef;padding:9px;margin:0 0 24px}
+.friend-pvp h2{font:700 17px/1.5 'MonaS12',sans-serif!important;letter-spacing:0!important;color:#181713}
+.friend-pvp button:focus-visible,.friend-pvp input:focus-visible{outline:2px solid #8d7721;outline-offset:3px}
+.friend-pvp-notice{background:#fff7d9;padding:8px;font-size:12px}
+.friend-pvp-intro{display:grid;gap:17px}
+.friend-pvp-intro .meong-battle-primary{margin:3px 0 0}
+.friend-pvp-leader{border:1px solid #e4ddce;padding:14px;background:#fff}
+.friend-pvp-leader strong{display:block;margin:7px 0;font:700 22px/1.3 'MonaS12',sans-serif}
+.friend-pvp-leader small{display:block;color:#827b6f;font-size:10px;line-height:1.5}
+.friend-pvp-join{display:grid;gap:8px;margin:0}
+.friend-pvp-join label{font-size:12px;font-weight:700}
+.friend-pvp-join>div{display:flex;gap:6px;min-width:0}
+.friend-pvp-join input{width:100%;min-width:0;flex:1;border:1px solid #dfd7c9;background:#fff;padding:10px;font-size:12px;color:#181713}
+.friend-pvp-join button{flex:0 0 auto;background:#f7d94d;border:1px solid #181713;padding:8px 11px;font-size:11px}
+.friend-pvp-help{font-size:10px;line-height:1.6;color:#756f63;margin:0!important}
+.friend-pvp-intro>a{font-size:12px;text-decoration:none;color:#726b5e}
+.friend-pvp-room{display:grid;gap:16px}
+.friend-pvp-room-head{display:flex;align-items:center;justify-content:space-between;gap:9px;border-bottom:1px solid #e9e4d7;padding:0 0 12px}
+.friend-pvp-room-head strong{display:block;font-size:17px}
+.friend-pvp-room-head small{display:block;font-size:10px;margin-top:5px;color:#837b70}
+.friend-pvp-room-head button{font-size:11px;padding:5px 8px;border:1px solid #dfd8c9;background:#fff;color:#333}
+.friend-pvp-participants{display:flex;align-items:center;gap:7px;justify-content:center}
+.friend-pvp-participants>div{flex:1;min-width:0;background:#fbf8ed;border:1px solid #e9dfba;text-align:center;padding:12px 4px;display:flex;flex-direction:column;gap:6px}
+.friend-pvp-participants>div>span{font-size:10px;color:#766d5f}
+.friend-pvp-participants>div>b{font-size:12px;overflow-wrap:anywhere}
+.friend-pvp-participants>div>small{font-size:10px;color:#776a5d}
+.friend-pvp-participants>strong{font-size:13px}
+.friend-pvp-invite{text-align:center;background:#fff9df;border:1px solid #f0dd94;padding:19px 10px}
+.friend-pvp-invite p{font-size:11px;line-height:1.6}
+.friend-pvp-invite label{display:block;font-size:11px;margin:17px 0 10px}
+.friend-pvp-invite label strong{display:block;margin-top:8px;font:700 23px/1.3 'MonaS12',monospace;letter-spacing:1px}
+.friend-pvp-invite>div{display:flex;gap:7px;justify-content:center}
+.friend-pvp-invite button{font:700 11px 'MonaS12',sans-serif;background:#f7d94d;border:1px solid #191713;padding:10px}
+.friend-pvp-clock{margin:0 0 11px;font-size:11px;text-align:center}
+.friend-pvp-clock strong{font-size:16px;letter-spacing:.025em}
+.friend-pvp-ready-state{display:flex;gap:8px;margin-bottom:13px}
+.friend-pvp-ready-state span{flex:1;padding:9px 6px;text-align:center;font-size:11px;background:#f6f3eb;border:1px solid #ddd7c7}
+.friend-pvp-prepare>h2{font-size:14px!important;margin:15px 0!important}
+.friend-pvp-current{background:#fdf9e9;border:1px solid #e9dea7;padding:10px}
+.friend-pvp-current h2{font-size:12px!important;margin:0 0 8px!important}
+.friend-pvp-current>div{display:flex;align-items:center;gap:13px}
+.friend-pvp-current .go-card-graphic{width:65px;height:auto;flex:0 0 65px}
+.friend-pvp-current p{font-size:12px;font-weight:700}
+.friend-pvp-current small{display:block;margin-top:7px;font-size:10px;font-weight:400;color:#776b5e}
+.friend-pvp-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:23px;row-gap:22px;margin:18px 0 22px}
+.friend-pvp-card{width:100%;border:0;background:#fff;padding:0;position:relative;color:#181713;text-align:center;display:flex;flex-direction:column;gap:5px;min-width:0}
+.friend-pvp-card.is-selected:before{content:'';position:absolute;inset:-5px -5px 35px;border:2px solid #e3c02b;pointer-events:none}
+.friend-pvp-card .go-card-graphic{width:100%;height:auto;display:block;aspect-ratio:166/265}
+.friend-pvp-card span{display:block;font-size:10px;line-height:1.4;font-weight:700;overflow-wrap:anywhere}
+.friend-pvp-card small{display:block;font-size:10px;color:#777067}
+.friend-pvp-prepare>.meong-battle-primary{margin:12px 0!important}
+.friend-pvp-ready-done{background:#fff5d0;text-align:center;padding:14px;border:1px solid #f0db8d}
+.friend-pvp-ready-done p{font-size:12px;line-height:1.7}
+.friend-pvp-ready-done button{padding:9px 12px;border:1px solid #181713;background:#fff;font-size:12px}
+.friend-pvp-result{padding:9px 0 0;text-align:center}
+.friend-pvp-result>h2{margin:9px 0 22px!important;font-size:21px!important}
+.friend-pvp-result .meong-battle-versus{margin:4px auto 15px}
+.friend-pvp-result-cards{display:flex;gap:18px;justify-content:center;margin:15px 0}
+.friend-pvp-result-cards>div{min-width:0;width:43%;display:flex;flex-direction:column;gap:8px}
+.friend-pvp-result-cards .go-card-graphic{width:100%;height:auto}
+.friend-pvp-result-cards strong{font-size:11px}
+.friend-pvp-result-score{font-size:17px;font-weight:700;line-height:1.5;margin:12px 0}
+.friend-pvp-result-note{font-size:11px;color:#817867}
+.friend-pvp-result .meong-battle-primary,.friend-pvp-result .meong-battle-secondary{margin-top:12px}
+.friend-pvp-cancelled{text-align:center;border:1px dashed #e1bcaa;background:#fff7f3;padding:17px}
+.friend-pvp-cancelled p{font-size:12px;line-height:1.65;color:#8a6554}
+.friend-pvp-history{margin-top:25px;border-top:1px solid #e7e2d7;padding-top:17px}
+.friend-pvp-history>h2{font-size:15px!important}
+.friend-pvp-history>p{font-size:11px;color:#776f63}
+.friend-pvp-history>small{display:block;font-size:10px;color:#7a7265;line-height:1.55;margin-top:11px}
+.friend-pvp-history ol{list-style:none;padding:0;margin:10px 0}
+.friend-pvp-history li{display:flex;align-items:center;gap:11px;border-bottom:1px solid #eee9de;padding:9px 1px}
+.friend-pvp-history li strong{width:25px;height:25px;display:grid;place-items:center;background:#f7d94d;font-size:11px}
+.friend-pvp-history li span{font-size:11px;flex:1}
+.friend-pvp-history li small{font-size:10px;color:#7b7469}
+@media(max-width:350px){.friend-pvp-invite label strong{font-size:19px}.friend-pvp-participants>div>b{font-size:11px}.friend-pvp-card-grid{column-gap:14px}}
+
+/* Mobile hit-target fix: constrain SVG faces to card cells; the ready action
+   must remain clickable even when a long SVG paints beyond its content box. */
+.friend-pvp-prepare .friend-pvp-card-grid{position:relative;isolation:isolate;contain:layout paint;z-index:0}
+.friend-pvp-prepare .friend-pvp-card-grid .friend-pvp-card{
+  position:relative;min-height:0;overflow:hidden;
+}
+.friend-pvp-prepare .friend-pvp-card-grid .go-card-graphic{
+  position:static!important;display:block!important;width:100%!important;
+  max-width:100%!important;height:auto!important;aspect-ratio:166/265!important;
+  pointer-events:none;
+}
+.friend-pvp-prepare>.meong-battle-primary{
+  position:relative!important;z-index:10!important;isolation:isolate;
+  display:block!important;clear:both;width:100%!important;
+}
+
+/* Result faces use the same Figma SVG. Do not allow those large painted
+   image elements to occlude the rematch or finish controls on mobile. */
+.friend-pvp-result-cards{
+  position:relative;z-index:0;isolation:isolate;
+  contain:layout paint;overflow:hidden;
+}
+.friend-pvp-result-cards .go-card-graphic{
+  position:static!important;display:block!important;width:100%!important;
+  max-width:100%!important;height:auto!important;aspect-ratio:166/265!important;
+  pointer-events:none;
+}
+.friend-pvp-result>.meong-battle-primary,
+.friend-pvp-result>.meong-battle-secondary{
+  position:relative!important;z-index:10!important;isolation:isolate;
+  display:block!important;clear:both;width:100%!important;
+}
+
+/* All card graphics are decorative within a parent button, so only the button owns the hit target. */
+.friend-pvp .go-card-graphic,.friend-pvp .go-card-graphic *{pointer-events:none!important}
