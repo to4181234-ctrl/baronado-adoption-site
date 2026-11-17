@@ -111,7 +111,7 @@ BEGIN
   WHERE NOT EXISTS(SELECT 1 FROM public.go_official_owned o
      WHERE o.member_id=p_member AND o.dog_id=p_dog AND o.slot=g.slot)
   ORDER BY random() LIMIT 1;
- IF v_slot IS NULL THEN RETURN jsonb_build_object('ok',false,'error','이 강아지의 사진 5종을 모두 모았어요.'); END IF;
+ IF v_slot IS NULL THEN RETURN jsonb_build_object('ok',false,'error','이 강아지의 사진 4종을 모두 모았어요.'); END IF;
  v_power:=public.go_battle_random_rating();v_charm:=public.go_battle_random_rating();
  INSERT INTO public.go_official_owned(member_id,dog_id,slot,power,charm)
   VALUES(p_member,p_dog,v_slot,v_power,v_charm);
