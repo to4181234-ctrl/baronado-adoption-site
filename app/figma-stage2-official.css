@@ -25,3 +25,11 @@
 .s2-official-viewer>button:not(.s2-official-close){background:#f7d94d;border:1px solid #181713;padding:7px 16px;cursor:pointer;font-family:'MonaS12',sans-serif}
 .s2-official-close{position:absolute;right:8px;top:5px;border:0;background:transparent;cursor:pointer;font-size:22px}
 @media(max-width:360px){.s2-official-grid{gap:14px}.s2-kind-tabs{gap:10px}.s2-kind-tabs button{font-size:13px}}
+
+/* Override the legacy one-line toolbar only when the stage 2 tab switch exists. */
+.v3-go-site .v5-album-toolbar:has(.s2-kind-tabs){height:auto;min-height:28px;flex-wrap:wrap;row-gap:10px;white-space:normal;margin-bottom:18px}
+.v3-go-site .v5-album-toolbar .s2-kind-tabs{flex:1 1 100%;white-space:normal}
+.v3-go-site .v5-album-toolbar .s2-kind-tabs button{font-family:'MonaS12',sans-serif!important;font-weight:700!important;font-size:15px!important;line-height:24px!important;white-space:normal}
+.v3-go-site .v5-album-toolbar .v5-manage-actions{margin-left:0}
+.v3-go-site .s2-official-card .go-card-graphic{display:block;width:100%;height:auto;aspect-ratio:166/265}
+.v3-go-site .s2-official-viewer .go-card-graphic{width:min(100%,166px);height:auto}
