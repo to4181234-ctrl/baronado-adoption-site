@@ -42,3 +42,12 @@
 .s4-store-close{position:absolute;right:10px;top:5px;font-size:22px;border:0;background:none}
 @media(prefers-reduced-motion:reduce){.s4-store-art>img{animation:none}}
 @media(max-width:340px){.s4-store{padding-inline:11px}.s4-store-choices{gap:7px}.s4-store-choices>button{padding-inline:8px}.s4-store-art{margin-inline:-11px}}
+
+/* Exact project source: GoDiscovery collar.png and GoPixelChoice interaction. */
+.s4-store-collars{display:flex;justify-content:center;gap:13px;margin:14px auto 18px}
+.s4-store-collars>button{box-sizing:border-box;border:1px solid transparent;background:#fffdfa;padding:6px;width:65px;height:69px}
+.s4-store-collars>button[aria-pressed="true"]{border:2px solid #181713;background:#fff4bb;padding:5px}
+.s4-store-collars img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.s4-store-collar-actions{display:grid;gap:5px;justify-content:center}
+.s4-store-collar-actions .v3-pixel-choice{min-width:130px;color:#181713}
+.s4-store-collar-actions .v3-pixel-choice:disabled{opacity:.5;cursor:not-allowed}
