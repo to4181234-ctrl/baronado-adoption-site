@@ -5,10 +5,19 @@ DB_NAME="${1:-go_integration_final}"
 if [[ ! "$DB_NAME" =~ ^go_integration_[a-z0-9_]+$ ]]; then
  echo "BLOCKED: expected disposable go_integration_* database" >&2; exit 3
 fi
-# Force the local socket so a Supabase production URL can never be consulted.
-PSQL=(psql -X -h /var/run/postgresql -d "$DB_NAME" -v ON_ERROR_STOP=1 -q)
+# Allow only a local socket or loopback TCP to a disposable PostgreSQL server.
+# Explicitly do NOT honor DATABASE_URL or any production Supabase connection string.
+QA_DB_HOST="${QA_DB_HOST:-/var/run/postgresql}"
+case "$QA_DB_HOST" in
+  /var/run/postgresql|localhost|127.0.0.1|::1) ;;
+  *) echo "BLOCKED nonlocal DB host: $QA_DB_HOST" >&2; exit 4 ;;
+esac
+PSQL=(psql -X -h "$QA_DB_HOST" -d "$DB_NAME" -v ON_ERROR_STOP=1 -q)
 SERVER="$("${PSQL[@]}" -Atqc "SELECT coalesce(inet_server_addr()::text, 'local')")"
-if [[ "$SERVER" != "local" ]]; then echo "BLOCKED nonlocal DB: $SERVER" >&2; exit 4; fi
+case "$SERVER" in
+  local|127.0.0.1|::1) ;;
+  *) echo "BLOCKED nonlocal resolved DB: $SERVER" >&2; exit 5 ;;
+esac
 echo "QA database: $DB_NAME (local socket, synthetic records)"
 "${PSQL[@]}" -f tests/fixtures/go-integration-schema.sql
 "${PSQL[@]}" -f tests/fixtures/go-integration-seed.sql
