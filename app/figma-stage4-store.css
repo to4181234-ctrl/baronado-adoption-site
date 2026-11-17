@@ -154,3 +154,14 @@
 
 /* Exact Figma caption first baseline y=654 at 390px. */
 .v3-go-site .s4-store-choices strong{margin-top:15px}
+
+/* Figma 558:607976: exact 357x80 dialogue, three original vector layers. */
+.v3-go-site .s4-store-dialogue{padding:0;border:0;outline:0;box-shadow:none;background:transparent}
+.v3-go-site .s4-store-dialogue>img{position:absolute;display:block;max-width:none;pointer-events:none}
+.v3-go-site .s4-store-dialogue-bg{left:1.879px;top:.87px;width:calc(100% - 3.758px);height:78.26px}
+.v3-go-site .s4-store-dialogue-outer{left:1.879px;top:.87px;width:calc(100% - 3.758px);height:78.26px}
+.v3-go-site .s4-store-dialogue-inner{left:7.516px;top:5.217px;width:calc(100% - 15.032px);height:69.565px}
+.v3-go-site .s4-store-dialogue-copy{position:absolute;left:29px;top:16px;right:15px;z-index:2}
+.v3-go-site .s4-store-dialogue-copy strong{display:block;margin:0;font:700 11px/16.5px 'Galmuri11',sans-serif}
+.v3-go-site .s4-store-dialogue-copy p{margin:7.5px 0 0!important;font:400 11px/16.5px 'Galmuri11',sans-serif}
+@media(max-width:389px){.v3-go-site .s4-store-dialogue-copy{left:24px}}
