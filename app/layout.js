@@ -42,4 +42,5 @@ import './figma-stage2-official.css';
 import './figma-stage4-store.css';
 import './figma-stage4-admin.css';
 import './figma-stage5-battle.css';
+import './figma-prelaunch-quests.css';
 import './meonggo-stage1.css';
