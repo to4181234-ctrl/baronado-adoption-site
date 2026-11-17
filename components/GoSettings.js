@@ -4,6 +4,7 @@ import Link from 'next/link';
 import {usePathname,useRouter} from 'next/navigation';
 import {fetchDogs} from '../lib/dogs.js';
 import GoShell,{useGoSession} from './GoShell.js';
+import GoSettingsTabs from './GoSettingsTabs.js';
 import {figmaSprite,FIGMA_DOGS} from '../lib/goV3Game.js';
 import {GAME_SOUND_KEY} from '../lib/goV3Audio.js';
 import {BATTLE_VIBRATION_KEY,battleVibrationEnabled,stopBattleVibration} from '../lib/goBattleHaptics.js';
@@ -21,7 +22,7 @@ function SettingsContent(){
  const router=useRouter();
  const pathname=usePathname()||'/go/settings';
  const tab=pathname.endsWith('/profile')?'profile':pathname.endsWith('/avatar')?'avatar':'settings';
- const {member,ready,openAccount}=useGoSession();
+ const {member,ready,openAccount,logout}=useGoSession();
  const [sound,setSound]=useState(true),[vibration,setVibration]=useState(true),[popup,setPopup]=useState(true);
  const [bio,setBio]=useState(''),[nickname,setNickname]=useState(''),[avatar,setAvatar]=useState(null);
  const [owned,setOwned]=useState([]),[busy,setBusy]=useState(false),[msg,setMsg]=useState('');
@@ -97,25 +98,27 @@ function SettingsContent(){
  const back=settings?'/go':avatarPicker?'/go/profile':'/go';
  const doBack=()=>{if(profile)clearDraft();if(avatarPicker)safeRemove(AVATAR_DRAFT_KEY)};
  return <div className={'v3-settings v3-account-figma v3-account-'+tab}>
-  <Link href={back} onClick={doBack} className="v3-back">‹ 뒤로</Link>
+  {!settings&&<Link href={back} onClick={doBack} className="v3-back">‹ 뒤로</Link>}
   {!ready||member&&initializedMember!==member.id?<p className="v3-status">설정을 불러오고 있어요.</p>:!member&&!settings?<div className="v3-account-login-required"><h1>{profile?'프로필 수정':'나를 표현할 멍멍이'}</h1><p>로그인 후 나만의 프로필을 수정할 수 있어요.</p><button type="button" className="v3-account-save" onClick={openAccount}>로그인하고 시작하기</button></div>:
   settings?<>
-   <h1>시스템 설정</h1>
+   <h1>설정/게임안내</h1><GoSettingsTabs/>
    <div className="v3-account-setting-row v3-account-setting-sound">
     <strong>소리</strong><button type="button" aria-pressed={sound} onClick={()=>setSound(x=>!x)}>{sound?'켜짐':'꺼짐'}</button>
-    <small>첫 터치 후 발견·카드 완성·배틀 효과음 재생</small>
+    <small>BGM과 게임 효과음</small>
    </div>
    <div className="v3-account-setting-row v3-account-setting-vibration">
     <strong>진동</strong><button type="button" aria-pressed={vibration} onClick={()=>setVibration(x=>!x)}>{vibration?'켜짐':'꺼짐'}</button>
-    <small>멍배틀 충돌 시 진동 · 지원되는 기기에서만 작동</small>
+    <small>멍배틀 진동 · 지원 기기에서 작동</small>
    </div>
    <div className="v3-account-setting-row v3-account-setting-popup">
     <strong>첫 방문 팝업</strong><button type="button" aria-pressed={popup} disabled={!member||busy} onClick={()=>setPopup(x=>!x)}>{popup?'켜짐':'꺼짐'}</button>
+    <small>기존 자동 안내 팝업 설정</small>
     <button className="v3-account-reset" type="button" disabled={!member||busy} onClick={resetPopupHide}>7일 숨김 해제</button>
    </div>
    <p className="v3-settings-note">소리·진동 설정은 이 브라우저에 저장돼요.<br/>팝업 노출과 7일 숨김은 계정 기준으로 적용돼요.</p>
-   <button type="button" className="v3-account-save" disabled={busy} onClick={saveSettings}>{busy?'저장 중…':'저장'}</button>
-   <Link href={member?'/go/withdraw':'/go/settings'} onClick={member?undefined:(e)=>{e.preventDefault();openAccount()}} className="v3-account-withdraw">회원 탈퇴</Link>
+   <button type="button" className="v3-account-save" disabled={busy} onClick={saveSettings}>{busy?'저장 중…':'설정 저장'}</button>
+   <div className="s1-settings-account">{member?<><Link href="/go/profile">프로필 수정</Link><button type="button" onClick={logout}>로그아웃</button></>:<button type="button" onClick={openAccount}>로그인 / 회원가입</button>}</div>
+   {member&&<Link href={member?'/go/withdraw':'/go/settings'} onClick={member?undefined:(e)=>{e.preventDefault();openAccount()}} className="v3-account-withdraw">회원 탈퇴</Link>}
   </>:profile?<>
    <h1>프로필 수정</h1>
    <div className="v3-profile-edit-portrait"><img src={avatar&&owned.includes(avatar)?portraitOf(avatar):'/figma-v3/album-shadow-gureum.svg'} alt={avatar&&owned.includes(avatar)?avatar:'기본 실루엣'}/></div>

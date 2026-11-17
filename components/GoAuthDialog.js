@@ -1,0 +1,7 @@
+'use client';
+import {useEffect,useRef} from 'react';
+export default function GoAuthDialog({children,onClose,className='',label}){
+ const ref=useRef(null);
+ useEffect(()=>{const previous=document.activeElement,overflow=document.body.style.overflow;document.body.style.overflow='hidden';const box=ref.current;box?.focus();function key(e){if(e.key==='Escape'){e.preventDefault();onClose();}if(e.key==='Tab'&&box){const items=[...box.querySelectorAll('a[href],button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex="0"]')].filter(n=>n.getClientRects().length);if(!items.length){e.preventDefault();return;}const first=items[0],last=items.at(-1);if(e.shiftKey&&(document.activeElement===first||document.activeElement===box)){e.preventDefault();last.focus();}else if(!e.shiftKey&&(document.activeElement===last||document.activeElement===box)){e.preventDefault();first.focus();}}}document.addEventListener('keydown',key);return()=>{document.body.style.overflow=overflow;document.removeEventListener('keydown',key);if(previous?.isConnected)previous.focus({preventScroll:true});};},[onClose]);
+ return <div className="s1-dialog-backdrop" onClick={onClose}><section ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={label} className={className} onClick={e=>e.stopPropagation()}><button className="s1-dialog-close" type="button" onClick={onClose} aria-label="닫기"><img src="/figma-stage1/close.svg" width="11" height="11" alt=""/></button>{children}</section></div>;
+}

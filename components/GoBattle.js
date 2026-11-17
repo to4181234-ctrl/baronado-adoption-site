@@ -163,7 +163,7 @@ function Game(){
  const insufficient=false;
  return <div className={"meong-battle-app meong-battle-phase-"+phase}>
   
-  {!ready?<p role="status">도감을 준비하고 있어요.</p>:!member?<section className="meong-battle-login"><h2>멍배틀을 시작해볼까요?</h2><p>내 멍카드를 고르고 다른 멍기록가와 배틀해보세요!</p><button onClick={openAccount}>로그인하고 시작하기</button></section>:<>
+  {!ready?<p role="status">도감을 준비하고 있어요.</p>:!member?<section className="meong-battle-login"><h2>멍배틀을 시작해볼까요?</h2><p>내 멍카드를 고르고 다른 멍기록가와 배틀해보세요!</p><button onClick={()=>openAccount('battle')}>로그인하고 시작하기</button></section>:<>
   {phase==='choose'&&<>
    <h1>멍배틀</h1><p className="meong-battle-hint">배틀에 출전할 내 멍카드를 한 장 골라주세요!</p>
    <button className="meong-battle-start-link" disabled={selected.length!==1||mutating} onClick={goOpponents}>상대 멍기록가 찾기 &gt;</button>

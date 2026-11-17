@@ -1,0 +1,55 @@
+/* Phase 1 only. Figma 558:312818 header, 599:163451 settings, 617:163517 login prompt. */
+@font-face{font-family:Galmuri11;src:url('/fonts/figma/Galmuri11-navigation.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
+.s1-go-site .s1-go-header{height:85px;min-height:85px;max-width:390px;margin:0 auto;background:#fff}
+.s1-go-site .s1-go-header .v3-header-inner{height:42px;max-width:390px;position:relative;padding:0 16px;gap:0;box-sizing:border-box}
+.s1-go-brand{position:absolute;left:16px;top:13px;font:700 12.5796918869px/1.5 MonaS12,sans-serif!important;color:#000;text-decoration:none;white-space:nowrap}
+.s1-header-actions{position:absolute;right:16px;top:13px;display:flex;align-items:center;gap:9px;height:16.5px;font:400 11px/1.5 Galmuri11,sans-serif;color:#000;white-space:nowrap}
+.s1-coin{min-width:61px;text-align:right}.s1-store{width:33px;text-align:right}.s1-header-divider{height:11px;width:0;border-left:.5px solid #a0a0a0}
+.s1-go-nav{position:absolute;top:53px;left:12px;right:10px;display:grid;grid-template-columns:repeat(4,minmax(0,67fr)) minmax(0,88fr);gap:3px;height:32px}
+.s1-go-nav a{position:relative;display:block;min-width:0;height:32px;color:#000;text-decoration:none;text-align:center;white-space:nowrap;font:400 11px/20.13px Galmuri11,sans-serif;border:0;background:transparent}
+.s1-go-nav a[aria-current=page]:after{content:'';position:absolute;height:4px;background:#f7d94d;width:52px;bottom:0;left:50%;transform:translateX(-50%)}
+.s1-go-nav a:last-child[aria-current=page]:after{width:76px}
+.s1-go-site .v3-go-app{min-height:calc(100dvh - 85px)}
+.s1-go-site .v3-album-guest .v3-profile-head .s1-login-primary{left:160px!important;top:110px!important;width:210px!important;max-width:calc(100% - 176px);height:29px!important;justify-content:center;text-align:center!important;border-radius:5px;background:#f7d94d!important}
+.s1-go-site .s1-login-primary .v3-album-pixel-arrow{display:none}
+.s1-go-site .v3-album-guest .v3-profile-head a.s1-browse-first{left:160px!important;top:145px!important;width:210px!important;max-width:calc(100% - 176px);justify-content:center;text-align:center!important;height:19px!important}
+.s1-dialog-backdrop{position:fixed;inset:0;z-index:120;background:#0009;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:clamp(24px,27.6vh,138px) 16px 24px}
+.s1-dialog-close{position:absolute;right:12px;top:10px;display:grid;place-items:center;min-width:22px;min-height:22px;padding:0;border:0;background:transparent;cursor:pointer}
+.s1-dialog-close img{width:11px;height:11px;display:block;max-width:none}
+.s1-login-prompt{position:relative;box-sizing:border-box;width:331px;max-width:100%;height:252px;flex:none;background:#fff;border-radius:7px;font-family:MonaS12,sans-serif;color:#1f1f1f;text-align:center;outline:0}
+.s1-go-site .s1-login-prompt h2{position:absolute;left:20px;right:20px;top:25px;font:700 18.46px/29.536px MonaS12,sans-serif!important;margin:0!important;white-space:pre-line;color:#1f1f1f}
+.s1-login-prompt p{position:absolute;left:20px;right:20px;top:94px;font:400 13px/20.8px MonaS12,sans-serif;margin:0;white-space:pre-line}
+.s1-prompt-primary{position:absolute;left:50%;transform:translateX(-50%);top:160px;width:222px;max-width:calc(100% - 40px);height:40px;background:#f7d94d;border:0;border-radius:5px;color:#1f1f1f;font:400 13px/20.8px MonaS12,sans-serif}
+.s1-prompt-browse{position:absolute;left:20px;right:20px;top:212px;height:20px;border:0;background:none;color:#1f1f1f;font:400 12px/19.2px MonaS12,sans-serif}
+.s1-account-dialog{flex:none;outline:0}.s1-go-site :focus-visible{outline:2px solid #181713;outline-offset:3px}
+/* Existing profile/avatar styling stays intact. Only the settings route changes. */
+.s1-go-site .v3-account-settings{min-height:815px;font-family:MonaS12,sans-serif}
+.s1-go-site .v3-account-settings>h1{top:27px;font:700 23px/36.8px MonaS12,sans-serif!important}
+.s1-settings-tabs{display:flex;height:40px;background:#f7f5f0}
+.s1-settings-tabs a{position:relative;flex:1;text-align:center;text-decoration:none;color:#141414;padding-top:10px;box-sizing:border-box;font:400 14px/22.4px MonaS12,sans-serif}
+.s1-settings-tabs a[aria-current=page]{font-weight:700}.s1-settings-tabs a[aria-current=page]:after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:#f7d94d}
+.s1-go-site .v3-account-settings>.s1-settings-tabs{position:absolute;left:16px;right:16px;top:82px}
+.s1-go-site .v3-account-settings .v3-account-setting-row{position:absolute;left:16px;right:16px;height:76px;margin:0;padding:0;border:0;border-bottom:1px solid #e5e3db}
+.s1-go-site .v3-account-settings .v3-account-setting-sound{top:139px}
+.s1-go-site .v3-account-settings .v3-account-setting-vibration{top:230px}
+.s1-go-site .v3-account-settings .v3-account-setting-popup{top:321px}
+.s1-go-site .v3-account-settings .v3-account-setting-row strong{position:absolute;left:0;top:0;margin:0;font:700 16px/25.6px MonaS12,sans-serif}
+.s1-go-site .v3-account-settings .v3-account-setting-row small{position:absolute;left:0;top:32px;max-width:calc(100% - 94px);margin:0;color:#141414;font:400 12px/19.2px MonaS12,sans-serif}
+.s1-go-site .v3-account-settings .v3-account-setting-row>button:not(.v3-account-reset){position:absolute;right:0;left:auto;top:0;width:84px;height:33px;padding:0;border:0;border-radius:5px;background:#f7d94d;color:#141414;font:400 13px/20.8px MonaS12,sans-serif}
+.s1-go-site .v3-account-settings .v3-account-reset{position:absolute;left:0;top:103px;width:auto;height:21px;margin:0;padding:0;border:0;background:transparent;color:#141414;font:400 13px/20.8px MonaS12,sans-serif}
+.s1-go-site .v3-account-settings>.v3-account-save{left:16px;right:16px;top:478px;transform:none;width:calc(100% - 32px);height:44px;border-radius:5px;font:400 13px/20.8px MonaS12,sans-serif}
+.s1-go-site .v3-account-settings>.v3-settings-note{position:absolute;left:16px;right:16px;top:543px;margin:0;font:400 12px/19.2px MonaS12,sans-serif;color:#141414}
+.s1-settings-account{position:absolute;top:620px;left:16px;right:16px;display:flex;gap:24px;align-items:center;font:400 12px/20px MonaS12,sans-serif}
+.s1-settings-account a,.s1-settings-account button{color:#141414;border:0;background:transparent;text-decoration:underline;padding:0;font:inherit}
+.s1-go-site .v3-account-settings>.v3-account-withdraw{top:666px;left:16px;right:auto;font:400 12px/20px MonaS12,sans-serif}
+.s1-go-site .v3-account-settings>.v3-message{top:590px;font:400 12px/19.2px MonaS12,sans-serif}
+.s1-go-site .v3-guide-figma .s1-guide-title{font:700 23px/36.8px MonaS12,sans-serif!important;margin:27px 0 18px!important}
+.s1-go-site .v3-guide-figma>.s1-settings-tabs{margin-bottom:24px}
+@media(max-width:360px){.s1-go-nav{left:6px;right:6px;gap:0}.s1-go-nav a{font-size:10px}.s1-go-nav a:last-child[aria-current=page]:after{width:65px}.s1-go-site .v3-album-guest .v3-profile-head h1{white-space:normal;font-size:15px!important}.s1-go-site .v3-album-guest .v3-profile-head small{width:calc(100% - 176px);font-size:10px!important}}
+.s1-go-site .v3-account-settings>.v3-account-withdraw{transform:none;width:auto;height:auto;padding:0!important;min-height:0;background:transparent;border:0;border-radius:0;color:#817b70;text-decoration:underline}
+.s1-go-site .v3-account-settings>.v3-settings-note{color:#141414!important}
+.s1-go-site .v3-profile-head .s1-login-primary .v3-album-pixel-arrow{display:none!important}
+.s1-go-site .v3-account-settings .v3-account-setting-row::after{display:none}
+.s1-go-site .v3-guide-figma>.s1-guide-title{position:absolute;top:27px;left:16px;right:16px;margin:0!important}
+.s1-go-site .v3-guide-figma>.s1-settings-tabs{position:absolute;top:82px;left:16px;right:16px;margin:0}
+.s1-guide-existing{position:absolute;top:28px;left:0;right:0}

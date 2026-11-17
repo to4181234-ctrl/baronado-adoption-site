@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import GoShell from '../../../components/GoShell.js';
+import GoSettingsTabs from '../../../components/GoSettingsTabs.js';
 import {ELEMENTS} from '../../../lib/goV3Game.js';
 
 export const metadata={title:'게임 안내 | 멍멍GO!'};
@@ -14,8 +15,7 @@ const steps=[
 ];
 export default function Page(){
  return <GoShell active="guide"><article className="v3-guide v3-guide-figma">
-  <Link href="/go" className="v3-back">‹ 뒤로</Link>
-  <h1>게임 안내</h1>
+  <h1 className="s1-guide-title">설정/게임안내</h1><GoSettingsTabs guide/><div className="s1-guide-existing">
   <div className="v3-guide-steps">{steps.map(([title,body])=><section key={title}><h2>{title}</h2><p>{body}</p></section>)}</div>
   <h2 className="v3-guide-elements-title">05 속성과 상성</h2>
   <div className="v3-guide-element-grid">{ELEMENTS.map((name,i)=><div key={name} className="v3-guide-element">
@@ -27,5 +27,5 @@ export default function Page(){
   <p className="v3-guide-footnote">강아지의 우열이 아닌 게임 카드의 대결이에요.<br/>속성은 강아지별 고정 · 능력치는 카드 발급 시 결정돼요.</p>
   <h2 className="v3-guide-affinity-title">06 능력치와 교감</h2>
   <p className="v3-guide-affinity-text">파워·애교는 각각 1~5로 무작위 발급돼요.<br/>확률: 1점 10% · 2점 20% · 3점 40% · 4점 20% · 5점 10%<br/>교감은 버튼별 하루 2회, 사용 후 30분 기다려요.<br/>친밀도는 하루 최대 +3, 총 10이며 카드 능력치는 바뀌지 않아요.</p>
- </article></GoShell>;
+ </div></article></GoShell>;
 }
