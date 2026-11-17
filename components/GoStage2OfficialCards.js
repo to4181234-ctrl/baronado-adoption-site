@@ -2,6 +2,17 @@
 
 import {useCallback,useEffect,useState} from 'react';
 import GoCardFace from './GoCardFace.js';
+import {CARD_FACE} from '../lib/goCardFace.js';
+
+function LockedOfficialCard({slot}) {
+  return <svg className="s2-locked-card-svg" viewBox="0 0 166 265" role="img" aria-label={`미보유 공식 멍카드 NO.${slot}`}>
+    <image href={CARD_FACE.frame} x="0" y="0" width="166" height="265"/>
+    <rect x="16" y="28" width="134" height="132" fill="#d9d9d9"/>
+    <text x="83" y="113" textAnchor="middle" fontSize="31.5" fontWeight="700" fontFamily="MonaS12,sans-serif" fill="#565656">?</text>
+    <text x="16" y="181" fontSize="12.3" fontWeight="700" fontFamily="MonaS12,sans-serif" fill="#727272">??</text>
+    <text x="150" y="247" textAnchor="end" fontSize="7" fontFamily="MonaS12,sans-serif">NO.{slot}</text>
+  </svg>;
+}
 import {useGoSession} from './GoShell.js';
 
 const NORMAL_COUNT=4;
@@ -47,7 +58,7 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
     if(!member){openAccount();return;}
     const card=dog?.slots?.find(item=>item.slot===slot);
     if(!card?.owned)return;
-    setOpened({slot,card});setError('');
+    setOpened({slot,card});setError('');setHiddenJustUnlocked(false);
     if(card.new){
       try{await request({action:'seen',dogId,slot});await refresh();}
       catch(e){setError(e.message);}
@@ -101,7 +112,7 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
               capturedAt:card.acquiredAt,battle:{power:card.power,charm:card.charm}}}/>
             {card.new&&<span className="s2-official-new">NEW</span>}
           </button>:
-          <div className="s2-official-locked" aria-label={`미보유 공식 멍카드 NO.${card.slot}`}><span>?</span></div>}
+          <div className="s2-official-locked"><LockedOfficialCard slot={card.slot}/></div>}
         <small>NO.{card.slot}</small>
       </div>)}
       <div className="s2-official-slot">
