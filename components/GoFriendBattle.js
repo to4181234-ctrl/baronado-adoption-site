@@ -200,7 +200,7 @@ export default function GoFriendBattle(){
  const activeStats=room?.myStats||history.stats;
  return <div className="meong-battle-app friend-pvp" data-pvp-stage="5">
   <header className="friend-pvp-header">
-   <h1>멍배틀</h1>
+   <h1>실시간 1:1 멍배틀</h1>
    <p className="meong-battle-hint">친구와 실시간으로 1:1 멍카드 배틀!</p>
    <p className="friend-pvp-rules">파워 + 매력으로 승패를 결정해요. 속성 상성 보너스는 없어요.</p>
   </header>
@@ -213,20 +213,23 @@ export default function GoFriendBattle(){
     <button onClick={openAccount}>로그인하고 시작하기</button>
    </section>:<>
    {!room&&<section className="friend-pvp-intro">
+    <div className="friend-pvp-create">
+     <input type="text" readOnly aria-label="생성할 방 코드" placeholder="방 코드 생성하기를 눌러주세요"/>
+     <button type="button" className="meong-battle-primary" disabled={busy}
+      onClick={()=>mutate({action:'create'})}>{busy?'초대방 생성 중…':'방 코드 생성하기'}</button>
+    </div>
+    <form className="friend-pvp-join" onSubmit={e=>{e.preventDefault();
+      if(invite.trim())mutate({action:'join',invite:invite.trim()});}}>
+     <label htmlFor="pvp-code" className="friend-pvp-label">친구에게 받은 초대 코드</label>
+     <input id="pvp-code" value={invite} onChange={e=>setInvite(e.target.value)}
+      maxLength={300} placeholder="방 코드를 입력해주세요" autoComplete="off"/>
+     <button type="submit" disabled={busy||!invite.trim()}>방 코드 입력해서 입장하기</button>
+    </form>
+    <p className="friend-pvp-help">초대는 30분 동안 유효하며, 참가 후에는 2분 안에 카드 준비를 완료해야 해요.</p>
     <div className="friend-pvp-leader">
      <h2>내 누적 전적</h2><strong>{formatPvpScore(activeStats)}</strong>
      <small>친구에게는 누적 승·무·패만 보여요. 공개 순위표는 없어요.</small>
     </div>
-    <button type="button" className="meong-battle-primary" disabled={busy}
-     onClick={()=>mutate({action:'create'})}>{busy?'초대방 생성 중…':'친구 초대방 만들기'}</button>
-    <form className="friend-pvp-join" onSubmit={e=>{e.preventDefault();
-     if(invite.trim())mutate({action:'join',invite:invite.trim()});}}>
-     <label htmlFor="pvp-code">친구에게 받은 초대 코드</label>
-     <div><input id="pvp-code" value={invite} onChange={e=>setInvite(e.target.value)}
-      maxLength={300} placeholder="12자리 초대 코드 또는 방 링크" autoComplete="off"/>
-      <button type="submit" disabled={busy||!invite.trim()}>참가하기</button></div>
-    </form>
-    <p className="friend-pvp-help">초대는 30분 동안 유효하며, 참가 후에는 2분 안에 카드 준비를 완료해야 해요.</p>
     <Link href="/go">← 도감으로 돌아가기</Link>
    </section>}
    {room&&<section className="friend-pvp-room">
