@@ -169,6 +169,8 @@ export async function PATCH(request){
    if(original.error)throw original.error;
    const buffer=Buffer.from(await original.data.arrayBuffer());
    await uploadAsset(db,{dogId:body.dogId,versionId:body.versionId,...settings,source:buffer});
+   // Remove draft-only old image after new version's pointers are persisted.
+   await db.storage.from(GO_OFFICIAL_BUCKET).remove([asset.original_path,asset.display_path]);
   }else{
    const {error:saveError}=await db.from('go_official_assets')
     .update({title:settings.title,updated_at:new Date().toISOString()})
