@@ -9,6 +9,7 @@ import GoCardFace from './GoCardFace.js';
 import GoElementSparkles,{elementForCard} from './GoElementSparkles.js';
 import {vibrateBattleHit,stopBattleVibration} from '../lib/goBattleHaptics.js';
 import {figmaSprite,FIGMA_DOGS} from '../lib/goV3Game.js';
+import GoFriendBattle,{GO_STAGE5_UI_ENABLED} from './GoFriendBattle.js';
 
 const initial={cards:[],hasMore:false,total:0,eligibleDogKinds:0};
 const emptyOpponents={members:[],total:0,hasMore:false};
@@ -88,6 +89,7 @@ function Game(){
    const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,secondId:selected[1].id,matchToken:preparedToken.current})});
    const body=await response.json();if(!alive.current)return;
    if(!response.ok)throw Error(body.error||'대결 결과를 저장하지 못했어요.');
+   if(body.coinsAdded>0)window.dispatchEvent(new CustomEvent('go-coins-changed',{detail:{notified:false}}));
    setResult(body.battle);setPhase('result');sounds.current?.play(body.battle.winner==='draw'?'draw':body.battle.winner==='first'?'victory':'defeat');timers.current.push(setTimeout(()=>sounds.current?.play('bark1'),450));
   }catch(e){
    setError(e.message);setSelected(list=>list.slice(0,1));setResult(null);
@@ -207,4 +209,17 @@ function Game(){
   </>}
  </div>;
 }
-export default function GoBattle(){return <GoShell active="battle" title="멍배틀" description="멍카드 두 장으로 즐기는 8비트 대결"><Game/></GoShell>;}
+function BattleModes(){
+ const [mode,setMode]=useState('random');
+ useEffect(()=>{
+  if(new URLSearchParams(window.location.search).has('room'))setMode('friend');
+ },[]);
+ return <>
+  {GO_STAGE5_UI_ENABLED&&<nav className="s5-battle-mode" aria-label="멍배틀 방식 선택">
+   <button type="button" onClick={()=>setMode('random')} aria-current={mode==='random'?'page':undefined}>랜덤 멍배틀</button>
+   <button type="button" onClick={()=>setMode('friend')} aria-current={mode==='friend'?'page':undefined}>친구 실시간 멍배틀</button>
+  </nav>}
+  {GO_STAGE5_UI_ENABLED&&mode==='friend'?<GoFriendBattle/>:<Game/>}
+ </>;
+}
+export default function GoBattle(){return <GoShell active="battle" title="멍배틀" description="랜덤 또는 친구와 즐기는 멍카드 대결"><BattleModes/></GoShell>;}

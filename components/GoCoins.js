@@ -10,7 +10,7 @@ const TYPES = {
   quest_care: '일일 퀘스트 · 첫 돌보기',
   quest_visit: '일일 퀘스트 · 방문 인증',
   quest_draw: '일일 퀘스트 · 무료 뽑기',
-  quest_battle: '일일 퀘스트 · 첫 친구 멍배틀',
+  quest_battle: '일일 퀘스트 · 첫 멍배틀(랜덤/친구)',
   visit_reversal: '방문 인증 승인 취소',
   store_purchase: '멍카드 상점 구매'
 };
