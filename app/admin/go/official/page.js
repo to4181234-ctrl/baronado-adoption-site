@@ -70,10 +70,10 @@ function OfficialEditor(){
      body:JSON.stringify({action,dogId,versionId})});
    const data=await r.json();
    if(!r.ok||!data.ok)throw Error(data.error||'작업을 완료하지 못했어요.');
+   await reload();
    setMessage(({newDraft:'임시 수정안을 열었어요.',publish:'5종을 한꺼번에 적용했어요.',
      pause:'공개를 중지했어요.',resume:'다시 공개했어요.',
      deleteSet:'세트가 삭제됐어요.',discardDraft:'임시 수정안을 폐기했어요.'})[action]);
-   await reload();
   }catch(e){setError(e.message);}finally{setBusy(false);}
  };
  const updatePhoto=async()=>{
