@@ -35,3 +35,21 @@
 .v3-go-site .s2-official-viewer .go-card-graphic{width:min(100%,166px);height:auto}
 
 .s2-locked-card-svg{display:block;width:100%;height:100%}.s2-official-number{position:absolute;right:15px;bottom:17px;z-index:1;font-family:'MonaS12',sans-serif;font-size:7px;font-weight:400;color:#181713}.s2-official-hidden .s2-locked-card-svg{width:100%;height:100%}
+
+/* Figma 558:433074 — one selected card kind, with full-width bottom sheet. */
+.s2-kind-selector{display:flex;align-items:center;gap:12px;min-width:0;white-space:nowrap}
+.v3-go-site .s2-kind-trigger{display:flex;align-items:center;gap:8px;background:transparent;border:0;padding:0;color:#181713;cursor:pointer;font:700 15.3159px/24px 'MonaS12',sans-serif}
+.s2-kind-chevron{display:inline-block;border-bottom:2px solid currentColor;border-right:2px solid currentColor;width:8px;height:8px;transform:rotate(45deg) translateY(-3px)}
+.s2-kind-count{font:400 11px/17px 'Galmuri11',sans-serif;color:#666}
+.s2-kind-backdrop{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.62);display:flex;align-items:flex-end;justify-content:center}
+.s2-kind-sheet{box-sizing:border-box;width:100%;max-height:70dvh;overflow:auto;border-radius:22px 22px 0 0;background:white;padding:17px 30px max(26px,env(safe-area-inset-bottom));font-family:'MonaS12',sans-serif;text-align:center}
+.s2-kind-sheet h2{font:700 15.5px/23px 'MonaS12',sans-serif;margin:0 0 14px}
+.s2-kind-sheet .s2-kind-option{background:none;border:0;border-bottom:1px solid #e9e0d3;width:100%;min-height:49px;display:flex;align-items:center;justify-content:center;position:relative;font:400 14px/21px 'MonaS12',sans-serif;color:#181713;cursor:pointer}
+.s2-kind-sheet .s2-kind-option:last-child{border-bottom:0}
+.s2-kind-sheet .s2-kind-option[aria-current="true"]{font-weight:700}
+.s2-kind-check{position:absolute;left:calc(50% + 37px);top:12px;font:700 20px/24px 'MonaS12',sans-serif}
+/* Figma official album: toolbar y=366, first framed card y=410 at 390px. */
+.v3-go-site .v5-album-toolbar:has(.s2-kind-selector){height:24px;min-height:24px;flex-wrap:nowrap;row-gap:0;white-space:nowrap;margin-bottom:8px}
+.v3-go-site .v5-album-toolbar:has(.s2-kind-selector) .v5-manage-actions{margin-left:auto}
+.s2-official-help{position:absolute;clip:rect(0,0,0,0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap;margin:0;padding:0}
+.v3-go-site .v5-dog-album:has(.s2-official) .v5-album-back-link{margin-top:15px}
