@@ -15,29 +15,29 @@ export default function GoQuests({ compact = false }) {
 
   const tasks = [
     {
-      id: 'care', title: '오늘 첫 돌보기', coins: 10,
-      caption: '첫 돌보기 퀘스트 +10C, 돌보기 행동은 하루 최대 5회 +10C예요.',
-      completed: Boolean(coins.daily?.careQuestDone),
-      href: '/go'
-    },
-    {
-      id: 'visit', title: '음료 구매 방문 인증', coins: 30,
-      caption: '방문 후 직원에게 음료 구매를 인증해 주세요.',
+      id: 'visit', title: '바로나도에 놀러왔개', coins: 30,
+      caption: '바로나도 방문 후 직원에게 인증해주세요',
       completed: Boolean(coins.daily?.visitQuestDone),
       href: '/go/visit'
+    },
+    {
+      id: 'care', title: '멍멍이 만나러가기', coins: 10,
+      caption: "내 도감 > 원하는 멍멍이 선택 > ‘보러가기’",
+      completed: Boolean(coins.daily?.careQuestDone),
+      href: '/go'
     }
   ];
   if(isQuestAvailable('draw',{draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE}))tasks.push({
-    id:'draw',title:'오늘의 무료 공식 멍카드 뽑기',coins:10,
-    caption:'오늘의 첫 공식 멍카드 뽑기로 10C를 받아요.',
+    id:'draw',title:'랜덤 멍카드 뽑기',coins:10,
+    caption:'아직 만나지 못한 멍카드를 뽑을지도?',
     completed:Boolean(coins.daily?.drawQuestDone),href:'/go'
   });
   if(isQuestAvailable('battle',{draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE}))tasks.push({
-    id:'battle',title:'오늘의 첫 멍배틀',coins:10,
-    caption:'랜덤 또는 친구 1:1 멍배틀 중 하나만 완료해도 하루 1회 +10C! 중복 지급은 없어요.',
+    id:'battle',title:'멍배틀 하기',coins:10,
+    caption:'친구와 1:1 멍배틀을 하면 승패 상관없이 멍코인!',
     completed:Boolean(coins.daily?.battleQuestDone),href:'/go/battle'
   });
-  tasks.sort((a,b)=>Number(a.completed)-Number(b.completed));
+  // Figma 558:466129 keeps the visible order: visit, care, random draw, battle.
 
   const done = tasks.filter(item => item.completed).length;
   return <section className={'go-quest-section' + (compact ? ' go-quest-compact' : '')}
@@ -45,9 +45,9 @@ export default function GoQuests({ compact = false }) {
     <header className="go-quest-heading">
       <div>
         <h2>오늘의 퀘스트</h2>
-        <p>매일 자정에 새로운 퀘스트를 시작해요.</p>
+        <p>매일 자정에 새로 시작되는 퀘스트를 완료하고 멍코인을 모아보세요!<br/>멍코인으로 아직 만나지 못한 최애 멍카드를 수집해보세요.</p>
       </div>
-      <b>{member ? done : 0} / {tasks.length}</b>
+      <b>완료 퀘스트 {member ? done : 0} / {tasks.length}</b>
     </header>
     <div className="go-quest-progress" aria-label={'완료한 퀘스트 ' + done + '/' + tasks.length}>
       <span style={{ width: (member ? done / tasks.length * 100 : 0) + '%' }} />
@@ -57,16 +57,15 @@ export default function GoQuests({ compact = false }) {
         <button type="button" onClick={coins.refresh}>새로고침</button></p>}
       {coins.loading && <p className="go-quest-loading" role="status">진행 상황 확인 중…</p>}
       <div className="go-quest-items">
-        {tasks.map(task => <article className="go-quest-item" key={task.id}>
+        {tasks.map(task => <article className={'go-quest-item' + (task.completed ? ' is-complete' : '')} key={task.id}>
           <div>
-            <strong>{task.title}</strong>
+            {task.completed
+              ? <button className="go-quest-title" type="button" onClick={()=>setNotice('오늘 이미 완료한 퀘스트예요.')}>{task.title} &gt;</button>
+              : <Link className="go-quest-title" href={task.href}>{task.title} &gt;</Link>}
             <small>{task.caption}</small>
           </div>
           <div className="go-quest-item-action">
-            <b>+{task.coins}C</b>
-            {task.completed ?
-              <button type="button" onClick={() => setNotice('오늘 이미 완료한 퀘스트예요.')}>완료</button> :
-              <Link href={task.href}>{task.id === 'visit' ? '인증하기' : task.id==='draw'?'뽑으러가기':task.id==='battle'?'배틀하러가기':'돌보러가기'} ›</Link>}
+            <b>+{task.coins} 멍코인</b>
           </div>
         </article>)}
       </div>
@@ -76,6 +75,6 @@ export default function GoQuests({ compact = false }) {
       {ready && <button type="button" onClick={openAccount}>로그인하고 시작하기</button>}
     </div>}
     {compact && <Link className="go-quest-all-link" href="/go/quests">퀘스트 자세히 보기 ›</Link>}
-    <p className="go-quest-caption">오늘 이용 가능한 퀘스트 {tasks.length}종 · 퀘스트 완료 보상 최대 {visibleQuestRewards({draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE})}C</p>
+    {compact && <p className="go-quest-caption">오늘 이용 가능한 퀘스트 {tasks.length}종 · 퀘스트 완료 보상 최대 {visibleQuestRewards({draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE})}C</p>}
   </section>;
 }
