@@ -91,7 +91,7 @@ BEGIN
   FROM public.go_cards c JOIN public.go_battle_card_stats s ON s.card_id=c.id
   JOIN public.dogs d ON d.id=c.dog_id
   WHERE c.id=p_card AND c.member_id=p_member AND c.status='approved';
- ELSIF p_kind='official' AND p_card IS NOT NULL AND p_slot BETWEEN 1 AND 5 THEN
+ ELSIF p_kind='official' AND p_card IS NOT NULL AND p_slot BETWEEN 1 AND 4 THEN
   SELECT jsonb_build_object(
    'kind','official','cardId',o.dog_id,'slot',o.slot,
    'dogId',o.dog_id,'dogName',d.name,'title',a.title,
