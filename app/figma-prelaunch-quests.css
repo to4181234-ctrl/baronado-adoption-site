@@ -1,0 +1,58 @@
+
+/* Figma 558:466129 · Quest page, 390×788. Scope to the full quests
+   route; compact quests on the home page retain their old composition. */
+.v3-go-site .go-quest-page{max-width:390px;margin:0 auto;padding:0!important}
+.v3-go-site .go-quest-page>.v3-back{display:none}
+.v3-go-site .go-quest-page .go-quest-section{
+ box-sizing:border-box;position:relative;width:100%;max-width:390px;margin:0;
+ padding:24px 16px 0!important;border:0;background:#fff;font-family:MonaS12,sans-serif;color:#151515
+}
+.v3-go-site .go-quest-page .go-quest-heading{display:block;position:relative;height:128px}
+.v3-go-site .go-quest-page .go-quest-heading h2{
+ position:absolute;left:0;top:0;margin:0!important;color:#181713;
+ font:700 17.91px/27.612px MonaS12,sans-serif!important;
+}
+.v3-go-site .go-quest-page .go-quest-heading p{
+ position:absolute;left:0;top:30px;width:100%;margin:0;color:#181713;
+ font:400 11px/16.5px MonaS12,sans-serif;
+}
+.v3-go-site .go-quest-page .go-quest-heading>b{
+ position:absolute;top:105px;left:0;display:block;margin:0;padding:0;
+ border:0;background:none;color:#181713;white-space:nowrap;
+ font:400 12.5px/21px MonaS12,sans-serif;
+}
+.v3-go-site .go-quest-page .go-quest-progress{
+ width:188px;max-width:100%;height:9px;margin:0 0 18px;border-radius:17px;background:#dcdcdc;
+}
+.v3-go-site .go-quest-page .go-quest-progress span{background:#f7d94d;border-radius:17px}
+.v3-go-site .go-quest-page .go-quest-items{display:block;margin:0;padding:0}
+.v3-go-site .go-quest-page .go-quest-item{
+ box-sizing:border-box;display:flex;justify-content:space-between;align-items:flex-start;
+ height:92px;min-height:0;margin:0;padding:21px 0 0;background:#fff;
+ border:0;border-bottom:1px solid #eae4d9;gap:8px;
+}
+.v3-go-site .go-quest-page .go-quest-item:first-child{height:73px;padding-top:10px}
+.v3-go-site .go-quest-page .go-quest-item:last-child{border-bottom:0}
+.v3-go-site .go-quest-page .go-quest-item>div:first-child{flex:1;min-width:0}
+.v3-go-site .go-quest-page .go-quest-title{
+ display:inline-block;text-decoration:none;text-align:left;cursor:pointer;
+ margin:0;padding:0;border:0;background:transparent;color:#151515;
+ font:700 13px/19.5px MonaS12,sans-serif;
+}
+.v3-go-site .go-quest-page .go-quest-title:hover{text-decoration:underline}
+.v3-go-site .go-quest-page .go-quest-item small{
+ display:block;margin:4px 0 0;max-width:250px;color:#797979;
+ font:400 10px/15.5px Galmuri11,sans-serif;
+}
+.v3-go-site .go-quest-page .go-quest-item-action{
+ display:block;flex:none;align-self:center;margin:9px 0 0;
+}
+.v3-go-site .go-quest-page .go-quest-item-action b{
+ display:block;color:#151515;white-space:nowrap;
+ font:700 13px/19.5px MonaS12,sans-serif;
+}
+.v3-go-site .go-quest-page .go-quest-caption{display:none}
+@media(max-width:355px){
+ .v3-go-site .go-quest-page .go-quest-item-action b{font-size:11px}
+ .v3-go-site .go-quest-page .go-quest-item small{font-size:9px}
+}
