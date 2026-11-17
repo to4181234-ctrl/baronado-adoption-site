@@ -81,3 +81,14 @@
 @media(prefers-reduced-motion:reduce){.go-quest-progress span{transition:none}}
 
 .go-visit-admin-badge{display:inline-flex;min-width:20px;height:20px;align-items:center;justify-content:center;margin-left:7px;padding:0 5px;border-radius:999px;background:#fbe04c;border:1px solid #171713;color:#171713;font:700 11px/1 Pretendard,sans-serif;vertical-align:middle}
+
+/* Stage 3 uses the exact existing stage-1 header geometry; only its balance becomes interactive. */
+.v3-go-site .s1-header-actions .s3-coin-trigger{
+  appearance:none;border:0;background:transparent;box-shadow:none;
+  margin:0;padding:0;min-width:0;display:inline-block;cursor:pointer;
+  color:inherit;font:inherit;white-space:nowrap;
+}
+.v3-go-site .s1-header-actions .s3-coin-trigger:focus-visible{
+  outline:2px solid #181713;outline-offset:3px;
+}
+.v3-go-site .s1-header-actions .s3-coin-trigger:disabled{opacity:.8;cursor:default}
