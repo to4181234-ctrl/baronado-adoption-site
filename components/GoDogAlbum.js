@@ -273,7 +273,7 @@ export default function GoDogAlbum({ dogId }) {
     {cameraOpen && <div className="v3-camera-backdrop" role="presentation">
       <section className="v3-camera-panel" role="dialog" aria-modal="true" aria-label="멍멍이 카드 촬영">
         <button className="v3-camera-close" aria-label="카메라 닫기" onClick={() => setCameraOpen(false)}>×</button>
-        <GoCamera dog={dog} nickname={member?.nickname} standing={collection.standing} firstCard={ownedCount === 0} onSaved={refresh} onDone={() => setCameraOpen(false)}/>
+        <GoCamera dog={dog} nickname={member?.nickname} standing={collection.standing} firstCard={total === 0} onSaved={refresh} onDone={() => setCameraOpen(false)}/>
       </section>
     </div>}
   </div>;
