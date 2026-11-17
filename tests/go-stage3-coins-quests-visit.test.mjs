@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {koreaDay,parseCoinHistoryQuery,coinHistoryCategory,
  GO_CARE_REWARD_COINS,GO_CARE_REWARD_DAILY_LIMIT,
  GO_CARE_QUEST_COINS,GO_VISIT_QUEST_COINS} from '../lib/goCoins.js';
-import {DAILY_QUESTS,isQuestAvailable,visibleQuestRewards,summarizeCareRewards} from '../lib/goStage3Quests.js';
+import {DAILY_QUESTS,isQuestAvailable,visibleQuestRewards,summarizeCareRewards,interactionProcedure} from '../lib/goStage3Quests.js';
 import {isVisitRequestWindow,normalizeVisitCode,validVisitDecision} from '../lib/goVisit.js';
 
 test('KST midnight is used, never browser local day',()=>{
@@ -61,4 +61,9 @@ test('visit approval and staff rejection reasons validated',()=>{
  assert.equal(validVisitDecision('reject','unverifiable'),true);
  assert.equal(validVisitDecision('reject','free-form'),false);
  assert.equal(validVisitDecision('reverse','not_present'),false);
+});
+
+test('rewarded interaction RPC is mandatory whenever server-side coins are enabled',()=>{
+ assert.equal(interactionProcedure(false),'go_do_interaction');
+ assert.equal(interactionProcedure(true),'go_do_rewarded_interaction');
 });
