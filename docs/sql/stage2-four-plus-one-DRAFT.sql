@@ -240,6 +240,17 @@ BEGIN
  RETURN OLD;
 END;$function$;
 
-REVOKE ALL ON FUNCTION public.go_official_unlock_hidden(uuid,uuid) FROM PUBLIC, anon, authenticated;
+-- Final integration hardening: enforce existing production service_role-only
+-- permissions even in a freshly provisioned staging database. CREATE OR REPLACE
+-- preserves old ACL in production but newly created functions default to PUBLIC.
+REVOKE ALL ON FUNCTION public.go_official_draw(uuid) FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON FUNCTION public.go_official_purchase(uuid,uuid,uuid) FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON FUNCTION public.go_official_manage(uuid,text,uuid) FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON FUNCTION public.go_official_mark_seen(uuid,uuid,smallint) FROM PUBLIC,anon,authenticated;
+REVOKE ALL ON FUNCTION public.go_official_unlock_hidden(uuid,uuid) FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.go_official_draw(uuid) TO service_role;
+GRANT EXECUTE ON FUNCTION public.go_official_purchase(uuid,uuid,uuid) TO service_role;
+GRANT EXECUTE ON FUNCTION public.go_official_manage(uuid,text,uuid) TO service_role;
+GRANT EXECUTE ON FUNCTION public.go_official_mark_seen(uuid,uuid,smallint) TO service_role;
 GRANT EXECUTE ON FUNCTION public.go_official_unlock_hidden(uuid,uuid) TO service_role;
 COMMIT;

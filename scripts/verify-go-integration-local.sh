@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Only local, disposable, synthetic PostgreSQL. NEVER point at Supabase production.
+set -euo pipefail
+DB_NAME="${1:-go_integration_final}"
+if [[ ! "$DB_NAME" =~ ^go_integration_[a-z0-9_]+$ ]]; then
+ echo "BLOCKED: expected disposable go_integration_* database" >&2; exit 3
+fi
+# Allow only a local socket or loopback TCP to a disposable PostgreSQL server.
+# Explicitly do NOT honor DATABASE_URL or any production Supabase connection string.
+QA_DB_HOST="${QA_DB_HOST:-/var/run/postgresql}"
+case "$QA_DB_HOST" in
+  /var/run/postgresql|localhost|127.0.0.1|::1) ;;
+  *) echo "BLOCKED nonlocal DB host: $QA_DB_HOST" >&2; exit 4 ;;
+esac
+PSQL=(psql -X -h "$QA_DB_HOST" -d "$DB_NAME" -v ON_ERROR_STOP=1 -q)
+SERVER="$("${PSQL[@]}" -Atqc "SELECT coalesce(inet_server_addr()::text, 'local')")"
+case "$SERVER" in
+  local|127.0.0.1|::1) ;;
+  *) echo "BLOCKED nonlocal resolved DB: $SERVER" >&2; exit 5 ;;
+esac
+echo "QA database: $DB_NAME (local socket, synthetic records)"
+"${PSQL[@]}" -f tests/fixtures/go-integration-schema.sql
+"${PSQL[@]}" -f tests/fixtures/go-integration-seed.sql
+for pass in first second; do
+  for stage in 2 3 4 5; do
+    f="$(find docs/sql -maxdepth 1 -name "stage${stage}-*DRAFT.sql" -print -quit)"
+    test -n "$f"
+    echo "Migration $pass: stage $stage"
+    "${PSQL[@]}" -f "$f"
+  done
+done
+"${PSQL[@]}" -f tests/fixtures/go-integration-assert.sql
+echo "PASS: source-correct 2→5 migration twice, original data preserved, cross-feature SQL flows"

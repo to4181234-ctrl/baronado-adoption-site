@@ -1,0 +1,59 @@
+name: MeongGO 2.0 final integration QA (isolated only)
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: qa-only-local
+          POSTGRES_DB: go_integration_gha
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d go_integration_gha"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      QA_DB_HOST: 127.0.0.1
+      PGUSER: postgres
+      PGPASSWORD: qa-only-local
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:3010
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: qa-not-a-real-key
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install local PostgreSQL client
+        run: sudo apt-get update -qq && sudo apt-get install -y postgresql-client
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Run all Node unit tests
+        run: node --test tests/*.test.mjs
+      - name: Apply 2-5 migrations twice and validate synthetic cross-feature data
+        run: bash scripts/verify-go-integration-local.sh go_integration_gha
+      - name: Build all MeongGO feature flags ON
+        env:
+          NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED: '1'
+          MEONGGO_STAGE1_COINS_ENABLED: '1'
+          NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED: '1'
+          MEONGGO_STAGE2_OFFICIAL_ENABLED: '1'
+          NEXT_PUBLIC_MEONGGO_STAGE4_STORE_ENABLED: '1'
+          MEONGGO_STAGE4_STORE_ENABLED: '1'
+          NEXT_PUBLIC_MEONGGO_STAGE5_PVP_ENABLED: '1'
+          MEONGGO_STAGE5_PVP_ENABLED: '1'
+        run: npm run build
+      - name: Build all MeongGO feature flags OFF
+        run: npm run build
