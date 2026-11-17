@@ -56,3 +56,62 @@
  .v3-go-site .go-quest-page .go-quest-item-action b{font-size:11px}
  .v3-go-site .go-quest-page .go-quest-item small{font-size:9px}
 }
+
+/* Figma visit quest overlays: 558:479032 request, 558:607591 pending,
+   558:607639 timeout. The canonical /go/visit direct route stays functional. */
+.go-visit-modal-backdrop{
+ position:fixed;inset:0;z-index:260;background:rgba(0,0,0,.60);
+ display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;
+ padding:clamp(22px,calc(50dvh - 231px),163px) 16px 22px;box-sizing:border-box;
+}
+.go-visit-modal{
+ position:relative;flex:none;width:294px;max-width:100%;height:383px;
+ background:white;border-radius:5px;color:#1f1f1f;
+ box-sizing:border-box;text-align:center;font-family:MonaS12,sans-serif;
+}
+.go-visit-modal-close{
+ position:absolute;right:11px;top:7px;z-index:2;width:24px;height:24px;padding:0;
+ border:0;background:transparent;color:#000;cursor:pointer;
+ font:400 25px/24px MonaS12,sans-serif;
+}
+.go-visit-dialog-content{position:relative;height:100%;width:100%}
+.go-visit-dialog-content h2{
+ position:absolute;top:68px;left:12px;right:12px;margin:0!important;
+ font:700 18.5px/30px MonaS12,sans-serif!important;
+}
+.go-visit-dialog-reward{
+ position:absolute;top:106px;left:0;right:0;margin:0!important;
+ font:400 15px/22px MonaS12,sans-serif;color:#181713;
+}
+.go-visit-dialog-desc{
+ position:absolute;top:188px;left:18px;right:18px;color:#181713;
+}
+.go-visit-dialog-desc p{
+ font:400 11px/16px MonaS12,sans-serif;margin:0 0 5px;
+}
+.go-visit-dialog-desc small{
+ display:block;color:#858585;font:400 10px/16px MonaS12,sans-serif;
+}
+.go-visit-dialog-status{
+ position:absolute;top:251px;left:14px;right:14px;height:24px;
+ margin:0!important;font:400 15px/24px Galmuri11,sans-serif;
+}
+.go-visit-dialog-submit{
+ position:absolute;top:280px;left:29px;width:235px;max-width:calc(100% - 58px);
+ height:45px;border-radius:5px;background:#f7d94d;border:0;color:#141414;
+ font:400 13px/18px MonaS12,sans-serif;cursor:pointer;
+}
+.go-visit-dialog-submit:disabled{background:#d7d7d7;color:#252525;cursor:not-allowed}
+.go-visit-dialog-error{position:absolute;left:14px;right:14px;top:330px;font:400 10px/1.4 MonaS12,sans-serif;color:#a32d1e}
+.go-visit-dialog-sub{
+ position:absolute;left:10px;right:10px;top:332px;color:#777;
+ font:400 10px/15px MonaS12,sans-serif;
+}
+.go-visit-dialog-code{
+ position:absolute;top:237px;left:14px;right:14px;
+ font:400 9px/13px Galmuri11,sans-serif;color:#555;
+}
+.go-visit-dialog-content:has(.go-visit-dialog-status[role=timer]) h2{top:49px}
+.go-visit-modal :focus-visible{outline:2px solid #141414;outline-offset:3px}
+@media(max-width:330px){.go-visit-modal{height:383px}.go-visit-dialog-submit{left:8%;max-width:84%;width:84%}}
+@media(max-height:440px){.go-visit-modal-backdrop{padding-top:16px}}
