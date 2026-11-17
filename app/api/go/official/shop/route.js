@@ -21,6 +21,10 @@ export async function GET(request){
  }catch{return goError('구매 상태를 확인하지 못했어요.',500);}
 }
 export async function POST(request){
+ // Once stage 4 launches, the old dog-specific 200C API must never undercut
+ // the confirmed random-200 / exact-slot-300 pricing contract.
+ if(process.env.MEONGGO_STAGE4_STORE_ENABLED==='1')
+  return goError('구매 방식이 변경됐어요. 스토어에서 다시 선택해주세요.',410);
  if(!goStage2ServerEnabled())return goError('멍카드 상점을 준비 중이에요.',503);
  const denied=goMutationAllowed(request);if(denied)return denied;
  const member=await goMember(request);if(!member)return goError('로그인이 필요해요.',401);
