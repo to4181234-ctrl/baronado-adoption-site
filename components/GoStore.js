@@ -2,6 +2,7 @@
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
 import GoCompletion from './GoCompletion.js';
+import GoPixelChoice from './GoPixelChoice.js';
 import {useGoSession} from './GoShell.js';
 import {useGoCoins} from './GoCoins.js';
 import {enqueueGoCoinNotice} from '../lib/goCoinNotices.js';
@@ -32,6 +33,7 @@ export default function GoStore(){
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false);
  const [error,setError]=useState(''),[message,setMessage]=useState('');
  const [selected,setSelected]=useState({mode:'random'}),[confirm,setConfirm]=useState(false);
+ const [choiceOpen,setChoiceOpen]=useState(false),[collarChoice,setCollarChoice]=useState(null);
  const [pending,setPending]=useState(null),[result,setResult]=useState(null);
  const [drawResult,setDrawResult]=useState(null),[duplicate,setDuplicate]=useState(null);
  const [revealed,setRevealed]=useState(null),[animating,setAnimating]=useState(true);
@@ -203,11 +205,29 @@ export default function GoStore(){
    </aside>}
    <button className="s4-store-buy" type="button"
     disabled={busy||loading||!items.length||Boolean(pending)||selected.mode==='specific'&&!selectedDog}
-    onClick={()=>{if(!member){openAccount();return;}setConfirm(true);setError('');}}>
+    onClick={()=>{setCollarChoice(null);setChoiceOpen(true);setError('');}}>
     {selected.mode==='random'?'200C 랜덤 구매':'300C 지정 구매'}
    </button>
    <Link className="s4-store-run" href="/go">도망간다 · 내 도감으로</Link>
   </section>
+  {choiceOpen&&<div className="s4-store-overlay" role="presentation" onClick={()=>setChoiceOpen(false)}>
+   <section role="dialog" aria-modal="true" aria-label="멍카드 목줄 선택"
+     onClick={e=>e.stopPropagation()}>
+    <button className="s4-store-close" onClick={()=>setChoiceOpen(false)} aria-label="닫기">×</button>
+    <h2>어떤 목줄을 고를까요?</h2>
+    <p>목줄을 고르는 동안에는 코인이 차감되지 않아요.</p>
+    <div className="s4-store-collars">{[0,1,2].map(i=>
+      <button type="button" key={i} aria-label={'목줄 '+(i+1)+' 선택'}
+       aria-pressed={collarChoice===i} onClick={()=>setCollarChoice(i)}>
+       <img src="/figma-v3/collar.png" alt="픽셀 목줄"/>
+      </button>)}</div>
+    <div className="s4-store-collar-actions">
+     <GoPixelChoice initial disabled={collarChoice===null}
+       onClick={()=>{if(collarChoice===null)return;setChoiceOpen(false);setConfirm(true);}}>하나 고른다</GoPixelChoice>
+     <GoPixelChoice onClick={()=>setChoiceOpen(false)}>도망간다</GoPixelChoice>
+    </div>
+   </section>
+  </div>}
   {confirm&&<div className="s4-store-overlay" role="presentation" onClick={()=>setConfirm(false)}>
    <section role="dialog" aria-modal="true" aria-label="멍카드 구매 최종 확인"
      onClick={e=>e.stopPropagation()}>
