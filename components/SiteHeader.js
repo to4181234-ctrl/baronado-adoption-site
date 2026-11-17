@@ -17,8 +17,8 @@ export default function SiteHeader({member=null,onLogout=null,onLogin=null}){
  return <header className={'v3-header'+(inGo?' v3-header-go s1-go-header':'')+(inAdmin?' v3-header-admin':'')}>
   <div className="v3-header-inner">
    {inGo?<><Link className="s1-go-brand" href="/go">멍멍GO!</Link><div className="s1-header-actions">{coins?.enabled&&member ? <button type="button" className="s1-coin s3-coin-trigger"
- aria-label={coins.loading?'멍코인 조회 중':coins.error?'멍코인 조회 오류 · 이용 내역 다시 보기':`멍코인 ${coins.balance}C 이용 내역 보기`}
- onClick={coins.openHistory}>{coins.loading||coins.error?'—':coins.balance} 멍코인</button>
+ aria-label={!coins.walletLoaded||coins.loading?'멍코인 조회 중':coins.error?'멍코인 조회 오류 · 이용 내역 다시 보기':`멍코인 ${coins.balance}C 이용 내역 보기`}
+ onClick={coins.openHistory} disabled={!coins.walletLoaded||Boolean(coins.error)}>{!coins.walletLoaded||coins.error?'—':coins.balance} 멍코인</button>
  :<span className="s1-coin" aria-label="멍코인은 로그인 후 확인할 수 있어요">{member?'—':'0'} 멍코인</span>}<span className="s1-header-divider" aria-hidden="true"/><span className="s1-store" aria-disabled="true" title="스토어는 후속 업데이트에서 열려요">스토어</span></div></>:
    <><Link className="v3-brand" href={inAdmin?'/admin':'/'}>{inAdmin?'바로나도 관리자':<img src="/figma-v3/baronado-wordmark.svg" width="47" height="9" alt="바로나도"/>}</Link>{inAdmin&&adminSession&&<button className="v10-admin-logout" onClick={adminSession.logout} disabled={adminSession.busy}>로그아웃</button>}<nav aria-label="주요 메뉴" className="v3-main-nav">{links.map(([href,label])=><Link key={href} href={href} aria-current={pathname===href?'page':undefined}>{label}</Link>)}</nav></>}
   </div>
