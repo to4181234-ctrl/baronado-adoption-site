@@ -1,0 +1,44 @@
+/* Stage 4 shop. Scoped; the existing 1–3차 Figma screens are not redesigned. */
+.s4-store{box-sizing:border-box;width:100%;max-width:390px;margin:0 auto;padding:18px 16px 46px;color:#181713;font-family:'MonaS12',sans-serif}
+.s4-store a{color:inherit}.s4-store-back{font:400 12px/1.6 'MonaS12',sans-serif;display:inline-block;margin-bottom:12px}
+.s4-store h1{font:700 23px/1.4 'MonaS12',sans-serif;margin:0 0 7px}
+.s4-store-sub{margin:0 0 14px;font:400 12px/1.6 'MonaS12',sans-serif;color:#726c60}
+.s4-store-art{position:relative;max-width:390px;margin:0 -16px 14px;display:grid;place-items:center;overflow:hidden}
+.s4-store-art>img{display:block;width:100%;height:auto;max-width:390px;aspect-ratio:390/225;object-fit:contain;image-rendering:pixelated}
+.s4-store-art>button{position:absolute;right:15px;bottom:3px;font:400 10px/1.3 'MonaS12',sans-serif;background:#fffdf0db;border:1px solid #b2a99a;padding:6px 9px;cursor:pointer}
+.s4-store-wallet{display:flex;justify-content:space-between;align-items:center;border:1px solid #181713;background:#f8dc4e;padding:10px 14px;margin:12px 0 19px;font-size:13px}.s4-store-wallet b{font-size:15px}
+.s4-store section>header h2{font:700 17px/1.5 'MonaS12',sans-serif;margin:0}
+.s4-store section>header p,.s4-store-draw p{font:400 11px/1.7 'MonaS12',sans-serif;color:#686054;margin:6px 0 12px}
+.s4-store-draw{border:1px solid #e3d9ca;padding:14px;background:#fffdfa;margin:0 0 21px}
+.s4-store-draw>header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.s4-store-draw small{color:#655f52;font-size:10px}
+.s4-store button{cursor:pointer;font-family:'MonaS12',sans-serif}.s4-store button:disabled{cursor:not-allowed;opacity:.55}
+.s4-store-draw>button{background:#f8dc4e;border:1px solid #181713;padding:9px 14px;font-size:12px}
+.s4-store-products{padding:0}
+.s4-store-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:13px 0 16px}
+.s4-store-choices>button{display:grid;justify-items:start;gap:7px;padding:13px 10px;border:1px solid #ccc4b8;background:#fff;min-width:0;text-align:left;color:#181713}
+.s4-store-choices>button[aria-pressed="true"]{background:#fff7cf;border:2px solid #181713;padding:12px 9px}
+.s4-store-choices strong{font-size:13px}.s4-store-choices b{font:700 19px/1.3 'Galmuri11','MonaS12',sans-serif}.s4-store-choices small{font-size:10px;color:#6b635b;line-height:1.5}
+.s4-store-dog-list{max-height:340px;overflow:auto;border:1px solid #e6dfd3;padding:12px;background:#fff;margin:0 0 14px}
+.s4-store-dog-list h3{font-size:13px;font-weight:700;margin:0 0 9px}
+.s4-store-dog-list>section+section{border-top:1px solid #eee7dd;margin-top:14px;padding-top:14px}
+.s4-store-card-choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.s4-store-card-choices button{min-width:0;padding:6px 3px;border:1px solid #bfb9ae;background:white;display:grid;gap:5px;text-align:center}
+.s4-store-card-choices button[aria-pressed="true"]{background:#fff4bf;border:2px solid #181713;padding:5px 2px}
+.s4-store-locked-card{display:grid;place-items:center;height:58px;background:#ddd;border:1px solid #bbb;color:#888;font-size:26px}
+.s4-store-card-choices button>span:last-child{font-size:10px}
+.s4-store-buy{display:block;width:100%;background:#f8dc4e;border:1px solid #181713;min-height:41px;font-size:13px;font-weight:700}
+.s4-store-run{display:block;text-align:center;margin:13px auto 0;font-size:11px;text-decoration:underline}
+.s4-store-message,.s4-store-error,.s4-store-pending{font-size:11px;line-height:1.6;padding:10px;margin:10px 0}
+.s4-store-message{background:#fff9d5}.s4-store-error{background:#ffede7;color:#9b3434}.s4-store-pending{background:#fff8de;border:1px solid #d3b851}
+.s4-store-error button,.s4-store-pending button{margin:5px 8px 0 0;border:1px solid #181713;background:#fff;padding:6px;font-size:11px}
+.s4-store-overlay{position:fixed;z-index:300;inset:0;display:flex;align-items:center;justify-content:center;background:#0009;padding:16px}
+.s4-store-overlay>section{position:relative;box-sizing:border-box;width:331px;max-width:100%;padding:23px 19px 19px;background:#fff;border:1px solid #181713;text-align:center;font-family:'MonaS12',sans-serif}
+.s4-store-overlay h2{font-size:18px;font-weight:700;line-height:1.45;margin:0 0 11px}
+.s4-store-overlay p{font-size:12px;color:#59534b;line-height:1.7;margin:8px 0 12px}
+.s4-store-overlay strong{display:block;font:700 22px/1.4 'Galmuri11','MonaS12',sans-serif}
+.s4-store-actions{display:flex;gap:11px;margin-top:16px}
+.s4-store-actions>button{flex:1;min-height:35px;border:1px solid #181713;background:#f8dc4e;font:400 12px/1.4 'MonaS12',sans-serif}
+.s4-store-close{position:absolute;right:10px;top:5px;font-size:22px;border:0;background:none}
+@media(prefers-reduced-motion:reduce){.s4-store-art>img{animation:none}}
+@media(max-width:340px){.s4-store{padding-inline:11px}.s4-store-choices{gap:7px}.s4-store-choices>button{padding-inline:8px}.s4-store-art{margin-inline:-11px}}
