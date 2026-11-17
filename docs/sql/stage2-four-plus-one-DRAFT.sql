@@ -217,6 +217,29 @@ BEGIN
  GET DIAGNOSTICS v_inserted = ROW_COUNT;
  RETURN jsonb_build_object('ok',true,'unlocked',true,'new',v_inserted=1);
 END;$function$;
+-- Preserve dog-level battle/interaction records while an official card remains.
+-- The final card rule must consider both card types, not just camera cards.
+CREATE OR REPLACE FUNCTION public.go_battle_cleanup_last_card()
+RETURNS trigger LANGUAGE plpgsql SET search_path TO 'public' AS $function$
+DECLARE deleted_dog text;
+BEGIN
+ IF NOT EXISTS(SELECT 1 FROM public.go_cards
+  WHERE member_id=OLD.member_id AND dog_id=OLD.dog_id AND status='approved')
+ AND NOT EXISTS(SELECT 1 FROM public.go_official_owned
+  WHERE member_id=OLD.member_id AND dog_id=OLD.dog_id)
+ AND NOT EXISTS(SELECT 1 FROM public.go_official_hidden
+  WHERE member_id=OLD.member_id AND dog_id=OLD.dog_id) THEN
+   DELETE FROM public.go_battles WHERE member_id=OLD.member_id
+    AND (first_dog_id=OLD.dog_id OR second_dog_id=OLD.dog_id);
+   DELETE FROM public.go_interactions WHERE member_id=OLD.member_id AND dog_id=OLD.dog_id;
+   DELETE FROM public.go_affinity WHERE member_id=OLD.member_id AND dog_id=OLD.dog_id;
+   SELECT name INTO deleted_dog FROM public.dogs WHERE id=OLD.dog_id;
+   UPDATE public.go_members SET avatar_dog=NULL
+    WHERE id=OLD.member_id AND avatar_dog=deleted_dog;
+ END IF;
+ RETURN OLD;
+END;$function$;
+
 REVOKE ALL ON FUNCTION public.go_official_unlock_hidden(uuid,uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.go_official_unlock_hidden(uuid,uuid) TO service_role;
 COMMIT;
