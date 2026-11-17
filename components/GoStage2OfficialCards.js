@@ -5,13 +5,29 @@ import GoCardFace from './GoCardFace.js';
 import GoCompletion from './GoCompletion.js';
 import {CARD_FACE} from '../lib/goCardFace.js';
 
-function LockedOfficialCard({slot}) {
-  return <svg className="s2-locked-card-svg" viewBox="0 0 166 265" role="img" aria-label={`미보유 공식 멍카드 NO.${slot}`}>
+function LockedOfficialCard({slot,hidden=false,unlockable=false}) {
+  return <svg className="s2-locked-card-svg" viewBox="0 0 166 265" role="img"
+    aria-label={hidden?'HIDDEN · '+(unlockable?'해금 가능':'일반 4종 수집 후 해금'):`미보유 공식 멍카드 NO.${slot}`}>
     <image href={CARD_FACE.frame} x="0" y="0" width="166" height="265"/>
-    <rect x="16" y="28" width="134" height="132" fill="#d9d9d9"/>
-    <text x="83" y="113" textAnchor="middle" fontSize="31.5" fontWeight="700" fontFamily="MonaS12,sans-serif" fill="#565656">?</text>
-    <text x="16" y="181" fontSize="12.3" fontWeight="700" fontFamily="MonaS12,sans-serif" fill="#727272">??</text>
-    <text x="150" y="247" textAnchor="end" fontSize="7" fontFamily="MonaS12,sans-serif">NO.{slot}</text>
+    <g fontFamily="MonaS12,sans-serif">
+      <text x="16" y="23" fontSize="7" fill="#181713">MEONG MEONG GO!</text>
+      <rect x="16" y="28" width="134" height="132" fill="#d9d9d9"/>
+      {hidden
+        ? <><text x="83" y="91" textAnchor="middle" fontSize="16" fontWeight="700" fill="#777">HIDDEN</text>
+           <text x="83" y="112" textAnchor="middle" fontSize="9" fill="#777">{unlockable?'눌러서 획득':'4종 모두 모으면 해금'}</text></>
+        : <text x="83" y="113" textAnchor="middle" fontSize="31.5" fontWeight="700" fill="#565656">?</text>}
+      <text x="16" y="181" fontSize="12.3" fontWeight="700" fill="#727272">??</text>
+      <rect x="112" y="169" width="38" height="14" rx="2" fill="#ddd" stroke="#727272" strokeWidth=".6"/>
+      <text x="131" y="179" textAnchor="middle" fontSize="7" fill="#777">?</text>
+      {['파워','애교'].map((label,index)=><g key={label}>
+        <text x="16" y={208+index*19} fontSize="10" fill="#727272">{label}</text>
+        {Array.from({length:5},(_,i)=><image key={i} href={CARD_FACE.star}
+          x={40+i*13.4} y={198+index*19} width="11.36" height="10.32"
+          style={{filter:'grayscale(1)',opacity:.65}}/>)}
+      </g>)}
+      <text x="16" y="247" fontSize="7" fill="#727272">바로나도</text>
+      <text x="150" y="247" textAnchor="end" fontSize="7" fill="#181713">NO.{slot}</text>
+    </g>
   </svg>;
 }
 import {useGoSession} from './GoShell.js';
@@ -110,11 +126,11 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
           <button className="s2-official-card" type="button" onClick={()=>openCard(card.slot)} aria-label={`공식 멍카드 NO.${card.slot} 보기`}>
             <GoCardFace card={{dogName:dog?.name||'멍멍이',nickname:'바로나도',
               imageUrl:card.imageUrl,title:card.title,
-              capturedAt:card.acquiredAt,battle:{power:card.power,charm:card.charm}}}/>
+              capturedAt:null,battle:{power:card.power,charm:card.charm}}}/>
+            <span className="s2-official-number">NO.{card.slot}</span>
             {card.new&&<span className="s2-official-new">NEW</span>}
           </button>:
           <div className="s2-official-locked"><LockedOfficialCard slot={card.slot}/></div>}
-        <small>NO.{card.slot}</small>
       </div>)}
       <div className="s2-official-slot">
         <button type="button" className={'s2-official-hidden '+(unlockable?'is-unlockable':'')}
@@ -122,10 +138,10 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
           disabled={!acquired&&!unlockable||busy||!dog}
           onClick={openHidden}>
           {acquired&&hiddenImage?<img src={hiddenImage} alt={dog?.name+' HIDDEN 일러스트'}/>:
-            <span>{unlockable?'!':'?'}</span>}
+            <LockedOfficialCard slot={HIDDEN_SLOT} hidden unlockable={unlockable}/>}
+          {acquired&&<span className="s2-official-number">NO.{HIDDEN_SLOT}</span>}
           {hidden?.new||unlockable?<b className="s2-official-new">NEW</b>:null}
         </button>
-        <small>HIDDEN</small>
       </div>
     </div>
     <p className="s2-official-help">{!dog?'':acquired?'히든 카드 해금 완료':unlockable?'일반 멍카드 4종을 모았어요. HIDDEN 카드를 눌러 해금하세요.':'일반 멍카드 4종을 모으면 HIDDEN 카드를 열 수 있어요.'}</p>
