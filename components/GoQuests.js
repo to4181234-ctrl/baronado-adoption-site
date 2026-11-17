@@ -33,8 +33,8 @@ export default function GoQuests({ compact = false }) {
     completed:Boolean(coins.daily?.drawQuestDone),href:'/go'
   });
   if(isQuestAvailable('battle',{draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE}))tasks.push({
-    id:'battle',title:'오늘의 첫 친구 멍배틀',coins:10,
-    caption:'친구와 1:1 대결을 정상 완료하면 승·무·패 관계없이 10C!',
+    id:'battle',title:'오늘의 첫 멍배틀',coins:10,
+    caption:'랜덤 또는 친구 1:1 멍배틀 중 하나만 완료해도 하루 1회 +10C! 중복 지급은 없어요.',
     completed:Boolean(coins.daily?.battleQuestDone),href:'/go/battle'
   });
   tasks.sort((a,b)=>Number(a.completed)-Number(b.completed));
