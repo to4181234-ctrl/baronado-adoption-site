@@ -6,7 +6,8 @@ import GoPixelChoice from './GoPixelChoice.js';
 import {useGoSession} from './GoShell.js';
 import {useGoCoins} from './GoCoins.js';
 import {enqueueGoCoinNotice} from '../lib/goCoinNotices.js';
-import {availableStoreItems,STORE_PRICES} from '../lib/goStore.js';
+import {availableStoreItems,availableStoreDogs,STORE_PRICES} from '../lib/goStore.js';
+import {LockedOfficialCard} from './GoStage2OfficialCards.js';
 
 const STAGE4=process.env.NEXT_PUBLIC_MEONGGO_STAGE4_STORE_ENABLED==='1';
 const STORE_ART='/meonggo/store/meonggo_store_loop.svg';
@@ -38,7 +39,8 @@ export default function GoStore(){
  const [drawResult,setDrawResult]=useState(null),[duplicate,setDuplicate]=useState(null);
  const [revealed,setRevealed]=useState(null),[animating,setAnimating]=useState(true);
  const items=useMemo(()=>availableStoreItems(catalog.dogs),[catalog.dogs]);
- const selectedDog=items.find(i=>i.dogId===selected.dogId&&i.slot===selected.slot);
+ const dogOptions=useMemo(()=>availableStoreDogs(catalog.dogs),[catalog.dogs]);
+ const selectedDog=dogOptions.find(i=>i.dogId===selected.dogId);
  const balance=coins?.walletLoaded?coins.balance:null;
  const refresh=useCallback(async()=>{
   if(!STAGE4){setLoading(false);return null;}
@@ -91,12 +93,12 @@ export default function GoStore(){
   if(!member){setConfirm(false);openAccount();return;}
   if(busy||pending||items.length===0)return;
   if(selected.mode==='specific'&&!selectedDog){
-   setError('지금 구매할 수 있는 미보유 일반 멍카드를 다시 선택해주세요.');setConfirm(false);return;
+   setError('미보유 공식 멍카드가 남아 있는 강아지를 선택해주세요.');setConfirm(false);return;
   }
   const price=STORE_PRICES[selected.mode];
   if(balance===null||balance<price){setError('멍코인이 부족하거나 잔액을 확인하지 못했어요.');setConfirm(false);return;}
   const details={mode:selected.mode,requestId:crypto.randomUUID()};
-  if(selected.mode==='specific'){details.dogId=selected.dogId;details.slot=selected.slot;}
+  if(selected.mode==='specific'){details.dogId=selected.dogId;}
   cacheRequest(details);
   setBusy(true);setError('');setMessage('');
   try{await showPurchased(await storePost(details));}
@@ -154,15 +156,18 @@ export default function GoStore(){
  const cardsForDog=(catalog.dogs||[]).filter(d=>d.available);
  if(!STAGE4)return <p role="status">스토어는 전체 업데이트 이후 이용할 수 있어요.</p>;
  return <article className="s4-store">
-  <Link className="s4-store-back" href="/go">‹ 내 도감</Link>
-  <h1>멍멍GO! 스토어</h1>
-  <p className="s4-store-sub">모으지 못한 공식 멍카드를 만나보세요.</p>
+  <Link className="s4-store-back" href="/go">← 돌아가기</Link>
+  <h1>스토어</h1>
   <div className="s4-store-art">
    <img src={showAnimation} width="390" height="225"
     alt="꼬맹이·카우가 카드를 주고받고 말랑이가 졸고 있는 멍멍GO 상점"/>
    <button type="button" onClick={()=>setAnimating(x=>!x)} aria-pressed={animating}>
     {animating?'움직임 멈추기':'움직임 재생'}
    </button>
+  </div>
+  <div className="s4-store-dialogue" aria-label="말랑이의 상점 안내">
+   <strong>말랑이</strong>
+   <p>한 번 골라봐..하암...졸리다</p>
   </div>
   {message&&<p role="status" className="s4-store-message">{message}</p>}
   {error&&<p role="alert" className="s4-store-error">{error} <button type="button" onClick={refresh}>다시 확인</button></p>}
@@ -174,30 +179,36 @@ export default function GoStore(){
     onClick={freeDraw}>{catalog.drawUsed?'오늘 뽑기 완료':busy?'처리 중…':'무료 뽑기'}</button>
   </section>
   <section className="s4-store-products">
-   <header><h2>멍카드 구매</h2><p>랜덤은 미보유 일반 멍카드 전체에서, 지정은 선택한 카드만 구매해요.</p></header>
+   <header className="s4-store-screen-reader"><h2>멍카드 구매</h2><p>랜덤은 모든 강아지의 미보유 카드에서, 지정은 선택한 강아지의 미보유 카드에서 랜덤 뽑기예요.</p></header>
    <div className="s4-store-choices" role="group" aria-label="구매 방식">
     <button type="button" aria-pressed={selected.mode==='random'}
-     onClick={()=>setSelected({mode:'random'})}><strong>랜덤 멍카드</strong><b>200C</b><small>미보유 1종 무작위</small></button>
+     onClick={()=>setSelected({mode:'random'})}>
+      <LockedOfficialCard slot={1}/>
+      <strong>카드 랜덤 뽑기</strong>
+      <small>미보유 카드중 랜덤으로<br/>멍카드를 뽑을 수 있다.</small>
+      <b>200 멍코인</b>
+    </button>
     <button type="button" aria-pressed={selected.mode==='specific'}
-     onClick={()=>setSelected({mode:'specific'})}><strong>지정 멍카드</strong><b>300C</b><small>강아지·번호 선택</small></button>
+     onClick={()=>setSelected({mode:'specific'})}>
+      <LockedOfficialCard slot={1}/>
+      <strong>카드 지정 랜덤 뽑기</strong>
+      <small>내가 지정한 멍멍이로<br/>랜덤 멍카드를 뽑을 수 있다.</small>
+      <b>300 멍코인</b>
+    </button>
    </div>
    {loading?<p role="status">판매 가능한 멍카드를 불러오는 중…</p>:
     items.length===0?<p>현재 구매할 수 있는 미보유 공식 멍카드가 없어요.</p>:
     selected.mode==='specific'&&<div className="s4-store-dog-list">
-      {cardsForDog.map(dog=>{
-       const available=items.filter(i=>i.dogId===dog.dogId);
-       if(!available.length)return null;
-       return <section key={dog.dogId}><h3>{dog.name}</h3>
-        <div className="s4-store-card-choices">{available.map(item=>
-         <button key={item.dogId+':'+item.slot} type="button"
-          aria-pressed={selected.dogId===item.dogId&&selected.slot===item.slot}
-          onClick={()=>setSelected({mode:'specific',dogId:item.dogId,slot:item.slot})}>
-          <span className="s4-store-locked-card">?</span>
-          <span>NO.{item.slot}</span>
-         </button>)}</div>
-       </section>;
-      })}
-     </div>}
+      <p>어떤 멍멍이의 카드를 뽑을까요?</p>
+      <div className="s4-store-dog-choices">
+      {dogOptions.map(dog=>
+        <button key={dog.dogId} type="button" aria-pressed={selected.dogId===dog.dogId}
+          onClick={()=>setSelected({mode:'specific',dogId:dog.dogId})}>
+          {dog.name} <small>미보유 {dog.missing}종</small>
+        </button>)}
+      </div>
+    </div>}
+
    {pending&&<aside className="s4-store-pending" role="status">
     <p>확인되지 않은 이전 구매가 있어요. 새로운 구매 전 결과를 확인해주세요.</p>
     <button type="button" disabled={busy} onClick={()=>recover(false)}>이전 구매 결과 확인</button>
@@ -206,7 +217,7 @@ export default function GoStore(){
    <button className="s4-store-buy" type="button"
     disabled={busy||loading||!items.length||Boolean(pending)||selected.mode==='specific'&&!selectedDog}
     onClick={()=>{setCollarChoice(null);setChoiceOpen(true);setError('');}}>
-    {selected.mode==='random'?'200C 랜덤 구매':'300C 지정 구매'}
+    {selected.mode==='random'?'200C 랜덤 뽑기':'300C 강아지 지정 뽑기'}
    </button>
    <Link className="s4-store-run" href="/go">도망간다 · 내 도감으로</Link>
   </section>
@@ -234,7 +245,7 @@ export default function GoStore(){
     <button className="s4-store-close" onClick={()=>setConfirm(false)} aria-label="닫기">×</button>
     <h2>정말 구매할까요?</h2>
     <p>{selected.mode==='random'?'미보유 공식 멍카드 1장을 무작위로 구매해요.':
-      (selectedDog?.dogName||'강아지')+'의 NO.'+selected.slot+' 카드를 선택했어요.'}</p>
+      (selectedDog?.name||'강아지')+'의 미보유 카드 중 1장을 무작위로 뽑아요.'}</p>
     <strong>{STORE_PRICES[selected.mode]}C</strong>
     <p>‘네’를 누르면 코인이 차감되고 카드가 지급돼요.</p>
     <div className="s4-store-actions"><button disabled={busy} onClick={()=>setConfirm(false)}>아니오</button>
