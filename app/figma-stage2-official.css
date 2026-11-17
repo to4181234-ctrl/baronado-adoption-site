@@ -53,3 +53,39 @@
 .v3-go-site .v5-album-toolbar:has(.s2-kind-selector) .v5-manage-actions{margin-left:auto}
 .s2-official-help{position:absolute;clip:rect(0,0,0,0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap;margin:0;padding:0}
 .v3-go-site .v5-dog-album:has(.s2-official) .v5-album-back-link{margin-top:15px}
+
+/* Figma 606:163455 + 606:163466: 331x210, MonaS12, two yellow 115x33 actions. */
+.v3-go-site .v5-delete-dialog.s2-delete-dialog{
+  position:relative;top:auto;left:auto;transform:none;box-sizing:border-box;
+  width:min(331px,calc(100vw - 32px));height:210px;min-height:210px;max-height:calc(100dvh - 32px);
+  padding:18px 18px 17px;background:#fff;border:0;border-radius:6px;box-shadow:none;
+  display:flex;align-items:center;flex-direction:column;gap:0;
+  font-family:'MonaS12',sans-serif;color:#181713;
+}
+.v3-go-site .v5-delete-dialog.s2-delete-dialog h2{
+  font:700 18px/27px 'MonaS12',sans-serif!important;text-align:center!important;
+  letter-spacing:0!important;margin:0 0 12px!important;padding:0!important;
+}
+.v3-go-site .v5-delete-dialog.s2-delete-dialog p:not(.s2-delete-error){
+  font:400 13px/20px 'MonaS12',sans-serif!important;text-align:center!important;
+  letter-spacing:0!important;margin:0!important;
+}
+.v3-go-site .v5-delete-dialog.s2-delete-dialog .s2-delete-close{
+  position:absolute;top:7px;right:9px;width:20px;height:20px;min-height:0;
+  background:transparent;border:0;padding:0;cursor:pointer;color:#181713;
+  font:400 25px/20px 'MonaS12',sans-serif;
+}
+.v3-go-site .v5-delete-dialog.s2-delete-dialog .s2-delete-actions{
+  display:flex;justify-content:space-between;gap:29px;width:259px;max-width:100%;
+  margin-top:auto;
+}
+.v3-go-site .v5-delete-dialog.s2-delete-dialog .s2-delete-actions button{
+  width:115px;height:33px;min-height:33px;flex:1 1 115px;padding:0;
+  border:0;border-radius:4px;background:#f7d94d;color:#181713;
+  cursor:pointer;font:400 13px/20px 'MonaS12',sans-serif!important;
+}
+.v3-go-site .v5-delete-dialog.s2-delete-dialog button:disabled{opacity:.6;cursor:wait}
+.v3-go-site .v5-delete-dialog.s2-delete-dialog .s2-delete-error{
+  font:400 11px/15px 'MonaS12',sans-serif!important;text-align:center!important;
+  color:#b22!important;margin:2px 0!important;max-width:100%;
+}
