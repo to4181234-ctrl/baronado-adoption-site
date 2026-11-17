@@ -33,6 +33,7 @@ export default function GoDogAlbum({ dogId }) {
   const [total, setTotal] = useState(0);
   const [officialCount, setOfficialCount] = useState(null);
   const [cardKind, setCardKind] = useState(STAGE2_ENABLED ? 'official' : 'custom');
+  const [kindOpen, setKindOpen] = useState(false);
   const onOfficialCatalog = useCallback(count => setOfficialCount(count), []);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('newest');
@@ -84,7 +85,7 @@ export default function GoDogAlbum({ dogId }) {
   }, [dogId, ready, member?.id, page, order, refreshCount]);
 
   useEffect(() => {
-    setSelectionMode(false); setSelectedIds([]); setSortOpen(false);
+    setSelectionMode(false); setSelectedIds([]); setSortOpen(false); setKindOpen(false);
     setStateRestored(false);
     // Preserve the current dog's sort and page when navigating into a card and back.
     try {
@@ -107,18 +108,18 @@ export default function GoDogAlbum({ dogId }) {
   }, [page, total, ready, member?.id, dogId, order, cardResultKey]);
 
   useEffect(() => {
-    if (!sortOpen && !deleteOpen) return;
+    if (!sortOpen && !deleteOpen && !kindOpen) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = previous; };
-  }, [sortOpen, deleteOpen]);
+  }, [sortOpen, deleteOpen, kindOpen]);
 
   useEffect(() => {
-    if (!sortOpen && !deleteOpen) return;
-    const handle = event => { if (event.key === 'Escape' && !deleting) { setSortOpen(false); setDeleteOpen(false); } };
+    if (!sortOpen && !deleteOpen && !kindOpen) return;
+    const handle = event => { if (event.key === 'Escape' && !deleting) { setSortOpen(false); setDeleteOpen(false); setKindOpen(false); } };
     document.addEventListener('keydown', handle);
     return () => document.removeEventListener('keydown', handle);
-  }, [sortOpen, deleteOpen, deleting]);
+  }, [sortOpen, deleteOpen, kindOpen, deleting]);
 
   function setSort(value) {
     setOrder(value);
@@ -203,10 +204,14 @@ export default function GoDogAlbum({ dogId }) {
 
     <section className={'v5-album-list ' + (!hasCards ? 'v5-album-empty' : '')}>
       <div className="v5-album-toolbar">
-        <div className="s2-kind-tabs" role="tablist" aria-label="멍카드 종류">
-          {STAGE2_ENABLED && <button role="tab" type="button" aria-selected={cardKind === 'official'} onClick={() => { cancelSelection(); setCardKind('official'); }}>멍카드 ({officialCount === null ? '—' : officialCount}장)</button>}
-          <button role={STAGE2_ENABLED ? 'tab' : undefined} type="button" aria-selected={STAGE2_ENABLED ? cardKind === 'custom' : undefined} onClick={() => setCardKind('custom')}>나만의 카드 ({total}장)</button>
-        </div>
+        {STAGE2_ENABLED ? <div className="s2-kind-selector">
+          <button className="s2-kind-trigger" type="button" aria-haspopup="dialog" aria-expanded={kindOpen}
+            onClick={() => setKindOpen(true)}>
+            {cardKind === 'official' ? '멍카드' : '나만의 카드'}
+            <span aria-hidden="true" className="s2-kind-chevron"/>
+          </button>
+          <span className="s2-kind-count">({cardKind === 'official' ? (officialCount === null ? '—' : officialCount) : total}장)</span>
+        </div> : <h2>수집한 카드 ({total}장)</h2>}
         {cardKind === 'custom' && member && total > 0 && <div className="v5-manage-actions">
           {!selectionMode ? <button type="button" onClick={() => setSelectionMode(true)}>선택</button> : <>
             <button type="button" onClick={cancelSelection}>취소</button>
@@ -236,6 +241,18 @@ export default function GoDogAlbum({ dogId }) {
     <Link className="v5-album-back-link" href="/go">← 내 도감으로 돌아가기</Link>
     {notice && <p className="v3-message" role="status">{notice}</p>}
     {error && <p className="v3-error" role="alert">{error}</p>}
+
+    {kindOpen && <div className="s2-kind-backdrop" role="presentation" onClick={() => setKindOpen(false)}>
+      <section className="s2-kind-sheet" role="dialog" aria-modal="true" aria-label="멍카드 종류 메뉴"
+        onClick={e => e.stopPropagation()}>
+        <h2>메뉴</h2>
+        {[['official','멍카드'],['custom','나만의 카드']].map(([value,label]) =>
+          <button key={value} type="button" className="s2-kind-option" aria-current={cardKind === value ? 'true' : undefined}
+            onClick={() => { if (value !== cardKind) cancelSelection(); setCardKind(value); setKindOpen(false); }}>
+            {label}{cardKind === value && <span aria-hidden="true" className="s2-kind-check">✓</span>}
+          </button>)}
+      </section>
+    </div>}
 
     {sortOpen && <div className="v5-modal-backdrop" role="presentation" onClick={() => setSortOpen(false)}>
       <div role="dialog" aria-modal="true" aria-label="수집 카드 정렬" className="v5-sort-dialog" onClick={e => e.stopPropagation()}>
