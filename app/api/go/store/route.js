@@ -15,12 +15,12 @@ export async function GET(request){
  try{
   const db=adminDatabase();
   const result=await db.from('go_official_purchases')
-    .select('dog_id,slot,coins,created_at')
+    .select('dog_id,slot,coins,purchase_mode,created_at')
     .eq('member_id',member.id).eq('request_id',requestId).maybeSingle();
   if(result.error)throw result.error;
   const row=result.data;
   return Response.json(row?{ok:true,found:true,dogId:row.dog_id,slot:row.slot,
-    price:row.coins,createdAt:row.created_at}:{ok:true,found:false},{headers});
+    price:row.coins,mode:row.purchase_mode,createdAt:row.created_at}:{ok:true,found:false},{headers});
  }catch{return goError('이전 구매 결과를 확인하지 못했어요.',500);}
 }
 export async function POST(request){
