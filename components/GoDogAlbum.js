@@ -36,6 +36,7 @@ export default function GoDogAlbum({ dogId }) {
   const [selectedIds, setSelectedIds] = useState([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const [collectConfirm, setCollectConfirm] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
   const [notice, setNotice] = useState('');
@@ -117,12 +118,17 @@ export default function GoDogAlbum({ dogId }) {
   function setSort(value) {
     setOrder(value);
     setPage(0);
-    setSelectedIds([]); // Explicit Figma rule: sorting invalidates a multi-page selection.
+    setSelectedIds([]); // Sorting resets a multi-page selection.
+    setSelectionMode(false);
     setSortOpen(false);
   }
 
   function toggleSelected(id) {
-    setSelectedIds(previous => toggleAlbumSelection(previous, id, MAX_SELECTION));
+    const next = toggleAlbumSelection(selectedIds, id, MAX_SELECTION);
+    setSelectedIds(next);
+    // Entering selection mode with zero cards is allowed; removing the final
+    // previously selected card exits automatically (Figma 586:163478).
+    if (selectedIds.length > 0 && next.length === 0) setSelectionMode(false);
   }
 
   function startSelection(id) {
@@ -132,12 +138,12 @@ export default function GoDogAlbum({ dogId }) {
   }
 
   function cancelSelection() {
-    setDeleteOpen(false); setSelectionMode(false); setSelectedIds([]);
+    setDeleteOpen(false); setDeleteError(''); setSelectionMode(false); setSelectedIds([]);
   }
 
   async function deleteSelected() {
     if (!member || deleting || !selectedIds.length) return;
-    setDeleting(true); setError('');
+    setDeleting(true); setDeleteError('');
     try {
       const response = await fetch('/api/go/cards', {
         method: 'DELETE', headers: { 'Content-Type': 'application/json' },
@@ -152,7 +158,7 @@ export default function GoDogAlbum({ dogId }) {
       cancelSelection(); refresh();
     } catch (e) {
       // On failure, keep selected IDs and the original cards visible for safe retry.
-      setError(e.message || '카드를 삭제하지 못했어요.');
+      setDeleteError(e.message || '카드를 삭제하지 못했어요.');
     } finally { setDeleting(false); }
   }
 
@@ -195,9 +201,9 @@ export default function GoDogAlbum({ dogId }) {
       <div className="v5-album-toolbar">
         <h2>수집한 카드 ({total}장)</h2>
         {member && total > 0 && <div className="v5-manage-actions">
-          {!selectionMode ? <button type="button" onClick={() => setSelectionMode(true)}>카드 선택</button> : <>
+          {!selectionMode ? <button type="button" onClick={() => setSelectionMode(true)}>선택</button> : <>
             <button type="button" onClick={cancelSelection}>취소</button>
-            <button type="button" className="v5-manage-delete" disabled={!selectedIds.length || deleting} onClick={() => setDeleteOpen(true)}>삭제 {selectedIds.length}</button>
+            <button type="button" className="v5-manage-delete" disabled={!selectedIds.length || deleting} onClick={() => { setDeleteError(''); setDeleteOpen(true); }}>{selectedIds.length}개 삭제</button>
           </>}
         </div>}
         <div className="v5-sort-control">
@@ -236,6 +242,7 @@ export default function GoDogAlbum({ dogId }) {
       <section role="dialog" aria-modal="true" aria-label="선택 카드 삭제 확인" className="v5-delete-dialog" onClick={e => e.stopPropagation()}>
         <h2>{deleteDogName} 카드 {selectedIds.length}장을 삭제할까요?</h2>
         <p>내 도감 › {deleteDogName} · 선택한 카드 {selectedIds.length}장<br/>공개 게시물도 함께 삭제돼요.</p>
+        {deleteError && <p className="v3-error" role="alert">{deleteError}</p>}
         <button type="button" className="v5-confirm-delete" disabled={deleting} onClick={deleteSelected}>{deleting ? '삭제 중…' : `선택한 ${selectedIds.length}장 삭제`}</button>
         <button type="button" className="v5-cancel-delete" disabled={deleting} onClick={() => setDeleteOpen(false)}>취소</button>
         <small>해당 강아지의 모든 카드를 삭제하면<br/>도감 획득 기록과 배틀 전적도 사라져요.</small>
