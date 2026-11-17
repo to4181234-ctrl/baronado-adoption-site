@@ -151,3 +151,6 @@
  .v3-go-site .s4-store-products{left:4%;right:4%}
  .v3-go-site .s4-store-wallet,.v3-go-site .s4-store-draw{left:4%;right:4%}
 }
+
+/* Exact Figma caption first baseline y=654 at 390px. */
+.v3-go-site .s4-store-choices strong{margin-top:15px}
