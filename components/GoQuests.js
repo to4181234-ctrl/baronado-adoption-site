@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import GoVisitPanel from './GoVisitPanel.js';
 import { useGoSession } from './GoShell.js';
 import { useGoCoins } from './GoCoins.js';
 import {isQuestAvailable,visibleQuestRewards} from '../lib/goStage3Quests.js';
@@ -11,6 +12,8 @@ export default function GoQuests({ compact = false }) {
   const { member, ready, openAccount } = useGoSession();
   const coins = useGoCoins();
   const [notice, setNotice] = useState('');
+  const [visitOpen,setVisitOpen]=useState(false);
+  useEffect(()=>{if(!visitOpen)return;const onKey=e=>{if(e.key==='Escape')setVisitOpen(false)};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[visitOpen]);
   if (!coins?.enabled) return null;
 
   const tasks = [
@@ -61,7 +64,9 @@ export default function GoQuests({ compact = false }) {
           <div>
             {task.completed
               ? <button className="go-quest-title" type="button" onClick={()=>setNotice('오늘 이미 완료한 퀘스트예요.')}>{task.title} &gt;</button>
-              : <Link className="go-quest-title" href={task.href}>{task.title} &gt;</Link>}
+              : task.id==='visit' && !compact
+                ? <button className="go-quest-title" type="button" onClick={()=>setVisitOpen(true)}>{task.title} &gt;</button>
+                : <Link className="go-quest-title" href={task.href}>{task.title} &gt;</Link>}
             <small>{task.caption}</small>
           </div>
           <div className="go-quest-item-action">
@@ -73,6 +78,12 @@ export default function GoQuests({ compact = false }) {
     </> : <div className="go-quest-login">
       <p>{ready ? '로그인하면 퀘스트를 시작할 수 있어요.' : '로그인 정보를 확인하고 있어요.'}</p>
       {ready && <button type="button" onClick={openAccount}>로그인하고 시작하기</button>}
+    </div>}
+    {visitOpen&&!compact&&<div className="go-visit-modal-backdrop" onClick={()=>setVisitOpen(false)}>
+      <section className="go-visit-modal" role="dialog" aria-modal="true" aria-label="바로나도에 놀러왔개" onClick={e=>e.stopPropagation()}>
+        <button className="go-visit-modal-close" type="button" aria-label="닫기" onClick={()=>setVisitOpen(false)}>×</button>
+        <GoVisitPanel embedded/>
+      </section>
     </div>}
     {compact && <Link className="go-quest-all-link" href="/go/quests">퀘스트 자세히 보기 ›</Link>}
     {compact && <p className="go-quest-caption">오늘 이용 가능한 퀘스트 {tasks.length}종 · 퀘스트 완료 보상 최대 {visibleQuestRewards({draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE})}C</p>}
