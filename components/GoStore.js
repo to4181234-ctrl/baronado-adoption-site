@@ -170,8 +170,11 @@ export default function GoStore(){
    </button>
   </div>
   <div className="s4-store-dialogue" aria-label="말랑이의 상점 안내">
-   <strong>말랑이</strong>
-   <p>한 번 골라봐..하암...졸리다</p>
+   <img className="s4-store-dialogue-bg" src="/meonggo/store/dialogue-bg.svg" alt="" aria-hidden="true"/>
+   <img className="s4-store-dialogue-outer" src="/meonggo/store/dialogue-outer.svg" alt="" aria-hidden="true"/>
+   <img className="s4-store-dialogue-inner" src="/meonggo/store/dialogue-inner.svg" alt="" aria-hidden="true"/>
+   <div className="s4-store-dialogue-copy"><strong>말랑이</strong>
+    <p>한 번 골라봐..하암...졸리다</p></div>
   </div>
   {message&&<p role="status" className="s4-store-message">{message}</p>}
   {error&&<p role="alert" className="s4-store-error">{error} <button type="button" onClick={refresh}>다시 확인</button></p>}
