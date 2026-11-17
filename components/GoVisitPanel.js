@@ -13,7 +13,7 @@ function leftSeconds(value, now) {
   return Math.max(0, Math.ceil((Date.parse(value || '') - now) / 1000) || 0);
 }
 
-export default function GoVisitPanel() {
+export default function GoVisitPanel({ embedded=false }={}) {
   const { member, ready, openAccount } = useGoSession();
   const coins = useGoCoins();
   const [state, setState] = useState(null);
@@ -80,6 +80,37 @@ export default function GoVisitPanel() {
   const isPending = item?.status === 'pending' && remain > 0;
   const waitForRetry = item?.status === 'rejected' ? leftSeconds(item.retryAt, now) : 0;
   const todayDone = Boolean(coins.daily?.visitQuestDone);
+  if(embedded) {
+    const statusExpired=item?.status==='expired'||(item?.status==='pending'&&remain===0);
+    return <div className="go-visit-dialog-content">
+      <h2>바로나도에 놀러왔개</h2>
+      <p className="go-visit-dialog-reward">+30 멍코인</p>
+      <div className="go-visit-dialog-desc">
+        <p>바로나도에서 음료를 주문하셨나요?<br/>직원에게 인증을 요청해주세요.<br/>음료 구매가 확인되면 30 멍코인을 드려요!</p>
+        <small>*계정당 1일 1회 가능*</small>
+      </div>
+      {error&&<p className="go-visit-dialog-error" role="alert">{error}</p>}
+      {todayDone ? <>
+        <p className="go-visit-dialog-status">인증 완료!</p>
+        <p className="go-visit-dialog-sub">오늘의 30 멍코인이 지급됐어요.</p>
+        <button type="button" className="go-visit-dialog-submit" disabled>오늘 인증 완료</button>
+      </> : isPending ? <>
+        <p className="go-visit-dialog-status" role="timer">{Math.floor(remain/60)} : {String(remain%60).padStart(2,'0')}</p>
+        {item.code&&<small className="go-visit-dialog-code">직원 확인 코드: {item.code}</small>}
+        <button type="button" className="go-visit-dialog-submit" disabled>직원에게 인증 신청 보내기</button>
+      </> : <>
+        <p className="go-visit-dialog-status">{statusExpired?'인증 시간 종료':item?.status==='rejected'?'인증 반려':(!state?.canRequestNow&&state?'신청 시간 외':'')}</p>
+        {item?.status==='rejected'&&<small className="go-visit-dialog-sub">{VISIT_REJECTION_REASONS[item.rejectedReason]||'직원에게 확인해 주세요.'}</small>}
+        <button type="button" className="go-visit-dialog-submit"
+          disabled={!member||busy||loading||!state?.canRequestNow||waitForRetry>0}
+          onClick={()=>{if(!member){openAccount();return}submit('request')}}>
+          {busy?'신청 중…':statusExpired?'인증 신청 다시 보내기':'직원에게 인증 신청 보내기'}
+        </button>
+        {state&&!state.canRequestNow&&<small className="go-visit-dialog-sub">신청 가능 시간은 매일 오전 9시부터 오후 9시 전까지예요.</small>}
+        {waitForRetry>0&&<small className="go-visit-dialog-sub">{waitForRetry}초 뒤 재신청 가능</small>}
+      </>}
+    </div>;
+  }
   return <article className="go-visit-screen">
     <Link className="v3-back" href="/go/quests">‹ 오늘의 퀘스트</Link>
     <h1>방문 인증</h1>
