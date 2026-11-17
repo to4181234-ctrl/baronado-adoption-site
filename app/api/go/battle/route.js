@@ -9,6 +9,15 @@ export const dynamic = 'force-dynamic';
 const uuid = x => typeof x === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(x);
 const noCache = { 'Cache-Control': 'no-store' };
 const MATCH_TTL_MS=10*60*1000;
+const stage5=()=>process.env.MEONGGO_STAGE5_PVP_ENABLED==='1' &&
+ process.env.MEONGGO_STAGE1_COINS_ENABLED==='1';
+async function battleQuest(db,memberId,battleId){
+ if(!stage5())return {coinsAdded:0};
+ const r=await db.rpc('go_battle_reward_random',{p_member:memberId,p_battle:battleId});
+ if(r.error||!r.data?.ok)throw Error('battle daily quest reward');
+ return {coinsAdded:Number(r.data.coinsAdded)||0};
+}
+
 function matchToken(id,memberId,firstId,secondId,expires){
  const message=[id,memberId,firstId,secondId,expires].join(':');
  return String(expires)+'.'+scopedSignature(message,'meonggo-random-opponent-v1');
@@ -152,7 +161,8 @@ export async function POST(request) {
   if(prior.error)throw prior.error;
   if(prior.data) {
    if(prior.data.member_id!==member.id||prior.data.first_card_id!==firstId||prior.data.second_card_id!==secondId)return goError('대결 정보를 확인해주세요.',403);
-   return Response.json({battle:prior.data,replayed:true},{headers:noCache});
+   const reward=await battleQuest(db,member.id,id);
+   return Response.json({battle:prior.data,replayed:true,...reward},{headers:noCache});
   }
   const cards=await db.from('go_cards').select('id,dog_id,status,member_id').in('id',[firstId,secondId]);
   if(cards.error)throw cards.error;
@@ -180,6 +190,7 @@ export async function POST(request) {
   const checked=await db.from('go_battles').select('*').eq('id',id).single();
   if(checked.error)throw checked.error;
   if(checked.data.member_id!==member.id||checked.data.first_card_id!==firstId||checked.data.second_card_id!==secondId)return goError('대결 정보를 확인해주세요.',403);
-  return Response.json({battle:checked.data},{status:201,headers:noCache});
+  const reward=await battleQuest(db,member.id,id);
+  return Response.json({battle:checked.data,...reward},{status:201,headers:noCache});
  }catch{return goError('대결 기록을 저장하지 못했어요.',500);}
 }
