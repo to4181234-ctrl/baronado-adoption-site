@@ -142,8 +142,19 @@ export async function PUT(request){
  try{
   const db=adminDatabase();
   if(!await isDraft(db,dogId,versionId))return fail('임시 저장 중인 세트만 수정할 수 있어요.',409);
+  const previous=await db.from('go_official_assets')
+    .select('original_path,display_path')
+    .eq('version_id',versionId).eq('slot',settings.slot).maybeSingle();
+  if(previous.error)throw previous.error;
   const result=await uploadAsset(db,{dogId,versionId,...settings,
     source:Buffer.from(await file.arrayBuffer())});
+  // Replacements always use a fresh version-scoped random path, never overwrite
+  // published bytes. Remove the old draft-only pair after the pointer commit.
+  if(previous.data?.original_path && previous.data?.display_path &&
+     previous.data.original_path!==result.row.original_path){
+    await db.storage.from(GO_OFFICIAL_BUCKET)
+      .remove([previous.data.original_path,previous.data.display_path]);
+  }
   return json({ok:true,slot:settings.slot,updated:true},201);
  }catch{return fail('이미지 처리 또는 업로드에 실패했어요.',500);}
 }
@@ -169,6 +180,8 @@ export async function PATCH(request){
    if(original.error)throw original.error;
    const buffer=Buffer.from(await original.data.arrayBuffer());
    await uploadAsset(db,{dogId:body.dogId,versionId:body.versionId,...settings,source:buffer});
+   // Remove draft-only old image after new version's pointers are persisted.
+   await db.storage.from(GO_OFFICIAL_BUCKET).remove([asset.original_path,asset.display_path]);
   }else{
    const {error:saveError}=await db.from('go_official_assets')
     .update({title:settings.title,updated_at:new Date().toISOString()})

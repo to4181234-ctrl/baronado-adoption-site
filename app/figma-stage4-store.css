@@ -1,0 +1,167 @@
+/* Stage 4 shop. Scoped; the existing 1–3차 Figma screens are not redesigned. */
+.s4-store{box-sizing:border-box;width:100%;max-width:390px;margin:0 auto;padding:18px 16px 46px;color:#181713;font-family:'MonaS12',sans-serif}
+.s4-store a{color:inherit}.s4-store-back{font:400 12px/1.6 'MonaS12',sans-serif;display:inline-block;margin-bottom:12px}
+.s4-store h1{font:700 23px/1.4 'MonaS12',sans-serif;margin:0 0 7px}
+.s4-store-sub{margin:0 0 14px;font:400 12px/1.6 'MonaS12',sans-serif;color:#726c60}
+.s4-store-art{position:relative;max-width:390px;margin:0 -16px 14px;display:grid;place-items:center;overflow:hidden}
+.s4-store-art>img{display:block;width:100%;height:auto;max-width:390px;aspect-ratio:390/225;object-fit:contain;image-rendering:pixelated}
+.s4-store-art>button{position:absolute;right:15px;bottom:3px;font:400 10px/1.3 'MonaS12',sans-serif;background:#fffdf0db;border:1px solid #b2a99a;padding:6px 9px;cursor:pointer}
+.s4-store-wallet{display:flex;justify-content:space-between;align-items:center;border:1px solid #181713;background:#f8dc4e;padding:10px 14px;margin:12px 0 19px;font-size:13px}.s4-store-wallet b{font-size:15px}
+.s4-store section>header h2{font:700 17px/1.5 'MonaS12',sans-serif;margin:0}
+.s4-store section>header p,.s4-store-draw p{font:400 11px/1.7 'MonaS12',sans-serif;color:#686054;margin:6px 0 12px}
+.s4-store-draw{border:1px solid #e3d9ca;padding:14px;background:#fffdfa;margin:0 0 21px}
+.s4-store-draw>header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.s4-store-draw small{color:#655f52;font-size:10px}
+.s4-store button{cursor:pointer;font-family:'MonaS12',sans-serif}.s4-store button:disabled{cursor:not-allowed;opacity:.55}
+.s4-store-draw>button{background:#f8dc4e;border:1px solid #181713;padding:9px 14px;font-size:12px}
+.s4-store-products{padding:0}
+.s4-store-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:13px 0 16px}
+.s4-store-choices>button{display:grid;justify-items:start;gap:7px;padding:13px 10px;border:1px solid #ccc4b8;background:#fff;min-width:0;text-align:left;color:#181713}
+.s4-store-choices>button[aria-pressed="true"]{background:#fff7cf;border:2px solid #181713;padding:12px 9px}
+.s4-store-choices strong{font-size:13px}.s4-store-choices b{font:700 19px/1.3 'Galmuri11','MonaS12',sans-serif}.s4-store-choices small{font-size:10px;color:#6b635b;line-height:1.5}
+.s4-store-dog-list{max-height:340px;overflow:auto;border:1px solid #e6dfd3;padding:12px;background:#fff;margin:0 0 14px}
+.s4-store-dog-list h3{font-size:13px;font-weight:700;margin:0 0 9px}
+.s4-store-dog-list>section+section{border-top:1px solid #eee7dd;margin-top:14px;padding-top:14px}
+.s4-store-card-choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.s4-store-card-choices button{min-width:0;padding:6px 3px;border:1px solid #bfb9ae;background:white;display:grid;gap:5px;text-align:center}
+.s4-store-card-choices button[aria-pressed="true"]{background:#fff4bf;border:2px solid #181713;padding:5px 2px}
+.s4-store-locked-card{display:grid;place-items:center;height:58px;background:#ddd;border:1px solid #bbb;color:#888;font-size:26px}
+.s4-store-card-choices button>span:last-child{font-size:10px}
+.s4-store-buy{display:block;width:100%;background:#f8dc4e;border:1px solid #181713;min-height:41px;font-size:13px;font-weight:700}
+.s4-store-run{display:block;text-align:center;margin:13px auto 0;font-size:11px;text-decoration:underline}
+.s4-store-message,.s4-store-error,.s4-store-pending{font-size:11px;line-height:1.6;padding:10px;margin:10px 0}
+.s4-store-message{background:#fff9d5}.s4-store-error{background:#ffede7;color:#9b3434}.s4-store-pending{background:#fff8de;border:1px solid #d3b851}
+.s4-store-error button,.s4-store-pending button{margin:5px 8px 0 0;border:1px solid #181713;background:#fff;padding:6px;font-size:11px}
+.s4-store-overlay{position:fixed;z-index:300;inset:0;display:flex;align-items:center;justify-content:center;background:#0009;padding:16px}
+.s4-store-overlay>section{position:relative;box-sizing:border-box;width:331px;max-width:100%;padding:23px 19px 19px;background:#fff;border:1px solid #181713;text-align:center;font-family:'MonaS12',sans-serif}
+.s4-store-overlay h2{font-size:18px;font-weight:700;line-height:1.45;margin:0 0 11px}
+.s4-store-overlay p{font-size:12px;color:#59534b;line-height:1.7;margin:8px 0 12px}
+.s4-store-overlay strong{display:block;font:700 22px/1.4 'Galmuri11','MonaS12',sans-serif}
+.s4-store-actions{display:flex;gap:11px;margin-top:16px}
+.s4-store-actions>button{flex:1;min-height:35px;border:1px solid #181713;background:#f8dc4e;font:400 12px/1.4 'MonaS12',sans-serif}
+.s4-store-close{position:absolute;right:10px;top:5px;font-size:22px;border:0;background:none}
+@media(prefers-reduced-motion:reduce){.s4-store-art>img{animation:none}}
+@media(max-width:340px){.s4-store{padding-inline:11px}.s4-store-choices{gap:7px}.s4-store-choices>button{padding-inline:8px}.s4-store-art{margin-inline:-11px}}
+
+/* Exact project source: GoDiscovery collar.png and GoPixelChoice interaction. */
+.s4-store-collars{display:flex;justify-content:center;gap:13px;margin:14px auto 18px}
+.s4-store-collars>button{box-sizing:border-box;border:1px solid transparent;background:#fffdfa;padding:6px;width:65px;height:69px}
+.s4-store-collars>button[aria-pressed="true"]{border:2px solid #181713;background:#fff4bb;padding:5px}
+.s4-store-collars img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.s4-store-collar-actions{display:grid;gap:5px;justify-content:center}
+.s4-store-collar-actions .v3-pixel-choice{min-width:130px;color:#181713}
+.s4-store-collar-actions .v3-pixel-choice:disabled{opacity:.5;cursor:not-allowed}
+
+/* Source of truth: Figma 558:607838 (390 x 758). Shared header stays intact
+   on other routes. Additional purchase/free-draw controls continue below
+   the visible store artwork; existing overlay dialogs remain fully functional. */
+.v3-go-site:has(.s4-store) .s1-go-header{height:42px;min-height:42px}
+.v3-go-site:has(.s4-store) .s1-go-nav{display:none}
+.v3-go-site:has(.s4-store) .s1-header-divider,
+.v3-go-site:has(.s4-store) .s1-store{display:none}
+.v3-go-site:has(.s4-store) .v3-go-app{padding:0!important;min-height:calc(100dvh - 42px)}
+.v3-go-site .s4-store{
+  position:relative;box-sizing:border-box;display:block;width:100%;max-width:390px;
+  margin:0 auto;min-height:1220px;padding:0!important;background:#fff;
+}
+.v3-go-site .s4-store-back{
+  position:absolute;top:4px;left:12px;margin:0;font:400 11px/26px 'Galmuri11',sans-serif;
+  text-decoration:none;
+}
+.v3-go-site .s4-store h1{
+  position:absolute;top:33px;left:16px;margin:0;font:700 18px/27px 'MonaS12',sans-serif;
+}
+.v3-go-site .s4-store-art{
+  position:absolute;top:47px;left:0;right:0;height:174px;max-width:none;
+  margin:0;overflow:hidden;display:block;
+}
+.v3-go-site .s4-store-art>img{
+  display:block;width:390px;max-width:100%;height:225px;object-fit:contain;
+  object-position:top center;image-rendering:pixelated;
+}
+.v3-go-site .s4-store-art>button{
+  position:absolute;right:13px;top:10px;bottom:auto;opacity:.82;
+  padding:3px 5px;font-size:9px;
+}
+.v3-go-site .s4-store-dialogue{
+  position:absolute;top:221px;left:16px;width:calc(100% - 33px);height:80px;
+  box-sizing:border-box;border:4px solid #111;background:white;
+  outline:2px solid black;outline-offset:-10px;padding:13px 23px;
+  box-shadow:inset 0 0 0 3px #fff;
+}
+.v3-go-site .s4-store-dialogue strong{display:block;font:700 11px/17px 'Galmuri11',sans-serif}
+.v3-go-site .s4-store-dialogue p{
+  margin:6px 0 0!important;font:400 11px/17px 'Galmuri11',sans-serif;color:#181713;
+}
+.v3-go-site .s4-store-products{
+  position:absolute;top:332px;left:17px;right:18px;box-sizing:border-box;padding:0;
+}
+.v3-go-site .s4-store-screen-reader{
+  position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);
+}
+.v3-go-site .s4-store-choices{
+  display:grid;grid-template-columns:repeat(2,minmax(0,166px));
+  justify-content:space-between;column-gap:23px;margin:0 0 16px;
+}
+.v3-go-site .s4-store-choices>button,
+.v3-go-site .s4-store-choices>button[aria-pressed="true"]{
+  display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
+  width:100%;min-width:0;margin:0;padding:0!important;border:0!important;
+  outline:none;background:#fff!important;color:#181713;text-align:left;gap:0;
+}
+.v3-go-site .s4-store-choices>button[aria-pressed="true"] .s2-locked-card-svg{
+  outline:2px solid #f7d94d;outline-offset:2px;
+}
+.v3-go-site .s4-store-choices .s2-locked-card-svg{
+  width:100%;height:auto;aspect-ratio:166 / 265;flex:none;
+}
+.v3-go-site .s4-store-choices strong{
+  display:block;margin:12px 0 0;font:700 11px/16.5px 'MonaS12',sans-serif;
+}
+.v3-go-site .s4-store-choices small{
+  display:block;margin:7px 0 0;height:46px;font:400 11px/16.5px 'Galmuri11',sans-serif;
+  color:#000;
+}
+.v3-go-site .s4-store-choices b{
+  display:block;margin:0;font:400 11px/16.5px 'Galmuri11',sans-serif;
+}
+.v3-go-site .s4-store-choices button:focus-visible{outline:2px solid #181713!important}
+.v3-go-site .s4-store-wallet{
+  position:absolute;top:1072px;left:17px;right:18px;margin:0;
+}
+.v3-go-site .s4-store-draw{
+  position:absolute;top:1120px;left:17px;right:18px;margin:0;
+}
+.v3-go-site .s4-store-message,.v3-go-site .s4-store-error{
+  position:absolute;top:304px;left:17px;right:18px;margin:0;
+  z-index:2;
+}
+.v3-go-site .s4-store-dog-list{margin:0 0 15px}
+.v3-go-site .s4-store-dog-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.v3-go-site .s4-store-dog-choices>button{
+  border:1px solid #222;background:#fff;padding:10px 6px;font:700 12px/18px 'MonaS12',sans-serif;
+  text-align:center;
+}
+.v3-go-site .s4-store-dog-choices>button[aria-pressed="true"]{background:#f7d94d}
+.v3-go-site .s4-store-dog-choices small{display:block;font:400 10px/15px 'Galmuri11',sans-serif}
+@media(max-width:389px){
+ .v3-go-site .s4-store-choices{column-gap:15px}
+ .v3-go-site .s4-store-art>img{width:100%}
+ .v3-go-site .s4-store-dialogue{left:4%;width:92%;padding-left:16px}
+ .v3-go-site .s4-store-products{left:4%;right:4%}
+ .v3-go-site .s4-store-wallet,.v3-go-site .s4-store-draw{left:4%;right:4%}
+}
+
+/* Exact Figma caption first baseline y=654 at 390px. */
+.v3-go-site .s4-store-choices strong{margin-top:15px}
+
+/* Figma 558:607976: exact 357x80 dialogue, three original vector layers. */
+.v3-go-site .s4-store-dialogue{padding:0;border:0;outline:0;box-shadow:none;background:transparent}
+.v3-go-site .s4-store-dialogue>img{position:absolute;display:block;max-width:none;pointer-events:none}
+.v3-go-site .s4-store-dialogue-bg{left:1.879px;top:.87px;width:calc(100% - 3.758px);height:78.26px}
+.v3-go-site .s4-store-dialogue-outer{left:1.879px;top:.87px;width:calc(100% - 3.758px);height:78.26px}
+.v3-go-site .s4-store-dialogue-inner{left:7.516px;top:5.217px;width:calc(100% - 15.032px);height:69.565px}
+.v3-go-site .s4-store-dialogue-copy{position:absolute;left:29px;top:16px;right:15px;z-index:2}
+.v3-go-site .s4-store-dialogue-copy strong{display:block;margin:0;font:700 11px/16.5px 'Galmuri11',sans-serif}
+.v3-go-site .s4-store-dialogue-copy p{margin:7.5px 0 0!important;font:400 11px/16.5px 'Galmuri11',sans-serif}
+@media(max-width:389px){.v3-go-site .s4-store-dialogue-copy{left:24px}}
