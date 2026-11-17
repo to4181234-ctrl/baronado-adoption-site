@@ -9,6 +9,7 @@ import GoCardFace from './GoCardFace.js';
 import GoElementSparkles,{elementForCard} from './GoElementSparkles.js';
 import {vibrateBattleHit,stopBattleVibration} from '../lib/goBattleHaptics.js';
 import {figmaSprite,FIGMA_DOGS} from '../lib/goV3Game.js';
+import GoFriendBattle,{GO_STAGE5_UI_ENABLED} from './GoFriendBattle.js';
 
 const initial={cards:[],hasMore:false,total:0,eligibleDogKinds:0};
 const emptyOpponents={members:[],total:0,hasMore:false};
@@ -207,4 +208,17 @@ function Game(){
   </>}
  </div>;
 }
-export default function GoBattle(){return <GoShell active="battle" title="멍배틀" description="멍카드 두 장으로 즐기는 8비트 대결"><Game/></GoShell>;}
+function BattleModes(){
+ const [mode,setMode]=useState('random');
+ useEffect(()=>{
+  if(new URLSearchParams(window.location.search).has('room'))setMode('friend');
+ },[]);
+ return <>
+  {GO_STAGE5_UI_ENABLED&&<nav className="s5-battle-mode" aria-label="멍배틀 방식 선택">
+   <button type="button" onClick={()=>setMode('random')} aria-current={mode==='random'?'page':undefined}>랜덤 멍배틀</button>
+   <button type="button" onClick={()=>setMode('friend')} aria-current={mode==='friend'?'page':undefined}>친구 실시간 멍배틀</button>
+  </nav>}
+  {GO_STAGE5_UI_ENABLED&&mode==='friend'?<GoFriendBattle/>:<Game/>}
+ </>;
+}
+export default function GoBattle(){return <GoShell active="battle" title="멍배틀" description="랜덤 또는 친구와 즐기는 멍카드 대결"><BattleModes/></GoShell>;}
