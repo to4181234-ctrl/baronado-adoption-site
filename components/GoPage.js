@@ -9,8 +9,10 @@ import GoDogAlbum from './GoDogAlbum.js';
 import GoCamera from './GoCamera.js';
 import GoCard from './GoCard.js';
 import GoDiscovery from './GoDiscovery.js';
+import GoQuests from './GoQuests.js';
 const EMPTY={counts:{},covers:{},progress:null,standing:null,ready:false};
 const STAGE2_ENABLED=process.env.NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED==='1';
+const STAGE3_COINS_ENABLED=process.env.NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED==='1';
 const FIGMA_ALBUM_SHADOW = {깡지:'/figma-v3/album-shadow-kangji.svg',버디:'/figma-v3/album-shadow-buddy.svg',뽀실:'/figma-v3/album-shadow-pposil.svg',구름:'/figma-v3/album-shadow-gureum.svg',오레오:'/figma-v3/album-shadow-oreo.svg'};
 function Album({initialDogId=null}){
  const {member,ready,openAccount}=useGoSession();
@@ -64,7 +66,7 @@ function Album({initialDogId=null}){
     <section className="v3-collection-section"><h2>내 도감</h2><div className="v3-progress-label">도감 수집 {officialLoaded?claimed:'—'} / {totalDogs}{member&&claimed===0?' (첫 도감을 기다리고 있어요)':''}</div><div className="v3-progress"><span style={{width:(officialLoaded?claimed/totalDogs*100:0)+'%'}}/></div>
      <div className="v3-collection-grid">{orderedDogs.map(name=>{const d=dogs.find(x=>x.name===name),owned=Boolean(d&&member&&hasDogCards(d.id));return <Link href={d?'/go/'+d.id:'/go'} className={'v3-collection-tile'+(owned?' unlocked':'')} key={name}><img src={owned?figure(name,true):FIGMA_ALBUM_SHADOW[name]||figure(name,false)} alt={owned?name:'미획득 실루엣'}/><strong>{name}</strong></Link>})}</div></section>
     <section className="v3-battle-home"><h2>멍배틀</h2><Link href="/go/battle" className="v3-battle-shortcut"><img src="/figma-v3/collar.png" alt="픽셀 목줄"/><strong>멍배틀 하러가기 &gt;</strong></Link><div className="v3-pixel-panel"><div className="v10-panel-canvas">{['bg','outer','inner'].map(name=><img key={name} className={'v3-album-panel-layer v3-album-panel-'+name} src={'/figma-v3/album-panel-'+name+'.svg'} alt=""/>)}<div className="v3-panel-content">{!member?<><b>멍배틀을 시작해볼까요?</b><p>서로 다른 멍카드 2장을 모아<br/>대결하고 나만의 전적을 쌓아보세요!</p><button type="button" className="v3-anon-battle-login" onClick={openAccount}><img src="/figma-v3/album-battle-arrow.svg" alt="" aria-hidden="true"/>로그인하고 시작하기</button></>:<><b>멍멍이별 대결 전적</b>{Object.keys(collection.battleRecords||{}).length?<ul className="v11-battle-records">{Object.entries(collection.battleRecords).map(([id,stats])=><li key={id}><span>{dogs.find(d=>d.id===id)?.name||'멍멍이'}</span><span>{stats.wins}승 {stats.draws}무 {stats.losses}패</span></li>)}</ul>:<p>멍배틀을 하고 기록을 쌓아보세요</p>}</>}</div></div></div></section>
-    
+    {STAGE3_COINS_ENABLED && <GoQuests compact/>}
   </div>}
   {!dogId&&!loadingDogs&&dogs.length>0&&<GoDiscovery dogs={dogs} dog={dogs[0]}/>}
   {notice&&<p className="v3-message" role="status">{notice}</p>}{error&&<p className="v3-error" role="alert">{error}</p>}

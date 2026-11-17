@@ -1,6 +1,7 @@
 'use client';
 import {createContext,useCallback,useContext,useEffect,useRef,useState} from 'react';
 import SiteHeader from './SiteHeader.js';
+import {GoCoinProvider} from './GoCoins.js';
 import GoAccount from './GoAccount.js';
 import GoAmbientSound from './GoAmbientSound.js';
 import GoAuthDialog from './GoAuthDialog.js';
@@ -20,6 +21,7 @@ export default function GoShell({children,active='album'}){
  async function logout(){const r=await fetch('/api/go/session',{method:'DELETE'});if(r.ok){try{for(const k of Object.keys(sessionStorage))if(/^(meonggo|baronado-go)/.test(k))sessionStorage.removeItem(k);}catch{}setMember(null);location.assign('/go');}}
  const copy=explanations[reason];
  return <SessionContext.Provider value={{member,ready,openAccount,openWithdraw:()=>{remember();setWithdrawIntent(true);setShowAccount(true);},logout}}>
+  <GoCoinProvider member={member}>
   <main className="site-shell v3-site v3-go-site s1-go-site">
    <SiteHeader member={member} onLogout={logout} onLogin={()=>openAccount()}/><GoAmbientSound/>
    <section className="v3-go-app">
@@ -29,5 +31,6 @@ export default function GoShell({children,active='album'}){
    {copy&&<GoAuthDialog onClose={close} className="s1-login-prompt" label="로그인 안내"><h2>{copy[0]}</h2><p>{copy[1]}</p><button type="button" className="s1-prompt-primary" onClick={()=>{setReason(null);setShowAccount(true);}}>{copy[2]}</button><button type="button" className="s1-prompt-browse" onClick={close}>계속 둘러보기</button></GoAuthDialog>}
    {showAccount&&<GoAuthDialog onClose={close} className="v3-auth s1-account-dialog" label="멍멍GO! 가입·로그인">{googleMessage&&<p className="v3-error" role="alert">{googleMessage}</p>}<GoAccount member={member} initialWithdraw={withdrawIntent} onChange={loggedIn}/></GoAuthDialog>}
   </main>
+  </GoCoinProvider>
  </SessionContext.Provider>;
 }
