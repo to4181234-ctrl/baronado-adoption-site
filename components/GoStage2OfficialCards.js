@@ -2,6 +2,7 @@
 
 import {useCallback,useEffect,useState} from 'react';
 import GoCardFace from './GoCardFace.js';
+import GoCompletion from './GoCompletion.js';
 import {CARD_FACE} from '../lib/goCardFace.js';
 
 function LockedOfficialCard({slot}) {
@@ -128,7 +129,12 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
       </div>
     </div>
     <p className="s2-official-help">{!dog?'':acquired?'히든 카드 해금 완료':unlockable?'일반 멍카드 4종을 모았어요. HIDDEN 카드를 눌러 해금하세요.':'일반 멍카드 4종을 모으면 HIDDEN 카드를 열 수 있어요.'}</p>
-    {opened&&openedData?.imageUrl&&
+    {hiddenJustUnlocked&&hiddenImage&&<GoCompletion viewOnly
+      card={{dogName:dog?.name||'멍멍이',nickname:'바로나도',imageUrl:hiddenImage,
+        title:'HIDDEN',status:'approved',battle:{power:0,charm:0}}}
+      viewerActions={<button type="button" className="go-primary go-complete-continue" onClick={()=>{setOpened(null);setHiddenJustUnlocked(false);}}>내 도감에서 보기</button>}
+      onDone={()=>{setOpened(null);setHiddenJustUnlocked(false);}}/>}
+    {opened&&openedData?.imageUrl&&!hiddenJustUnlocked&&
       <div className="v5-modal-backdrop" role="presentation" onClick={()=>{setOpened(null);setHiddenJustUnlocked(false);}}>
         <section className="s2-official-viewer" role="dialog" aria-modal="true" aria-label="공식 멍카드 보기" onClick={e=>e.stopPropagation()}>
           <button type="button" className="s2-official-close" aria-label="닫기" onClick={()=>{setOpened(null);setHiddenJustUnlocked(false);}}>×</button>
