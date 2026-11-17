@@ -12,6 +12,9 @@ END
 $guard$;
 ALTER TABLE public.go_official_assets DROP CONSTRAINT go_official_assets_slot_check;
 ALTER TABLE public.go_official_assets ADD CONSTRAINT go_official_assets_slot_check CHECK (slot BETWEEN 1 AND 5);
+ALTER TABLE public.go_official_assets DROP CONSTRAINT go_official_assets_check;
+ALTER TABLE public.go_official_assets ADD CONSTRAINT go_official_assets_check
+ CHECK ((slot=5) OR (length(trim(title)) BETWEEN 1 AND 30));
 ALTER TABLE public.go_official_owned DROP CONSTRAINT go_official_owned_slot_check;
 ALTER TABLE public.go_official_owned ADD CONSTRAINT go_official_owned_slot_check CHECK (slot BETWEEN 1 AND 4);
 
