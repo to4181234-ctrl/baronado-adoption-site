@@ -80,7 +80,7 @@ BEGIN
   'duplicate',v_owned,'requiresChoice',v_owned,'proposedPower',v_power,
   'proposedCharm',v_charm,'coinsAdded',10,'balance',v_wallet,
   'hiddenUnlocked',v_hidden);
-END;$function$
+END;$function$;
 
 
 CREATE OR REPLACE FUNCTION public.go_official_purchase(p_member uuid, p_dog uuid, p_request uuid)
@@ -125,7 +125,7 @@ BEGIN
   WHERE member_id=p_member RETURNING balance INTO v_balance;
  RETURN jsonb_build_object('ok',true,'dogId',p_dog,'slot',v_slot,'power',v_power,
    'charm',v_charm,'coinsSpent',200,'balance',v_balance,'hiddenUnlocked',v_hidden);
-END;$function$
+END;$function$;
 
 
 CREATE OR REPLACE FUNCTION public.go_official_manage(p_dog uuid, p_action text, p_draft uuid DEFAULT NULL::uuid)
@@ -144,7 +144,7 @@ BEGIN
   SELECT count(*) INTO v_count FROM public.go_official_assets
    WHERE version_id=p_draft AND display_path<>'' AND original_path<>'';
   IF v_count<>5 THEN RETURN jsonb_build_object('ok',false,'error','사진 4종과 HIDDEN 일러스트를 모두 등록해주세요.'); END IF;
-  -- Old public revision remains unchanged until all six assets are validated.
+  -- Old public revision remains unchanged until all five assets are validated.
   UPDATE public.go_official_versions SET status='retired'
    WHERE id=v_set.current_version AND status='published';
   UPDATE public.go_official_versions SET status='published',published_at=now() WHERE id=p_draft;
@@ -173,7 +173,7 @@ BEGIN
   RETURN jsonb_build_object('ok',true,'status','deleted');
  END IF;
  RETURN jsonb_build_object('ok',false,'error','지원하지 않는 작업이에요.');
-END;$function$
+END;$function$;
 
 
 CREATE OR REPLACE FUNCTION public.go_official_mark_seen(p_member uuid, p_dog uuid, p_slot smallint)
@@ -190,7 +190,7 @@ BEGIN
    WHERE member_id=p_member AND dog_id=p_dog AND slot=p_slot;
  END IF;
  RETURN FOUND;
-END;$function$
+END;$function$;
 
 
 
