@@ -89,6 +89,7 @@ function Game(){
    const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,secondId:selected[1].id,matchToken:preparedToken.current})});
    const body=await response.json();if(!alive.current)return;
    if(!response.ok)throw Error(body.error||'대결 결과를 저장하지 못했어요.');
+   if(body.coinsAdded>0)window.dispatchEvent(new CustomEvent('go-coins-changed',{detail:{notified:false}}));
    setResult(body.battle);setPhase('result');sounds.current?.play(body.battle.winner==='draw'?'draw':body.battle.winner==='first'?'victory':'defeat');timers.current.push(setTimeout(()=>sounds.current?.play('bark1'),450));
   }catch(e){
    setError(e.message);setSelected(list=>list.slice(0,1));setResult(null);
