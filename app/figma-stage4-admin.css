@@ -1,0 +1,31 @@
+/* Stage 4 official-card admin. Admin hierarchy follows the existing
+   v10 admin shell; this scopes layout and avoids the globally absolute
+   GoCardFace SVG intercepting controls in the adjacent slot grid. */
+.go-official-admin{box-sizing:border-box;max-width:900px;margin:0 auto;padding:24px 16px 50px;color:#181713;font-family:'MonaS12',sans-serif}
+.go-official-admin *{box-sizing:border-box}
+.go-official-admin h1{font-size:22px;line-height:1.35;margin:10px 0}
+.go-official-admin h2{font-size:18px;margin:16px 0 8px}
+.go-official-admin h3{font-size:15px;margin:0}
+.go-official-admin p{font-size:12px;line-height:1.7}
+.go-official-admin label{display:grid;gap:6px;margin:12px 0;font:400 12px/1.5 'MonaS12',sans-serif}
+.go-official-admin input:not([type=range]),.go-official-admin select{max-width:100%;min-height:35px;padding:6px;border:1px solid #b6b1aa;background:white;color:#181713}
+.go-official-admin input[type=range]{width:100%}
+.go-official-admin button{font:400 12px/1.35 'MonaS12',sans-serif;border:1px solid #181713;border-radius:4px;background:#f7d94d;padding:9px 13px;min-height:33px;color:#181713;cursor:pointer}
+.go-official-admin button:disabled{opacity:.5;cursor:not-allowed}
+.go-official-admin-status,.go-official-admin-editor{padding:16px;margin:14px 0;border:1px solid #dfd8cc;background:#fff}
+.go-official-admin-slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:15px 0;position:relative;z-index:1}
+.go-official-admin-slots>button{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;min-height:89px;padding:7px 3px;border:1px solid #d3cabb;background:#fff}
+.go-official-admin-slots>button.is-selected{border:2px solid #181713;background:#fff5ca;padding:6px 2px}
+.go-official-admin-slots>button img{width:100%;max-width:64px;height:61px;object-fit:cover}
+.go-official-admin-slots>button small{display:block;margin-top:4px;font-size:10px}
+.go-official-admin-edit-area{display:grid;gap:10px;position:relative;clear:both;min-width:0}
+.go-official-admin-photo-preview{width:134px;height:132px;max-width:100%;overflow:hidden;border:1px solid #bbb;background:#eee;display:grid;place-items:center}
+.go-official-admin-photo-preview img{width:100%;height:100%;object-fit:cover}
+.go-official-admin-card-face{position:relative;width:166px;max-width:100%;height:auto;min-height:265px;margin:0;display:grid;justify-items:center;gap:7px}
+.go-official-admin-card-face .go-card-graphic{position:relative!important;inset:auto!important;width:166px!important;max-width:100%!important;height:265px!important;pointer-events:none;flex:none}
+.go-official-admin-card-face small{width:min(270px,90vw);font-size:10px;line-height:1.5;color:#666}
+.go-official-admin-crop{max-width:360px;display:grid;gap:5px}
+.go-official-admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.go-official-admin .is-danger{background:#fff3f2;color:#9b2e2e;border-color:#9b2e2e}
+.go-official-admin .v10-admin-note{font-size:11px;line-height:1.6}
+@media(max-width:350px){.go-official-admin{padding-inline:11px}.go-official-admin-slots{gap:4px}.go-official-admin-slots>button{min-height:75px}}
