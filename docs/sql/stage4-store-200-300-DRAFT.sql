@@ -7,9 +7,18 @@ BEGIN;
 -- dog-targeted receipts remain legacy and cannot be replayed as random.
 ALTER TABLE public.go_official_purchases
  ADD COLUMN IF NOT EXISTS purchase_mode text;
-ALTER TABLE public.go_official_purchases
- ADD CONSTRAINT go_official_purchases_mode_check
- CHECK (purchase_mode IS NULL OR purchase_mode IN ('random','specific'));
+DO $check$
+BEGIN
+ IF NOT EXISTS (
+   SELECT 1 FROM pg_constraint
+   WHERE conrelid='public.go_official_purchases'::regclass
+     AND conname='go_official_purchases_mode_check'
+ ) THEN
+  ALTER TABLE public.go_official_purchases
+    ADD CONSTRAINT go_official_purchases_mode_check
+    CHECK (purchase_mode IS NULL OR purchase_mode IN ('random','specific'));
+ END IF;
+END $check$;
 CREATE OR REPLACE FUNCTION public.go_store_purchase(
  p_member uuid,p_request uuid,p_mode text,p_dog uuid DEFAULT NULL,p_slot smallint DEFAULT NULL
 ) RETURNS jsonb LANGUAGE plpgsql SET search_path TO 'public' AS $function$
