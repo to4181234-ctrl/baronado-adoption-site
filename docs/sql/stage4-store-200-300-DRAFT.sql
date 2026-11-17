@@ -33,8 +33,8 @@ BEGIN
  IF p_mode='random' AND (p_dog IS NOT NULL OR p_slot IS NOT NULL) THEN
   RETURN jsonb_build_object('ok',false,'error','랜덤 구매에는 강아지와 카드 번호를 지정할 수 없어요.');
  END IF;
- IF p_mode='specific' AND (p_dog IS NULL OR p_slot IS NULL OR p_slot NOT BETWEEN 1 AND 4) THEN
-  RETURN jsonb_build_object('ok',false,'error','구매할 미보유 일반 멍카드를 선택해주세요.');
+ IF p_mode='specific' AND (p_dog IS NULL OR p_slot IS NOT NULL) THEN
+  RETURN jsonb_build_object('ok',false,'error','지정 뽑기에서는 강아지만 선택해주세요.');
  END IF;
  IF NOT EXISTS(SELECT 1 FROM public.go_members WHERE id=p_member AND NOT disabled) THEN
   RETURN jsonb_build_object('ok',false,'error','로그인이 필요해요.');
@@ -47,7 +47,7 @@ BEGIN
   WHERE member_id=p_member AND request_id=p_request;
  IF FOUND THEN
   IF v_saved.coins<>v_price OR v_saved.purchase_mode IS DISTINCT FROM p_mode OR (p_mode='specific'
-     AND (v_saved.dog_id<>p_dog OR v_saved.slot<>p_slot)) THEN
+     AND v_saved.dog_id IS DISTINCT FROM p_dog) THEN
    RETURN jsonb_build_object('ok',false,'error','다른 구매에 사용된 요청 번호예요.');
   END IF;
   RETURN jsonb_build_object('ok',true,'replayed',true,
@@ -58,14 +58,15 @@ BEGIN
   RETURN jsonb_build_object('ok',false,'error','멍코인이 부족해요.','balance',v_balance);
  END IF;
  IF p_mode='specific' THEN
-  SELECT d.id,p_slot INTO v_dog,v_slot
+  -- Pick an unowned normal card of the user-chosen dog at random (Figma 558:607838).
+  SELECT d.id,a.slot INTO v_dog,v_slot
   FROM public.dogs d JOIN public.go_official_sets s ON s.dog_id=d.id
-   JOIN public.go_official_assets a ON a.version_id=s.current_version AND a.slot=p_slot
+   JOIN public.go_official_assets a ON a.version_id=s.current_version
   WHERE d.id=p_dog AND d.category='adoption' AND NOT d.adopted
-   AND s.current_version IS NOT NULL AND NOT s.paused AND p_slot BETWEEN 1 AND 4
+   AND s.current_version IS NOT NULL AND NOT s.paused AND a.slot BETWEEN 1 AND 4
    AND NOT EXISTS(SELECT 1 FROM public.go_official_owned o
-     WHERE o.member_id=p_member AND o.dog_id=d.id AND o.slot=p_slot)
-  LIMIT 1;
+     WHERE o.member_id=p_member AND o.dog_id=d.id AND o.slot=a.slot)
+  ORDER BY random() LIMIT 1;
  ELSE
   SELECT d.id,a.slot INTO v_dog,v_slot
   FROM public.dogs d JOIN public.go_official_sets s ON s.dog_id=d.id
