@@ -66,7 +66,7 @@ export default function GoQuests({ compact = false }) {
               ? <button className="go-quest-title" type="button" onClick={()=>setNotice('오늘 이미 완료한 퀘스트예요.')}>{task.title} &gt;</button>
               : task.id==='visit' && !compact
                 ? <button className="go-quest-title" type="button" onClick={()=>setVisitOpen(true)}>{task.title} &gt;</button>
-                : <Link className="go-quest-title" href={task.href}>{task.title} &gt;</Link>}
+                : <Link className="go-quest-title" href={task.href} aria-label={task.id==='battle'?'랜덤 또는 친구 1:1 멍배틀, 오늘 첫 완료 시 10 멍코인':undefined}>{task.title} &gt;</Link>}
             <small>{task.caption}</small>
           </div>
           <div className="go-quest-item-action">
