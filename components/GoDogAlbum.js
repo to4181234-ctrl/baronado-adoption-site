@@ -263,13 +263,19 @@ export default function GoDogAlbum({ dogId }) {
     </div>}
 
     {deleteOpen && <div className="v5-modal-backdrop" role="presentation" onClick={() => !deleting && setDeleteOpen(false)}>
-      <section role="dialog" aria-modal="true" aria-label="선택 카드 삭제 확인" className="v5-delete-dialog" onClick={e => e.stopPropagation()}>
-        <h2>{deleteDogName} 카드 {selectedIds.length}장을 삭제할까요?</h2>
-        <p>내 도감 › {deleteDogName} · 선택한 카드 {selectedIds.length}장<br/>공개 게시물도 함께 삭제돼요.</p>
-        {deleteError && <p className="v3-error" role="alert">{deleteError}</p>}
-        <button type="button" className="v5-confirm-delete" disabled={deleting} onClick={deleteSelected}>{deleting ? '삭제 중…' : `선택한 ${selectedIds.length}장 삭제`}</button>
-        <button type="button" className="v5-cancel-delete" disabled={deleting} onClick={() => setDeleteOpen(false)}>취소</button>
-        <small>해당 강아지의 모든 카드를 삭제하면<br/>도감 획득 기록과 배틀 전적도 사라져요.</small>
+      <section role="dialog" aria-modal="true" aria-label="선택 카드 삭제 확인"
+        className="v5-delete-dialog s2-delete-dialog" onClick={e => e.stopPropagation()}>
+        <button type="button" className="s2-delete-close" aria-label="닫기"
+          disabled={deleting} onClick={() => setDeleteOpen(false)}>×</button>
+        <h2>선택한 {selectedIds.length}장을<br/>삭제할까요?</h2>
+        <p>삭제한 카드와 사진은<br/>복구할 수 없어요.</p>
+        {deleteError && <p className="s2-delete-error" role="alert">{deleteError}</p>}
+        <div className="s2-delete-actions">
+          <button type="button" disabled={deleting} onClick={() => setDeleteOpen(false)}>취소</button>
+          <button type="button" disabled={deleting} onClick={deleteSelected}>
+            {deleting ? '삭제 중…' : '삭제'}
+          </button>
+        </div>
       </section>
     </div>}
 
