@@ -49,6 +49,8 @@ def main():
     p.add_argument("baseline", type=Path)
     p.add_argument("--manifest", type=Path,
                    help="optional local private manifest file; never commit")
+    p.add_argument("--expected-manifest", type=Path,
+                   help="previous trusted SHA-256 manifest for content verification")
     args = p.parse_args()
     base = json.loads(args.baseline.read_text(encoding="utf-8"))
     dest = args.backup_storage_dir
@@ -56,6 +58,10 @@ def main():
         p.error("downloaded Storage directory not found")
     results = {}
     failed = False
+    trusted = (json.loads(args.expected_manifest.read_text(encoding="utf-8"))
+               if args.expected_manifest else None)
+    if trusted is not None and set(trusted) != set(base["buckets"]):
+        p.error("trusted manifest bucket set does not match baseline")
     for bucket, expected in base["buckets"].items():
         current = inspect(dest / bucket)
         files, total = current["files"], current["bytes"]
@@ -64,6 +70,11 @@ def main():
         ok = (len(files) == expected["objects"] and
               total == expected["bytes"] and
               metadata_md5 == expected.get("names_sizes_md5"))
+        if trusted is not None:
+            prior = trusted[bucket]
+            if prior.get("ok") is not True:
+                p.error("trusted manifest must come from a successful verification")
+            ok = ok and files == prior.get("files")
         results[bucket] = {
             "files": files, "file_count": len(files),
             "total_bytes": total, "names_sizes_md5": metadata_md5,
@@ -73,7 +84,7 @@ def main():
               f"names/sizes manifest match={metadata_md5 == expected.get('names_sizes_md5')}, "
               f"PASS={ok}")
         failed |= not ok
-    if args.manifest:
+    if args.manifest and not failed:
         args.manifest.parent.mkdir(parents=True, exist_ok=True)
         if args.manifest.exists():
             p.error("will not overwrite previous checksum manifest")
@@ -87,6 +98,8 @@ def main():
               file=sys.stderr)
         return 1
     print("PASS: downloaded object counts, exact bytes, and paths/sizes match baseline.")
+    print("SHA-256 content comparison PASS." if trusted is not None else
+          "SHA-256 recorded only; source content integrity is not established by metadata.")
     return 0
 
 if __name__ == "__main__":

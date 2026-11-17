@@ -1,0 +1,21 @@
+import {spawn,execFileSync} from 'node:child_process';import fs from 'node:fs';import path from 'node:path';import net from 'node:net';import http from 'node:http';import {runtimeRequire,runtimeRoot,repoRoot,scriptRoot} from './paths.mjs';const pg=runtimeRequire('pg');
+const base=runtimeRoot;const dbDir=path.join(base,'pgdata_http_'+Date.now());const children=[];const logs=[];
+const start=(name,bin,args=[],env={})=>{const log=fs.openSync(path.join(base,name+'.log'),'w');logs.push(log);const p=spawn(bin,args,{cwd:base,env:{...process.env,...env},stdio:['ignore',log,log]});children.push(p);return p};
+async function waitPort(port){for(let i=0;i<100;i++){const ok=await new Promise(resolve=>{const s=net.connect(port,'127.0.0.1');s.on('connect',()=>{s.destroy();resolve(true)});s.on('error',()=>resolve(false));});if(ok)return;await new Promise(r=>setTimeout(r,200));}throw Error('port not ready '+port);}
+try{
+ if(!fs.existsSync(path.join(dbDir,'PG_VERSION')))execFileSync(path.join(base,'node_modules/@embedded-postgres/linux-x64/native/bin/initdb'),['-D',dbDir,'-U','postgres','--auth=trust','--locale=C','--encoding=UTF8'],{stdio:'ignore'});
+ start('postgres',path.join(base,'node_modules/@embedded-postgres/linux-x64/native/bin/postgres'),['-D',dbDir,'-h','127.0.0.1','-p','55432','-c',"unix_socket_directories="]);
+ await waitPort(55432);for(let i=0;i<100;i++){const c=new pg.Client({host:'127.0.0.1',port:55432,user:'postgres',password:'qa-local-only',database:'postgres'});try{await c.connect();await c.query('select 1');await c.end();break;}catch{await c.end().catch(()=>{});await new Promise(r=>setTimeout(r,200));if(i===99)throw Error('database not ready');}}
+ execFileSync(process.execPath,[path.join(scriptRoot,'setup.mjs')],{cwd:base,stdio:'inherit'});execFileSync(process.execPath,[path.join(scriptRoot,'prepare-http-extra.mjs')],{cwd:base,stdio:'inherit'});
+ const cfgStorage=JSON.parse(fs.readFileSync(path.join(base,'local-config.json')));
+ const storageEnv={DATABASE_URL:'postgresql://postgres:qa-local-only@127.0.0.1:55432/go_integration_http',AUTH_JWT_SECRET:cfgStorage.jwtSecret,SERVICE_KEY:cfgStorage.serviceKey,ANON_KEY:cfgStorage.anonKey,DB_INSTALL_ROLES:'false',DB_SUPER_USER:'postgres',STORAGE_BACKEND:'file',FILE_STORAGE_BACKEND_PATH:path.join(base,'storage-files'),STORAGE_FILE_BACKEND_PATH:path.join(base,'storage-files'),STORAGE_S3_BUCKET:'qa-storage',GLOBAL_S3_BUCKET:'qa-storage',STORAGE_S3_REGION:'us-east-1',REGION:'us-east-1',SERVER_HOST:'127.0.0.1',SERVER_PORT:'55434',SERVER_ADMIN_PORT:'55437',TENANT_ID:'qa-local',PG_QUEUE_ENABLE:'false',S3_PROTOCOL_ENABLED:'false',IMAGE_TRANSFORMATION_ENABLED:'false',DEFAULT_METRICS_ENABLED:'false'};
+ const storageLog=fs.openSync(path.join(base,'storage.log'),'w');const storage=spawn(process.execPath,['dist/start/server.js'],{cwd:path.join(base,'storage-source'),env:{...process.env,...storageEnv},stdio:['ignore',storageLog,storageLog]});children.push(storage);await waitPort(55434);
+ start('postgrest',path.join(base,'postgrest'),[path.join(base,'postgrest.conf')]);await waitPort(55433);start('gateway',process.execPath,[path.join(scriptRoot,'gateway.mjs')]);await waitPort(55435);console.log('REAL_LOCAL_POSTGREST_READY');
+ const cfg=JSON.parse(fs.readFileSync(path.join(base,'local-config.json')));
+
+ const appenv={NEXT_PUBLIC_SUPABASE_URL:'http://127.0.0.1:55435',SUPABASE_SERVICE_ROLE_KEY:cfg.serviceKey,NEXT_PUBLIC_SUPABASE_ANON_KEY:cfg.anonKey,ADMIN_SESSION_SECRET:'qa-http-session-secret-thirty-two-characters',ADMIN_PASSWORD:'qa-admin-pass',NEXT_TELEMETRY_DISABLED:'1'};
+ for(const name of ['MEONGGO_STAGE1_COINS_ENABLED','MEONGGO_STAGE2_OFFICIAL_ENABLED','MEONGGO_STAGE4_STORE_ENABLED','MEONGGO_STAGE5_PVP_ENABLED']){appenv[name]='1';appenv['NEXT_PUBLIC_'+name]='1';}
+ start('next',process.execPath,[path.join(repoRoot,'node_modules/next/dist/bin/next'),'start',repoRoot,'-H','127.0.0.1','-p','55436'],appenv);await waitPort(55436);
+ try{execFileSync(process.execPath,[path.join(scriptRoot,'http-checks.mjs')],{cwd:base,stdio:'inherit'});}finally{}
+ 
+}catch(e){console.error(e);process.exitCode=1;}finally{for(const p of children.reverse())p.kill('SIGTERM');await new Promise(r=>setTimeout(r,500));for(const p of children)p.kill('SIGKILL');}

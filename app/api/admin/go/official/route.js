@@ -1,6 +1,7 @@
 import sharp from 'sharp';
 import { hasAdminSession, sameOrigin } from '../../../../../lib/server/adminSession.js';
 import { adminDatabase, validId } from '../../../../../lib/server/adminData.js';
+import { removeUnusedDraftAssets } from '../../../../../lib/server/goOfficialStorage.js';
 import { GO_OFFICIAL_BUCKET, GO_OFFICIAL_MAX_BYTES, goStage2ServerEnabled,
   officialPhotoOptions, officialPhotoOutput, officialStoragePaths } from '../../../../../lib/goOfficial.js';
 
@@ -152,8 +153,8 @@ export async function PUT(request){
   // published bytes. Remove the old draft-only pair after the pointer commit.
   if(previous.data?.original_path && previous.data?.display_path &&
      previous.data.original_path!==result.row.original_path){
-    await db.storage.from(GO_OFFICIAL_BUCKET)
-      .remove([previous.data.original_path,previous.data.display_path]);
+    await removeUnusedDraftAssets(db,{dogId,versionId,
+      paths:[previous.data.original_path,previous.data.display_path]});
   }
   return json({ok:true,slot:settings.slot,updated:true},201);
  }catch{return fail('이미지 처리 또는 업로드에 실패했어요.',500);}
@@ -181,7 +182,8 @@ export async function PATCH(request){
    const buffer=Buffer.from(await original.data.arrayBuffer());
    await uploadAsset(db,{dogId:body.dogId,versionId:body.versionId,...settings,source:buffer});
    // Remove draft-only old image after new version's pointers are persisted.
-   await db.storage.from(GO_OFFICIAL_BUCKET).remove([asset.original_path,asset.display_path]);
+   await removeUnusedDraftAssets(db,{dogId:body.dogId,versionId:body.versionId,
+     paths:[asset.original_path,asset.display_path]});
   }else{
    const {error:saveError}=await db.from('go_official_assets')
     .update({title:settings.title,updated_at:new Date().toISOString()})

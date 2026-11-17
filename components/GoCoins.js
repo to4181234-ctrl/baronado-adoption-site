@@ -6,6 +6,7 @@ export const GO_STAGE1_UI_ENABLED = process.env.NEXT_PUBLIC_MEONGGO_STAGE1_COINS
 const CoinsContext = createContext(null);
 const EMPTY = { balance: 0, daily: { careRewards: 0, careQuestDone: false, visitQuestDone: false,drawQuestDone:false,battleQuestDone:false } };
 const TYPES = {
+  admin_grant: '관리자 지급',
   care: '강아지 돌보기',
   quest_care: '일일 퀘스트 · 첫 돌보기',
   quest_visit: '일일 퀘스트 · 방문 인증',
