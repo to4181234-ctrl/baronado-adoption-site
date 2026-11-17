@@ -3,6 +3,14 @@
 -- The existing go_official_purchases table stores (member_id,request_id,dog_id,slot,coins)
 -- and must be reused; no new ownership schema is created.
 BEGIN;
+-- INTEGRATION FIX: production's existing go_official_purchases_coins_check
+-- is CHECK (coins = 200). Without expanding this constraint all 300C purchases
+-- roll back even though go_store_purchase itself correctly charges 300C.
+-- Preserve every legacy 200C receipt; allow only the two Figma SKU prices.
+ALTER TABLE public.go_official_purchases
+ DROP CONSTRAINT IF EXISTS go_official_purchases_coins_check;
+ALTER TABLE public.go_official_purchases
+ ADD CONSTRAINT go_official_purchases_coins_check CHECK (coins IN (200,300));
 -- Add a small audit discriminator to existing receipts. Earlier 200C
 -- dog-targeted receipts remain legacy and cannot be replayed as random.
 ALTER TABLE public.go_official_purchases
