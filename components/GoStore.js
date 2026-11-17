@@ -114,6 +114,9 @@ export default function GoStore(){
     const d=await r.json();
     if(!r.ok||!d.ok)throw Error(d.error||'이전 결제를 조회하지 못했어요.');
     if(d.found){
+     if(d.mode!==pending.mode || d.price!==STORE_PRICES[pending.mode] ||
+       (pending.mode==='specific' && d.dogId!==pending.dogId))
+       throw Error('이전 거래의 구매 방식이 달라요. 관리자에게 문의해주세요.');
      await showPurchased({dogId:d.dogId,slot:d.slot,price:d.price,coinsSpent:0},true);
      return;
     }
