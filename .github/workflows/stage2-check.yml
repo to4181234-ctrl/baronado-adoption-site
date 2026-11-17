@@ -1,0 +1,27 @@
+name: MeongGO Stage 2 read-only checks
+on:
+  push:
+    branches: [work/go2-stage2-20261117]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Stage 2 pure-rule regression
+        run: node --test tests/go-stage2-selection.test.mjs tests/go-stage2-collection.test.mjs
+      - name: Next.js production compilation (no deployment)
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+          NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED: '0'
