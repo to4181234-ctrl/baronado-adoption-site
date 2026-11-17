@@ -1,18 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {STORE_PRICES,parseStorePurchase,availableStoreItems,validStoreUuid} from '../lib/goStore.js';
+import {STORE_PRICES,parseStorePurchase,availableStoreItems,availableStoreDogs,validStoreUuid} from '../lib/goStore.js';
 const id='11111111-1111-4111-8111-111111111111',dog='22222222-2222-4222-8222-222222222222';
 test('4차 랜덤 200C / 일반 지정 300C only',()=>{
  assert.deepEqual(STORE_PRICES,{random:200,specific:300});
  assert.deepEqual(parseStorePurchase({mode:'random',requestId:id}),
   {mode:'random',requestId:id,dogId:null,slot:null,price:200});
- assert.deepEqual(parseStorePurchase({mode:'specific',requestId:id,dogId:dog,slot:4}),
-  {mode:'specific',requestId:id,dogId:dog,slot:4,price:300});
+ assert.deepEqual(parseStorePurchase({mode:'specific',requestId:id,dogId:dog}),
+  {mode:'specific',requestId:id,dogId:dog,slot:null,price:300});
 });
-test('random cannot be made dog-specific and specific cannot purchase HIDDEN',()=>{
+test('200C global random forbids filters; 300C dog-specific forbids slot targeting',()=>{
  for(const bad of [
   {mode:'random',requestId:id,dogId:dog},
   {mode:'random',requestId:id,slot:2},
+  {mode:'specific',requestId:id,dogId:dog,slot:1},
   {mode:'specific',requestId:id,dogId:dog,slot:5},
   {mode:'specific',requestId:id,dogId:dog,slot:0},
   {mode:'specific',requestId:id,dogId:dog,slot:2.5},
@@ -35,4 +36,6 @@ test('only unowned general cards for available and not-adopted dogs',()=>{
  const items=availableStoreItems(dogs);
  assert.deepEqual(items.map(x=>x.slot),[2,3,4]);
  assert(items.every(x=>x.dogId===dog&&x.price===300));
+ assert.deepEqual(availableStoreDogs(dogs),[{dogId:dog,name:'깡지',missing:3}]);
 });
+
