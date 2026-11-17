@@ -1,4 +1,4 @@
--- SYNTHETIC TEST DATA ONLY; no production identifiers or secrets.
+-- SYNTHETIC TEST DATA ONLY; no production records or credentials.
 
 INSERT INTO public.go_members(id,nickname,nickname_key,password_hash,recovery_hash) VALUES
  ('11111111-1111-4111-8111-111111111111','기록가가','qausera','hash-a','recover-a'),
@@ -27,4 +27,9 @@ VALUES
  ('88888888-8888-4888-8888-888888888888','44444444-4444-4444-8444-444444444444','published');
 UPDATE public.go_official_sets SET current_version=
  CASE WHEN dog_id='33333333-3333-4333-8333-333333333333' THEN '77777777-7777-4777-8777-777777777777'::uuid
- ELSE '88888888-8888-4888-8888-8888888888...[truncated]
+ ELSE '88888888-8888-4888-8888-888888888888'::uuid END;
+INSERT INTO public.go_official_assets(version_id,slot,title,original_path,display_path)
+ SELECT '77777777-7777-4777-8777-777777777777',v,'깡지 카드 '||v,'qa/originalA'||v,'qa/displayA'||v FROM generate_series(1,4) v;
+INSERT INTO public.go_official_assets(version_id,slot,title,original_path,display_path)
+ SELECT '88888888-8888-4888-8888-888888888888',v,'카우 카드 '||v,'qa/originalB'||v,'qa/displayB'||v FROM generate_series(1,4) v;
+
