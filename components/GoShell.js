@@ -7,7 +7,7 @@ import GoAuthDialog from './GoAuthDialog.js';
 import {AUTH_CONTEXT_KEY,authReturnContext,safeGoReturnPath} from '../lib/goAuthReturn.js';
 const SessionContext=createContext(null);
 export const useGoSession=()=>useContext(SessionContext);
-const explanations={save:['이 카드를\n내 도감에 저장할까요?','로그인하면 수집 기록을\n다음에도 이어갈 수 있어요.','로그인하고 저장하기'],battle:['내 멍카드로\n대결해볼까요?','로그인하고 내 멍카드로\n배틀을 시작해보세요.','로그인하고 시작하기'],like:['이 카드가\n마음에 드나요?','로그인하면 좋아요를\n남길 수 있어요.','로그인하고 계속하기'],report:['신고를\n접수할까요?','로그인한 뒤 신고 내용을\n작성할 수 있어요.','로그인하고 계속하기']};
+const explanations={save:['멍카드 이미지를\n저장할까요?','로그인하면 카드 이미지를\n저장하고 공유할 수 있어요.','로그인하고 저장하기'],battle:['내 멍카드로\n대결해볼까요?','로그인하고 내 멍카드로\n배틀을 시작해보세요.','로그인하고 시작하기'],like:['이 카드가\n마음에 드나요?','로그인하면 좋아요를\n남길 수 있어요.','로그인하고 계속하기'],report:['신고를\n접수할까요?','로그인한 뒤 신고 내용을\n작성할 수 있어요.','로그인하고 계속하기']};
 export default function GoShell({children,active='album'}){
  const [member,setMember]=useState(null),[ready,setReady]=useState(false),[showAccount,setShowAccount]=useState(false),[reason,setReason]=useState(null),[withdrawIntent,setWithdrawIntent]=useState(false),[googleMessage,setGoogleMessage]=useState('');
  const context=useRef(null);
