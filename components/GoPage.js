@@ -10,6 +10,7 @@ import GoCamera from './GoCamera.js';
 import GoCard from './GoCard.js';
 import GoDiscovery from './GoDiscovery.js';
 const EMPTY={counts:{},covers:{},progress:null,standing:null,ready:false};
+const STAGE2_ENABLED=process.env.NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED==='1';
 const FIGMA_ALBUM_SHADOW = {깡지:'/figma-v3/album-shadow-kangji.svg',버디:'/figma-v3/album-shadow-buddy.svg',뽀실:'/figma-v3/album-shadow-pposil.svg',구름:'/figma-v3/album-shadow-gureum.svg',오레오:'/figma-v3/album-shadow-oreo.svg'};
 function Album({initialDogId=null}){
  const {member,ready,openAccount}=useGoSession();
@@ -17,18 +18,30 @@ function Album({initialDogId=null}){
  const [error,setError]=useState(''),[ownCards,setOwnCards]=useState([]),[cardTotal,setCardTotal]=useState(0),[cardPage,setCardPage]=useState(0),[order,setOrder]=useState('newest');
  const [camera,setCamera]=useState(null),[collectConfirm,setCollectConfirm]=useState(false),[selection,setSelection]=useState(false),[selectedIds,setSelectedIds]=useState([]),[deleting,setDeleting]=useState(false);
  const [notice,setNotice]=useState(''),[showAdopted,setShowAdopted]=useState(false);
+ const [officialDogs,setOfficialDogs]=useState([]),[officialLoaded,setOfficialLoaded]=useState(!STAGE2_ENABLED);
  const dogId=initialDogId;
  const dog=dogs.find(x=>x.id===dogId)||null;
  useEffect(()=>{fetchDogs('adoption').then(setDogs).catch(()=>setError('강아지 목록을 불러오지 못했어요.')).finally(()=>setLoadingDogs(false));},[]);
  const reloadCollection=useCallback(()=>{if(!member){setCollection(EMPTY);return Promise.resolve();}return fetch('/api/go/collection'+(dogId?'?dog='+encodeURIComponent(dogId):''),{cache:'no-store'}).then(r=>r.json()).then(data=>{if(data.error)throw Error(data.error);setCollection({...data,ready:true});}).catch(e=>setError(e.message));},[member?.id,dogId]);
  const reloadCards=useCallback(()=>{if(!member){setOwnCards([]);return Promise.resolve();}const p=new URLSearchParams({mine:'1',page:String(cardPage),limit:'4',order});if(dogId)p.set('dog',dogId);return fetch('/api/go/cards?'+p,{cache:'no-store'}).then(r=>r.json()).then(data=>{if(data.error)throw Error(data.error);setOwnCards(data.cards||[]);setCardTotal(data.total||0);}).catch(e=>setError(e.message));},[member?.id,cardPage,order,dogId]);
  useEffect(()=>{reloadCollection();},[reloadCollection]);
+ useEffect(()=>{
+  if(!STAGE2_ENABLED){setOfficialDogs([]);setOfficialLoaded(true);return;}
+  let active=true;
+  setOfficialLoaded(false);
+  fetch('/api/go/official',{cache:'no-store'}).then(async r=>{
+   const d=await r.json();if(!r.ok)throw Error(d.error||'공식 도감을 불러오지 못했어요.');return d;
+  }).then(d=>{if(active){setOfficialDogs(d.dogs||[]);setOfficialLoaded(true);}})
+   .catch(e=>{if(active){setOfficialDogs([]);setOfficialLoaded(false);setError(e.message);}});
+  return()=>{active=false;};
+ },[member?.id]);
  useEffect(()=>{reloadCards();},[reloadCards]);
  useEffect(()=>{setCardPage(0);setSelection(false);setSelectedIds([]);},[dogId,member?.id]);
  const count=dogId?(collection.counts?.[dogId]||0):0;
- const claimed=FIGMA_DOGS.filter(name=>{const d=dogs.find(x=>x.name===name);return d&&(collection.counts?.[d.id]||0)>0;}).length;
+ const hasDogCards=id=>Boolean((collection.counts?.[id]||0)>0 || officialDogs.some(o=>o.dogId===id&&(o.collected>0||o.hidden?.unlocked)));
+ const claimed=FIGMA_DOGS.filter(name=>{const d=dogs.find(x=>x.name===name);return Boolean(d&&member&&hasDogCards(d.id));}).length;
  const totalDogs=FIGMA_DOGS.length;
- const orderedDogs=FIGMA_DOGS.slice().sort((a,b)=>{const da=dogs.find(x=>x.name===a),db=dogs.find(x=>x.name===b),oa=da&&member&&(collection.counts?.[da.id]||0)>0,ob=db&&member&&(collection.counts?.[db.id]||0)>0;return Number(Boolean(ob))-Number(Boolean(oa));});
+ const orderedDogs=FIGMA_DOGS.slice().sort((a,b)=>{const da=dogs.find(x=>x.name===a),db=dogs.find(x=>x.name===b),oa=da&&member&&hasDogCards(da.id),ob=db&&member&&hasDogCards(db.id);return Number(Boolean(ob))-Number(Boolean(oa));});
  const figure=(name,unlocked=false,shadow=false)=>figmaSprite(name,shadow||!unlocked?'shadow':'front');
  function toggle(id){setSelectedIds(prev=>prev.includes(id)?prev.filter(x=>x!==id):[...prev,id].slice(0,50));}
  async function deleteSelected(){
@@ -48,8 +61,8 @@ function Album({initialDogId=null}){
    <Link href="/go" className="v3-return-link">← 내 도감으로 돌아가기</Link>
   </div>:<div className={'v3-album-home v3-album-figma '+(member?'v3-album-member':'v3-album-guest')}>
     <section className="v3-profile-head"><div className="v3-profile-avatar"><img className={!member?'v3-profile-anon-silhouette':undefined} src={member?figmaSprite(member.avatarDog||'구름',member.avatarDog?'front':'shadow'):'/figma-v3/album-shadow-buddy.svg'} alt={member?'프로필 캐릭터':'미획득 실루엣'}/></div><div>{member?<><h1>{member.nickname}</h1><p>멍기록가</p><small>{member.profileBio||'자기소개가 없습니다.'}</small><Link href="/go/profile"><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>프로필 수정</Link><Link href={'/go/recorders/'+member.id}><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>내 프로필 미리보기</Link></>:<><h1 className="v3-anon-heading">멍기록가를 기다리는중!</h1><p>멍기록가</p><small className="v3-anon-lede">로그인하고 나만의 멍멍 도감 채우기</small><button type="button" className="v3-profile-login s1-login-primary" onClick={openAccount}><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>로그인하고 시작하기</button><Link className="s1-browse-first" href="/go/community">먼저 둘러보기 ›</Link></>}</div></section>
-    <section className="v3-collection-section"><h2>내 도감</h2><div className="v3-progress-label">도감 수집 {claimed} / {totalDogs}{member&&claimed===0?' (첫 도감을 기다리고 있어요)':''}</div><div className="v3-progress"><span style={{width:(claimed/totalDogs*100)+'%'}}/></div>
-     <div className="v3-collection-grid">{orderedDogs.map(name=>{const d=dogs.find(x=>x.name===name),owned=Boolean(d&&member&&(collection.counts?.[d.id]||0)>0);return <Link href={d?'/go/'+d.id:'/go'} className={'v3-collection-tile'+(owned?' unlocked':'')} key={name}><img src={owned?figure(name,true):FIGMA_ALBUM_SHADOW[name]||figure(name,false)} alt={owned?name:'미획득 실루엣'}/><strong>{name}</strong></Link>})}</div></section>
+    <section className="v3-collection-section"><h2>내 도감</h2><div className="v3-progress-label">도감 수집 {officialLoaded?claimed:'—'} / {totalDogs}{member&&claimed===0?' (첫 도감을 기다리고 있어요)':''}</div><div className="v3-progress"><span style={{width:(officialLoaded?claimed/totalDogs*100:0)+'%'}}/></div>
+     <div className="v3-collection-grid">{orderedDogs.map(name=>{const d=dogs.find(x=>x.name===name),owned=Boolean(d&&member&&hasDogCards(d.id));return <Link href={d?'/go/'+d.id:'/go'} className={'v3-collection-tile'+(owned?' unlocked':'')} key={name}><img src={owned?figure(name,true):FIGMA_ALBUM_SHADOW[name]||figure(name,false)} alt={owned?name:'미획득 실루엣'}/><strong>{name}</strong></Link>})}</div></section>
     <section className="v3-battle-home"><h2>멍배틀</h2><Link href="/go/battle" className="v3-battle-shortcut"><img src="/figma-v3/collar.png" alt="픽셀 목줄"/><strong>멍배틀 하러가기 &gt;</strong></Link><div className="v3-pixel-panel"><div className="v10-panel-canvas">{['bg','outer','inner'].map(name=><img key={name} className={'v3-album-panel-layer v3-album-panel-'+name} src={'/figma-v3/album-panel-'+name+'.svg'} alt=""/>)}<div className="v3-panel-content">{!member?<><b>멍배틀을 시작해볼까요?</b><p>서로 다른 멍카드 2장을 모아<br/>대결하고 나만의 전적을 쌓아보세요!</p><button type="button" className="v3-anon-battle-login" onClick={openAccount}><img src="/figma-v3/album-battle-arrow.svg" alt="" aria-hidden="true"/>로그인하고 시작하기</button></>:<><b>멍멍이별 대결 전적</b>{Object.keys(collection.battleRecords||{}).length?<ul className="v11-battle-records">{Object.entries(collection.battleRecords).map(([id,stats])=><li key={id}><span>{dogs.find(d=>d.id===id)?.name||'멍멍이'}</span><span>{stats.wins}승 {stats.draws}무 {stats.losses}패</span></li>)}</ul>:<p>멍배틀을 하고 기록을 쌓아보세요</p>}</>}</div></div></div></section>
     
   </div>}
