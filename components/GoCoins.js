@@ -26,6 +26,7 @@ export function useGoCoins() {
 
 export function GoCoinProvider({ member, children }) {
   const [state, setState] = useState(EMPTY);
+  const [walletLoaded, setWalletLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -48,6 +49,7 @@ export function GoCoinProvider({ member, children }) {
         }
         balanceRef.current = { memberId: member.id, balance: data.balance };
         setState(data);
+        setWalletLoaded(true);
         setError('');
       }
     } catch (e) {
@@ -63,12 +65,14 @@ export function GoCoinProvider({ member, children }) {
       ++requestRef.current;
       balanceRef.current = { memberId: null, balance: null };
       setState(EMPTY);
+      setWalletLoaded(false);
       setHistoryOpen(false);
       setError('');
       return;
     }
     balanceRef.current = { memberId: member.id, balance: null };
     setState(EMPTY);
+    setWalletLoaded(false);
     refresh();
     const changed = event => refresh({ suppressNotice: Boolean(event?.detail?.notified) });
     const focus = () => { if (document.visibilityState === 'visible') refresh(); };
@@ -98,7 +102,7 @@ export function GoCoinProvider({ member, children }) {
 
   useEffect(() => subscribeGoCoinNotices(setNotice), []);
   return <CoinsContext.Provider value={{
-    enabled: GO_STAGE1_UI_ENABLED, ...state, loading, error, refresh,
+    enabled: GO_STAGE1_UI_ENABLED, ...state, loading, walletLoaded, error, refresh,
     openHistory: () => setHistoryOpen(true)
   }}>
     {children}
