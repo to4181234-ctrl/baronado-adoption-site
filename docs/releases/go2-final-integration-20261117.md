@@ -34,6 +34,10 @@
 
 **보안 강화:** 2차 SQL의 기존 `CREATE OR REPLACE` 공식 RPC들도 기존 운영 권한을 보존하는 것에만 의존하지 않고 새 격리 DB에서 직접 `anon/authenticated`를 REVOKE, `service_role`에만 EXECUTE하도록 보강. 재검증 완료.
 
+### 2-1. 로컬 합성 DB 백업/복원 리허설 (추가 검증)
+
+별도 `go_integration_rollback_src`에서 **2~5차 적용 전** 합성 데이터를 `pg_dump -Fc`로 백업한 다음 마이그레이션을 실제 실행했다. 그와 별개인 새 DB `go_integration_rollback_restored`에 `pg_restore`로 백업을 복원해 **회원2·카드2·기존 원장1·공식 이미지8** 건과 구형 영수증 제약 `CHECK(coins=200)`이 돌아옴을 확인했다. 마이그레이션 완료 측에서는 변경 후 `coins IN(200,300)`을 별도로 확인했다. **로컬 합성 DB 복원 테스트 PASS**. 다만 이는 실제 운영 Supabase PITR 백업/Storage 객체를 복원한 것은 아니므로 출시 전 필수 실제 복원 검증을 대체하지 않는다.
+
 ## 3. 실서비스 사전점검(읽기만 함)
 
 2026-11-17 기준 실제 운영 DB 행 수: `dogs=14`, `go_members=20`, `go_cards=55`, `go_battles=46`, `go_coin_wallets=1`, `go_coin_transactions=0`, `go_official_assets=0`, `go_official_owned=0`, `go_official_purchases=0`, `go_pvp_records=0`. Storage 메타데이터 `go-cards=94`개, `go-official-cards=0`개. 레거시 `assets slot6=0`, `owned slot5=0` → 현재 기준 4+1 마이그레이션 사전 가드 통과 가능하지만 **실배포 직전 재조회 필수**.
