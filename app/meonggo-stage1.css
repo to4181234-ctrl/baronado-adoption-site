@@ -92,3 +92,12 @@
   outline:2px solid #181713;outline-offset:3px;
 }
 .v3-go-site .s1-header-actions .s3-coin-trigger:disabled{opacity:.8;cursor:default}
+
+/* Keep original 390px profile coordinates, but prevent the two member links
+   from overflowing a 320px viewport (pre-existing narrow-screen issue). */
+@media (max-width:359px){
+ .v3-go-site .v3-album-figma .v3-profile-head a{
+  width:calc(100% - 174px);min-width:0;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
+ }
+}
