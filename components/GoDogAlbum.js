@@ -8,6 +8,7 @@ import { figmaSprite, gameElement } from '../lib/goV3Game.js';
 import { useGoSession } from './GoShell.js';
 import GoCard from './GoCard.js';
 import GoCamera from './GoCamera.js';
+import GoStage2OfficialCards from './GoStage2OfficialCards.js';
 import { ALBUM_PAGE_SIZE, ALBUM_SELECTION_LIMIT, changeAlbumSelection, lastAlbumPage, albumRankPercent } from '../lib/goAlbumSelection.js';
 
 const EMPTY_COLLECTION = { counts: {}, covers: {}, standing: null };
@@ -20,6 +21,7 @@ const ALBUM_SHADOWS = {
 };
 const PER_PAGE = ALBUM_PAGE_SIZE;
 const MAX_SELECTION = ALBUM_SELECTION_LIMIT;
+const STAGE2_ENABLED = process.env.NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED === '1';
 
 /** The six Figma dog-album states live on this single route, not six mockup pages. */
 export default function GoDogAlbum({ dogId }) {
@@ -29,6 +31,9 @@ export default function GoDogAlbum({ dogId }) {
   const [collection, setCollection] = useState(EMPTY_COLLECTION);
   const [cards, setCards] = useState([]);
   const [total, setTotal] = useState(0);
+  const [officialCount, setOfficialCount] = useState(null);
+  const [cardKind, setCardKind] = useState(STAGE2_ENABLED ? 'official' : 'custom');
+  const onOfficialCatalog = useCallback(count => setOfficialCount(count), []);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('newest');
   const [sortOpen, setSortOpen] = useState(false);
@@ -163,7 +168,8 @@ export default function GoDogAlbum({ dogId }) {
   if (loadingDog || !ready) return <p className="v3-status" role="status">도감을 불러오는 중…</p>;
   if (!dog) return <p className="v3-error">도감을 찾지 못했어요.</p>;
 
-  const ownedCount = total;
+  const ownedCount = STAGE2_ENABLED ? (officialCount === null ? total : total + officialCount) : total;
+  const summaryCount = STAGE2_ENABLED && officialCount === null ? '—' : String(ownedCount);
   const hasCards = Boolean(member && ownedCount > 0);
   const dogImage = hasCards ? figmaSprite(dog.name, 'front') : (ALBUM_SHADOWS[dog.name] || figmaSprite(dog.name, 'shadow'));
   const ranking = hasCards ? albumRankPercent(collection.standing?.rank, collection.standing?.participants) : null;
@@ -188,7 +194,7 @@ export default function GoDogAlbum({ dogId }) {
       <div className="v5-album-summary">
         <strong>{dog.name}</strong>
         <span className="v5-count-caption">수집 카드</span>
-        <span className="v5-count-value">{ownedCount}{hasCards ? '장' : '개'}</span>
+        <span className="v5-count-value">{summaryCount}{STAGE2_ENABLED || hasCards ? '장' : '개'}</span>
         <span className="v5-element-caption">속성</span>
         <span className="v5-element-value">{hasCards ? <>✧ {gameElement(dog.name)}</> : '미공개'}</span>
       </div>
@@ -197,18 +203,21 @@ export default function GoDogAlbum({ dogId }) {
 
     <section className={'v5-album-list ' + (!hasCards ? 'v5-album-empty' : '')}>
       <div className="v5-album-toolbar">
-        <h2>수집한 카드 ({total}장)</h2>
-        {member && total > 0 && <div className="v5-manage-actions">
+        <div className="s2-kind-tabs" role="tablist" aria-label="멍카드 종류">
+          {STAGE2_ENABLED && <button role="tab" type="button" aria-selected={cardKind === 'official'} onClick={() => { cancelSelection(); setCardKind('official'); }}>멍카드 ({officialCount === null ? '—' : officialCount}장)</button>}
+          <button role={STAGE2_ENABLED ? 'tab' : undefined} type="button" aria-selected={STAGE2_ENABLED ? cardKind === 'custom' : undefined} onClick={() => setCardKind('custom')}>나만의 카드 ({total}장)</button>
+        </div>
+        {cardKind === 'custom' && member && total > 0 && <div className="v5-manage-actions">
           {!selectionMode ? <button type="button" onClick={() => setSelectionMode(true)}>선택</button> : <>
             <button type="button" onClick={cancelSelection}>취소</button>
             <button type="button" className="v5-manage-delete" disabled={!selectedIds.length || deleting} onClick={() => { setDeleteError(''); setDeleteOpen(true); }}>{selectedIds.length}개 삭제</button>
           </>}
         </div>}
-        <div className="v5-sort-control">
+        {cardKind === 'custom' && <div className="v5-sort-control">
           <span>등록 순서ㅣ</span><button type="button" aria-expanded={sortOpen} aria-haspopup="dialog" onClick={() => setSortOpen(true)}>{order === 'newest' ? '최신순' : '오래된순'}<span aria-hidden="true">⌄</span></button>
-        </div>
+        </div>}
       </div>
-      {!member ? <div className="v5-empty-message"><p>로그인하면 수집한 카드를 볼 수 있어요.</p><button onClick={openAccount}>로그인하기</button></div>
+      {STAGE2_ENABLED && cardKind === 'official' ? <GoStage2OfficialCards dogId={dogId} onCatalogLoaded={onOfficialCatalog}/> : !member ? <div className="v5-empty-message"><p>로그인하면 수집한 카드를 볼 수 있어요.</p><button onClick={openAccount}>로그인하기</button></div>
         : total === 0 ? <div className="v5-empty-message"><p>아직 수집한 카드가 없어요.<br/>힌트에서 {dog.name}의 이야기를 만나보세요.</p><img src="/figma-v3/album-empty-collar.png" alt="픽셀 목줄"/></div>
         : <>
           <div className="v5-card-grid">
