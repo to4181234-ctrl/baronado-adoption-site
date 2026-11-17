@@ -3,6 +3,13 @@
 -- The existing go_official_purchases table stores (member_id,request_id,dog_id,slot,coins)
 -- and must be reused; no new ownership schema is created.
 BEGIN;
+-- Add a small audit discriminator to existing receipts. Earlier 200C
+-- dog-targeted receipts remain legacy and cannot be replayed as random.
+ALTER TABLE public.go_official_purchases
+ ADD COLUMN IF NOT EXISTS purchase_mode text;
+ALTER TABLE public.go_official_purchases
+ ADD CONSTRAINT go_official_purchases_mode_check
+ CHECK (purchase_mode IS NULL OR purchase_mode IN ('random','specific'));
 CREATE OR REPLACE FUNCTION public.go_store_purchase(
  p_member uuid,p_request uuid,p_mode text,p_dog uuid DEFAULT NULL,p_slot smallint DEFAULT NULL
 ) RETURNS jsonb LANGUAGE plpgsql SET search_path TO 'public' AS $function$
@@ -30,7 +37,7 @@ BEGIN
  SELECT * INTO v_saved FROM public.go_official_purchases
   WHERE member_id=p_member AND request_id=p_request;
  IF FOUND THEN
-  IF v_saved.coins<>v_price OR (p_mode='specific'
+  IF v_saved.coins<>v_price OR v_saved.purchase_mode IS DISTINCT FROM p_mode OR (p_mode='specific'
      AND (v_saved.dog_id<>p_dog OR v_saved.slot<>p_slot)) THEN
    RETURN jsonb_build_object('ok',false,'error','다른 구매에 사용된 요청 번호예요.');
   END IF;
@@ -68,8 +75,8 @@ BEGIN
  INSERT INTO public.go_official_owned(member_id,dog_id,slot,power,charm)
   VALUES(p_member,v_dog,v_slot,v_power,v_charm);
  -- HIDDEN slot5 is earned only by a separate user-initiated unlock action.
- INSERT INTO public.go_official_purchases(member_id,request_id,dog_id,slot,coins)
-  VALUES(p_member,p_request,v_dog,v_slot,v_price);
+ INSERT INTO public.go_official_purchases(member_id,request_id,dog_id,slot,coins,purchase_mode)
+  VALUES(p_member,p_request,v_dog,v_slot,v_price,p_mode);
  INSERT INTO public.go_coin_transactions(member_id,amount,event_type,source_key,local_day)
   VALUES(p_member,-v_price,'store_purchase','shop:'||p_request::text,v_today);
  UPDATE public.go_coin_wallets SET balance=balance-v_price,updated_at=now()
