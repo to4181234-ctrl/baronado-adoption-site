@@ -72,7 +72,7 @@ AS $function$
  ) OR EXISTS(
   SELECT 1 FROM public.go_official_owned o WHERE o.member_id=p_member
  );
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.go_pvp_card_snapshot(p_member uuid, p_kind text, p_card uuid, p_slot smallint)
