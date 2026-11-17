@@ -3,6 +3,8 @@ on:
   push:
     branches: [work/go2-stage2-20261117]
   workflow_dispatch:
+  pull_request:
+    branches: [release/figma-stage1-20261117]
 
 permissions:
   contents: read
