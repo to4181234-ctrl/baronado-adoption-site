@@ -8,7 +8,8 @@ import { figmaSprite, gameElement } from '../lib/goV3Game.js';
 import { useGoSession } from './GoShell.js';
 import GoCard from './GoCard.js';
 import GoCamera from './GoCamera.js';
-import { ALBUM_PAGE_SIZE, ALBUM_SELECTION_LIMIT, toggleAlbumSelection, lastAlbumPage, albumRankPercent } from '../lib/goAlbumSelection.js';
+import GoStage2OfficialCards from './GoStage2OfficialCards.js';
+import { ALBUM_PAGE_SIZE, ALBUM_SELECTION_LIMIT, changeAlbumSelection, lastAlbumPage, albumRankPercent } from '../lib/goAlbumSelection.js';
 
 const EMPTY_COLLECTION = { counts: {}, covers: {}, standing: null };
 const ALBUM_SHADOWS = {
@@ -20,6 +21,7 @@ const ALBUM_SHADOWS = {
 };
 const PER_PAGE = ALBUM_PAGE_SIZE;
 const MAX_SELECTION = ALBUM_SELECTION_LIMIT;
+const STAGE2_ENABLED = process.env.NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED === '1';
 
 /** The six Figma dog-album states live on this single route, not six mockup pages. */
 export default function GoDogAlbum({ dogId }) {
@@ -29,6 +31,10 @@ export default function GoDogAlbum({ dogId }) {
   const [collection, setCollection] = useState(EMPTY_COLLECTION);
   const [cards, setCards] = useState([]);
   const [total, setTotal] = useState(0);
+  const [officialCount, setOfficialCount] = useState(null);
+  const [cardKind, setCardKind] = useState(STAGE2_ENABLED ? 'official' : 'custom');
+  const [kindOpen, setKindOpen] = useState(false);
+  const onOfficialCatalog = useCallback(count => setOfficialCount(count), []);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('newest');
   const [sortOpen, setSortOpen] = useState(false);
@@ -36,6 +42,7 @@ export default function GoDogAlbum({ dogId }) {
   const [selectedIds, setSelectedIds] = useState([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const [collectConfirm, setCollectConfirm] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
   const [notice, setNotice] = useState('');
@@ -78,7 +85,7 @@ export default function GoDogAlbum({ dogId }) {
   }, [dogId, ready, member?.id, page, order, refreshCount]);
 
   useEffect(() => {
-    setSelectionMode(false); setSelectedIds([]); setSortOpen(false);
+    setSelectionMode(false); setSelectedIds([]); setSortOpen(false); setKindOpen(false);
     setStateRestored(false);
     // Preserve the current dog's sort and page when navigating into a card and back.
     try {
@@ -101,28 +108,31 @@ export default function GoDogAlbum({ dogId }) {
   }, [page, total, ready, member?.id, dogId, order, cardResultKey]);
 
   useEffect(() => {
-    if (!sortOpen && !deleteOpen) return;
+    if (!sortOpen && !deleteOpen && !kindOpen) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = previous; };
-  }, [sortOpen, deleteOpen]);
+  }, [sortOpen, deleteOpen, kindOpen]);
 
   useEffect(() => {
-    if (!sortOpen && !deleteOpen) return;
-    const handle = event => { if (event.key === 'Escape' && !deleting) { setSortOpen(false); setDeleteOpen(false); } };
+    if (!sortOpen && !deleteOpen && !kindOpen) return;
+    const handle = event => { if (event.key === 'Escape' && !deleting) { setSortOpen(false); setDeleteOpen(false); setKindOpen(false); } };
     document.addEventListener('keydown', handle);
     return () => document.removeEventListener('keydown', handle);
-  }, [sortOpen, deleteOpen, deleting]);
+  }, [sortOpen, deleteOpen, kindOpen, deleting]);
 
   function setSort(value) {
     setOrder(value);
     setPage(0);
-    setSelectedIds([]); // Explicit Figma rule: sorting invalidates a multi-page selection.
+    setSelectedIds([]); // Sorting resets a multi-page selection.
+    setSelectionMode(false);
     setSortOpen(false);
   }
 
   function toggleSelected(id) {
-    setSelectedIds(previous => toggleAlbumSelection(previous, id, MAX_SELECTION));
+    const next = changeAlbumSelection(selectedIds, id, MAX_SELECTION);
+    setSelectedIds(next.selectedIds);
+    if (!next.selectionMode) setSelectionMode(false);
   }
 
   function startSelection(id) {
@@ -132,12 +142,12 @@ export default function GoDogAlbum({ dogId }) {
   }
 
   function cancelSelection() {
-    setDeleteOpen(false); setSelectionMode(false); setSelectedIds([]);
+    setDeleteOpen(false); setDeleteError(''); setSelectionMode(false); setSelectedIds([]);
   }
 
   async function deleteSelected() {
     if (!member || deleting || !selectedIds.length) return;
-    setDeleting(true); setError('');
+    setDeleting(true); setDeleteError('');
     try {
       const response = await fetch('/api/go/cards', {
         method: 'DELETE', headers: { 'Content-Type': 'application/json' },
@@ -152,14 +162,15 @@ export default function GoDogAlbum({ dogId }) {
       cancelSelection(); refresh();
     } catch (e) {
       // On failure, keep selected IDs and the original cards visible for safe retry.
-      setError(e.message || '카드를 삭제하지 못했어요.');
+      setDeleteError(e.message || '카드를 삭제하지 못했어요.');
     } finally { setDeleting(false); }
   }
 
   if (loadingDog || !ready) return <p className="v3-status" role="status">도감을 불러오는 중…</p>;
   if (!dog) return <p className="v3-error">도감을 찾지 못했어요.</p>;
 
-  const ownedCount = total;
+  const ownedCount = STAGE2_ENABLED ? (officialCount === null ? total : total + officialCount) : total;
+  const summaryCount = STAGE2_ENABLED && officialCount === null ? '—' : String(ownedCount);
   const hasCards = Boolean(member && ownedCount > 0);
   const dogImage = hasCards ? figmaSprite(dog.name, 'front') : (ALBUM_SHADOWS[dog.name] || figmaSprite(dog.name, 'shadow'));
   const ranking = hasCards ? albumRankPercent(collection.standing?.rank, collection.standing?.participants) : null;
@@ -184,7 +195,7 @@ export default function GoDogAlbum({ dogId }) {
       <div className="v5-album-summary">
         <strong>{dog.name}</strong>
         <span className="v5-count-caption">수집 카드</span>
-        <span className="v5-count-value">{ownedCount}{hasCards ? '장' : '개'}</span>
+        <span className="v5-count-value">{summaryCount}{STAGE2_ENABLED || hasCards ? '장' : '개'}</span>
         <span className="v5-element-caption">속성</span>
         <span className="v5-element-value">{hasCards ? <>✧ {gameElement(dog.name)}</> : '미공개'}</span>
       </div>
@@ -193,18 +204,25 @@ export default function GoDogAlbum({ dogId }) {
 
     <section className={'v5-album-list ' + (!hasCards ? 'v5-album-empty' : '')}>
       <div className="v5-album-toolbar">
-        <h2>수집한 카드 ({total}장)</h2>
-        {member && total > 0 && <div className="v5-manage-actions">
-          {!selectionMode ? <button type="button" onClick={() => setSelectionMode(true)}>카드 선택</button> : <>
+        {STAGE2_ENABLED ? <div className="s2-kind-selector">
+          <button className="s2-kind-trigger" type="button" aria-haspopup="dialog" aria-expanded={kindOpen}
+            onClick={() => setKindOpen(true)}>
+            {cardKind === 'official' ? '멍카드' : '나만의 카드'}
+            <span aria-hidden="true" className="s2-kind-chevron"/>
+          </button>
+          <span className="s2-kind-count">({cardKind === 'official' ? (officialCount === null ? '—' : officialCount) : total}장)</span>
+        </div> : <h2>수집한 카드 ({total}장)</h2>}
+        {cardKind === 'custom' && member && total > 0 && <div className="v5-manage-actions">
+          {!selectionMode ? <button type="button" onClick={() => setSelectionMode(true)}>선택</button> : <>
             <button type="button" onClick={cancelSelection}>취소</button>
-            <button type="button" className="v5-manage-delete" disabled={!selectedIds.length || deleting} onClick={() => setDeleteOpen(true)}>삭제 {selectedIds.length}</button>
+            <button type="button" className="v5-manage-delete" disabled={!selectedIds.length || deleting} onClick={() => { setDeleteError(''); setDeleteOpen(true); }}>{selectedIds.length}개 삭제</button>
           </>}
         </div>}
-        <div className="v5-sort-control">
+        {cardKind === 'custom' && <div className="v5-sort-control">
           <span>등록 순서ㅣ</span><button type="button" aria-expanded={sortOpen} aria-haspopup="dialog" onClick={() => setSortOpen(true)}>{order === 'newest' ? '최신순' : '오래된순'}<span aria-hidden="true">⌄</span></button>
-        </div>
+        </div>}
       </div>
-      {!member ? <div className="v5-empty-message"><p>로그인하면 수집한 카드를 볼 수 있어요.</p><button onClick={openAccount}>로그인하기</button></div>
+      {STAGE2_ENABLED && cardKind === 'official' ? <GoStage2OfficialCards dogId={dogId} onCatalogLoaded={onOfficialCatalog}/> : !member ? <div className="v5-empty-message"><p>로그인하면 수집한 카드를 볼 수 있어요.</p><button onClick={openAccount}>로그인하기</button></div>
         : total === 0 ? <div className="v5-empty-message"><p>아직 수집한 카드가 없어요.<br/>힌트에서 {dog.name}의 이야기를 만나보세요.</p><img src="/figma-v3/album-empty-collar.png" alt="픽셀 목줄"/></div>
         : <>
           <div className="v5-card-grid">
@@ -224,6 +242,18 @@ export default function GoDogAlbum({ dogId }) {
     {notice && <p className="v3-message" role="status">{notice}</p>}
     {error && <p className="v3-error" role="alert">{error}</p>}
 
+    {kindOpen && <div className="s2-kind-backdrop" role="presentation" onClick={() => setKindOpen(false)}>
+      <section className="s2-kind-sheet" role="dialog" aria-modal="true" aria-label="멍카드 종류 메뉴"
+        onClick={e => e.stopPropagation()}>
+        <h2>메뉴</h2>
+        {[['official','멍카드'],['custom','나만의 카드']].map(([value,label]) =>
+          <button key={value} type="button" className="s2-kind-option" aria-current={cardKind === value ? 'true' : undefined}
+            onClick={() => { if (value !== cardKind) cancelSelection(); setCardKind(value); setKindOpen(false); }}>
+            {label}{cardKind === value && <span aria-hidden="true" className="s2-kind-check">✓</span>}
+          </button>)}
+      </section>
+    </div>}
+
     {sortOpen && <div className="v5-modal-backdrop" role="presentation" onClick={() => setSortOpen(false)}>
       <div role="dialog" aria-modal="true" aria-label="수집 카드 정렬" className="v5-sort-dialog" onClick={e => e.stopPropagation()}>
         <h3>등록 순서</h3>
@@ -233,12 +263,19 @@ export default function GoDogAlbum({ dogId }) {
     </div>}
 
     {deleteOpen && <div className="v5-modal-backdrop" role="presentation" onClick={() => !deleting && setDeleteOpen(false)}>
-      <section role="dialog" aria-modal="true" aria-label="선택 카드 삭제 확인" className="v5-delete-dialog" onClick={e => e.stopPropagation()}>
-        <h2>{deleteDogName} 카드 {selectedIds.length}장을 삭제할까요?</h2>
-        <p>내 도감 › {deleteDogName} · 선택한 카드 {selectedIds.length}장<br/>공개 게시물도 함께 삭제돼요.</p>
-        <button type="button" className="v5-confirm-delete" disabled={deleting} onClick={deleteSelected}>{deleting ? '삭제 중…' : `선택한 ${selectedIds.length}장 삭제`}</button>
-        <button type="button" className="v5-cancel-delete" disabled={deleting} onClick={() => setDeleteOpen(false)}>취소</button>
-        <small>해당 강아지의 모든 카드를 삭제하면<br/>도감 획득 기록과 배틀 전적도 사라져요.</small>
+      <section role="dialog" aria-modal="true" aria-label="선택 카드 삭제 확인"
+        className="v5-delete-dialog s2-delete-dialog" onClick={e => e.stopPropagation()}>
+        <button type="button" className="s2-delete-close" aria-label="닫기"
+          disabled={deleting} onClick={() => setDeleteOpen(false)}>×</button>
+        <h2>선택한 {selectedIds.length}장을<br/>삭제할까요?</h2>
+        <p>삭제한 카드와 사진은<br/>복구할 수 없어요.</p>
+        {deleteError && <p className="s2-delete-error" role="alert">{deleteError}</p>}
+        <div className="s2-delete-actions">
+          <button type="button" disabled={deleting} onClick={() => setDeleteOpen(false)}>취소</button>
+          <button type="button" disabled={deleting} onClick={deleteSelected}>
+            {deleting ? '삭제 중…' : '삭제'}
+          </button>
+        </div>
       </section>
     </div>}
 
@@ -259,7 +296,7 @@ export default function GoDogAlbum({ dogId }) {
     {cameraOpen && <div className="v3-camera-backdrop" role="presentation">
       <section className="v3-camera-panel" role="dialog" aria-modal="true" aria-label="멍멍이 카드 촬영">
         <button className="v3-camera-close" aria-label="카메라 닫기" onClick={() => setCameraOpen(false)}>×</button>
-        <GoCamera dog={dog} nickname={member?.nickname} standing={collection.standing} firstCard={ownedCount === 0} onSaved={refresh} onDone={() => setCameraOpen(false)}/>
+        <GoCamera dog={dog} nickname={member?.nickname} standing={collection.standing} firstCard={total === 0} onSaved={refresh} onDone={() => setCameraOpen(false)}/>
       </section>
     </div>}
   </div>;
