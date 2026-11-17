@@ -12,10 +12,10 @@ test('official and custom card totals are separate and additive', () => {
   });
 });
 
-test('duplicates count as copies, not extra normal types', () => {
+test('duplicate official draws do not create additional owned copies', () => {
   const state = summarizeDogCards([card(1),card(1),card(2),card(3),card(4)], 2);
-  assert.equal(state.officialCount, 5);
-  assert.equal(state.totalCount, 7);
+  assert.equal(state.officialCount, 4);
+  assert.equal(state.totalCount, 6);
   assert.equal(state.collectedNormalKinds, 4);
   assert.equal(state.hiddenUnlockable, true);
 });
