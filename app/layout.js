@@ -39,4 +39,5 @@ import './figma-user-revisions.css';
 import './figma-stage1-navigation.css';
 
 import './figma-stage2-official.css';
+import './figma-stage4-store.css';
 import './meonggo-stage1.css';
