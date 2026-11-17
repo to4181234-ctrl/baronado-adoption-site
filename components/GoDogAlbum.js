@@ -8,7 +8,7 @@ import { figmaSprite, gameElement } from '../lib/goV3Game.js';
 import { useGoSession } from './GoShell.js';
 import GoCard from './GoCard.js';
 import GoCamera from './GoCamera.js';
-import { ALBUM_PAGE_SIZE, ALBUM_SELECTION_LIMIT, toggleAlbumSelection, lastAlbumPage, albumRankPercent } from '../lib/goAlbumSelection.js';
+import { ALBUM_PAGE_SIZE, ALBUM_SELECTION_LIMIT, changeAlbumSelection, lastAlbumPage, albumRankPercent } from '../lib/goAlbumSelection.js';
 
 const EMPTY_COLLECTION = { counts: {}, covers: {}, standing: null };
 const ALBUM_SHADOWS = {
@@ -124,11 +124,9 @@ export default function GoDogAlbum({ dogId }) {
   }
 
   function toggleSelected(id) {
-    const next = toggleAlbumSelection(selectedIds, id, MAX_SELECTION);
-    setSelectedIds(next);
-    // Entering selection mode with zero cards is allowed; removing the final
-    // previously selected card exits automatically (Figma 586:163478).
-    if (selectedIds.length > 0 && next.length === 0) setSelectionMode(false);
+    const next = changeAlbumSelection(selectedIds, id, MAX_SELECTION);
+    setSelectedIds(next.selectedIds);
+    if (!next.selectionMode) setSelectionMode(false);
   }
 
   function startSelection(id) {
