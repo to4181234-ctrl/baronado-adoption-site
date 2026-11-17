@@ -60,7 +60,7 @@ export default function GoFriendBattle(){
  const [owned,setOwned]=useState(EMPTY),[loadingCards,setLoadingCards]=useState(false);
  const [history,setHistory]=useState({stats:{wins:0,draws:0,losses:0},recent:[]});
  const [animation,setAnimation]=useState('idle'),[impact,setImpact]=useState(0);
- const [now,setNow]=useState(Date.now()),[soundOn,setSoundOn]=useState(false);
+ const [now,setNow]=useState(0),[soundOn,setSoundOn]=useState(false);
  const audio=useRef(null),motionTimers=useRef([]),mutating=useRef(false),polling=useRef(false);
  const autoJoined=useRef(false),lastAnimated=useRef('');
  const selectedKey=x=>x?x.kind+':'+x.cardId+':'+(x.slot||''):null;
@@ -255,6 +255,11 @@ export default function GoFriendBattle(){
      <p>남은 초대 시간: {Math.ceil(remaining/60)}분</p>
     </div>}
     {room.status==='playing'&&<div className="friend-pvp-prepare">
+     {room.otherConnected===false&&<div className="friend-pvp-reconnect" role="status">
+      <strong>친구의 연결이 끊어졌어요.</strong>
+      <p>같은 방에서 재접속을 기다리는 중이에요. 남은 시간: {roomSecondsRemaining(room.reconnectDeadline,now)}초</p>
+      <p>연결되면 양쪽 모두 카드를 다시 준비해야 해요. 지금은 코인과 전적이 기록되지 않아요.</p>
+     </div>}
      <p className="friend-pvp-clock">준비 남은 시간: <strong>{Math.floor(remaining/60)}:{String(remaining%60).padStart(2,'0')}</strong></p>
      <div className="friend-pvp-ready-state">
       <span>나 {room.myReady?'✓ 준비 완료':room.mySelected?'카드 선택 완료':'카드 선택 전'}</span>
@@ -287,7 +292,7 @@ export default function GoFriendBattle(){
        <span>{page+1}</span>
        <button disabled={!owned.hasMore||busy} onClick={()=>setPage(p=>p+1)}>다음</button>
       </div>}
-      <button type="button" className="meong-battle-primary" disabled={busy||!room.mySelected}
+      <button type="button" className="meong-battle-primary" disabled={busy||!room.mySelected||room.otherConnected===false}
        onClick={()=>mutate({action:'ready',roomId:room.roomId})}>
        준비 완료 · 상대와 동시 공개</button>
      </>}
