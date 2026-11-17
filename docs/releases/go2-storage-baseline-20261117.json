@@ -1,0 +1,26 @@
+{
+  "observed_at": "2026-11-17",
+  "source": "read-only Supabase storage.objects metadata",
+  "buckets": {
+    "dog-images": {
+      "objects": 82,
+      "bytes": 53733125,
+      "names_sizes_md5": "18310be74b3bcde7d879488480c40c17"
+    },
+    "go-cards": {
+      "objects": 94,
+      "bytes": 3863668,
+      "names_sizes_md5": "25dd02e404be4ff46a22d5ec719fe1e5"
+    },
+    "go-official-cards": {
+      "objects": 0,
+      "bytes": 0,
+      "names_sizes_md5": null
+    }
+  },
+  "warnings": [
+    "This manifest does not contain actual Storage file bytes.",
+    "Refresh immediately before deployment.",
+    "39 go-cards objects do not have a direct current go_cards.image_path reference; preserve rather than delete."
+  ]
+}
