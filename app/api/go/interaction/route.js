@@ -9,15 +9,17 @@ export async function GET(request){
  if(!validId(id))return goError('강아지 정보를 확인해주세요.');
  try{
   const db=adminDatabase();
-  const [affinity,history,owned]=await Promise.all([
+  const [affinity,history,owned,official,hidden]=await Promise.all([
    db.from('go_affinity').select('level').eq('member_id',member.id).eq('dog_id',id).maybeSingle(),
    db.from('go_interactions').select('action,created_at').eq('member_id',member.id).eq('dog_id',id).gte('created_at',new Date(Date.now()-40*3600*1000).toISOString()).order('created_at',{ascending:false}),
-   db.from('go_cards').select('id').eq('member_id',member.id).eq('dog_id',id).eq('status','approved').limit(1)
+   db.from('go_cards').select('id').eq('member_id',member.id).eq('dog_id',id).eq('status','approved').limit(1),
+   db.from('go_official_owned').select('slot').eq('member_id',member.id).eq('dog_id',id).limit(1),
+   db.from('go_official_hidden').select('dog_id').eq('member_id',member.id).eq('dog_id',id).limit(1)
   ]);
-  if(affinity.error||history.error||owned.error)throw Error();
+  if(affinity.error||history.error||owned.error||official.error||hidden.error)throw Error();
   const now=new Date(),date=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
   const daily=(history.data||[]).filter(x=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(x.created_at))===date);
-  return Response.json({level:affinity.data?.level||0,owned:!!owned.data?.length,actions:Object.fromEntries(actions.map(action=>{const rows=daily.filter(x=>x.action===action);return [action,{remaining:Math.max(0,2-rows.length),nextAt:rows.length&&Date.now()-new Date(rows[0].created_at).getTime()<1800000?new Date(new Date(rows[0].created_at).getTime()+1800000).toISOString():null}]}))},{headers:{'Cache-Control':'no-store'}});
+  return Response.json({level:affinity.data?.level||0,owned:Boolean(owned.data?.length||official.data?.length||hidden.data?.length),actions:Object.fromEntries(actions.map(action=>{const rows=daily.filter(x=>x.action===action);return [action,{remaining:Math.max(0,2-rows.length),nextAt:rows.length&&Date.now()-new Date(rows[0].created_at).getTime()<1800000?new Date(new Date(rows[0].created_at).getTime()+1800000).toISOString():null}]}))},{headers:{'Cache-Control':'no-store'}});
  }catch{return goError('교감 상태를 불러오지 못했어요.',500);}
 }
 export async function POST(request){
