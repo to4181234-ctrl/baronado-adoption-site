@@ -103,7 +103,7 @@ BEGIN
   WHERE o.member_id=p_member AND o.dog_id=p_card AND o.slot=p_slot;
  END IF;
  RETURN v_data;
-END;$function$
+END;$function$;
 
 
 CREATE OR REPLACE FUNCTION public.go_pvp_create(p_member uuid)
@@ -124,7 +124,7 @@ BEGIN
  INSERT INTO public.go_pvp_rooms(invite_code,host_id) VALUES(v_code,p_member) RETURNING id INTO v_id;
  INSERT INTO public.go_pvp_rounds(room_id,round_number) VALUES(v_id,1);
  RETURN jsonb_build_object('ok',true,'roomId',v_id,'inviteCode',v_code);
-END;$function$
+END;$function$;
 
 
 CREATE OR REPLACE FUNCTION public.go_pvp_join(p_member uuid, p_invite text)
@@ -160,7 +160,7 @@ BEGIN
   joined_at=now(),guest_seen_at=now(),ready_deadline=now()+interval '2 minutes',
   updated_at=now() WHERE id=v_room.id;
  RETURN jsonb_build_object('ok',true,'roomId',v_room.id,'role','guest');
-END;$function$
+END;$function$;
 
 
 CREATE OR REPLACE FUNCTION public.go_pvp_action(p_member uuid, p_room uuid, p_action text, p_kind text DEFAULT NULL::text, p_card uuid DEFAULT NULL::uuid, p_slot smallint DEFAULT NULL::smallint)
@@ -299,7 +299,7 @@ BEGIN
   RETURN jsonb_build_object('ok',true,'status','waiting-rematch');
  END IF;
  RETURN jsonb_build_object('ok',false,'error','지원하지 않는 대결 작업이에요.');
-END;$function$
+END;$function$;
 
 
 CREATE OR REPLACE FUNCTION public.go_pvp_snapshot(p_member uuid, p_room uuid)
@@ -366,7 +366,7 @@ BEGIN
   'otherRematch',CASE WHEN v_role='host' THEN v_room.guest_rematch ELSE v_room.host_rematch END,
   'winner',v_round.winner,'hostScore',v_round.host_score,'guestScore',v_round.guest_score,
   'myStats',v_own_stats,'otherStats',v_their_stats,'recent',v_history);
-END;$function$
+END;$function$;
 
 
 -- Shared daily quest: friend PvP and existing random battle BOTH count toward
