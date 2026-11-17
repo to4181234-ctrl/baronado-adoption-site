@@ -35,6 +35,7 @@ export default function GoStore(){
  const [error,setError]=useState(''),[message,setMessage]=useState('');
  const [selected,setSelected]=useState({mode:'random'}),[confirm,setConfirm]=useState(false);
  const [choiceOpen,setChoiceOpen]=useState(false),[collarChoice,setCollarChoice]=useState(null);
+ const [dogPickerOpen,setDogPickerOpen]=useState(false);
  const [pending,setPending]=useState(null),[result,setResult]=useState(null);
  const [drawResult,setDrawResult]=useState(null),[duplicate,setDuplicate]=useState(null);
  const [revealed,setRevealed]=useState(null),[animating,setAnimating]=useState(true);
@@ -185,14 +186,14 @@ export default function GoStore(){
    <header className="s4-store-screen-reader"><h2>멍카드 구매</h2><p>랜덤은 모든 강아지의 미보유 카드에서, 지정은 선택한 강아지의 미보유 카드에서 랜덤 뽑기예요.</p></header>
    <div className="s4-store-choices" role="group" aria-label="구매 방식">
     <button type="button" aria-pressed={selected.mode==='random'}
-     onClick={()=>setSelected({mode:'random'})}>
+     onClick={()=>{setSelected({mode:'random'});setCollarChoice(null);setChoiceOpen(true);}}>
       <LockedOfficialCard slot={1}/>
       <strong>카드 랜덤 뽑기</strong>
       <small>미보유 카드중 랜덤으로<br/>멍카드를 뽑을 수 있다.</small>
       <b>200 멍코인</b>
     </button>
     <button type="button" aria-pressed={selected.mode==='specific'}
-     onClick={()=>setSelected({mode:'specific'})}>
+     onClick={()=>{setSelected({mode:'specific'});setDogPickerOpen(true);}}>
       <LockedOfficialCard slot={1}/>
       <strong>카드 지정 랜덤 뽑기</strong>
       <small>내가 지정한 멍멍이로<br/>랜덤 멍카드를 뽑을 수 있다.</small>
@@ -224,6 +225,20 @@ export default function GoStore(){
    </button>
    <Link className="s4-store-run" href="/go">도망간다 · 내 도감으로</Link>
   </section>
+  {dogPickerOpen&&<div className="s4-store-overlay" role="presentation" onClick={()=>setDogPickerOpen(false)}>
+   <section role="dialog" aria-modal="true" aria-label="지정할 강아지 선택" onClick={e=>e.stopPropagation()}>
+    <button className="s4-store-close" onClick={()=>setDogPickerOpen(false)} aria-label="닫기">×</button>
+    <h2>어떤 멍멍이로 뽑을까요?</h2>
+    <p>선택한 멍멍이의 미보유 공식 카드 중 1장이 무작위로 나와요.</p>
+    {dogOptions.length===0?<p>지금 선택할 수 있는 미보유 공식 멍카드가 없어요.</p>:
+     <div className="s4-store-dog-choices">{dogOptions.map(dog=>
+      <button type="button" key={dog.dogId} onClick={()=>{
+       setSelected({mode:'specific',dogId:dog.dogId});setDogPickerOpen(false);
+       setCollarChoice(null);setChoiceOpen(true);
+      }}>{dog.name}<small>미보유 {dog.missing}종</small></button>)}</div>}
+    <button type="button" className="s4-store-run" onClick={()=>setDogPickerOpen(false)}>도망간다</button>
+   </section>
+  </div>}
   {choiceOpen&&<div className="s4-store-overlay" role="presentation" onClick={()=>setChoiceOpen(false)}>
    <section role="dialog" aria-modal="true" aria-label="멍카드 목줄 선택"
      onClick={e=>e.stopPropagation()}>
