@@ -44,7 +44,12 @@ export default function GoStore(){
    const r=await fetch('/api/go/official',{cache:'no-store'});
    const data=await r.json();
    if(!r.ok)throw Error(data.error||'공식 멍카드 목록을 불러오지 못했어요.');
-   setCatalog(data);setError('');return data;
+   setCatalog(data);
+   if(data.pendingDuplicate){
+    setDuplicate(data.pendingDuplicate);
+    setDrawResult({dogId:data.pendingDuplicate.dogId,slot:data.pendingDuplicate.slot,requiresChoice:true});
+   }
+   setError('');return data;
   }catch(e){setError(e.message);return null;}
   finally{setLoading(false);}
  },[]);
@@ -139,7 +144,7 @@ export default function GoStore(){
    if(!r.ok||!data.ok)throw Error(data.error||'능력치를 저장하지 못했어요.');
    setDuplicate(null);
    const next=await refresh();
-   setDrawResult(p=>({...p,card:cardFor(next?.dogs?.find(d=>d.dogId===p.dogId),p.slot)}));
+   setDrawResult(p=>({...p,card:cardFor(next?.dogs?.find(d=>d.dogId===(p?.dogId||duplicate.dogId)),p?.slot||duplicate.slot)}));
    setMessage(replace?'새 능력치로 교체했어요.':'기존 능력치를 유지했어요.');
   }catch(e){setError(e.message);}finally{setBusy(false);}
  }
@@ -220,6 +225,7 @@ export default function GoStore(){
    <section role="dialog" aria-modal="true" aria-label="중복 멍카드 능력치 선택">
     <h2>이미 가지고 있는 카드예요!</h2>
     <p>기존 능력치를 유지하거나 새 능력치를 선택해주세요.</p>
+    <p>기존 파워 {catalog.dogs.find(d=>d.dogId===duplicate.dogId)?.slots.find(c=>c.slot===duplicate.slot)?.power??'—'} · 기존 애교 {catalog.dogs.find(d=>d.dogId===duplicate.dogId)?.slots.find(c=>c.slot===duplicate.slot)?.charm??'—'}</p>
     <p>새 파워 {duplicate.proposedPower} · 새 애교 {duplicate.proposedCharm}</p>
     <div className="s4-store-actions"><button disabled={busy} onClick={()=>resolveDuplicate(false)}>기존 유지</button>
      <button disabled={busy} onClick={()=>resolveDuplicate(true)}>새 능력치로 교체</button></div>
