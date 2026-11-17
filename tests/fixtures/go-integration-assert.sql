@@ -1,4 +1,4 @@
--- SYNTHETIC TEST DATA ONLY; no production identifiers or secrets.
+-- SYNTHETIC TEST DATA ONLY; no production records or credentials.
 DO $integration$
 DECLARE
  a uuid:='11111111-1111-4111-8111-111111111111';
@@ -36,4 +36,44 @@ BEGIN
  THEN RAISE EXCEPTION 'stage4 dog-specific 300C failed %',r; END IF;
  receipt:=r;
  r:=public.go_store_purchase(a,'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','specific',da,NULL);
- IF r->>'ok'<>'true' OR (r->...[truncated]
+ IF r->>'ok'<>'true' OR (r->>'coinsSpent')::int<>0 OR r->>'slot'<>receipt->>'slot'
+ THEN RAISE EXCEPTION 'stage4 duplicate transaction doublecharged %',r; END IF;
+ r:=public.go_store_purchase(a,'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb','specific',da,2::smallint);
+ IF r->>'ok'<>'false' THEN RAISE EXCEPTION 'allowed exact-card targeting %',r; END IF;
+ r:=public.go_store_purchase(a,'cccccccc-cccc-4ccc-8ccc-cccccccccccc','random',NULL,NULL);
+ IF r->>'ok'<>'true' OR (r->>'coinsSpent')::int<>200 OR (r->>'slot')::int NOT BETWEEN 1 AND 4
+ THEN RAISE EXCEPTION 'stage4 global 200C failed %',r; END IF;
+
+ -- Stage2 HIDDEN is a user action after 4 unique normals, no automatic card.
+ INSERT INTO public.go_official_owned(member_id,dog_id,slot,power,charm)
+ SELECT a,da,slot,3,3 FROM generate_series(1,4) slot
+ ON CONFLICT (member_id,dog_id,slot) DO NOTHING;
+ r:=public.go_official_unlock_hidden(a,da);
+ IF r->>'ok'<>'true' OR NOT EXISTS(SELECT 1 FROM public.go_official_hidden WHERE member_id=a AND dog_id=da)
+ THEN RAISE EXCEPTION 'manual HIDDEN unlock failed %',r; END IF;
+ IF EXISTS(SELECT 1 FROM public.go_official_hidden WHERE member_id=b) THEN
+  RAISE EXCEPTION 'HIDDEN leaked to other account'; END IF;
+
+ -- Stage5 two-member PvP and shared first-battle reward.
+ r:=public.go_pvp_create(a);rid:=(r->>'roomId')::uuid;code:=r->>'inviteCode';
+ IF r->>'ok'<>'true' THEN RAISE EXCEPTION 'pvp create failed %',r; END IF;
+ r:=public.go_pvp_join(b,code);
+ IF r->>'ok'<>'true' THEN RAISE EXCEPTION 'pvp join failed %',r; END IF;
+ r:=public.go_pvp_action(a,rid,'select','camera',ca,NULL);
+ IF r->>'ok'<>'true' THEN RAISE EXCEPTION 'old personal card not battle eligible %',r; END IF;
+ r:=public.go_pvp_action(b,rid,'select','camera',cb,NULL);
+ IF r->>'ok'<>'true' THEN RAISE EXCEPTION 'second card not battle eligible %',r; END IF;
+ r:=public.go_pvp_action(a,rid,'ready');
+ r:=public.go_pvp_action(b,rid,'ready');
+ IF r->>'status'<>'completed' OR (SELECT count(*) FROM public.go_pvp_records WHERE room_id=rid)<>2 THEN
+  RAISE EXCEPTION 'PvP result not persisted exactly once %',r; END IF;
+ IF (SELECT count(*) FROM public.go_coin_transactions WHERE event_type='quest_battle')<>2 THEN
+  RAISE EXCEPTION 'PvP daily battle quest not once per person'; END IF;
+
+ -- Cannot fake a past receipt or freely alter previous cards.
+ IF (SELECT count(*) FROM public.go_cards)<>2 OR
+    (SELECT count(*) FROM public.go_members)<>2 OR
+    (SELECT count(*) FROM public.go_coin_transactions WHERE source_key='qa:historic:one')<>1 THEN
+  RAISE EXCEPTION 'Integration changed preexisting card/member/receipt'; END IF;
+ RAISE NOTICE 'PASS all 2→3→4→5 SQL migrations with 2 synthetic legacy cards, daily draw, care+coin, 200/300 purchases, HIDDEN, PvP and preexisting data preserved';
+END $integration$;
