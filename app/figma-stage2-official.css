@@ -89,3 +89,30 @@
   font:400 11px/15px 'MonaS12',sans-serif!important;text-align:center!important;
   color:#b22!important;margin:2px 0!important;max-width:100%;
 }
+
+/* Card restoration: content remains inside its own 166x265 frame in every viewport. */
+.v3-go-site .s2-official-card,.v3-go-site .s2-official-hidden{overflow:visible;align-self:stretch}
+.v3-go-site .s2-official-card>.go-card-graphic,.v3-go-site .s2-official-hidden>.go-card-graphic,
+.v3-go-site .s2-official-viewer-card>.go-card-graphic{
+  display:block;position:relative!important;inset:auto!important;width:100%!important;height:auto!important;
+  aspect-ratio:166/265;max-width:100%;overflow:hidden;
+}
+.s2-official-viewer-card{position:relative;display:block;flex:0 0 auto;width:166px;max-width:100%;aspect-ratio:166/265}
+.s2-official-card-caption{display:block;max-width:100%;font:400 11px/16px 'MonaS12',sans-serif;
+ color:#181713;text-align:center;overflow-wrap:anywhere;padding-top:4px}
+.v3-go-site .s2-official-hidden.is-unlockable{outline:none;outline-offset:0}
+.v3-go-site .s2-official-hidden.is-unlockable:focus-visible{outline:2px solid #181713;outline-offset:3px}
+.v3-go-site .s2-official-viewer{box-sizing:border-box;background:#fff;border:0;border-radius:6px;padding:22px 20px 24px;min-height:0;max-height:calc(100dvh - 32px);
+ overflow-y:auto;overscroll-behavior:contain;box-shadow:none;gap:16px}
+.v3-go-site .s2-official-viewer h2{margin:0 18px;font:700 17px/1.5 'MonaS12',sans-serif;overflow-wrap:anywhere}
+.v3-go-site .s2-official-viewer>button:not(.s2-official-close){background:#fade40;border:0;border-radius:5px;min-height:40px;width:198px;max-width:100%}
+@media(max-width:350px){.v3-go-site .s2-official-viewer{padding-inline:13px}}
+
+.s2-official-unavailable{display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+ width:100%;min-height:0;aspect-ratio:166/265;padding:12px;background:#f8f7f3;color:#777;
+ text-align:center;font:400 11px/1.6 'MonaS12',sans-serif}
+
+/* Official-card viewer shares the existing full-screen cinematic card style (reference image 5). */
+.s2-official-completion-actions{display:grid;gap:8px;width:100%;max-width:460px;margin-inline:auto}
+.s2-official-completion-title{margin:0;text-align:center;font:700 13px/1.5 'MonaS12',sans-serif;
+ color:#fff2ce;overflow-wrap:anywhere}

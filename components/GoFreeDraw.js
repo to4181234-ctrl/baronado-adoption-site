@@ -1,9 +1,11 @@
 'use client';
-import {useCallback,useEffect,useState} from 'react';
+import {useCallback,useEffect,useRef,useState} from 'react';
+import {createGameAudio} from '../lib/goV3Audio.js';
 import Link from 'next/link';
 import GoPixelChoice from './GoPixelChoice.js';
 import GoOfficialDrawReveal from './GoOfficialDrawReveal.js';
 import GoDuplicateCompare from './GoDuplicateCompare.js';
+import GoSoundToggle from './GoSoundToggle.js';
 import {enqueueGoCoinNotice} from '../lib/goCoinNotices.js';
 
 function displayCard(dog,slot){
@@ -15,6 +17,8 @@ function displayCard(dog,slot){
 /** Free daily draw stays over the quest screen (Figma 558:479084 / 558:606067). */
 export default function GoFreeDraw({onClose}){
  const [catalog,setCatalog]=useState(null);
+ const sound=useRef(null);
+ useEffect(()=>{sound.current=createGameAudio();return()=>{sound.current?.dispose();sound.current=null;};},[]);
  const [choice,setChoice]=useState(null);
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState('');
@@ -53,6 +57,7 @@ export default function GoFreeDraw({onClose}){
     window.dispatchEvent(new CustomEvent('go-coins-changed',{detail:{notified:true}}));
    }else window.dispatchEvent(new CustomEvent('go-coins-changed',{detail:{notified:false}}));
    const latest=await refresh();
+   void sound.current?.play('discover');
    if(data.requiresChoice){setDuplicate(latest.pendingDuplicate||{dogId:data.dogId,slot:data.slot,proposedPower:data.proposedPower,proposedCharm:data.proposedCharm});}
    else showCard(data,latest);
   }catch(e){setError(e.message)}finally{setBusy(false)}
@@ -82,7 +87,7 @@ export default function GoFreeDraw({onClose}){
     </div>:<>
      <div className="go-free-draw-collars" aria-label="목줄 하나 선택">
       {[0,1,2].map(index=><button key={index} type="button" aria-pressed={choice===index} disabled={busy||Boolean(duplicate)}
-       onClick={()=>setChoice(index)} aria-label={'목줄 '+(index+1)+' 선택'}>
+       onClick={()=>{setChoice(index);void sound.current?.play('collar');}} aria-label={'목줄 '+(index+1)+' 선택'}>
        <img src="/figma-v3/collar.png" alt=""/>
       </button>)}
      </div>
@@ -96,9 +101,9 @@ export default function GoFreeDraw({onClose}){
        <GoPixelChoice disabled={busy||Boolean(duplicate)} onClick={onClose}>도망간다</GoPixelChoice>
       </div>
      </div>
-     <img className="go-free-draw-sound" src="/figma-v3/sound-on.png" alt="소리 켜짐"/>
+     <GoSoundToggle className="go-free-draw-sound"/>
     </>}
-    {error&&!duplicate&&<p role="alert" className="go-free-draw-error">{error}</p>}
+    {error&&<p role="alert" className="go-free-draw-error">{error}</p>}
     {noImage&&<p role="status" className="go-free-draw-error">카드를 지급했지만 이미지를 불러올 수 없어요. 내 도감에서 확인해주세요.
      <Link href="/go" onClick={onClose}>내 도감에서 보기</Link></p>}
    </section>

@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import {useRouter} from 'next/navigation';
 import GoVisitPanel from './GoVisitPanel.js';
 import GoFreeDraw from './GoFreeDraw.js';
 import { useGoSession } from './GoShell.js';
@@ -12,7 +13,20 @@ const BATTLE_AVAILABLE=process.env.NEXT_PUBLIC_MEONGGO_STAGE5_PVP_ENABLED==='1';
 export default function GoQuests({ compact = false }) {
   const { member, ready, openAccount } = useGoSession();
   const coins = useGoCoins();
-  const [notice, setNotice] = useState('');
+  const router = useRouter();
+  const [careBusy,setCareBusy]=useState(false);
+  const [careError,setCareError]=useState('');
+  async function goToCare(){
+    if(careBusy||coins.loading||coins.daily?.careQuestDone)return;
+    setCareBusy(true);setCareError('');
+    try {
+      const res=await fetch('/api/go/quests/care-target',{cache:'no-store'});
+      const data=await res.json();
+      if(!res.ok||!data.dogId)throw Error(data.error||'방문할 수 있는 멍멍이가 없어요.');
+      router.push('/go/interact/'+encodeURIComponent(data.dogId));
+    }catch(e){setCareError(e.message||'멍멍이를 찾지 못했어요.');}
+    finally{setCareBusy(false);}
+  }
   const [visitOpen,setVisitOpen]=useState(false);
   const [drawOpen,setDrawOpen]=useState(false);
   useEffect(()=>{if(!visitOpen)return;const onKey=e=>{if(e.key==='Escape')setVisitOpen(false)};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[visitOpen]);
@@ -27,9 +41,9 @@ export default function GoQuests({ compact = false }) {
     },
     {
       id: 'care', title: '멍멍이 만나러가기', coins: 10,
-      caption: "내 도감 > 원하는 멍멍이 선택 > ‘보러가기’",
+      caption: '친밀도가 아직 최대가 아닌 멍멍이를 만나러 가요',
       completed: Boolean(coins.daily?.careQuestDone),
-      href: '/go'
+      href: '/go/quests'
     }
   ];
   if(isQuestAvailable('draw',{draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE}))tasks.push({
@@ -58,19 +72,24 @@ export default function GoQuests({ compact = false }) {
       <span style={{ width: (member ? done / tasks.length * 100 : 0) + '%' }} />
     </div>
     {member ? <>
+      {careError&&<p className="go-coin-error" role="alert">{careError}</p>}
       {coins.error && <p className="go-coin-error" role="alert">{coins.error}
         <button type="button" onClick={coins.refresh}>새로고침</button></p>}
       {coins.loading && <p className="go-quest-loading" role="status">진행 상황 확인 중…</p>}
       <div className="go-quest-items">
         {tasks.map(task => <article className={'go-quest-item' + (task.completed ? ' is-complete' : '')} key={task.id}>
           <div>
-            {task.id==='draw' && !compact
-              ? <button className="go-quest-title" type="button" onClick={()=>setDrawOpen(true)}>{task.title} &gt;</button>
-              : task.completed
-                ? <button className="go-quest-title" type="button" onClick={()=>setNotice('오늘 이미 완료한 퀘스트예요.')}>{task.title} &gt;</button>
-              : task.id==='visit' && !compact
-                ? <button className="go-quest-title" type="button" onClick={()=>setVisitOpen(true)}>{task.title} &gt;</button>
-                : <Link className="go-quest-title" href={task.href} aria-label={task.id==='battle'?'랜덤 또는 친구 1:1 멍배틀, 오늘 첫 완료 시 10 멍코인':undefined}>{task.title} &gt;</Link>}
+            {task.completed
+              ? <span className="go-quest-title is-complete" aria-disabled="true">{task.title}</span>
+              : coins.loading
+                ? <span className="go-quest-title" aria-disabled="true">{task.title} &gt;</span>
+                : task.id==='care'
+                  ? <button className="go-quest-title" type="button" onClick={goToCare} disabled={careBusy}>{careBusy?'멍멍이 찾는 중…':task.title+' >'}</button>
+                : task.id==='draw' && !compact
+                  ? <button className="go-quest-title" type="button" onClick={()=>setDrawOpen(true)}>{task.title} &gt;</button>
+                  : task.id==='visit' && !compact
+                    ? <button className="go-quest-title" type="button" onClick={()=>setVisitOpen(true)}>{task.title} &gt;</button>
+                    : <Link className="go-quest-title" href={task.href} aria-label={task.id==='battle'?'랜덤 또는 친구 1:1 멍배틀, 오늘 첫 완료 시 10 멍코인':undefined}>{task.title} &gt;</Link>}
             <small>{task.caption}</small>
           </div>
           <div className="go-quest-item-action">
@@ -78,7 +97,6 @@ export default function GoQuests({ compact = false }) {
           </div>
         </article>)}
       </div>
-      {notice && <p className="go-quest-note" role="status">{notice}</p>}
     </> : <div className="go-quest-login">
       <p>{ready ? '로그인하면 퀘스트를 시작할 수 있어요.' : '로그인 정보를 확인하고 있어요.'}</p>
       {ready && <button type="button" onClick={openAccount}>로그인하고 시작하기</button>}

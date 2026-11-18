@@ -29,12 +29,12 @@ test('stage5 SQL: lost connection resets both readiness, 30s grace, single KST b
  assert.match(sql,/ON CONFLICT\(member_id,source_key\) DO NOTHING/);
  assert.match(sql,/FOR UPDATE/);
 });
-test('stage5: hidden slot5 never appears in friend PvP owned card choices',()=>{
- const sql=read('docs/sql/stage5-friend-pvp-and-random-battle-DRAFT.sql');
+test('stage5 revision: HIDDEN slot5 is available in 1:1 PvP via the reviewed migration',()=>{
+ const sql=read('docs/sql/predeploy-hidden-stats-pvp-DRAFT.sql');
  const api=read('app/api/go/pvp/route.js');
- assert.match(sql,/p_slot BETWEEN 1 AND 4/);
- assert.match(api,/\.in\('slot',\[1,2,3,4\]\)/);
- assert.match(api,/body\.slot<=4/);
+ assert.match(sql,/p_slot=5/);
+ assert.match(api,/\.in\('slot',\[1,2,3,4,5\]\)/);
+ assert.match(api,/body\.slot<=5/);
 });
 test('stage5 Figma 617:163536: shared quest describes random and friend battles',()=>{
  const quests=read('components/GoQuests.js');

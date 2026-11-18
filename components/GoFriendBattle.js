@@ -19,7 +19,7 @@ const formatDate=value=>value?new Date(value).toLocaleString('ko-KR',{
  timeZone:'Asia/Seoul',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'
 }):'';
 const face=card=>({
- dogName:card?.dogName||'멍멍이',nickname:'멍기록가',
+ dogName:card?.dogName||'멍멍이',nickname:'멍기록가',title:card?.title||'',officialSlot:card?.kind==='official'?card?.slot:null,
  imageUrl:card?.imageUrl||'',capturedAt:null,
  battle:{power:Number(card?.power)||0,charm:Number(card?.charm)||0}
 });
@@ -29,7 +29,7 @@ function OwnedCard({card,selected,onClick}){
   onClick={onClick} aria-pressed={selected}>
    <GoCardFace card={face(card)}/>
    <span>{card.dogName} · {card.title||'공식 멍카드'}</span>
-   <small>파워 {card.power} · 매력 {card.charm}</small>
+   <small>파워 {card.power} · 애교 {card.charm}</small>
  </button>;
 }
 function MatchAnimation({state,impact}){
@@ -203,7 +203,7 @@ export default function GoFriendBattle(){
   <header className="friend-pvp-header">
    <h1>실시간 1:1 멍배틀</h1>
    <p className="meong-battle-hint">친구와 실시간으로 1:1 멍카드 배틀!</p>
-   <p className="friend-pvp-rules">파워 + 매력으로 승패를 결정해요. 속성 상성 보너스는 없어요.</p>
+   <p className="friend-pvp-rules">파워 + 애교으로 승패를 결정해요. 속성 상성 보너스는 없어요.</p>
   </header>
   {error&&<p className="meong-battle-error" role="alert">{error}</p>}
   {notice&&<p className="friend-pvp-notice" role="status">{notice}</p>}
@@ -272,7 +272,7 @@ export default function GoFriendBattle(){
      {room.myCard&&<div className="friend-pvp-current">
       <h2>선택한 멍카드</h2>
       <div><GoCardFace card={face(room.myCard)}/>
-       <p>{room.myCard.dogName}<small>파워 {room.myCard.power} · 매력 {room.myCard.charm}</small></p></div>
+       <p>{room.myCard.dogName}<small>파워 {room.myCard.power} · 애교 {room.myCard.charm}</small></p></div>
      </div>}
      {!room.myReady&&<>
       <h2>내 카드 한 장 선택하기</h2>
@@ -337,7 +337,7 @@ export default function GoFriendBattle(){
        <p className="friend-pvp-result-score">
         {room.hostName} {room.hostScore} : {room.guestScore} {room.guestName}
        </p>
-       <p className="friend-pvp-result-note">파워 + 매력 합산 · 속성 보너스 0</p>
+       <p className="friend-pvp-result-note">파워 + 애교 합산 · 속성 보너스 0</p>
        <button type="button" className="meong-battle-primary"
         disabled={busy||room.myRematch}
         onClick={()=>mutate({action:'rematch',roomId:room.roomId})}>

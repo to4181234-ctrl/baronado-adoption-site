@@ -15,7 +15,7 @@ function kstToday() {
 
 export async function GET(request) {
   if (!adminReady()) return apiResponse({ error: '관리자 설정을 확인해주세요.' }, 503);
-  if (!hasAdminSession(request)) return apiResponse({ error: '관리자 로그인이 필요합니다.' }, 401);
+  if (!(await hasAdminSession(request))) return apiResponse({ error: '관리자 로그인이 필요합니다.' }, 401);
 
   const period = new URL(request.url).searchParams.get('period') || '7d';
   if (!['today', '7d', '30d', 'all'].includes(period)) {

@@ -9,9 +9,9 @@ export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const headers={'Cache-Control':'no-store'};
 const fail=(error,status=400)=>Response.json({error},{status,headers});
-const allow=(request,mutation=false)=>{
+const allow=async(request,mutation=false)=>{
  if(!goStage2ServerEnabled())return fail('공식 멍카드 기능을 준비하고 있어요.',503);
- if(!hasAdminSession(request))return fail('관리자 로그인이 필요해요.',401);
+ if(!(await hasAdminSession(request)))return fail('관리자 로그인이 필요해요.',401);
  if(mutation&&!sameOrigin(request))return fail('같은 사이트에서 다시 시도해주세요.',403);
  return null;
 };
@@ -55,7 +55,7 @@ async function uploadAsset(db,{dogId,versionId,slot,title,cropX,cropY,zoom,sourc
  }
 }
 export async function GET(request){
- const denied=allow(request);if(denied)return denied;
+ const denied=await allow(request);if(denied)return denied;
  const params=new URL(request.url).searchParams;
  const chosen=params.get('dogId');
  if(chosen&&!validId(chosen))return fail('강아지 정보를 확인해주세요.');
@@ -105,7 +105,7 @@ export async function GET(request){
  }catch{return fail('공식 멍카드 관리 정보를 불러오지 못했어요.',500);}
 }
 export async function POST(request){
- const denied=allow(request,true);if(denied)return denied;
+ const denied=await allow(request,true);if(denied)return denied;
  const body=await safeBody(request);
  if(!validId(body?.dogId))return fail('강아지를 선택해주세요.');
  const action=body?.action;
@@ -127,7 +127,7 @@ export async function POST(request){
  }catch{return fail('관리 작업을 저장하지 못했어요.',500);}
 }
 export async function PUT(request){
- const denied=allow(request,true);if(denied)return denied;
+ const denied=await allow(request,true);if(denied)return denied;
  let form;
  try{form=await request.formData();}catch{return fail('사진 정보를 확인해주세요.');}
  const dogId=form.get('dogId'),versionId=form.get('versionId'),file=form.get('file');
@@ -160,7 +160,7 @@ export async function PUT(request){
  }catch{return fail('이미지 처리 또는 업로드에 실패했어요.',500);}
 }
 export async function PATCH(request){
- const denied=allow(request,true);if(denied)return denied;
+ const denied=await allow(request,true);if(denied)return denied;
  const body=await safeBody(request);
  if(!validId(body?.dogId)||!validId(body?.versionId))
   return fail('강아지와 수정안을 확인해주세요.');

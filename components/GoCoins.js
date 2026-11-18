@@ -108,14 +108,11 @@ export function GoCoinProvider({ member, children }) {
   useEffect(() => subscribeGoCoinNotices(setNotice), []);
   return <CoinsContext.Provider value={{
     enabled: GO_STAGE1_UI_ENABLED, ...state, loading, walletLoaded, error, refresh,
-    openHistory: () => setHistoryOpen(true)
+    openHistory: () => setHistoryOpen(true), notice
   }}>
     {children}
     {GO_STAGE1_UI_ENABLED && member?.id && historyOpen &&
       <GoCoinHistory balance={walletLoaded ? state.balance : null} onClose={() => setHistoryOpen(false)} />}
-    {GO_STAGE1_UI_ENABLED && notice && <div className="go-coin-notice" role="status" aria-live="polite">
-      {notice.amount > 0 ? '+' : '−'}{Math.abs(notice.amount)}C
-    </div>}
   </CoinsContext.Provider>;
 }
 

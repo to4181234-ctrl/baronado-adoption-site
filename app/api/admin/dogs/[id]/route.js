@@ -4,7 +4,7 @@ import { authorizeMutation, apiResponse, readJson, badRequest } from '../../../.
 export const runtime = 'nodejs';
 
 async function authorized(request, context) {
-  const blocked = authorizeMutation(request);
+  const blocked = await authorizeMutation(request);
   if (blocked) return { blocked };
   const { id } = await context.params;
   if (!validId(id)) return { blocked: apiResponse({ error: '게시글 주소가 올바르지 않습니다.' }, 400) };

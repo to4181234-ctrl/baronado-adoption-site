@@ -29,3 +29,7 @@
 .go-official-admin .is-danger{background:#fff3f2;color:#9b2e2e;border-color:#9b2e2e}
 .go-official-admin .v10-admin-note{font-size:11px;line-height:1.6}
 @media(max-width:350px){.go-official-admin{padding-inline:11px}.go-official-admin-slots{gap:4px}.go-official-admin-slots>button{min-height:75px}}
+
+/* Existing admin banner: let its description wrap and match narrow-page gutters. */
+.go-official-admin .v10-admin-heading{height:auto;min-height:88px}
+@media(max-width:350px){.go-official-admin .v10-admin-heading{margin-inline:-11px}}

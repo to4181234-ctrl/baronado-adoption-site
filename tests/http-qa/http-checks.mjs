@@ -52,7 +52,7 @@ const draw=(await call('/api/go/official',{action:'draw'},b)).data;
 const redraw=(await call('/api/go/official',{action:'draw'},b)).data;assert.equal(draw.dogId,redraw.dogId);assert.equal(draw.slot,redraw.slot);assert.equal(redraw.coinsAdded,0);assert.equal((await call('/api/go/coins',undefined,b)).data.balance,beforeDraw+10);passed.push('Daily free draw HTTP retry preserves card and rewards once');
 const beforeCare=(await call('/api/go/coins',undefined,a)).data.balance;
 await call('/api/go/interaction',{dogId:'33333333-3333-4333-8333-333333333333',action:'snack'},a);
-assert.equal((await call('/api/go/coins',undefined,a)).data.balance,beforeCare+20);passed.push('Care action and first daily care quest award exactly 20C');
+assert.equal((await call('/api/go/coins',undefined,a)).data.balance,beforeCare+10);passed.push('Care action and first daily care quest award 10C total');
 const visitState=(await call('/api/go/visit',undefined,a)).data;
 if(visitState.canRequestNow){
  const visit=(await call('/api/go/visit',{action:'request'},a)).data;

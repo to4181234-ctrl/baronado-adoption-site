@@ -10,7 +10,7 @@ test('four ordinary card images use 536x528 WebP crop, HIDDEN uses PNG',async()=
  }));
  const meta=await sharp(rendered).metadata();
  assert.equal(meta.format,'webp');assert.equal(meta.width,536);assert.equal(meta.height,528);
- const hidden=await officialPhotoOutput(input,5,officialPhotoOptions({slot:5,title:''}));
+ const hidden=await officialPhotoOutput(input,5,officialPhotoOptions({slot:5,title:'HIDDEN 제목'}));
  const hm=await sharp(hidden).metadata();
  assert.equal(hm.format,'png');
  assert.equal(hm.width,900);assert.equal(hm.height,850);
@@ -26,6 +26,7 @@ test('admin rejects slot 6 and invalid title, zoom or crop',()=>{
  for(const args of [
   {slot:6,title:'no'},
   {slot:2,title:''},
+  {slot:5,title:''},
   {slot:3,title:'x'.repeat(31)},
   {slot:2,title:'valid',zoom:3.5},
   {slot:2,title:'valid',cropX:-0.2}

@@ -25,7 +25,7 @@ export async function GET(request){
   const [ownedResult,hiddenResult,drawResult]=member?await Promise.all([
    db.from('go_official_owned').select('dog_id,slot,power,charm,acquired_at,seen_at')
     .eq('member_id',member.id),
-   db.from('go_official_hidden').select('dog_id,unlocked_at,seen_at')
+   db.from('go_official_hidden').select('dog_id,power,charm,unlocked_at,seen_at')
     .eq('member_id',member.id),
    db.from('go_official_daily_draws')
     .select('dog_id,slot,duplicate,proposed_power,proposed_charm,resolved_at,created_at')
@@ -73,12 +73,14 @@ export async function GET(request){
     collected:cards.length,missing:4-cards.length,
     slots:Array.from({length:4},(_,i)=>{
      const slot=i+1,own=cards.find(x=>x.slot===slot),asset=photoMap.get(s.dog_id+':'+slot);
-     return {slot,owned:Boolean(own),title:own?asset?.title||'공식 멍카드':'',
+     return {slot,owned:Boolean(own),title:own?asset?.title||'':'',
       imageUrl:own?asset?.imageUrl||'':'',power:own?.power??null,charm:own?.charm??null,
       new:own?!own.seen_at:false,acquiredAt:own?.acquired_at||null};
     }),
     hidden:{unlocked:Boolean(special),new:Boolean(special&&!special.seen_at),
+      title:special?photoMap.get(s.dog_id+':5')?.title||'':'',
       imageUrl:special?photoMap.get(s.dog_id+':5')?.imageUrl||'':'',
+      power:special?.power??null,charm:special?.charm??null,
       unlockedAt:special?.unlocked_at||null}
    };
   }).sort((a,b)=>Number(b.collected>0)-Number(a.collected>0)||a.name.localeCompare(b.name,'ko'));

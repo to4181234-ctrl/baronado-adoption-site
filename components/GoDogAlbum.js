@@ -4,7 +4,7 @@ import Link from 'next/link';
 import GoPixelChoice from './GoPixelChoice.js';
 import { useCallback, useEffect, useState } from 'react';
 import { fetchDogs } from '../lib/dogs.js';
-import { figmaSprite, gameElement, gameElementIcon } from '../lib/goV3Game.js';
+import { figmaSprite, gameElement } from '../lib/goV3Game.js';
 import { useGoSession } from './GoShell.js';
 import GoCard from './GoCard.js';
 import GoCamera from './GoCamera.js';
@@ -197,7 +197,7 @@ export default function GoDogAlbum({ dogId }) {
         <span className="v5-count-caption">수집 카드</span>
         <span className="v5-count-value">{summaryCount}{STAGE2_ENABLED || hasCards ? '장' : '개'}</span>
         <span className="v5-element-caption">속성</span>
-        <span className="v5-element-value">{hasCards ? <><img className="v5-element-effect" src={gameElementIcon(dog.name)} alt=""/>{gameElement(dog.name)}</> : '미공개'}</span>
+        <span className="v5-element-value">{hasCards ? <>✧ {gameElement(dog.name)}</> : '미공개'}</span>
       </div>
       {!dog.adopted && <button className="v5-album-collect" type="button" onClick={() => member ? setCollectConfirm(true) : openAccount()}>멍카드 수집하러가기 <span aria-hidden="true">›</span></button>}
     </section>

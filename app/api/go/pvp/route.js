@@ -112,7 +112,10 @@ export async function GET(request){
    .order('acquired_at',{ascending}).order('dog_id')
    .range(0,99);
   if(mine.error)throw mine.error;
-  const rows=mine.data||[],dogIds=[...new Set(rows.map(x=>x.dog_id))];
+  const hiddenOwned=await db.from('go_official_hidden')
+   .select('dog_id,power,charm,unlocked_at').eq('member_id',member.id);
+  if(hiddenOwned.error)throw hiddenOwned.error;
+  const rows=[...(mine.data||[]),...(hiddenOwned.data||[]).map(x=>({dog_id:x.dog_id,slot:5,power:x.power,charm:x.charm,acquired_at:x.unlocked_at}))],dogIds=[...new Set([...(mine.data||[]),...(hiddenOwned.data||[])].map(x=>x.dog_id))];
   if(!rows.length)return json({kind,cards:[],total:mine.count||0,hasMore:false});
   const [dogs,sets]=await Promise.all([
    db.from('dogs').select('id,name').in('id',dogIds),
@@ -124,7 +127,7 @@ export async function GET(request){
   const versionIds=[...new Set((sets.data||[]).map(x=>x.current_version).filter(Boolean))];
   const assets=versionIds.length?await db.from('go_official_assets')
     .select('version_id,slot,title,display_path').in('version_id',versionIds)
-    .in('slot',[1,2,3,4]):{data:[],error:null};
+    .in('slot',[1,2,3,4,5]):{data:[],error:null};
   if(assets.error)throw assets.error;
   const assetMap=new Map((assets.data||[]).map(x=>[x.version_id+':'+x.slot,x]));
   const visible=rows.map(x=>({row:x,asset:assetMap.get(versions.get(x.dog_id)+':'+x.slot)}))
@@ -175,7 +178,7 @@ export async function POST(request){
    if(!['camera','official'].includes(body?.kind) || !validId(body?.cardId))
     return error('내 카드 종류와 ID를 확인해주세요.');
    kind=body.kind;card=body.cardId;
-   if(kind==='official'&&Number.isInteger(body.slot)&&body.slot>=1&&body.slot<=4)
+   if(kind==='official'&&Number.isInteger(body.slot)&&body.slot>=1&&body.slot<=5)
     slot=body.slot;
    else if(kind==='official'||(body.slot!=null&&kind==='camera'))
     return error('공식 카드 번호를 확인해주세요.');

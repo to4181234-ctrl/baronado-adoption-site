@@ -2,6 +2,7 @@
 -- On deleting a member's last owned card for a dog, clear that member's dog-specific
 -- random and friend PvP records. Preserve the opponent's independently owned records.
 -- The original go_pvp_records schema did not identify the participating dog.
+-- Requires predeploy-random-official-battle-DRAFT.sql first.
 BEGIN;
 
 ALTER TABLE public.go_pvp_records ADD COLUMN IF NOT EXISTS dog_id uuid;
@@ -89,11 +90,12 @@ RETURNS trigger LANGUAGE plpgsql SET search_path=public AS $$
 BEGIN
  PERFORM 1 FROM public.go_members WHERE id=NEW.member_id FOR UPDATE;
  INSERT INTO public.go_random_dog_records(battle_id,member_id,dog_id,outcome,created_at)
- SELECT NEW.id,NEW.member_id,c.dog_id,
- CASE WHEN NEW.winner='draw' THEN 'draw' WHEN NEW.winner=side.label THEN 'win' ELSE 'loss' END,NEW.created_at
- FROM (VALUES('first',NEW.first_card_id,NEW.first_dog_id),('second',NEW.second_card_id,NEW.second_dog_id)) side(label,card_id,dog_id)
- JOIN public.go_cards c ON c.id=side.card_id AND c.member_id=NEW.member_id AND c.dog_id=side.dog_id
- WHERE NOT EXISTS(SELECT 1 FROM public.go_dog_record_resets r WHERE r.member_id=NEW.member_id AND r.dog_id=c.dog_id AND r.reset_at>=NEW.created_at)
+ SELECT NEW.id,NEW.member_id,NEW.first_dog_id,
+ CASE NEW.winner WHEN 'draw' THEN 'draw' WHEN 'first' THEN 'win' ELSE 'loss' END,NEW.created_at
+ WHERE (
+  (NEW.first_kind='camera' AND EXISTS(SELECT 1 FROM public.go_cards c WHERE c.id=NEW.first_card_id AND c.member_id=NEW.member_id AND c.dog_id=NEW.first_dog_id))
+  OR (NEW.first_kind='official' AND NEW.first_card_id=NEW.first_dog_id AND ((NEW.first_slot BETWEEN 1 AND 4 AND EXISTS(SELECT 1 FROM public.go_official_owned o WHERE o.member_id=NEW.member_id AND o.dog_id=NEW.first_dog_id AND o.slot=NEW.first_slot)) OR (NEW.first_slot=5 AND EXISTS(SELECT 1 FROM public.go_official_hidden h WHERE h.member_id=NEW.member_id AND h.dog_id=NEW.first_dog_id)))))
+ AND NOT EXISTS(SELECT 1 FROM public.go_dog_record_resets r WHERE r.member_id=NEW.member_id AND r.dog_id=NEW.first_dog_id AND r.reset_at>=NEW.created_at)
  ON CONFLICT DO NOTHING;
  RETURN NEW;
 END $$;
@@ -102,12 +104,11 @@ CREATE TRIGGER go_stage3_random_record AFTER INSERT ON public.go_battles
 FOR EACH ROW EXECUTE FUNCTION public.go_stage3_record_random();
 
 INSERT INTO public.go_random_dog_records(battle_id,member_id,dog_id,outcome,created_at)
- SELECT b.id,b.member_id,c.dog_id,
- CASE WHEN b.winner='draw' THEN 'draw' WHEN b.winner=side.label THEN 'win' ELSE 'loss' END,b.created_at
- FROM public.go_battles b
- CROSS JOIN LATERAL(VALUES('first',b.first_card_id,b.first_dog_id),('second',b.second_card_id,b.second_dog_id)) side(label,card_id,dog_id)
- JOIN public.go_cards c ON c.id=side.card_id AND c.member_id=b.member_id AND c.dog_id=side.dog_id
- WHERE NOT EXISTS(SELECT 1 FROM public.go_dog_record_resets r WHERE r.member_id=b.member_id AND r.dog_id=c.dog_id AND r.reset_at>=b.created_at)
+ SELECT b.id,b.member_id,b.first_dog_id,CASE b.winner WHEN 'draw' THEN 'draw' WHEN 'first' THEN 'win' ELSE 'loss' END,b.created_at
+ FROM public.go_battles b WHERE (
+ (b.first_kind='camera' AND EXISTS(SELECT 1 FROM public.go_cards c WHERE c.id=b.first_card_id AND c.member_id=b.member_id AND c.dog_id=b.first_dog_id))
+ OR (b.first_kind='official' AND b.first_card_id=b.first_dog_id AND ((b.first_slot BETWEEN 1 AND 4 AND EXISTS(SELECT 1 FROM public.go_official_owned o WHERE o.member_id=b.member_id AND o.dog_id=b.first_dog_id AND o.slot=b.first_slot)) OR (b.first_slot=5 AND EXISTS(SELECT 1 FROM public.go_official_hidden h WHERE h.member_id=b.member_id AND h.dog_id=b.first_dog_id)))))
+ AND NOT EXISTS(SELECT 1 FROM public.go_dog_record_resets r WHERE r.member_id=b.member_id AND r.dog_id=b.first_dog_id AND r.reset_at>=b.created_at)
  ON CONFLICT DO NOTHING;
 
 CREATE OR REPLACE FUNCTION public.go_battle_cleanup_last_card()

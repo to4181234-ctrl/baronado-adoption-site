@@ -7,7 +7,7 @@ import { parseBulkCardIds } from '../../../../../lib/goBulkDelete.js';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export async function GET(request) {
-  if (!hasAdminSession(request)) return Response.json({ error: '관리자 로그인이 필요해요.' }, { status: 401 });
+  if (!(await hasAdminSession(request))) return Response.json({ error: '관리자 로그인이 필요해요.' }, { status: 401 });
   try {
     const params = new URL(request.url).searchParams;
     const page = Math.max(0, Math.min(1000, Number(params.get('page')) || 0));
@@ -20,7 +20,7 @@ export async function GET(request) {
   } catch { return Response.json({ error: '게시물을 가져오지 못했어요.' }, { status: 500 }); }
 }
 export async function PATCH(request) {
-  if (!hasAdminSession(request) || !sameOrigin(request)) return Response.json({ error: '관리자 로그인이 필요해요.' }, { status: 401 });
+  if (!(await hasAdminSession(request)) || !sameOrigin(request)) return Response.json({ error: '관리자 로그인이 필요해요.' }, { status: 401 });
   try {
     const { id, status: requestedStatus, reason: requestedReason, note: requestedNote } = await request.json();
     // Older open admin tabs may still submit the former "hidden" action.
@@ -38,7 +38,7 @@ export async function PATCH(request) {
 }
 
 export async function DELETE(request) {
-  if (!hasAdminSession(request) || !sameOrigin(request)) return Response.json({ error: '관리자 로그인이 필요해요.' }, { status: 401 });
+  if (!(await hasAdminSession(request)) || !sameOrigin(request)) return Response.json({ error: '관리자 로그인이 필요해요.' }, { status: 401 });
   try {
     const input = await request.json();
     if (Array.isArray(input?.ids)) {

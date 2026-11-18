@@ -1,6 +1,7 @@
 'use client';
 import {useState} from 'react';
 import GoCardFace from './GoCardFace.js';
+import GoSoundToggle from './GoSoundToggle.js';
 import {LockedOfficialCard} from './GoStage2OfficialCards.js';
 
 /** Approved Figma 558:606067 comparison → 558:606964 confirmation. */
@@ -34,8 +35,8 @@ export default function GoDuplicateCompare({dog,duplicate,busy,error,onResolve,o
      <button type="button" disabled={busy} onClick={()=>{setChoice(true);setConfirm(true);}}>새 카드로 교체하기</button>
     </div>
    </>}
-   {error&&<p className="go-duplicate-error" role="alert">{error}</p>}
-   <img className="go-duplicate-sound" src="/figma-v3/sound-on.png" alt="소리 켜짐"/>
+   {error&&<p role="alert" className="go-duplicate-error">{error}</p>}
+   <GoSoundToggle className="go-duplicate-sound"/>
   </section>
  </div>;
 }

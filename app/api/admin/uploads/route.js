@@ -4,7 +4,7 @@ import { signedImageUpload } from '../../../../lib/server/adminData';
 export const runtime = 'nodejs';
 
 export async function POST(request) {
-  const blocked = authorizeMutation(request);
+  const blocked = await authorizeMutation(request);
   if (blocked) return blocked;
   try {
     const info = await readJson(request, 1000);

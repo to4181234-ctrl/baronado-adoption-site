@@ -10,7 +10,7 @@ const enabled=()=>process.env.MEONGGO_STAGE1_COINS_ENABLED==='1';
 
 export async function GET(request){
   if(!enabled())return fail('방문 인증 기능을 준비 중이에요.',503);
-  if(!hasAdminSession(request))return fail('관리자 로그인이 필요해요.',401);
+  if(!(await hasAdminSession(request)))return fail('관리자 로그인이 필요해요.',401);
   const url=new URL(request.url);
   const rawCode=url.searchParams.get('code');
   const history=url.searchParams.get('history')==='1';
@@ -53,7 +53,7 @@ export async function GET(request){
 
 export async function PATCH(request){
   if(!enabled())return fail('방문 인증 기능을 준비 중이에요.',503);
-  if(!hasAdminSession(request))return fail('관리자 로그인이 필요해요.',401);
+  if(!(await hasAdminSession(request)))return fail('관리자 로그인이 필요해요.',401);
   if(!sameOrigin(request))return fail('같은 사이트에서 다시 시도해주세요.',403);
   let payload;
   try{payload=await request.json();}catch{return fail('요청 내용을 확인해주세요.',400);}

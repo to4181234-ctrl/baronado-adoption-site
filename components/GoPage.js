@@ -8,7 +8,6 @@ import GoShell,{useGoSession} from './GoShell.js';
 import GoDogAlbum from './GoDogAlbum.js';
 import GoCamera from './GoCamera.js';
 import GoCard from './GoCard.js';
-import GoDiscovery from './GoDiscovery.js';
 import GoAlbumBattleRecords from './GoAlbumBattleRecords.js';
 import {koreaDay} from '../lib/goCoins.js';
 const EMPTY={counts:{},covers:{},progress:null,standing:null,ready:false};
@@ -67,11 +66,10 @@ function Album({initialDogId=null}){
   </div>:<div className={'v3-album-home v3-album-figma '+(member?'v3-album-member':'v3-album-guest')}>
     <section className="v3-profile-head"><div className="v3-profile-avatar"><img className={!member?'v3-profile-anon-silhouette':undefined} src={member?figmaSprite(member.avatarDog||'구름',member.avatarDog?'front':'shadow'):'/figma-v3/album-shadow-buddy.svg'} alt={member?'프로필 캐릭터':'미획득 실루엣'}/></div><div>{member?<><h1>{member.nickname}</h1><p>멍기록가</p><small>{member.profileBio||'자기소개가 없습니다.'}</small><Link href="/go/profile"><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>프로필 수정</Link><button type="button" className="v3-profile-logout" onClick={logout}><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>로그아웃</button></>:<><h1 className="v3-anon-heading">멍기록가를 기다리는중!</h1><p>멍기록가</p><small className="v3-anon-lede">로그인하고 나만의 멍멍 도감 채우기</small><button type="button" className="v3-profile-login s1-login-primary" onClick={openAccount}><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>로그인하고 시작하기</button><Link className="s1-browse-first" href="/go/community">먼저 둘러보기 ›</Link></>}</div></section>
     <div className="v3-home-quest-shortcut"><Link href="/go/quests" onClick={()=>{setQuestSeen(true);try{localStorage.setItem('meonggo:quest-seen:'+koreaDay(),'1');}catch{}}}>{!questSeen&&<span className="v3-home-quest-new">NEW</span>}<strong>오늘의 멍코인 퀘스트 보러가기 &gt;</strong><small>매일 자정에 업데이트!</small></Link></div>
-    <section className="v3-collection-section"><h2>내 도감</h2><div className="v3-progress-label">도감 수집 {officialLoaded?claimed:'—'} / {totalDogs}{member&&claimed===0?' (첫 도감을 기다리고 있어요)':''}</div><div className="v3-progress"><span style={{width:(officialLoaded?claimed/totalDogs*100:0)+'%'}}/></div>
+    <section id="meonggo-album" className="v3-collection-section"><h2>내 도감</h2><div className="v3-progress-label">도감 수집 {officialLoaded?claimed:'—'} / {totalDogs}{member&&claimed===0?' (첫 도감을 기다리고 있어요)':''}</div><div className="v3-progress"><span style={{width:(officialLoaded?claimed/totalDogs*100:0)+'%'}}/></div>
      <div className="v3-collection-grid">{orderedDogs.map(name=>{const d=dogs.find(x=>x.name===name),owned=Boolean(d&&member&&hasDogCards(d.id));return <Link href={d?'/go/'+d.id:'/go'} className={'v3-collection-tile'+(owned?' unlocked':'')} key={name}><img src={owned?figure(name,true):FIGMA_ALBUM_SHADOW[name]||figure(name,false)} alt={owned?name:'미획득 실루엣'}/><strong>{name}</strong></Link>})}</div></section>
     <GoAlbumBattleRecords dogs={dogs} records={collection.battleRecords} member={member} ready={collection.ready}/>
   </div>}
-  {!dogId&&!loadingDogs&&dogs.length>0&&<GoDiscovery dogs={dogs} dog={dogs[0]}/>}
   {notice&&<p className="v3-message" role="status">{notice}</p>}{error&&<p className="v3-error" role="alert">{error}</p>}
   {collectConfirm&&dog&&<div className="v3-discovery-backdrop v3-discovery-figma" role="presentation" onClick={()=>setCollectConfirm(false)}><section className="v3-discovery-modal v3-collection-confirm" role="dialog" aria-modal="true" aria-label="멍카드 수집 준비" onClick={e=>e.stopPropagation()}>
   <button className="v3-discovery-close" aria-label="닫기" onClick={()=>setCollectConfirm(false)}>×</button>

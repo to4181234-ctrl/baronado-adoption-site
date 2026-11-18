@@ -14,6 +14,7 @@ import GoAlbumBattleRecords from './GoAlbumBattleRecords.js';
 import {fetchDogs} from '../lib/dogs.js';
 
 const initial={cards:[],hasMore:false,total:0,eligibleDogKinds:0};
+const cardKey=c=>`${c?.kind||'camera'}:${c?.id||''}:${c?.slot||0}`;
 const emptyOpponents={members:[],total:0,hasMore:false};
 function BattleCard({card,selected,onSelect,disabled=false,mini=false}){
  return <button type="button" className={'meong-battle-card'+(selected?' is-picked':'')+(mini?' is-mini':'')} onClick={onSelect} disabled={disabled||!onSelect} aria-pressed={Boolean(selected)}>
@@ -23,6 +24,7 @@ function BattleCard({card,selected,onSelect,disabled=false,mini=false}){
 function Game(){
  const {member,ready,openAccount}=useGoSession();
  const [query,setQuery]=useState(''),[searched,setSearched]=useState('');
+ const [kind,setKind]=useState('official');
  const [order,setOrder]=useState('newest'),[page,setPage]=useState(0);
  const [data,setData]=useState(initial),[loading,setLoading]=useState(true),[error,setError]=useState('');
  const [selected,setSelected]=useState([]),[phase,setPhase]=useState('choose');
@@ -39,23 +41,23 @@ function Game(){
  useEffect(()=>{
   if(!ready||!member||phase!=='choose'){return;}
   const ctl=new AbortController();setLoading(true);setError('');
-  const qs=new URLSearchParams({mine:'1',q:searched,order,page:String(page)});
+  const qs=new URLSearchParams({mine:'1',kind,q:searched,order,page:String(page)});
   fetch('/api/go/battle?'+qs,{cache:'no-store',signal:ctl.signal})
    .then(r=>r.json().then(j=>{if(!r.ok)throw Error(j.error||'카드를 불러오지 못했어요.');return j;}))
    .then(setData).catch(e=>{if(!ctl.signal.aborted)setError(e.message);})
    .finally(()=>{if(!ctl.signal.aborted)setLoading(false);});
   return()=>ctl.abort();
- },[ready,member?.id,phase,searched,order,page]);
+ },[ready,member?.id,phase,searched,order,page,kind]);
  useEffect(()=>{
   if(!ready||!member||phase!=='opponents'||!selected[0])return;
   const ctl=new AbortController();setLoading(true);setError('');
-  const qs=new URLSearchParams({mode:'opponents',ownCardId:selected[0].id,q:searched,page:String(opponentPage)});
+  const qs=new URLSearchParams({mode:'opponents',ownCardId:selected[0].id,ownKind:selected[0].kind||'camera',ownSlot:String(selected[0].slot||''),q:searched,page:String(opponentPage)});
   fetch('/api/go/battle?'+qs,{cache:'no-store',signal:ctl.signal})
    .then(r=>r.json().then(j=>{if(!r.ok)throw Error(j.error||'상대 목록을 불러오지 못했어요.');return j;}))
    .then(setOpponents).catch(e=>{if(!ctl.signal.aborted)setError(e.message);})
    .finally(()=>{if(!ctl.signal.aborted)setLoading(false);});
   return()=>ctl.abort();
- },[ready,member?.id,phase,selected[0]?.id,searched,opponentPage]);
+ },[ready,member?.id,phase,selected[0]?.id,selected[0]?.kind,selected[0]?.slot,searched,opponentPage]);
  const choose=card=>{
   if(phase!=='choose')return;
   if(!card.battle||card.status!=='approved'){setError('배틀 가능한 멍카드를 선택해주세요.');return;}
@@ -71,7 +73,7 @@ function Game(){
   stop();finished.current=false;requestId.current=null;preparedId.current=null;preparedToken.current=null;
   setImpactBeat(0);setOpponentBusy(true);setError('');
   try{
-   const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'prepare',firstId:selected[0].id,opponentId:id,randomMember:random})});
+   const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'prepare',firstId:selected[0].id,firstKind:selected[0].kind||'camera',firstSlot:selected[0].slot||null,opponentId:id,randomMember:random})});
    const body=await response.json();
    if(!response.ok)throw Error(body.error||'상대 카드를 선정하지 못했어요.');
    if(!body.battleId||!body.matchToken||!body.card||!body.opponent)throw Error('배틀 선정 정보를 확인하지 못했어요.');
@@ -88,7 +90,7 @@ function Game(){
   setImpactBeat(0);stopBattleVibration();
   setMutating(true);sounds.current?.stop();
   try{
-   const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,secondId:selected[1].id,matchToken:preparedToken.current})});
+   const response=await fetch('/api/go/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:requestId.current,firstId:selected[0].id,firstKind:selected[0].kind||'camera',firstSlot:selected[0].slot||null,secondId:selected[1].id,secondKind:selected[1].kind||'camera',secondSlot:selected[1].slot||null,secondOwnerId:selected[1].ownerId,matchToken:preparedToken.current})});
    const body=await response.json();if(!alive.current)return;
    if(!response.ok)throw Error(body.error||'대결 결과를 저장하지 못했어요.');
    if(body.coinsAdded>0)window.dispatchEvent(new CustomEvent('go-coins-changed',{detail:{notified:false}}));
@@ -121,7 +123,7 @@ function Game(){
   ];
  };
  const startRef=useRef(null);startRef.current=start;
- const reset=()=>{stop();sounds.current?.startMusic();requestId.current=null;preparedId.current=null;preparedToken.current=null;finished.current=false;setPhase('choose');setSelected([]);setOpponent(null);setResult(null);setImpactBeat(0);setRevealed(false);setError('');setPage(0);setSearched('');setQuery('');};
+ const reset=()=>{stop();sounds.current?.startMusic();requestId.current=null;preparedId.current=null;preparedToken.current=null;finished.current=false;setPhase('choose');setSelected([]);setOpponent(null);setResult(null);setImpactBeat(0);setRevealed(false);setError('');setPage(0);setKind('official');setSearched('');setQuery('');};
  const retryOpponent=()=>{stop();preparedId.current=null;preparedToken.current=null;requestId.current=null;setSelected(list=>list.slice(0,1));setOpponent(null);setPhase('opponents');setSearched('');setQuery('');setOpponentPage(0);setError('');};
  useEffect(()=>{
   if(phase!=='reveal')return;
@@ -171,12 +173,15 @@ function Game(){
   {phase==='choose'&&<>
    <h1>멍배틀</h1><p className="meong-battle-hint">배틀에 출전할 내 멍카드를 한 장 골라주세요!</p>
    <button className="meong-battle-start-link" disabled={selected.length!==1||mutating} onClick={goOpponents}>상대 멍기록가 찾기 &gt;</button>
-   <div className="meong-battle-tabs"><button className="active">내 카드</button><span>선택 {selected.length}/1</span></div>
+   <div className="meong-battle-tabs" role="group" aria-label="출전 카드 종류">
+    <button type="button" className={kind==='official'?'active':''} aria-pressed={kind==='official'} onClick={()=>{setKind('official');setPage(0);setSearched('');setQuery('');}}>멍카드</button>
+    <button type="button" className={kind==='camera'?'active':''} aria-pressed={kind==='camera'} onClick={()=>{setKind('camera');setPage(0);setSearched('');setQuery('');}}>나만의 멍카드</button>
+    <span>선택 {selected.length}/1</span></div>
    <form className="meong-battle-search" onSubmit={e=>{e.preventDefault();setPage(0);setSearched(query);}}><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="제목·강아지 이름" aria-label="내 카드 검색"/><button type="submit">검색</button></form>
    <div className="meong-battle-sort">등록 순서 | <button onClick={()=>{setPage(0);setOrder(x=>x==='newest'?'oldest':'newest');}}>{order==='newest'?'최신순':'오래된순'}⌄</button><span>전체 {data.total}장</span></div>
    <div className="meong-battle-chosen" aria-label="선택한 카드">{selected.length===0?<span className="meong-battle-chosen-placeholder">출전할 카드 한 장을 선택해주세요.</span>:<button type="button" onClick={()=>{setSelected([]);sounds.current?.play('deselect');}}>{selected[0].dogName} · {selected[0].title} ×</button>}</div>
    {error&&<p className="meong-battle-error" role="alert">{error}</p>}
-   {loading?<p className="meong-battle-empty">카드를 불러오는 중이에요.</p>:data.cards.length?<div className="meong-battle-grid">{data.cards.map(c=><div className="meong-battle-entry" key={c.id}><BattleCard card={c} onSelect={()=>choose(c)} selected={selected[0]?.id===c.id}/><span>{c.nickname} 멍기록가</span><small>{c.capturedAt?new Date(c.capturedAt).toLocaleDateString('ko-KR'):''}</small></div>)}</div>:<div className="meong-battle-empty">출전 가능한 내 카드가 없어요. <Link href="/go">카드 수집하러 가기</Link></div>}
+   {loading?<p className="meong-battle-empty">카드를 불러오는 중이에요.</p>:data.cards.length?<div className="meong-battle-grid">{data.cards.map(c=><div className="meong-battle-entry" key={cardKey(c)}><BattleCard card={c} onSelect={()=>choose(c)} selected={cardKey(selected[0])===cardKey(c)}/><span>{c.nickname} 멍기록가</span><small>{c.capturedAt?new Date(c.capturedAt).toLocaleDateString('ko-KR'):''}</small></div>)}</div>:<div className="meong-battle-empty">출전 가능한 내 카드가 없어요. <Link href="/go">카드 수집하러 가기</Link></div>}
    {data.total>4&&<div className="meong-battle-pager"><button disabled={page===0||loading} onClick={()=>setPage(p=>p-1)}>‹ 이전</button><span>{page+1}</span><button disabled={!data.hasMore||loading} onClick={()=>setPage(p=>p+1)}>다음 ›</button></div>}
   </>}
   {phase==='opponents'&&<section className="meong-battle-opponents">

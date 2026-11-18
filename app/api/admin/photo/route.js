@@ -4,7 +4,7 @@ import { authorizeMutation, apiResponse, readJson, badRequest } from '../../../.
 export const runtime = 'nodejs';
 
 export async function POST(request) {
-  const blocked = authorizeMutation(request);
+  const blocked = await authorizeMutation(request);
   if (blocked) return blocked;
   try {
     const { url } = await readJson(request, 1600);

@@ -4,15 +4,15 @@ import Link from 'next/link';
 import GoOfficialDrawReveal from './GoOfficialDrawReveal.js';
 import GoDuplicateCompare from './GoDuplicateCompare.js';
 import GoPixelChoice from './GoPixelChoice.js';
+import GoSoundToggle from './GoSoundToggle.js';
+import {createGameAudio} from '../lib/goV3Audio.js';
 import {useGoSession} from './GoShell.js';
 import {useGoCoins} from './GoCoins.js';
 import {enqueueGoCoinNotice} from '../lib/goCoinNotices.js';
 import {availableStoreItems,availableStoreDogs,STORE_PRICES} from '../lib/goStore.js';
-import {FIGMA_DOGS,figmaSprite} from '../lib/goV3Game.js';
 import {LockedOfficialCard} from './GoStage2OfficialCards.js';
 
 const STAGE4=process.env.NEXT_PUBLIC_MEONGGO_STAGE4_STORE_ENABLED==='1';
-const STORE_SHADOWS={깡지:'kangji',버디:'buddy',뽀실:'pposil',구름:'gureum',오레오:'oreo'};
 const STORE_ART='/meonggo/store/meonggo_store_loop.svg';
 const EMPTY={dogs:[],drawUsed:false,pendingDuplicate:null};
 const keyFor=id=>'meonggo2:store-pending:'+id;
@@ -33,6 +33,8 @@ export default function GoStore(){
  const {member,ready,openAccount}=useGoSession();
  const coins=useGoCoins();
  const [catalog,setCatalog]=useState(EMPTY);
+ const sound=useRef(null);
+ useEffect(()=>{sound.current=createGameAudio();return()=>{sound.current?.dispose();sound.current=null;};},[]);
  const catalogRequestRef=useRef(0);
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false);
  const [error,setError]=useState(''),[message,setMessage]=useState('');
@@ -43,7 +45,7 @@ export default function GoStore(){
  const [duplicate,setDuplicate]=useState(null);
  const [revealed,setRevealed]=useState(null);
  const items=useMemo(()=>availableStoreItems(catalog.dogs),[catalog.dogs]);
- const dogOptions=useMemo(()=>availableStoreDogs(catalog.dogs).sort((a,b)=>Number((catalog.dogs.find(d=>d.dogId===b.dogId)?.collected||0)>0)-Number((catalog.dogs.find(d=>d.dogId===a.dogId)?.collected||0)>0)||FIGMA_DOGS.indexOf(a.name)-FIGMA_DOGS.indexOf(b.name)),[catalog.dogs]);
+ const dogOptions=useMemo(()=>availableStoreDogs(catalog.dogs),[catalog.dogs]);
  const selectedDog=dogOptions.find(i=>i.dogId===selected.dogId);
  const balance=coins?.walletLoaded?coins.balance:null;
  const refresh=useCallback(async()=>{
@@ -167,7 +169,7 @@ export default function GoStore(){
     <p>한 번 골라봐..하암...졸리다</p></div>
   </div>
   {message&&<p role="status" className="s4-store-message">{message}</p>}
-  {error&&!duplicate&&<p role="alert" className="s4-store-error">{error} <button type="button" onClick={refresh}>다시 확인</button></p>}
+  {error&&<p role="alert" className="s4-store-error">{error} <button type="button" onClick={refresh}>다시 확인</button></p>}
   <section className="s4-store-products">
    <header className="s4-store-screen-reader"><h2>멍카드 구매</h2><p>랜덤은 모든 강아지의 미보유 카드에서, 지정은 선택한 강아지의 미보유 카드에서 랜덤 뽑기예요.</p></header>
    <div className="s4-store-choices" role="group" aria-label="구매 방식">
@@ -193,30 +195,31 @@ export default function GoStore(){
    </aside>}
   </section>
   {dogPickerOpen&&<div className="s4-store-overlay" role="presentation" onClick={()=>setDogPickerOpen(false)}>
-   <section className="s4-store-dog-picker" role="dialog" aria-modal="true" aria-label="지정할 강아지 선택" onClick={e=>e.stopPropagation()}>
+   <section role="dialog" aria-modal="true" aria-label="지정할 강아지 선택" onClick={e=>e.stopPropagation()}>
     <button className="s4-store-close" onClick={()=>setDogPickerOpen(false)} aria-label="닫기">×</button>
-    <h2>멍멍이 고르기</h2>
+    <h2>어떤 멍멍이로 뽑을까요?</h2>
+    <p>선택한 멍멍이의 미보유 공식 카드 중 1장이 무작위로 나와요.</p>
     {dogOptions.length===0?<p>지금 선택할 수 있는 미보유 공식 멍카드가 없어요.</p>:
      <div className="s4-store-dog-choices">{dogOptions.map(dog=>
-      <button type="button" key={dog.dogId} className={(catalog.dogs.find(d=>d.dogId===dog.dogId)?.collected||0)>0?'s4-dog-known':''} aria-label={`${dog.name} 미보유 ${dog.missing}종`} onClick={()=>{
+      <button type="button" key={dog.dogId} onClick={()=>{
        setSelected({mode:'specific',dogId:dog.dogId});setDogPickerOpen(false);
        setCollarChoice(null);setChoiceOpen(true);
-      }}><img src={(catalog.dogs.find(d=>d.dogId===dog.dogId)?.collected||0)>0?figmaSprite(dog.name):`/figma-v3/album-shadow-${STORE_SHADOWS[dog.name]||'pposil'}.svg`} alt=""/><strong>{dog.name}</strong></button>)}</div>}
-    <img className="s4-picker-sound" src="/figma-v3/sound-on.png" alt="소리 켜짐"/>
+      }}>{dog.name}<small>미보유 {dog.missing}종</small></button>)}</div>}
+    <button type="button" className="s4-store-run" onClick={()=>setDogPickerOpen(false)}>도망간다</button>
    </section>
   </div>}
   {choiceOpen&&<div className="s4-store-overlay" role="presentation" onClick={()=>setChoiceOpen(false)}>
    <section className="s4-store-original-choice" role="dialog" aria-modal="true" aria-label="멍카드 목줄 선택"
      onClick={e=>e.stopPropagation()}>
     <button className="s4-store-close" onClick={()=>setChoiceOpen(false)} aria-label="닫기">×</button>
-    <h2>{selected.mode==='specific'&&<span className="s4-selected-dog-name">{selectedDog?.name}</span>}랜덤 뽑기</h2>
+    <h2>랜덤 뽑기</h2>
     <div className="s4-store-collars">{[0,1,2].map(i=>
       <button type="button" key={i} aria-label={'목줄 '+(i+1)+' 선택'}
-       aria-pressed={collarChoice===i} onClick={()=>setCollarChoice(i)}>
+       aria-pressed={collarChoice===i} onClick={()=>{setCollarChoice(i);void sound.current?.play('collar');}}>
        <img src="/figma-v3/collar.png" alt="픽셀 목줄"/>
       </button>)}</div>
     <div className="s4-store-pixel-dialogue" aria-label="목줄 선택 안내"><img src="/figma-v3/discovery-dialog-bg.svg" alt=""/><img src="/figma-v3/discovery-dialog-outer.svg" alt=""/><img src="/figma-v3/discovery-dialog-inner.svg" alt=""/><p>오늘의 멍멍이는 누구일까요?</p></div>
-    <img className="s4-store-sound-icon" src="/figma-v3/sound-on.png" alt="소리 켜짐"/>
+    <GoSoundToggle className="s4-store-sound-icon"/>
     <div className="s4-store-collar-actions">
      <GoPixelChoice initial disabled={collarChoice===null}
        onClick={()=>{if(collarChoice===null)return;setChoiceOpen(false);setConfirm(true);}}>하나 고른다</GoPixelChoice>
@@ -237,7 +240,7 @@ export default function GoStore(){
   </div>}
   {duplicate&&<GoDuplicateCompare
    dog={catalog.dogs.find(d=>d.dogId===duplicate.dogId)} duplicate={duplicate}
-   busy={busy} error={error} onResolve={resolveDuplicate} onClose={()=>{setDuplicate(null);setError('');}}/>}
-  {revealed&&revealed.imageUrl&&<GoOfficialDrawReveal card={revealed} selectedDogName={selected.mode==='specific'?(catalog.dogs.find(d=>d.dogId===selected.dogId)?.name):null} onClose={()=>setRevealed(null)}/>}
+   busy={busy} error={error} onResolve={resolveDuplicate} onClose={()=>setDuplicate(null)}/>}
+  {revealed&&revealed.imageUrl&&<GoOfficialDrawReveal card={revealed} onClose={()=>setRevealed(null)}/>}
  </article>;
 }

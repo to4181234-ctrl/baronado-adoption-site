@@ -2,12 +2,11 @@
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import GoCardFace from './GoCardFace.js';
+import GoSoundToggle from './GoSoundToggle.js';
 
 /** Figma 558:529529 → 558:593265: official draw animation and card reveal. */
-export default function GoOfficialDrawReveal({card,onClose,selectedDogName=null}){
+export default function GoOfficialDrawReveal({card,onClose}){
  const [phase,setPhase]=useState('reveal');
- const dogName=card.dogName||'멍멍이',last=dogName.charCodeAt(dogName.length-1);
- const subjectParticle=last>=0xAC00&&last<=0xD7A3&&(last-0xAC00)%28!==0?'이':'가';
  useEffect(()=>{
   if(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches){setPhase('card');return;}
   const timeout=window.setTimeout(()=>setPhase('card'),1650);
@@ -23,7 +22,7 @@ export default function GoOfficialDrawReveal({card,onClose,selectedDogName=null}
   <section className="go-official-reveal-screen" role="dialog" aria-modal="true" aria-label="멍카드 뽑기 결과">
    <button type="button" className="go-official-reveal-close" onClick={onClose} aria-label="닫기">×</button>
    {phase==='reveal'?<>
-    <h2>{selectedDogName?<><span className="go-reveal-selected-dog">{selectedDogName}</span>랜덤 뽑기</>:'멍멍GO!'}</h2>
+    <h2>멍멍GO!</h2>
     <div className="go-official-reveal-collar" aria-hidden="true">
      <img className="go-official-sparkles-top" src="/figma-post/sparkle-top.svg" alt=""/>
      <img className="go-official-sparkles-bottom" src="/figma-post/sparkle-bottom.svg" alt=""/>
@@ -31,11 +30,11 @@ export default function GoOfficialDrawReveal({card,onClose,selectedDogName=null}
     </div>
     <button type="button" className="go-official-reveal-bottom" onClick={()=>setPhase('card')}>SKIP ›</button>
    </>:<>
-    <h2>{dogName}{subjectParticle} 나타났다!</h2>
+    <h2>{card.dogName}{/[가-힣]$/.test(card.dogName||'')&&(card.dogName.charCodeAt(card.dogName.length-1)-0xAC00)%28!==0?'이':''}가 나타났다!</h2>
     <div className="go-official-reveal-card"><GoCardFace card={card}/></div>
     <Link className="go-official-reveal-bottom" href="/go" onClick={onClose}>내 도감에서 보기 ›</Link>
    </>}
-   <img className="go-official-reveal-sound" src="/figma-v3/sound-on.png" alt="소리 켜짐"/>
+   <GoSoundToggle className="go-official-reveal-sound"/>
   </section>
  </div>;
 }

@@ -1,5 +1,5 @@
 import { createHmac } from 'node:crypto';
-import { adminReady, issueAdminCookie, sameOrigin, validPassword } from '../../../../lib/server/adminSession';
+import { adminAuthMode, adminReady, issueAdminCookie, sameOrigin, validPassword } from '../../../../lib/server/adminSession';
 import { adminDatabase } from '../../../../lib/server/adminData';
 import { apiResponse, readJson } from '../../../../lib/server/adminHttp';
 
@@ -22,6 +22,7 @@ async function recentFailures(client, key) {
 }
 
 export async function POST(request) {
+  if (adminAuthMode()!=='password') return apiResponse({ error: '이 관리 환경에서는 별도 관리자 비밀번호 로그인을 사용하지 않아요.' }, 403);
   if (!adminReady()) return apiResponse({ error: '관리자 비밀번호와 서버 키 설정이 필요합니다.' }, 503);
   if (!sameOrigin(request)) return apiResponse({ error: '허용되지 않은 요청입니다.' }, 403);
   try {

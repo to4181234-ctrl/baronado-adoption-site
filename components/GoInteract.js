@@ -27,7 +27,7 @@ function Interaction(){
  }
  function actionBlocked(action){
   const state=status?.actions?.[action];
-  return busy||!member||!status?.owned||!state?.remaining||Boolean(state.nextAt&&Date.parse(state.nextAt)>now);
+  return busy||!member||!status?.canInteract||!state?.remaining||Boolean(state.nextAt&&Date.parse(state.nextAt)>now);
  }
  // Current Figma 173:3556/3634: a five-second quiet period triggers a short side walk.
  useEffect(()=>{
@@ -59,7 +59,7 @@ function Interaction(){
  async function interact(action){
   if(busy)return;
   if(!member){openAccount();return;}
-  if(!status?.owned){setError('먼저 '+dog?.name+'의 멍카드를 수집해주세요.');return;}
+  if(!status?.canInteract){setError('교감 상태를 확인해주세요.');return;}
   if(!status?.actions?.[action]?.remaining){setError('오늘 사용할 수 있는 횟수가 없어요.');return;}
   if(status?.actions?.[action]?.nextAt&&Date.now()<Date.parse(status.actions[action].nextAt)){setError('30분 뒤에 다시 이용할 수 있어요.');return;}
   setBusy(true);setWalking(false);setPose('front');setError('');
@@ -90,7 +90,7 @@ function Interaction(){
   </div>
   {error&&<p className="v3-interact-error" role="alert">{error}</p>}
   {!member&&ready&&<button className="v3-interact-login" onClick={openAccount}>로그인하고 교감하기</button>}
-  {status&&!status.owned&&<p className="v3-interact-help">이 강아지의 카드를 먼저 수집하면 교감할 수 있어요.</p>}
+  {status&&status.canInteract===false&&<p className="v3-interact-help">현재 교감할 수 없는 강아지예요.</p>}
  </div>;
 }
 export default function GoInteract(){return <GoShell active="interact"><Interaction/></GoShell>}

@@ -65,8 +65,3 @@ test('store discards previous-account catalog, reveal and duplicate on account c
  assert.match(store,/setCatalog\(EMPTY\);setDuplicate\(null\);setRevealed\(null\);setConfirm\(false\)/);
  assert.match(store,/\},\[member\?\.id\]\)/);
 });
-
-test('duplicate graphics stay in their card cell despite global absolute SVG styling',()=>{
- const css=read('app/figma-stage4-store.css');
- for(const selector of ['go-duplicate-card-frame','go-duplicate-confirm-card'])assert.match(css,new RegExp(selector+'[^}]+position:relative;inset:auto'));
-});

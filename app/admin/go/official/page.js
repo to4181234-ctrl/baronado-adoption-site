@@ -29,7 +29,7 @@ function OfficialEditor(){
  const draft=officialSet?.versions.find(v=>v.status==='draft');
  const current=officialSet?.versions.find(v=>v.id===officialSet.currentVersion);
  const shown=draft||current;
- const hasFive=Boolean(draft&&draft.assets?.length===5&&slots.every(i=>draft.assets.some(x=>x.slot===i)));
+ const hasFive=Boolean(draft&&draft.assets?.length===5&&slots.every(i=>draft.assets.some(x=>x.slot===i&&typeof x.title==='string'&&x.title.trim().length>=1&&x.title.trim().length<=30)));
  const published=Boolean(officialSet?.currentVersion);
  const currentValues=editing[activeSlot]||baseValues()[activeSlot];
  const savedAsset=shown?.assets.find(a=>a.slot===activeSlot);
@@ -79,7 +79,7 @@ function OfficialEditor(){
  const updatePhoto=async()=>{
   if(!dogId||!draft?.id||busy)return;
   const options=editing[activeSlot];
-  if(activeSlot<=4&&(!options.title?.trim()||options.title.trim().length>30)){
+  if(!options.title?.trim()||options.title.trim().length>30){
    setError('사진 제목을 1~30자로 입력해주세요.');return;
   }
   if(!options.file&&!savedAsset){setError('먼저 새 사진 파일을 선택해주세요.');return;}
@@ -102,7 +102,7 @@ function OfficialEditor(){
    }
    const data=await r.json();
    if(!r.ok||!data.ok)throw Error(data.error||'저장하지 못했어요.');
-   setMessage(activeSlot===5?'HIDDEN 일러스트를 임시 저장했어요.':
+   setMessage(activeSlot===5?'HIDDEN 이미지와 제목을 임시 저장했어요.':
      '사진 '+activeSlot+'번의 제목과 구도를 임시 저장했어요.');
    setEditing(v=>({...v,[activeSlot]:{...v[activeSlot],file:null}}));
    await reload();
@@ -134,7 +134,7 @@ function OfficialEditor(){
       </section>}
       {(draft||current)&&<section className="go-official-admin-editor">
         <h2>{draft?'공식 멍카드 수정안':'현재 공개 버전'}</h2>
-        <p className="v10-admin-note">슬롯을 선택해 사진과 카드 제목을 등록하세요. 원본은 별도 보존하고 Figma의 사진 영역(134×132)에 맞춰 구도를 조절해요.</p>
+        <p className="v10-admin-note">슬롯을 선택해 사진 또는 HIDDEN 일러스트와 각각의 카드 제목을 등록하세요. 원본은 별도 보존하고 Figma의 사진 영역(134×132)에 맞춰 구도를 조절해요.</p>
         <div className="go-official-admin-slots">{slots.map(slot=>
           <button type="button" key={slot} className={activeSlot===slot?'is-selected':''}
             onClick={()=>setActiveSlot(slot)}>
@@ -152,19 +152,20 @@ function OfficialEditor(){
                 transform:'scale('+currentValues.zoom+')'}:undefined}/>:
               <span>사진을 등록해주세요</span>}
           </div>
-          {activeSlot<=4&&savedAsset?.imageUrl&&<div className="go-official-admin-card-face">
+          {savedAsset?.imageUrl&&<div className="go-official-admin-card-face">
             <GoCardFace card={{dogName:dog?.name||'강아지',nickname:'바로나도',
-              imageUrl:savedAsset.imageUrl,capturedAt:null,battle:{power:0,charm:0}}}/>
-            <small>Figma 카드 프레임 미리보기 · 파워/매력은 사용자가 획득할 때 결정돼요.</small>
+              imageUrl:savedAsset.imageUrl,title:currentValues.title,officialSlot:activeSlot,
+              unknownScores:true,capturedAt:null,battle:{power:null,charm:null}}}/>
+            <small>Figma 카드 프레임 미리보기 · {activeSlot===5?'HIDDEN 능력치는 저장된 데이터가 없어 임의의 점수를 표시하지 않아요.':'파워/매력은 사용자가 획득할 때 결정돼요.'}</small>
           </div>}
           {draft&&<>
             <label>새 이미지 파일
               <input type="file" accept="image/jpeg,image/png,image/webp"
                 onChange={e=>update('file',e.target.files?.[0]||null)}/>
             </label>
-            {activeSlot<=4&&<label>카드별 제목 (최대 30자)
+            {<label>카드별 제목 (최대 30자)
               <input maxLength={30} value={currentValues.title}
-                onChange={e=>update('title',e.target.value)} placeholder="예: 햇살 아래의 구름"/>
+                onChange={e=>update('title',e.target.value)} placeholder={activeSlot===5?'예: 우리의 특별한 순간':'예: 햇살 아래의 구름'}/>
             </label>}
             {activeSlot<=4&&<div className="go-official-admin-crop">
               {[['cropX','사진 가로 위치'],['cropY','사진 세로 위치'],['zoom','확대 비율']].map(([key,label])=>

@@ -141,18 +141,9 @@
 .go-coin-sheet-header h2{margin-top:20px}
 .go-coin-filters{margin-top:8px}
 
-/* Final integrated QA: exact Figma 599:163493 balance and transaction geometry. */
-.go-coin-site-header strong{font:700 12.57969px/17px 'MonaS12',sans-serif}
-.go-coin-sheet-header button{font:400 12px/26px 'MonaS12',sans-serif}
-.go-coin-sheet-header h2{font-size:23px!important}
-.go-coin-balance{height:86px;min-height:86px;padding:14px 14px 8px;background:#f7f5f0}
-.go-coin-balance span{font-size:13px}
-.go-coin-balance strong{font-size:23px}
-.go-coin-filters{margin-top:27px}
-.go-coin-filters button{height:37px}
-.go-coin-filters button[aria-pressed="true"]{border-bottom-color:#f7d94d}
-.go-coin-history-list{padding-top:10px}
-.go-coin-transaction{border-bottom-color:#e6e3db}
-.go-coin-transaction-body{min-height:85px;padding:18px 0}
-.go-coin-transaction strong,.go-coin-transaction b{font-size:14px}
-.go-coin-transaction small{font-size:12px;margin-top:6px}
+/* Approved coin feedback: text beside the wallet for 1.5 seconds; no floating badge. */
+.v3-go-site .s1-header-actions .s3-coin-feedback{
+ position:absolute;right:calc(100% + 5px);top:0;white-space:nowrap;
+ color:#161616;background:transparent;border:0;box-shadow:none;pointer-events:none;
+ font:700 11px/16.5px Galmuri11,sans-serif;font-variant-numeric:tabular-nums;
+}

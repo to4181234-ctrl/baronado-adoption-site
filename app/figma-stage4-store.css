@@ -292,9 +292,9 @@
 .go-duplicate-screen{position:relative;flex:0 0 auto;width:345px;max-width:100%;height:502px;min-height:0;border-radius:6px;background:white;padding:0;text-align:center}
 .go-duplicate-screen>h2{position:absolute;top:37px;left:5px;right:5px;margin:0;font:700 18px/27px 'MonaS12',sans-serif}
 .go-duplicate-close{position:absolute;top:9px;right:12px;border:0;background:transparent;font:25px/28px Arial,sans-serif;cursor:pointer}
-.go-duplicate-cards{position:absolute;left:22px;right:22px;top:88px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:29px}
-.go-duplicate-card-frame{width:133px;max-width:100%;height:auto;aspect-ratio:166/265}
-.go-duplicate-cards strong{margin-top:8px;font:400 11px/17px 'Galmuri11',sans-serif}
+.go-duplicate-cards{position:absolute;left:22px;right:16.56px;top:89px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:29.56px}
+.go-duplicate-card-frame{width:138.44px;max-width:100%;height:auto;aspect-ratio:166/265}
+.go-duplicate-cards strong{margin-top:0;font:400 11px/21px 'Galmuri11',sans-serif}
 .go-duplicate-buttons{position:absolute;top:362px;left:74px;right:73px;margin:0;gap:11px;max-width:none}
 .go-duplicate-buttons button{height:38px;min-height:38px;border:0;border-radius:5px;background:#ffdf49;padding:0;font:400 11px/17px 'Galmuri11',sans-serif}
 .go-duplicate-confirm{position:absolute;top:353px;left:35px;right:35px;margin:0}
@@ -352,40 +352,20 @@
 .go-official-sparkles-top{width:200px;max-width:none;opacity:.9}
 .go-official-sparkles-bottom{width:157px;max-width:none;opacity:1}
 @media(prefers-reduced-motion:reduce){.go-official-sparkles-top,.go-official-sparkles-bottom{animation:none}}
+/* Figma original collar choice: selection is stateful, never a black/yellow box. */
+.go-free-draw-collars button[aria-pressed="true"],
+.s4-store-original-choice .s4-store-collars>button[aria-pressed="true"]{
+  outline:none!important;border:0!important;background:transparent!important;padding:0!important;
+}
+.go-free-draw-collars button:focus-visible,
+.s4-store-original-choice .s4-store-collars>button:focus-visible{
+  outline:2px solid #181713!important;outline-offset:3px;
+}
 
-/* Figma 558:840547 and 558:786271: approved three-column dog picker. */
-.s4-store-overlay:has(>.s4-store-dog-picker){align-items:flex-start;padding-top:96px;overflow-y:auto}
-.s4-store-overlay>.s4-store-dog-picker{width:min(345px,calc(100vw - 32px));height:502px;flex-shrink:0;padding:0;border:0;border-radius:6px}
-.s4-store-dog-picker>h2{position:absolute;left:0;right:0;top:78px;margin:0;font:700 35.694px/54px 'MonaS12',sans-serif}
-.s4-store-dog-picker .s4-store-dog-choices{position:absolute;top:160px;left:20px;right:20px;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 9px}
-.s4-store-dog-picker .s4-store-dog-choices>button{display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:95/116;min-width:0;border:0;border-radius:7px;background:#f8f7f3;padding:7px}
-.s4-store-dog-picker .s4-store-dog-choices>button.s4-dog-known{background:#f7d94d}
-.s4-store-dog-picker .s4-store-dog-choices img{width:100%;max-width:75px;height:75px;object-fit:contain;image-rendering:pixelated}
-.s4-store-dog-picker .s4-store-dog-choices strong{font:700 11px/18px 'MonaS12',sans-serif}
-.s4-picker-sound{position:absolute;width:24px;height:24px;right:22px;bottom:19px;image-rendering:pixelated}
-.s4-store-dog-picker .s4-store-close{right:20px;top:14px;width:20px;height:20px;padding:0;line-height:20px}
-.s4-selected-dog-name,.go-reveal-selected-dog{display:block;font:700 24px/37px 'MonaS12',sans-serif}
-.s4-store-original-choice:has(.s4-selected-dog-name)>h2{top:32px}
-@media(max-height:580px){.s4-store-overlay:has(>.s4-store-dog-picker){padding-top:12px}}
-.s4-store-original-choice .s4-selected-dog-name,.go-official-reveal-screen .go-reveal-selected-dog{display:block;font:700 26px/39px 'MonaS12',sans-serif}
+/* Audio icons are interactive controls, not decorative images. Keep Figma geometry. */
+.go-audio-toggle{box-sizing:border-box;display:grid;place-items:center;padding:0;border:0;background:transparent;cursor:pointer;z-index:4;touch-action:manipulation}
+.go-audio-toggle img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated;pointer-events:none}
+.go-audio-toggle:focus-visible{outline:2px solid #181713;outline-offset:3px}
 
-/* Runtime QA: Figma 558:606067 / 558:606964 measured card and text bounds. */
-.go-duplicate-screen>h2{top:39px;font:700 20px/30px 'MonaS12',sans-serif}
-.go-duplicate-cards{top:89px;left:21.5px;right:17.06227px;gap:29.56227px}
-.go-duplicate-card-frame{width:138.43773px;max-width:100%}
-.go-duplicate-cards strong{margin-top:2px;font:400 9px/21px 'Galmuri11',sans-serif}
-.go-duplicate-buttons button,.go-duplicate-confirm-buttons button{background:#f7d94d;font:400 12.6383px/15px 'MonaS12',sans-serif}
-.go-duplicate-confirm-card{left:calc(50% - 73.5px);width:138.43773px}
-.go-free-draw-screen h2{font:700 35.694px/54px 'MonaS12',sans-serif}
-.go-free-draw-collars{top:195px;left:52px;right:52px;gap:14px;justify-content:center}
-.go-free-draw-collars button{width:71px;height:46.0281px;flex:none}
-.go-free-draw-dialogue{left:30px;right:30px;top:306px;height:119px}
-.go-free-draw-dialogue-content{top:25px}
-.go-free-draw-dialogue-content p{font-size:13px;line-height:21px;margin-bottom:2px}
-.go-free-draw-dialogue-content .v3-pixel-choice{font-size:13px}
-.go-free-draw-close,.go-duplicate-close,.go-official-reveal-close{top:17px;right:22px;width:12px;height:12px;padding:0;font-size:0}
-.go-free-draw-close:before,.go-free-draw-close:after,.go-duplicate-close:before,.go-duplicate-close:after,.go-official-reveal-close:before,.go-official-reveal-close:after{content:'';position:absolute;left:0;top:5px;width:13px;height:2px;background:#111;transform:rotate(45deg)}
-.go-free-draw-close:after,.go-duplicate-close:after,.go-official-reveal-close:after{transform:rotate(-45deg)}
-@media(max-width:370px){.go-duplicate-cards{left:14px;right:14px;gap:12px}.go-free-draw-collars{left:15px;right:15px;gap:10px}.go-free-draw-dialogue{left:15px;right:15px}}
-
-.go-duplicate-error{position:absolute;top:450px;left:16px;right:52px;margin:0;color:#a52323;font:400 12px/17px 'MonaS12',sans-serif;text-align:left}
+/* Keep existing failure feedback visible while its parent picker is hidden. */
+.go-duplicate-error{position:absolute;bottom:7px;left:16px;right:55px;margin:0;color:#b42318;font:400 10px/14px 'MonaS12',sans-serif;max-height:28px;overflow:auto}

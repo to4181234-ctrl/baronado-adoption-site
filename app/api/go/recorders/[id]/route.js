@@ -25,7 +25,7 @@ export async function GET(request,{params}){
    db.from('go_members').select('id,nickname,profile_bio,avatar_dog').eq('id',id).eq('disabled',false).maybeSingle(),
    db.from('dogs').select('id,name').eq('category','adoption'),
    db.from('go_official_owned').select('dog_id,slot,power,charm,acquired_at').eq('member_id',id),
-   db.from('go_official_hidden').select('dog_id,unlocked_at').eq('member_id',id)
+   db.from('go_official_hidden').select('dog_id,power,charm,unlocked_at').eq('member_id',id)
   ]);
   if(userResult.error||dogsResult.error||officialResult.error||hiddenResult.error) return fail();
   if(!userResult.data)return goError('멍기록가를 찾지 못했어요.',404);
@@ -78,8 +78,8 @@ export async function GET(request,{params}){
   const signed=viewable.length?await db.storage.from(GO_OFFICIAL_BUCKET).createSignedUrls(viewable.map(a=>a.display_path),1800):{data:[],error:null};
   if(signed.error)return fail();
   const images=new Map(viewable.map((a,i)=>[a.slot,{title:a.title,imageUrl:signed.data?.[i]?.signedUrl||''}]));
-  const slots=[1,2,3,4].map(slot=>{const row=owned.find(o=>o.slot===slot),asset=images.get(slot);return {slot,owned:Boolean(row),title:row?asset?.title||'공식 멍카드':'',imageUrl:row?asset?.imageUrl||'': '',power:row?.power??null,charm:row?.charm??null,acquiredAt:row?.acquired_at||null};});
-  slots.push({slot:5,hidden:true,owned:special,title:special?images.get(5)?.title||'HIDDEN':'',imageUrl:special?images.get(5)?.imageUrl||'':''});
+  const slots=[1,2,3,4].map(slot=>{const row=owned.find(o=>o.slot===slot),asset=images.get(slot);return {slot,owned:Boolean(row),title:row?asset?.title||'':'',imageUrl:row?asset?.imageUrl||'': '',power:row?.power??null,charm:row?.charm??null,acquiredAt:row?.acquired_at||null};});
+  slots.push({slot:5,hidden:true,owned:special,title:special?images.get(5)?.title||'HIDDEN':'',imageUrl:special?images.get(5)?.imageUrl||'':'',power:hidden.find(h=>h.dog_id===dogId)?.power??null,charm:hidden.find(h=>h.dog_id===dogId)?.charm??null});
   return Response.json({...base,dog:selected,kind,slots},{headers});
  }catch{return fail();}
 }

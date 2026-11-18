@@ -42,7 +42,7 @@ jobs:
         run: npm ci
       - name: Run all Node unit tests
         run: node --test tests/*.test.mjs
-      - name: Apply 2-5 migrations twice and validate synthetic cross-feature data
+      - name: Apply 2-5 + all predeploy drafts twice to synthetic database
         run: bash scripts/verify-go-integration-local.sh go_integration_gha
       - name: Build all MeongGO feature flags ON
         env:
@@ -55,5 +55,9 @@ jobs:
           NEXT_PUBLIC_MEONGGO_STAGE5_PVP_ENABLED: '1'
           MEONGGO_STAGE5_PVP_ENABLED: '1'
         run: npm run build
+      - name: Smoke check Next.js routes with MeongGO flags ON
+        run: bash scripts/verify-go-http-smoke.sh
       - name: Build all MeongGO feature flags OFF
         run: npm run build
+      - name: Smoke check Next.js routes with MeongGO flags OFF
+        run: bash scripts/verify-go-http-smoke.sh

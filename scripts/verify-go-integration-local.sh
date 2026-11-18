@@ -21,12 +21,27 @@ esac
 echo "QA database: $DB_NAME (local socket, synthetic records)"
 "${PSQL[@]}" -f tests/fixtures/go-integration-schema.sql
 "${PSQL[@]}" -f tests/fixtures/go-integration-seed.sql
+"${PSQL[@]}" -f tests/fixtures/go-integration-baseline-rpc.sql
 for pass in first second; do
   for stage in 2 3 4 5; do
     f="$(find docs/sql -maxdepth 1 -name "stage${stage}-*DRAFT.sql" -print -quit)"
     test -n "$f"
     echo "Migration $pass: stage $stage"
     "${PSQL[@]}" -f "$f"
+  done
+done
+# The 2026-11-18 bug fixes are *not* part of stage2..5: run their drafts
+# twice too, so CI catches missing columns, non-idempotent statements,
+# and accidentally reverting the first-care reward to 20C.
+for pass in first second; do
+  for migration in \
+    docs/sql/predeploy-hidden-stats-pvp-DRAFT.sql \
+    docs/sql/predeploy-random-official-battle-DRAFT.sql \
+    docs/sql/quest-care-10-total-DRAFT.sql \
+    docs/sql/predeploy-care-no-card-DRAFT.sql \
+    docs/restoration/stage3-last-card-pvp-DRAFT.sql; do
+    echo "Predeploy migration $pass: $migration"
+    "${PSQL[@]}" -f "$migration"
   done
 done
 "${PSQL[@]}" -f tests/fixtures/go-integration-assert.sql

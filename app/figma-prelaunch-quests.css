@@ -108,10 +108,25 @@
  font:400 10px/15px MonaS12,sans-serif;
 }
 .go-visit-dialog-code{
- position:absolute;top:237px;left:14px;right:14px;
+ position:absolute;top:231px;left:14px;right:14px;
+ display:block;max-width:calc(100% - 28px);overflow-wrap:anywhere;
  font:400 9px/13px Galmuri11,sans-serif;color:#555;
 }
+/* Keep the employee code above the 30-minute countdown, never over it. */
+.go-visit-dialog-content:has(.go-visit-dialog-code) .go-visit-dialog-desc{top:158px}
+.go-visit-dialog-content:has(.go-visit-dialog-code) .go-visit-dialog-status[role=timer]{top:254px}
 .go-visit-dialog-content:has(.go-visit-dialog-status[role=timer]) h2{top:49px}
 .go-visit-modal :focus-visible{outline:2px solid #141414;outline-offset:3px}
 @media(max-width:330px){.go-visit-modal{height:352px}.go-visit-dialog-submit{left:8%;max-width:84%;width:84%}}
 @media(max-height:440px){.go-visit-modal-backdrop{padding-top:16px}}
+
+/* Figma 558:466129: consistent title/reward typography, even when completed. */
+.v3-go-site .go-quest-page .go-quest-title.is-complete{
+ display:inline-block;cursor:default;text-decoration:none;pointer-events:none;
+ font:700 13px/19.5px MonaS12,sans-serif;
+}
+.v3-go-site .go-quest-page .go-quest-item-action b{
+ font:700 13px/19.5px MonaS12,sans-serif;
+}
+.v3-go-site .go-quest-page .go-quest-item.is-complete .go-quest-title:hover{text-decoration:none}
+.v3-go-site .v3-collection-section#meonggo-album{scroll-margin-top:100px}

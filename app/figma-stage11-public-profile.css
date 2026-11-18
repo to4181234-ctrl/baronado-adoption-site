@@ -29,18 +29,18 @@
 .s4-public-profile .s4-record-nav{display:flex;justify-content:space-between;align-items:center;padding:13px 35px 0}
 .s4-public-profile .s4-record-nav button{border:0;background:none;color:#181713;font-size:11px}
 .s4-public-profile .s4-record-nav button:disabled{color:#ccc;cursor:default}
-.s4-public-profile .s4-dog-banner{background:#f7d94d;padding:15px 14px 24px;min-height:263px;box-sizing:border-box}
-.s4-public-profile .s4-dog-banner h1{font:700 17.24284px/26.58272px 'MonaS12',sans-serif}
-.s4-public-profile .s4-dog-banner>p{margin-top:3px;font-size:11px;line-height:17px}
-.s4-public-profile .s4-dog-summary{display:flex;align-items:center;gap:13.18885px;margin:30px 0 22px}
-.s4-public-profile .s4-dog-summary>img{width:105.34826px;height:105.34826px;object-fit:contain;background:#fff;border-radius:5px;image-rendering:pixelated;padding:12px;box-sizing:border-box}
-.s4-public-profile .s4-dog-summary strong{font-size:15.07954px;line-height:23.24762px;font-weight:700}
-.s4-public-profile .s4-dog-summary p{font-size:9.18785px;line-height:14.1994px;margin-top:3.34107px}
-.s4-public-profile .s4-detail-body{padding:18px 16px 38px}
-.s4-public-profile .s4-detail-toolbar{display:flex;align-items:center;gap:9px;min-height:24px;margin-bottom:20px}
-.s4-public-profile .s4-detail-toolbar select{appearance:none;border:0;background:transparent url('/figma-v3/list-chevron.svg') right center/9px 6px no-repeat;padding:0 16px 0 0;font-size:15.31585px;line-height:24px;font-weight:700}
-.s4-public-profile .s4-detail-toolbar .s4-sort{margin-left:auto;font-size:11px}
-.s4-public-profile .s4-detail-toolbar .s4-sort select{font-weight:400;font-size:11px}
+.s4-public-profile .s4-dog-banner{background:#f7d94d;padding:17px 16px 19px;min-height:263px;box-sizing:border-box}
+.s4-public-profile .s4-dog-banner h1{font:700 18px/1.45 'MonaS12',sans-serif}
+.s4-public-profile .s4-dog-banner>p{margin-top:6px}
+.s4-public-profile .s4-dog-summary{display:flex;align-items:center;gap:14px;margin:30px 0 20px}
+.s4-public-profile .s4-dog-summary>img{width:104px;height:106px;object-fit:contain;background:#fff;border-radius:5px;image-rendering:pixelated;padding:9px;box-sizing:border-box}
+.s4-public-profile .s4-dog-summary strong{font-weight:700}
+.s4-public-profile .s4-dog-summary p{margin-top:6px}
+.s4-public-profile .s4-detail-body{padding:24px 16px 38px}
+.s4-public-profile .s4-detail-toolbar{display:flex;align-items:center;gap:9px;margin-bottom:23px}
+.s4-public-profile .s4-detail-toolbar select{appearance:none;border:0;background:transparent url('/figma-v3/list-chevron.svg') right center/9px 6px no-repeat;padding:0 16px 0 0;font-weight:700}
+.s4-public-profile .s4-detail-toolbar .s4-sort{margin-left:auto;font-size:10px}
+.s4-public-profile .s4-detail-toolbar .s4-sort select{font-weight:400}
 .s4-public-profile .s4-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 26px}
 .s4-public-profile .s4-public-card{min-width:0;aspect-ratio:166/265}
 .s4-public-profile .s4-public-card>svg,.s4-public-profile .s4-public-card .go-card-graphic{display:block;position:relative;inset:auto;width:100%;height:auto;aspect-ratio:166/265}
@@ -55,12 +55,10 @@
 .s4-public-profile .s4-public-hidden-art{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 .s4-public-profile .s4-asset-unavailable{display:grid;place-items:center;min-height:100%;padding:10px;border:1px solid #ddd;color:#777;text-align:center;box-sizing:border-box}
 
-/* Figma C toolbar is 5px lower than B; the card row begins at y=417. */
-.s4-public-profile .s4-custom-body{padding-top:23px}
-.s4-public-profile .s4-custom-body .s4-detail-toolbar{margin-bottom:22px}
-.s4-public-profile .s4-detail-toolbar>span:not(.s4-sort){font-size:11px}
-.s4-public-profile .s4-dog-banner>p:last-child{font-size:12px;line-height:18px;margin-top:0}
+/* All official slots including HIDDEN share the approved 166x265 frame. */
+.s4-public-profile .s4-public-card{aspect-ratio:auto;min-height:0}
+.s4-public-profile .s4-public-card>.go-card-graphic{position:relative!important;inset:auto!important;height:auto!important;aspect-ratio:166/265}
+.s4-public-profile .s4-public-card-title{display:block;font:400 11px/1.5 'MonaS12',sans-serif;text-align:center;margin-top:4px;overflow-wrap:anywhere}
 
-.s4-public-profile .s4-element-value{display:flex;align-items:center;gap:0}
-.s4-public-profile .s4-element-value img{width:20px;height:20px;image-rendering:pixelated;margin-left:-2px}
-.s4-public-profile .s4-detail-toolbar>span.s4-sort{margin-right:11px}
+/* Figma C places its card row 7px below B. */
+.s4-public-profile .s4-detail-body[data-kind="custom"] .s4-detail-toolbar{margin-bottom:30px}
