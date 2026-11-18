@@ -69,11 +69,21 @@ export async function GET(request){
   const page=Number(url.searchParams.get('page')||0);
   if(!Number.isInteger(page)||page<0||page>1000)return error('페이지를 확인해주세요.');
   const offset=page*12;
+  // Search/sort comes from the approved friend PvP card-picker Figma screen.
+  // Keep filters on the server so paging doesn't silently omit search matches.
+  const q=(url.searchParams.get('q')||'').slice(0,40).replace(/[^가-힣a-zA-Z0-9 ]/g,'').trim();
+  const ascending=url.searchParams.get('order')==='oldest';
   if(kind==='camera'){
-   const mine=await db.from('go_cards')
+   let ownQuery=db.from('go_cards')
     .select('id,dog_id,title,image_path,captured_at',{count:'exact'})
-    .eq('member_id',member.id).eq('status','approved')
-    .order('captured_at',{ascending:false}).order('id',{ascending:false})
+    .eq('member_id',member.id).eq('status','approved');
+   if(q){
+    const dogsMatching=await db.from('dogs').select('id').ilike('name','%'+q+'%');
+    if(dogsMatching.error)throw dogsMatching.error;
+    const ids=(dogsMatching.data||[]).map(d=>d.id);
+    ownQuery=ownQuery.or('title.ilike.%'+q+'%'+(ids.length?',dog_id.in.('+ids.join(',')+')':''));
+   }
+   const mine=await ownQuery.order('captured_at',{ascending}).order('id',{ascending})
     .range(offset,offset+11);
    if(mine.error)throw mine.error;
    const rows=mine.data||[],ids=rows.map(c=>c.id);
@@ -94,11 +104,13 @@ export async function GET(request){
    }));
    return json({kind,cards,total:mine.count||0,hasMore:offset+12<(mine.count||0)});
   }
+  // One member can own at most 4 slots for each of the five official dogs.
+  // Load this small bounded set so title/dog search precedes pagination.
   const mine=await db.from('go_official_owned')
    .select('dog_id,slot,power,charm,acquired_at',{count:'exact'})
    .eq('member_id',member.id)
-   .order('acquired_at',{ascending:false}).order('dog_id')
-   .range(offset,offset+11);
+   .order('acquired_at',{ascending}).order('dog_id')
+   .range(0,99);
   if(mine.error)throw mine.error;
   const rows=mine.data||[],dogIds=[...new Set(rows.map(x=>x.dog_id))];
   if(!rows.length)return json({kind,cards:[],total:mine.count||0,hasMore:false});
@@ -116,16 +128,19 @@ export async function GET(request){
   if(assets.error)throw assets.error;
   const assetMap=new Map((assets.data||[]).map(x=>[x.version_id+':'+x.slot,x]));
   const visible=rows.map(x=>({row:x,asset:assetMap.get(versions.get(x.dog_id)+':'+x.slot)}))
-    .filter(x=>x.asset);
-  const signed=visible.length?await db.storage.from('go-official-cards')
-    .createSignedUrls(visible.map(x=>x.asset.display_path),900):{data:[],error:null};
+    .filter(x=>x.asset)
+    .filter(x=>!q || (dogMap.get(x.row.dog_id)||'').includes(q) || x.asset.title?.includes(q));
+  const filteredTotal=visible.length;
+  const pageCards=visible.slice(offset,offset+12);
+  const signed=pageCards.length?await db.storage.from('go-official-cards')
+    .createSignedUrls(pageCards.map(x=>x.asset.display_path),900):{data:[],error:null};
   if(signed.error)throw signed.error;
-  const cards=visible.map((x,i)=>({
+  const cards=pageCards.map((x,i)=>({
     kind:'official',cardId:x.row.dog_id,slot:x.row.slot,dogId:x.row.dog_id,
     dogName:dogMap.get(x.row.dog_id)||'멍멍이',title:x.asset.title,
     power:x.row.power,charm:x.row.charm,imageUrl:signed.data[i]?.signedUrl||''
   }));
-  return json({kind,cards,total:mine.count||0,hasMore:offset+12<(mine.count||0)});
+  return json({kind,cards,total:filteredTotal,hasMore:offset+12<filteredTotal});
  }catch{return error('멍배틀 자료를 불러오지 못했어요.',500);}
 }
 export async function POST(request){

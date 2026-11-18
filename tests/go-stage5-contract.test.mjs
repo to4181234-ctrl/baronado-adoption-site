@@ -16,7 +16,7 @@ test('stage5 separate feature flag protects both API and UI, leaves random mode'
  const ui=read('components/GoBattle.js');
  assert.match(api,/MEONGGO_STAGE5_PVP_ENABLED/);
  assert.match(ui,/GO_STAGE5_UI_ENABLED/);
- assert.match(ui,/친구 실시간 멍배틀/);
+ assert.match(ui,/실시간 1:1 멍배틀/);
  assert.match(ui,/<Game\/>/);
 });
 test('stage5 SQL: lost connection resets both readiness, 30s grace, single KST battle quest',()=>{

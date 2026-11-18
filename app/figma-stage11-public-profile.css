@@ -1,0 +1,66 @@
+/* Approved public profile A-D: Figma 646:163494, 646:163587, 646:164130, 646:164641. */
+.v3-go-site .s4-public-profile{max-width:390px;margin:auto;color:#181713;font-family:'MonaS12',sans-serif;font-size:12px;min-height:650px}
+.s4-public-profile button,.s4-public-profile select{font:inherit;color:inherit;cursor:pointer}
+.s4-public-profile h1,.s4-public-profile h2,.s4-public-profile p{margin:0}
+.s4-public-profile .s4-identity{min-height:183px;box-sizing:border-box;padding:26px 16px;display:flex;gap:16px;background:#e9e0d3}
+.s4-public-profile .s4-avatar{flex:0 0 126px;height:126px;border-radius:6px;background:white;display:grid;place-items:center}
+.s4-public-profile .s4-avatar img{width:95px;height:95px;object-fit:contain;image-rendering:pixelated}
+.s4-public-profile .s4-identity>div:last-child{min-width:0;flex:1}
+.s4-public-profile .s4-identity h1{font:700 22px/1.35 'MonaS12',sans-serif;overflow-wrap:anywhere}
+.s4-public-profile .s4-identity span{color:#6a655d;display:block;margin:2px 0 8px}
+.s4-public-profile .s4-identity p{color:#9b958c;line-height:1.7;overflow-wrap:anywhere}
+.s4-public-profile .s4-public-home{padding:16px}
+.s4-public-profile .s4-home-back{display:block;margin-bottom:34px;text-decoration:none;color:#181713}
+.s4-public-profile .s4-public-home h2{font:700 17px/1.5 'MonaS12',sans-serif;margin-bottom:22px}
+.s4-public-profile .s4-progress-label{margin-bottom:5px}
+.s4-public-profile .s4-progress{width:188px;height:9px;background:#ddd;border-radius:9px;overflow:hidden;margin-bottom:18px}
+.s4-public-profile .s4-progress span{display:block;background:#f7d94d;height:100%;border-radius:9px}
+.s4-public-profile .s4-dog-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:24px}
+.s4-public-profile .s4-dog-grid button{border:0;border-radius:9px;background:#f8f7f3;min-width:0;aspect-ratio:112/138;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:8px}
+.s4-public-profile .s4-dog-grid button.s4-known{background:#f7d94d}
+.s4-public-profile .s4-dog-grid img{width:76%;max-height:82px;object-fit:contain;image-rendering:pixelated}
+.s4-public-profile .s4-dog-grid strong{font-size:12px}
+.s4-public-profile .s4-public-records{border-top:1px solid #e9e0d3;padding-top:27px}
+.s4-public-profile .s4-public-records h2{font-size:16px;margin-bottom:24px}
+.s4-public-profile .s4-record-frame{width:100%;aspect-ratio:356/162;position:relative;overflow:hidden}
+.s4-public-profile .s4-record-frame>img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none}
+.s4-public-profile .s4-record-frame>div{position:absolute;inset:18% 9%;line-height:1.8}
+.s4-public-profile .s4-record-frame>div p+ p{margin-top:9px}
+.s4-public-profile .s4-record-nav{display:flex;justify-content:space-between;align-items:center;padding:13px 35px 0}
+.s4-public-profile .s4-record-nav button{border:0;background:none;color:#181713;font-size:11px}
+.s4-public-profile .s4-record-nav button:disabled{color:#ccc;cursor:default}
+.s4-public-profile .s4-dog-banner{background:#f7d94d;padding:15px 14px 24px;min-height:263px;box-sizing:border-box}
+.s4-public-profile .s4-dog-banner h1{font:700 17.24284px/26.58272px 'MonaS12',sans-serif}
+.s4-public-profile .s4-dog-banner>p{margin-top:3px;font-size:11px;line-height:17px}
+.s4-public-profile .s4-dog-summary{display:flex;align-items:center;gap:13.18885px;margin:30px 0 22px}
+.s4-public-profile .s4-dog-summary>img{width:105.34826px;height:105.34826px;object-fit:contain;background:#fff;border-radius:5px;image-rendering:pixelated;padding:12px;box-sizing:border-box}
+.s4-public-profile .s4-dog-summary strong{font-size:15.07954px;line-height:23.24762px;font-weight:700}
+.s4-public-profile .s4-dog-summary p{font-size:9.18785px;line-height:14.1994px;margin-top:3.34107px}
+.s4-public-profile .s4-detail-body{padding:18px 16px 38px}
+.s4-public-profile .s4-detail-toolbar{display:flex;align-items:center;gap:9px;min-height:24px;margin-bottom:20px}
+.s4-public-profile .s4-detail-toolbar select{appearance:none;border:0;background:transparent url('/figma-v3/list-chevron.svg') right center/9px 6px no-repeat;padding:0 16px 0 0;font-size:15.31585px;line-height:24px;font-weight:700}
+.s4-public-profile .s4-detail-toolbar .s4-sort{margin-left:auto;font-size:11px}
+.s4-public-profile .s4-detail-toolbar .s4-sort select{font-weight:400;font-size:11px}
+.s4-public-profile .s4-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 26px}
+.s4-public-profile .s4-public-card{min-width:0;aspect-ratio:166/265}
+.s4-public-profile .s4-public-card>svg,.s4-public-profile .s4-public-card .go-card-graphic{display:block;position:relative;inset:auto;width:100%;height:auto;aspect-ratio:166/265}
+.s4-public-profile .s4-profile-return{display:block;border:0;background:none;margin:45px auto 0;color:#888;font-size:11px}
+.s4-public-profile .s4-public-loading,.s4-public-profile .s4-public-error{padding:22px 16px;color:#777}
+.s4-public-profile .s4-custom-nav{display:flex;justify-content:space-between;margin-top:26px}
+.s4-public-profile .s4-custom-nav button{background:none;border:0}
+.s4-public-profile .s4-custom-nav button:disabled{color:#bbb}
+.s4-public-profile :is(a,button,select):focus-visible{outline:2px solid #9b7a13;outline-offset:3px}
+@media(max-width:350px){.s4-public-profile .s4-dog-grid{gap:8px}.s4-public-profile .s4-card-grid{gap:12px}.s4-public-profile .s4-identity h1{font-size:18px}}
+
+.s4-public-profile .s4-public-hidden-art{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.s4-public-profile .s4-asset-unavailable{display:grid;place-items:center;min-height:100%;padding:10px;border:1px solid #ddd;color:#777;text-align:center;box-sizing:border-box}
+
+/* Figma C toolbar is 5px lower than B; the card row begins at y=417. */
+.s4-public-profile .s4-custom-body{padding-top:23px}
+.s4-public-profile .s4-custom-body .s4-detail-toolbar{margin-bottom:22px}
+.s4-public-profile .s4-detail-toolbar>span:not(.s4-sort){font-size:11px}
+.s4-public-profile .s4-dog-banner>p:last-child{font-size:12px;line-height:18px;margin-top:0}
+
+.s4-public-profile .s4-element-value{display:flex;align-items:center;gap:0}
+.s4-public-profile .s4-element-value img{width:20px;height:20px;image-rendering:pixelated;margin-left:-2px}
+.s4-public-profile .s4-detail-toolbar>span.s4-sort{margin-right:11px}

@@ -94,3 +94,6 @@
 .v3-go-site .v5-dog-album :is(button,a):focus-visible{outline:2px solid #ae8a20;outline-offset:3px;}
 @media(max-width:359px){.v3-go-site .v5-album-toolbar{flex-wrap:wrap;height:auto;gap:5px 10px;}.v3-go-site .v5-album-toolbar .v5-sort-control{margin-left:auto;}.v3-go-site .v5-card-grid{column-gap:12px;}.v3-go-site .v5-album-rank p{white-space:normal;font-size:9px!important;}}
 @media(prefers-reduced-motion:reduce){.v3-go-site .v5-card-grid .go-card{transition:none!important;}}
+
+.v3-go-site .v5-element-value{display:flex;align-items:center}
+.v3-go-site .v5-element-effect{width:20px;height:20px;image-rendering:pixelated;flex:none;margin-left:-2px}

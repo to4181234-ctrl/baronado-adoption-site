@@ -17,7 +17,7 @@ export default function GoCardFace({card}){
    <text x="132.5" y="179" fontSize="7" textAnchor="middle">{model.element}</text>
    {[['파워',model.power,198],['애교',model.charm,217]].map(([label,value,y])=><g key={label}><text x="16" y={y+10} fontSize="10">{label}</text>{Array.from({length:value},(_,i)=><image key={i} href={CARD_FACE.star} x={40+i*13.4} y={y} width="11.36" height="10.32"/>)}</g>)}
    <text x="16" y="247" fontSize="7" clipPath={'url(#'+id+'author)'}>{model.author}</text>
-   <text x="150" y="247" fontSize="7" textAnchor="end">{model.date}</text>
+   <text x="150" y="247" fontSize="7" textAnchor="end">{Number.isInteger(card.officialSlot)?`NO.${card.officialSlot}`:model.date}</text>
   </g>
  </svg>;
 }

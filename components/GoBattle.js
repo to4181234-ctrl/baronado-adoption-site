@@ -10,6 +10,8 @@ import GoElementSparkles,{elementForCard} from './GoElementSparkles.js';
 import {vibrateBattleHit,stopBattleVibration} from '../lib/goBattleHaptics.js';
 import {figmaSprite,FIGMA_DOGS} from '../lib/goV3Game.js';
 import GoFriendBattle,{GO_STAGE5_UI_ENABLED} from './GoFriendBattle.js';
+import GoAlbumBattleRecords from './GoAlbumBattleRecords.js';
+import {fetchDogs} from '../lib/dogs.js';
 
 const initial={cards:[],hasMore:false,total:0,eligibleDogKinds:0};
 const emptyOpponents={members:[],total:0,hasMore:false};
@@ -210,16 +212,50 @@ function Game(){
  </div>;
 }
 function BattleModes(){
- const [mode,setMode]=useState('random');
+ const {member,ready}=useGoSession();
+ const [mode,setMode]=useState(null);
+ const [dogs,setDogs]=useState([]),[records,setRecords]=useState({});
+ const [recordReady,setRecordReady]=useState(false);
  useEffect(()=>{
-  if(new URLSearchParams(window.location.search).has('room'))setMode('friend');
+  const syncMode=()=>{
+   const search=new URLSearchParams(window.location.search);
+   setMode(search.has('room')?'friend':search.get('mode')==='random'?'random':
+    search.get('mode')==='friend'&&GO_STAGE5_UI_ENABLED?'friend':null);
+  };
+  syncMode();window.addEventListener('popstate',syncMode);
+  return()=>window.removeEventListener('popstate',syncMode);
  },[]);
- return <>
-  {GO_STAGE5_UI_ENABLED&&<nav className="s5-battle-mode" aria-label="멍배틀 방식 선택">
-   <button type="button" onClick={()=>setMode('random')} aria-current={mode==='random'?'page':undefined}>랜덤 멍배틀</button>
-   <button type="button" onClick={()=>setMode('friend')} aria-current={mode==='friend'?'page':undefined}>친구 실시간 멍배틀</button>
-  </nav>}
-  {GO_STAGE5_UI_ENABLED&&mode==='friend'?<GoFriendBattle/>:<Game/>}
- </>;
+ const chooseMode=value=>{
+  window.history.pushState(null,'','/go/battle?mode='+value);
+  setMode(value);
+ };
+ useEffect(()=>{
+  let active=true;
+  fetchDogs('adoption').then(items=>{if(active)setDogs(items);}).catch(()=>{});
+  return()=>{active=false;};
+ },[]);
+ useEffect(()=>{
+  let active=true;
+  setRecords({});setRecordReady(false);
+  if(!ready||!member)return()=>{active=false;};
+  fetch('/api/go/collection',{cache:'no-store'})
+   .then(async response=>{const body=await response.json();if(!response.ok)throw Error(body.error||'전적을 불러오지 못했어요.');return body;})
+   .then(body=>{if(active){setRecords(body.battleRecords||{});setRecordReady(true);}})
+   .catch(()=>{if(active)setRecordReady(false);});
+  return()=>{active=false;};
+ },[member?.id,ready,mode]);
+ if(mode==='random')return <Game/>;
+ if(mode==='friend'&&GO_STAGE5_UI_ENABLED)return <GoFriendBattle/>;
+ return <div className="v3-battle-entry" data-figma-frame="577:881499">
+  <div className="v3-battle-entry-choices">
+   <button type="button" disabled={!GO_STAGE5_UI_ENABLED} onClick={()=>chooseMode('friend')}>
+    <strong>실시간 1:1 멍배틀 &gt;</strong><span>방 코드를 친구에게 공유하고, 실시간으로 대결해요</span>
+   </button>
+   <button type="button" onClick={()=>chooseMode('random')}>
+    <strong>랜덤 멍배틀 &gt;</strong><span>접속 중인 상대 없이도 카드끼리 대결해요.</span>
+   </button>
+  </div>
+  <GoAlbumBattleRecords dogs={dogs} records={records} member={member} ready={recordReady} compact/>
+ </div>;
 }
 export default function GoBattle(){return <GoShell active="battle" title="멍배틀" description="랜덤 또는 친구와 즐기는 멍카드 대결"><BattleModes/></GoShell>;}

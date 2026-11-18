@@ -116,3 +116,11 @@
 
 /* All card graphics are decorative within a parent button, so only the button owns the hit target. */
 .friend-pvp .go-card-graphic,.friend-pvp .go-card-graphic *{pointer-events:none!important}
+
+/* Approved Figma 577:881938: server-filtered card search and registration sort. */
+.friend-pvp-search{margin:17px 0 11px!important}
+.friend-pvp-search input{font:400 11px/1.5 'MonaS12',sans-serif;border-radius:5px;background:#faf9f6}
+.friend-pvp-search button{font:400 12px/1.5 'MonaS12',sans-serif;border-radius:4px}
+.friend-pvp-sort{margin:0 0 17px!important;font:400 11px/18px 'MonaS12',sans-serif}
+.friend-pvp-sort button{padding:0;font:inherit}
+.friend-pvp-sort span{font:inherit;color:#888}

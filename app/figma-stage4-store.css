@@ -53,8 +53,8 @@
 .s4-store-collar-actions .v3-pixel-choice:disabled{opacity:.5;cursor:not-allowed}
 
 /* Source of truth: Figma 558:607838 (390 x 758). Shared header stays intact
-   on other routes. Additional purchase/free-draw controls continue below
-   the visible store artwork; existing overlay dialogs remain fully functional. */
+   on other routes. Purchase entry points stay in the original two product tiles;
+   existing recovery notices and overlay dialogs remain functional. */
 .v3-go-site:has(.s4-store) .s1-go-header{height:42px;min-height:42px}
 .v3-go-site:has(.s4-store) .s1-go-nav{display:none}
 .v3-go-site:has(.s4-store) .s1-header-divider,
@@ -62,14 +62,14 @@
 .v3-go-site:has(.s4-store) .v3-go-app{padding:0!important;min-height:calc(100dvh - 42px)}
 .v3-go-site .s4-store{
   position:relative;box-sizing:border-box;display:block;width:100%;max-width:390px;
-  margin:0 auto;min-height:1220px;padding:0!important;background:#fff;
+  margin:0 auto;min-height:716px;padding:0!important;background:#fff;
 }
 .v3-go-site .s4-store-back{
   position:absolute;top:4px;left:12px;margin:0;font:400 11px/26px 'Galmuri11',sans-serif;
   text-decoration:none;
 }
 .v3-go-site .s4-store h1{
-  position:absolute;top:33px;left:16px;margin:0;font:700 18px/27px 'MonaS12',sans-serif;
+  position:absolute;top:31px;left:16px;margin:0;font:700 18px/27px 'MonaS12',sans-serif;
 }
 .v3-go-site .s4-store-art{
   position:absolute;top:47px;left:0;right:0;height:174px;max-width:none;
@@ -109,9 +109,6 @@
   width:100%;min-width:0;margin:0;padding:0!important;border:0!important;
   outline:none;background:#fff!important;color:#181713;text-align:left;gap:0;
 }
-.v3-go-site .s4-store-choices>button[aria-pressed="true"] .s2-locked-card-svg{
-  outline:2px solid #f7d94d;outline-offset:2px;
-}
 .v3-go-site .s4-store-choices .s2-locked-card-svg{
   width:100%;height:auto;aspect-ratio:166 / 265;flex:none;
 }
@@ -119,19 +116,13 @@
   display:block;margin:12px 0 0;font:700 11px/16.5px 'MonaS12',sans-serif;
 }
 .v3-go-site .s4-store-choices small{
-  display:block;margin:7px 0 0;height:46px;font:400 11px/16.5px 'Galmuri11',sans-serif;
+  display:block;margin:7px 0 0;height:43.5px;font:400 11px/16.5px 'Galmuri11',sans-serif;
   color:#000;
 }
 .v3-go-site .s4-store-choices b{
   display:block;margin:0;font:400 11px/16.5px 'Galmuri11',sans-serif;
 }
 .v3-go-site .s4-store-choices button:focus-visible{outline:2px solid #181713!important}
-.v3-go-site .s4-store-wallet{
-  position:absolute;top:1072px;left:17px;right:18px;margin:0;
-}
-.v3-go-site .s4-store-draw{
-  position:absolute;top:1120px;left:17px;right:18px;margin:0;
-}
 .v3-go-site .s4-store-message,.v3-go-site .s4-store-error{
   position:absolute;top:304px;left:17px;right:18px;margin:0;
   z-index:2;
@@ -165,3 +156,236 @@
 .v3-go-site .s4-store-dialogue-copy strong{display:block;margin:0;font:700 11px/16.5px 'Galmuri11',sans-serif}
 .v3-go-site .s4-store-dialogue-copy p{margin:7.5px 0 0!important;font:400 11px/16.5px 'Galmuri11',sans-serif}
 @media(max-width:389px){.v3-go-site .s4-store-dialogue-copy{left:24px}}
+
+/* 2026-11-18 approved Figma restore: 558:607838 / 558:608507.
+   Product tiles are the purchase entry points; no extra lower store UI. */
+.v3-go-site .s4-store-choices>button:focus-visible{outline:2px solid #181713!important;outline-offset:3px}
+.v3-go-site .s4-store-dialogue-copy strong{font:700 13px/19.5px 'MonaS12',sans-serif}
+.v3-go-site .s4-store-dialogue-copy p{font:400 13px/19.5px 'MonaS12',sans-serif}
+.s4-store-overlay>.s4-store-original-choice{width:min(345px,calc(100vw - 24px));height:min(502px,calc(100dvh - 24px));padding:0;background:transparent;border:0;overflow:hidden}
+.s4-store-original-choice>h2{position:absolute;top:42px;left:0;right:0;margin:0;color:#181713;font:700 35.694px/1.5 'MonaS12',sans-serif}
+.s4-store-original-choice .s4-store-close{z-index:3;top:23px;right:22px}
+.s4-store-original-choice .s4-store-collars{position:absolute;left:15px;right:15px;top:132px;height:105px;display:flex;justify-content:center;align-items:center;gap:22px;margin:0}
+.s4-store-original-choice .s4-store-collars>button{width:79px;height:84px;padding:4px;background:transparent;border:2px solid transparent}
+.s4-store-original-choice .s4-store-collars>button[aria-pressed="true"]{padding:4px;border:2px solid #181713;background:transparent}
+.s4-store-original-choice .s4-store-pixel-dialogue{position:absolute;top:267px;left:30px;width:285px;height:119px}
+.s4-store-original-choice .s4-store-pixel-dialogue>img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;image-rendering:pixelated}
+.s4-store-original-choice .s4-store-pixel-dialogue>p{position:absolute;top:31px;left:24px;right:24px;color:#181713;font:400 13px/1.5 'MonaS12',sans-serif}
+.s4-store-original-choice .s4-store-collar-actions{position:absolute;top:401px;left:0;right:0;display:flex;justify-content:center;gap:40px}
+.s4-store-original-choice .s4-store-collar-actions .v3-pixel-choice{min-width:0}
+@media(max-width:359px){.s4-store-original-choice .s4-store-pixel-dialogue{left:calc((100% - 285px)/2)}}
+
+/* Figma 558:608507 pixel modal: white 345×502 card at centered 390px. */
+.s4-store-overlay>.s4-store-original-choice{background:#fff;border-radius:6px}
+.s4-store-original-choice .s4-store-collars{top:182px}
+.s4-store-original-choice .s4-store-pixel-dialogue{top:306px}
+.s4-store-original-choice .s4-store-pixel-dialogue>p{top:12px;left:22px;margin:0}
+.s4-store-original-choice .s4-store-collar-actions{top:352px;left:62px;right:auto;display:flex;flex-direction:column;align-items:flex-start;gap:0}
+.s4-store-original-choice .s4-store-collar-actions .v3-pixel-choice{height:23px;font:400 13px/23px 'MonaS12',sans-serif}
+.s4-store-original-choice .s4-store-sound-icon{position:absolute;right:22px;bottom:19px;width:24px;height:24px;image-rendering:pixelated}
+
+/* Figma 558:608507 shows the initially focused pixel-option arrow at full ink.
+   The action remains disabled until a collar is selected; only its visual
+   opacity is restored to the approved screenshot. */
+.s4-store-original-choice .s4-store-collar-actions .v3-pixel-choice:disabled{opacity:1}
+
+/* Approved Figma 558:608507: the 345×502 collar modal starts at y=96 in
+   the 390×788 reference, rather than being viewport-centered at y=143. */
+.s4-store-overlay:has(>.s4-store-original-choice){align-items:flex-start;padding-top:96px;overflow-y:auto}
+@media(max-height:620px){
+ .s4-store-overlay:has(>.s4-store-original-choice){padding-top:12px}
+ .s4-store-overlay>.s4-store-original-choice{height:502px;flex-shrink:0}
+}
+
+/* Reuse the original discovery dialogue's unboxed pixel choices in the shop.
+   Their original rule was scoped to discovery and never applied in GoStore. */
+.s4-store-original-choice .s4-store-collar-actions .v3-pixel-choice{
+ display:flex;align-items:center;gap:8px;text-decoration:none;color:#111!important;
+ padding:0!important;background:none;border:0;text-align:left;min-height:23px;
+}
+/* Pixel alignment verified against the supplied 390px approval capture. */
+.s4-store-original-choice>h2{top:32px}
+.s4-store-original-choice .s4-store-collars{top:163px;gap:14px}
+.s4-store-original-choice .s4-store-collars>button{width:71px;height:84px}
+.s4-store-original-choice .s4-store-pixel-dialogue>p{top:24px;text-align:left}
+.s4-store-original-choice .s4-store-close{top:17px;right:21px;width:12px;height:12px;padding:0;font-size:0}
+.s4-store-original-choice .s4-store-close:before,
+.s4-store-original-choice .s4-store-close:after{content:'';position:absolute;width:13px;height:2px;background:#111;left:0;top:5px;transform:rotate(45deg)}
+.s4-store-original-choice .s4-store-close:after{transform:rotate(-45deg)}
+.s4-store-original-choice .s4-store-collars{top:160px}
+.s4-store-original-choice .s4-store-collars>button,
+.s4-store-original-choice .s4-store-collars>button[aria-pressed="true"]{padding:0}
+.s4-store-original-choice .s4-store-collars{top:164px}
+/* Figma store illustration: keep the original SVG and its visible bottom edge,
+   while restoring the 390px frame's taller artwork footprint (top ~97px). */
+.v3-go-site .s4-store-art>img{transform:scaleY(1.085);transform-origin:center bottom}
+
+/* Approved Figma 558:748180: purchase confirmation rectangle at x29 y243
+   (331x169), 2-line prompt, '네' then '아니오' in 115x33 buttons.
+   No extra description, balance block or unapproved confirmation copy. */
+.s4-store-confirm-overlay{align-items:flex-start;padding-top:243px;overflow-y:auto}
+.s4-store-confirm-overlay>.s4-store-original-confirm{
+ width:min(331px,calc(100vw - 24px));height:169px;flex-shrink:0;
+ padding:0;background:#fff;border:0;border-radius:0;
+}
+.s4-store-original-confirm .s4-store-confirm-question{
+ position:absolute;top:29px;left:12px;right:12px;margin:0;
+ font:400 14px/28px 'MonaS12',sans-serif;color:#181713;text-align:center;
+}
+.s4-store-original-confirm .s4-store-confirm-answers{
+ position:absolute;top:114px;left:37px;right:35px;display:flex;justify-content:space-between;gap:29px;
+}
+.s4-store-original-confirm .s4-store-confirm-answers>button{
+ width:115px;height:33px;flex:0 1 115px;padding:0;border:1px solid #181713;
+ background:#fff;color:#181713;font:400 13px/20px 'MonaS12',sans-serif;
+}
+.s4-store-original-confirm .s4-store-close{top:13px;right:13px;font-size:0;width:12px;height:12px;padding:0}
+.s4-store-original-confirm .s4-store-close:before,.s4-store-original-confirm .s4-store-close:after{
+ content:'';position:absolute;width:13px;height:2px;background:#111;left:0;top:5px;transform:rotate(45deg);
+}
+.s4-store-original-confirm .s4-store-close:after{transform:rotate(-45deg)}
+@media(max-height:450px){.s4-store-confirm-overlay{padding-top:12px}}
+
+/* At narrow widths two 166px Figma cards must proportionally shrink,
+   not force a 347px grid out of the 320px viewport. */
+@media(max-width:389px){
+ .v3-go-site .s4-store-choices{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:15px}
+ .v3-go-site .s4-store-choices .s2-locked-card-svg{max-width:100%}
+}
+
+/* Figma 558:606067 / 558:606964 — duplicate draw comparison, not text-only popup. */
+.go-duplicate-overlay{position:fixed;z-index:310;inset:0;background:#fff;overflow-y:auto;display:flex;justify-content:center;font-family:'MonaS12',sans-serif}
+.go-duplicate-screen{box-sizing:border-box;width:100%;max-width:390px;min-height:788px;padding:0 16px 35px;text-align:center;color:#181713}
+.go-duplicate-screen>h2{margin:126px 0 28px;font:700 20px/30px 'MonaS12',sans-serif}
+.go-duplicate-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start}
+.go-duplicate-card-frame{width:100%;max-width:166px;margin:0 auto;aspect-ratio:166/265}
+.go-duplicate-card-frame .go-card-graphic,.go-duplicate-card-frame .s2-locked-card-svg{display:block;position:relative;inset:auto;width:100%;height:auto}
+.go-duplicate-cards strong{display:block;margin:9px 0 0;font:400 14px/21px 'Galmuri11',sans-serif}
+.go-duplicate-buttons{display:flex;flex-direction:column;gap:12px;margin:32px auto 0;max-width:245px}
+.go-duplicate-buttons button,.go-duplicate-confirm button{background:#fff;border:0;cursor:pointer;font:400 11px/20px 'Galmuri11',sans-serif;padding:9px 5px;color:#181713}
+.go-duplicate-buttons button:disabled,.go-duplicate-confirm button:disabled{opacity:.5;cursor:wait}
+.go-duplicate-confirm{margin:30px auto 0;font:400 13px/20px 'MonaS12',sans-serif}
+.go-duplicate-confirm>div{display:flex;justify-content:space-evenly;max-width:235px;margin:auto}
+@media(max-width:350px){.go-duplicate-screen{padding-inline:10px}.go-duplicate-screen>h2{margin-top:70px}}
+
+/* Figma 558:479084: free draw over Today's Quests, without redirect to shop. */
+.go-free-draw-overlay{position:fixed;inset:0;z-index:305;background:#0009;display:flex;justify-content:center;align-items:center;overflow-y:auto;padding:16px;box-sizing:border-box}
+.go-free-draw-screen{position:relative;flex-shrink:0;box-sizing:border-box;width:min(345px,100%);min-height:502px;background:#fff;border:3px solid #181713;text-align:center;color:#181713;font-family:'MonaS12',sans-serif;padding:21px 16px}
+.go-free-draw-screen h2{margin:0;font:700 29px/50px 'Galmuri11',sans-serif}
+.go-free-draw-close{position:absolute;right:10px;top:4px;border:0;background:transparent;font:25px/30px sans-serif;cursor:pointer}
+.go-free-draw-collars{display:flex;justify-content:center;gap:12px;margin:22px auto 24px}
+.go-free-draw-collars button{width:70px;height:72px;padding:5px;border:2px solid transparent;background:#fff;cursor:pointer}
+.go-free-draw-collars button[aria-pressed="true"]{border-color:#181713;background:#fff6d6}
+.go-free-draw-collars img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.go-free-draw-dialogue{position:relative;height:120px;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:'Galmuri11',sans-serif}
+.go-free-draw-dialogue>img{position:absolute;inset:0;width:100%;height:100%}
+.go-free-draw-dialogue p,.go-free-draw-dialogue small{position:relative;margin:5px 0;z-index:1;font:400 11px/17px 'Galmuri11',sans-serif;color:#181713}
+.go-free-draw-actions{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:18px}
+.go-free-draw-used{padding:25px 0 35px;font:400 12px/21px 'MonaS12',sans-serif}
+.go-free-draw-used strong{font-size:18px}
+.go-free-draw-used button{padding:10px 30px;background:#fff;border:1px solid #181713;font:inherit}
+.go-free-draw-error{font:400 11px/17px 'MonaS12',sans-serif;color:#9d2929}
+@media(max-width:340px){.go-free-draw-screen{padding-inline:9px}.go-free-draw-collars{gap:3px}}
+
+/* Pixel overlay coordinates from approved 558:606067 screenshot (390×788). */
+.go-duplicate-overlay{z-index:320;background:#0009;align-items:flex-start;padding:96px 12px 20px;box-sizing:border-box}
+.go-duplicate-screen{position:relative;flex:0 0 auto;width:345px;max-width:100%;height:502px;min-height:0;border-radius:6px;background:white;padding:0;text-align:center}
+.go-duplicate-screen>h2{position:absolute;top:37px;left:5px;right:5px;margin:0;font:700 18px/27px 'MonaS12',sans-serif}
+.go-duplicate-close{position:absolute;top:9px;right:12px;border:0;background:transparent;font:25px/28px Arial,sans-serif;cursor:pointer}
+.go-duplicate-cards{position:absolute;left:22px;right:22px;top:88px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:29px}
+.go-duplicate-card-frame{width:133px;max-width:100%;height:auto;aspect-ratio:166/265}
+.go-duplicate-cards strong{margin-top:8px;font:400 11px/17px 'Galmuri11',sans-serif}
+.go-duplicate-buttons{position:absolute;top:362px;left:74px;right:73px;margin:0;gap:11px;max-width:none}
+.go-duplicate-buttons button{height:38px;min-height:38px;border:0;border-radius:5px;background:#ffdf49;padding:0;font:400 11px/17px 'Galmuri11',sans-serif}
+.go-duplicate-confirm{position:absolute;top:353px;left:35px;right:35px;margin:0}
+.go-duplicate-confirm>div button{background:#ffdf49;border-radius:5px;min-width:95px}
+.go-duplicate-sound{position:absolute;right:19px;bottom:19px;width:25px;height:25px;object-fit:contain;image-rendering:pixelated}
+@media(max-width:370px){.go-duplicate-overlay{padding:12px 12px 20px}.go-duplicate-cards{left:14px;right:14px;gap:12px}.go-duplicate-buttons{left:calc(50% - 99px);right:auto;width:198px}}
+
+/* Free draw modal geometry from Figma screenshot 558:479084 (390×788). */
+.go-free-draw-overlay{align-items:flex-start;padding:96px 12px 20px}
+.go-free-draw-screen{width:345px;max-width:100%;height:502px;min-height:0;border:0;border-radius:6px;padding:0}
+.go-free-draw-screen h2{position:absolute;top:32px;left:0;right:0;font:700 33px/50px 'Galmuri11',sans-serif}
+.go-free-draw-close{top:9px;right:12px}
+.go-free-draw-collars{position:absolute;top:197px;left:43px;right:43px;margin:0;gap:8px;justify-content:space-between}
+.go-free-draw-collars button{width:75px;height:47px;padding:0;border:0;background:transparent}
+.go-free-draw-collars button[aria-pressed="true"]{background:transparent;outline:2px solid #181713;outline-offset:2px}
+.go-free-draw-dialogue{position:absolute;left:31px;right:31px;top:309px;height:114px;display:block}
+.go-free-draw-dialogue>img{position:absolute;inset:0;width:100%;height:100%}
+.go-free-draw-dialogue-content{position:absolute;top:18px;left:21px;right:12px;z-index:1;text-align:left}
+.go-free-draw-dialogue-content p{margin:0 0 10px;font:400 12px/19px 'MonaS12',sans-serif;color:#181713}
+.go-free-draw-dialogue-content .v3-pixel-choice{min-height:23px;height:23px;width:100%;display:flex;align-items:center;gap:7px;border:0;background:transparent;padding:0;font:400 12px/23px 'MonaS12',sans-serif;text-align:left;color:#181713}
+.go-free-draw-dialogue-content .v3-choice-arrow{width:10px;height:14px;visibility:hidden}
+.go-free-draw-dialogue-content .v3-pixel-choice.is-current .v3-choice-arrow,.go-free-draw-dialogue-content .v3-pixel-choice:focus .v3-choice-arrow{visibility:visible}
+.go-free-draw-dialogue-content .v3-pixel-choice:disabled{opacity:1}
+.go-free-draw-sound{position:absolute;right:19px;bottom:19px;width:25px;height:25px;image-rendering:pixelated}
+.go-free-draw-used{position:absolute;top:130px;left:16px;right:16px}
+.go-free-draw-error{position:absolute;top:432px;left:20px;right:20px;margin:0}
+@media(max-width:370px){.go-free-draw-overlay{padding-top:12px}.go-free-draw-collars{left:15px;right:15px;gap:4px}.go-free-draw-dialogue{left:15px;right:15px}}
+/* Figma 558:606964: selected card alone in second confirmation. */
+.go-duplicate-confirm-card{position:absolute;top:94px;left:calc(50% - 68px);width:136px;height:auto;aspect-ratio:166/265}
+.go-duplicate-confirm-card .go-card-graphic,.go-duplicate-confirm-card .s2-locked-card-svg{display:block;position:relative;inset:auto;width:100%;height:auto}
+.go-duplicate-confirm-buttons{position:absolute;top:357px;left:calc(50% - 99px);width:198px;display:flex;flex-direction:column;gap:11px}
+.go-duplicate-confirm-buttons button{height:38px;border:0;border-radius:5px;background:#ffdf49;font:400 11px/17px 'Galmuri11',sans-serif;cursor:pointer}
+.go-duplicate-confirm-buttons button:disabled{opacity:.6;cursor:not-allowed}
+/* Figma 558:529529 / 558:593265: official card reveal stays in original popup. */
+.go-official-reveal-overlay{position:fixed;inset:0;z-index:330;box-sizing:border-box;display:flex;align-items:flex-start;justify-content:center;padding:96px 12px 20px;background:#0009;overflow-y:auto}
+.go-official-reveal-screen{position:relative;flex-shrink:0;width:345px;max-width:100%;height:502px;background:#fff;border-radius:6px;font-family:'MonaS12',sans-serif;color:#181713;text-align:center}
+.go-official-reveal-screen h2{position:absolute;top:31px;left:10px;right:10px;margin:0;font:700 24px/40px 'MonaS12',sans-serif}
+.go-official-reveal-screen:has(.go-official-reveal-collar) h2{font:700 33px/50px 'Galmuri11',sans-serif}
+.go-official-reveal-close{position:absolute;right:12px;top:9px;border:0;background:transparent;cursor:pointer;font:25px/28px Arial,sans-serif;z-index:2}
+.go-official-reveal-card{position:absolute;top:102px;left:calc(50% - 84px);width:168px;aspect-ratio:166/265}
+.go-official-reveal-card .go-card-graphic{display:block;width:100%;height:auto}
+.go-official-reveal-collar{position:absolute;left:calc(50% - 68px);top:139px;width:136px;height:245px;display:grid;place-items:center}
+.go-official-reveal-collar>.go-official-collar-image{position:relative;z-index:2;width:105px;height:85px;object-fit:contain;image-rendering:pixelated;animation:go-collar-pop 1.3s steps(7,end) both}
+.go-official-sparkles{position:absolute;inset:0;background:repeating-conic-gradient(from 0deg,#ffca47 0deg 4deg,transparent 4deg 30deg);clip-path:polygon(50% 0,58% 36%,70% 6%,64% 42%,97% 32%,66% 50%,100% 52%,66% 59%,85% 93%,58% 68%,50% 100%,45% 65%,12% 93%,35% 57%,0 53%,35% 47%,3% 31%,41% 40%,30% 6%,46% 37%);opacity:.8;animation:go-sparkle-pulse 1.3s steps(7,end) both}
+.go-official-reveal-bottom{position:absolute;left:22px;bottom:16px;background:transparent;border:0;color:#181713;text-decoration:none;font:400 11px/17px 'Galmuri11',sans-serif;cursor:pointer}
+.go-official-reveal-sound{position:absolute;right:19px;bottom:19px;width:25px;height:25px;image-rendering:pixelated}
+@keyframes go-collar-pop{0%{transform:scale(.7);opacity:0}50%{transform:scale(1.14);opacity:1}100%{transform:scale(1)}}
+@keyframes go-sparkle-pulse{0%{transform:scale(.5);opacity:0}50%{transform:scale(1);opacity:.85}100%{transform:scale(1.2);opacity:.2}}
+@media(max-width:370px){.go-official-reveal-overlay{padding-top:12px}}
+@media(prefers-reduced-motion:reduce){.go-official-reveal-collar>.go-official-collar-image,.go-official-sparkles{animation:none}}
+
+/* Use the original exported pixel SVG sparkles, not CSS-invented rays. */
+.go-official-sparkles{display:none}
+.go-official-sparkles-top,.go-official-sparkles-bottom{position:absolute;left:50%;top:50%;height:auto;transform:translate(-50%,-50%);pointer-events:none;image-rendering:pixelated}
+.go-official-sparkles-top{width:200px;max-width:none;opacity:.9}
+.go-official-sparkles-bottom{width:157px;max-width:none;opacity:1}
+@media(prefers-reduced-motion:reduce){.go-official-sparkles-top,.go-official-sparkles-bottom{animation:none}}
+
+/* Figma 558:840547 and 558:786271: approved three-column dog picker. */
+.s4-store-overlay:has(>.s4-store-dog-picker){align-items:flex-start;padding-top:96px;overflow-y:auto}
+.s4-store-overlay>.s4-store-dog-picker{width:min(345px,calc(100vw - 32px));height:502px;flex-shrink:0;padding:0;border:0;border-radius:6px}
+.s4-store-dog-picker>h2{position:absolute;left:0;right:0;top:78px;margin:0;font:700 35.694px/54px 'MonaS12',sans-serif}
+.s4-store-dog-picker .s4-store-dog-choices{position:absolute;top:160px;left:20px;right:20px;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 9px}
+.s4-store-dog-picker .s4-store-dog-choices>button{display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:95/116;min-width:0;border:0;border-radius:7px;background:#f8f7f3;padding:7px}
+.s4-store-dog-picker .s4-store-dog-choices>button.s4-dog-known{background:#f7d94d}
+.s4-store-dog-picker .s4-store-dog-choices img{width:100%;max-width:75px;height:75px;object-fit:contain;image-rendering:pixelated}
+.s4-store-dog-picker .s4-store-dog-choices strong{font:700 11px/18px 'MonaS12',sans-serif}
+.s4-picker-sound{position:absolute;width:24px;height:24px;right:22px;bottom:19px;image-rendering:pixelated}
+.s4-store-dog-picker .s4-store-close{right:20px;top:14px;width:20px;height:20px;padding:0;line-height:20px}
+.s4-selected-dog-name,.go-reveal-selected-dog{display:block;font:700 24px/37px 'MonaS12',sans-serif}
+.s4-store-original-choice:has(.s4-selected-dog-name)>h2{top:32px}
+@media(max-height:580px){.s4-store-overlay:has(>.s4-store-dog-picker){padding-top:12px}}
+.s4-store-original-choice .s4-selected-dog-name,.go-official-reveal-screen .go-reveal-selected-dog{display:block;font:700 26px/39px 'MonaS12',sans-serif}
+
+/* Runtime QA: Figma 558:606067 / 558:606964 measured card and text bounds. */
+.go-duplicate-screen>h2{top:39px;font:700 20px/30px 'MonaS12',sans-serif}
+.go-duplicate-cards{top:89px;left:21.5px;right:17.06227px;gap:29.56227px}
+.go-duplicate-card-frame{width:138.43773px;max-width:100%}
+.go-duplicate-cards strong{margin-top:2px;font:400 9px/21px 'Galmuri11',sans-serif}
+.go-duplicate-buttons button,.go-duplicate-confirm-buttons button{background:#f7d94d;font:400 12.6383px/15px 'MonaS12',sans-serif}
+.go-duplicate-confirm-card{left:calc(50% - 73.5px);width:138.43773px}
+.go-free-draw-screen h2{font:700 35.694px/54px 'MonaS12',sans-serif}
+.go-free-draw-collars{top:195px;left:52px;right:52px;gap:14px;justify-content:center}
+.go-free-draw-collars button{width:71px;height:46.0281px;flex:none}
+.go-free-draw-dialogue{left:30px;right:30px;top:306px;height:119px}
+.go-free-draw-dialogue-content{top:25px}
+.go-free-draw-dialogue-content p{font-size:13px;line-height:21px;margin-bottom:2px}
+.go-free-draw-dialogue-content .v3-pixel-choice{font-size:13px}
+.go-free-draw-close,.go-duplicate-close,.go-official-reveal-close{top:17px;right:22px;width:12px;height:12px;padding:0;font-size:0}
+.go-free-draw-close:before,.go-free-draw-close:after,.go-duplicate-close:before,.go-duplicate-close:after,.go-official-reveal-close:before,.go-official-reveal-close:after{content:'';position:absolute;left:0;top:5px;width:13px;height:2px;background:#111;transform:rotate(45deg)}
+.go-free-draw-close:after,.go-duplicate-close:after,.go-official-reveal-close:after{transform:rotate(-45deg)}
+@media(max-width:370px){.go-duplicate-cards{left:14px;right:14px;gap:12px}.go-free-draw-collars{left:15px;right:15px;gap:10px}.go-free-draw-dialogue{left:15px;right:15px}}
+
+.go-duplicate-error{position:absolute;top:450px;left:16px;right:52px;margin:0;color:#a52323;font:400 12px/17px 'MonaS12',sans-serif;text-align:left}

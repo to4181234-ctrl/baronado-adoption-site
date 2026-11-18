@@ -4,7 +4,7 @@ import Link from 'next/link';
 import GoPixelChoice from './GoPixelChoice.js';
 import { useCallback, useEffect, useState } from 'react';
 import { fetchDogs } from '../lib/dogs.js';
-import { figmaSprite, gameElement } from '../lib/goV3Game.js';
+import { figmaSprite, gameElement, gameElementIcon } from '../lib/goV3Game.js';
 import { useGoSession } from './GoShell.js';
 import GoCard from './GoCard.js';
 import GoCamera from './GoCamera.js';
@@ -197,7 +197,7 @@ export default function GoDogAlbum({ dogId }) {
         <span className="v5-count-caption">수집 카드</span>
         <span className="v5-count-value">{summaryCount}{STAGE2_ENABLED || hasCards ? '장' : '개'}</span>
         <span className="v5-element-caption">속성</span>
-        <span className="v5-element-value">{hasCards ? <>✧ {gameElement(dog.name)}</> : '미공개'}</span>
+        <span className="v5-element-value">{hasCards ? <><img className="v5-element-effect" src={gameElementIcon(dog.name)} alt=""/>{gameElement(dog.name)}</> : '미공개'}</span>
       </div>
       {!dog.adopted && <button className="v5-album-collect" type="button" onClick={() => member ? setCollectConfirm(true) : openAccount()}>멍카드 수집하러가기 <span aria-hidden="true">›</span></button>}
     </section>
@@ -269,6 +269,7 @@ export default function GoDogAlbum({ dogId }) {
           disabled={deleting} onClick={() => setDeleteOpen(false)}>×</button>
         <h2>선택한 {selectedIds.length}장을<br/>삭제할까요?</h2>
         <p>삭제한 카드와 사진은<br/>복구할 수 없어요.</p>
+        <p className="s3-last-card-warning">해당 강아지의 마지막 카드를 삭제하면<br/>도감 획득 기록과 배틀 전적도 사라져요.</p>
         {deleteError && <p className="s2-delete-error" role="alert">{deleteError}</p>}
         <div className="s2-delete-actions">
           <button type="button" disabled={deleting} onClick={() => setDeleteOpen(false)}>취소</button>

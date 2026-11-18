@@ -209,3 +209,24 @@
  .v3-go-site .v3-album-figma .v3-battle-home .v3-pixel-panel{container-type:inline-size;height:auto!important;min-height:0!important;aspect-ratio:356/162}
  .v3-go-site .v3-album-figma .v10-panel-canvas{transform:scale(calc(100cqw / 356px))}
 }
+
+/* Approved home 558:312818, measured against the actual 390px Next render. */
+.v3-go-site .v3-album-figma .v3-home-quest-shortcut{position:relative;height:112px;box-sizing:border-box;padding:37px 16px 0}
+.v3-go-site .v3-album-figma .v3-home-quest-shortcut:after{content:'';position:absolute;left:16px;right:16px;bottom:0;height:1px;background:#eae4d9}
+.v3-go-site .v3-album-figma .v3-home-quest-shortcut>a{position:relative;display:block;text-decoration:none;color:#181713;font-family:'MonaS12',sans-serif}
+.v3-go-site .v3-album-figma .v3-home-quest-new{position:absolute;left:0;top:-24px;color:#f00;font:700 15.315852px/24px 'MonaS12',sans-serif}
+.v3-go-site .v3-album-figma .v3-home-quest-shortcut strong{display:block;font:700 15.315852px/24px 'MonaS12',sans-serif}
+.v3-go-site .v3-album-figma .v3-home-quest-shortcut small{display:block;margin-top:5px;font:400 11px/21px 'MonaS12',sans-serif}
+.v3-go-site .v3-album-figma .v3-collection-section{padding-top:19px!important}
+.v3-go-site .v3-album-figma .v3-approved-battle-records{margin-top:24px!important;padding-top:29px!important;padding-bottom:26px!important}
+.v3-go-site .v3-album-figma .v3-approved-battle-records .v3-pixel-panel{margin-top:24px!important}
+.v3-go-site .v3-album-figma .v3-approved-battle-records .v3-panel-content p{margin-top:9px!important}
+.v3-go-site .v3-album-figma .v3-battle-record-pagination{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;margin-top:11px;height:22px;color:#000;font:400 12px/22px 'MonaS12',sans-serif;text-align:center}
+.v3-go-site .v3-album-figma .v3-battle-record-pagination button{padding:0;background:none;border:0;font:inherit;color:inherit;cursor:pointer}
+.v3-go-site .v3-album-figma .v3-battle-record-pagination button:disabled{color:#d9d9d9;cursor:default}
+
+/* Restore the approved member profile action: edit profile / log out. */
+.v3-go-site .v3-album-figma .v3-profile-head .v3-profile-logout{position:absolute;left:162px;top:138px;display:flex;align-items:center;gap:6px;height:19px;max-width:calc(100% - 174px);margin:0;padding:0;border:0;background:none;color:#181713;font:400 11px/1.5 'MonaS12',sans-serif;cursor:pointer}
+
+/* Existing approved last-card deletion policy, kept inside the original dialog. */
+.v3-go-site .v5-delete-dialog .s3-last-card-warning{font:400 10px/1.5 'MonaS12',sans-serif;color:#6e665e;margin:5px auto 10px;max-width:280px}

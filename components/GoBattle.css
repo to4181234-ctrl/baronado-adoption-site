@@ -347,3 +347,27 @@
 
 /* Replace only the result-screen radiating yellow rays. Keep Figma layout and winner pop. */
 .meong-battle-phase-result .meong-battle-winner::before{display:none!important}
+
+/* Approved battle landing: Figma 577:881499 (390px source viewport). */
+.v3-battle-entry{width:min(100%,390px);margin:0 auto;padding:0 16px 35px;background:#fff;color:#181713;font-family:'MonaS12',sans-serif;box-sizing:border-box;min-height:600px}
+.v3-battle-entry-choices{display:grid;gap:34px;padding-top:24px}
+.v3-battle-entry-choices button{display:grid;gap:12px;text-align:left;background:none;border:0;padding:0;cursor:pointer;font-family:inherit;color:inherit}
+.v3-battle-entry-choices button strong{font:700 17px/26px 'MonaS12',sans-serif}
+.v3-battle-entry-choices button span{font:400 12px/19px 'MonaS12',sans-serif;color:#898989}
+.v3-battle-entry-choices button:disabled{opacity:.45;cursor:not-allowed}
+.v3-battle-entry .v3-approved-battle-records{margin:72px 0 0;padding:0;border:0;background:#fff}
+.v3-battle-entry .v3-pixel-panel{width:356px;max-width:100%;aspect-ratio:356/162;position:relative;overflow:hidden;background:#fff}
+.v3-battle-entry .v10-panel-canvas{position:relative;width:356px;height:162px;transform-origin:top left}
+.v3-battle-entry .v3-album-panel-layer{position:absolute;display:block;pointer-events:none;max-width:none}
+.v3-battle-entry .v3-album-panel-bg,.v3-battle-entry .v3-album-panel-outer{left:0;top:0;width:356px;height:162px}
+.v3-battle-entry .v3-album-panel-inner{left:8px;top:8px;width:344px;height:146px}
+.v3-battle-entry .v3-panel-content{position:absolute;left:29px;top:28px;right:25px;color:#000;font:400 14.333px/23px 'MonaS12',sans-serif}
+.v3-battle-entry .v3-panel-content b{display:block;font:inherit}
+.v3-battle-entry .v3-panel-content p{margin:9px 0 0;font:400 14.333px/26px 'MonaS12',sans-serif}
+.v3-battle-entry .v3-battle-record-pagination{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;margin-top:11px;height:22px;color:#000;font:400 12px/22px 'MonaS12',sans-serif;text-align:center}
+.v3-battle-entry .v3-battle-record-pagination button{padding:0;border:0;background:none;font:inherit;color:inherit;cursor:pointer}
+.v3-battle-entry .v3-battle-record-pagination button:disabled{color:#d9d9d9;cursor:default}
+@media(max-width:389px){
+ .v3-battle-entry .v3-pixel-panel{container-type:inline-size}
+ .v3-battle-entry .v10-panel-canvas{transform:scale(calc(100cqw / 356px))}
+}

@@ -56,7 +56,8 @@ export default function GoFriendBattle(){
  const {member,ready,openAccount}=useGoSession();
  const [room,setRoom]=useState(null),[invite,setInvite]=useState('');
  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
- const [kind,setKind]=useState('camera'),[page,setPage]=useState(0);
+ const [kind,setKind]=useState('official'),[page,setPage]=useState(0);
+ const [query,setQuery]=useState(''),[searched,setSearched]=useState(''),[order,setOrder]=useState('newest');
  const [owned,setOwned]=useState(EMPTY),[loadingCards,setLoadingCards]=useState(false);
  const [history,setHistory]=useState({stats:{wins:0,draws:0,losses:0},recent:[]});
  const [animation,setAnimation]=useState('idle'),[impact,setImpact]=useState(0);
@@ -147,15 +148,15 @@ export default function GoFriendBattle(){
   if(!member||room?.status!=='playing'||room.myReady)return;
   const ctrl=new AbortController();
   setLoadingCards(true);
-  fetch('/api/go/pvp?'+new URLSearchParams({mode:'cards',kind,page:String(page)}),
+  fetch('/api/go/pvp?'+new URLSearchParams({mode:'cards',kind,page:String(page),q:searched,order}),
    {cache:'no-store',signal:ctrl.signal})
     .then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.error||'멍카드를 불러오지 못했어요.');return d;})
     .then(d=>{if(!ctrl.signal.aborted)setOwned(d);})
     .catch(e=>{if(!ctrl.signal.aborted)setError(e.message);})
     .finally(()=>{if(!ctrl.signal.aborted)setLoadingCards(false);});
   return()=>ctrl.abort();
- },[member?.id,room?.status,room?.myReady,room?.round,kind,page]);
- useEffect(()=>{setPage(0);setKind('camera');},[room?.round]);
+ },[member?.id,room?.status,room?.myReady,room?.round,kind,page,searched,order]);
+ useEffect(()=>{setPage(0);setKind('official');setQuery('');setSearched('');setOrder('newest');},[room?.round]);
  useEffect(()=>{
   if(room?.status!=='completed')return;
   const key=room.roomId+':'+room.round;
@@ -276,11 +277,20 @@ export default function GoFriendBattle(){
      {!room.myReady&&<>
       <h2>내 카드 한 장 선택하기</h2>
       <div className="meong-battle-tabs">
-       <button type="button" className={kind==='camera'?'active':''}
-        onClick={()=>{setKind('camera');setPage(0);}}>나만의 카드</button>
        <button type="button" className={kind==='official'?'active':''}
-        onClick={()=>{setKind('official');setPage(0);}}>공식 멍카드</button>
+        onClick={()=>{setKind('official');setPage(0);setQuery('');setSearched('');}}>멍카드</button>
+       <button type="button" className={kind==='camera'?'active':''}
+        onClick={()=>{setKind('camera');setPage(0);setQuery('');setSearched('');}}>나만의 멍카드</button>
        <span>출전 1장</span>
+      </div>
+      <form className="meong-battle-search friend-pvp-search" onSubmit={event=>{event.preventDefault();setPage(0);setSearched(query.trim());}}>
+       <input aria-label="출전할 카드 검색" placeholder="제목·강아지 이름" value={query} onChange={event=>setQuery(event.target.value)} maxLength={40}/>
+       <button type="submit">검색</button>
+      </form>
+      <div className="meong-battle-sort friend-pvp-sort">등록 순서ㅣ
+       <button type="button" onClick={()=>{setPage(0);setOrder(value=>value==='newest'?'oldest':'newest');}}>
+        {order==='newest'?'최신순':'오래된순'}⌄
+       </button><span>전체 {owned.total}장</span>
       </div>
       {loadingCards?<p role="status">내 카드를 불러오는 중…</p>:
        owned.cards.length?<div className="friend-pvp-card-grid">{owned.cards.map(card=>
@@ -352,7 +362,7 @@ export default function GoFriendBattle(){
       <span>{h.opponentName} 멍기록가</span>
       <small>{formatDate(h.finishedAt)}</small>
      </li>)}</ol>:<p>아직 대결 기록이 없어요.</p>}
-    <small>최근 20경기만 표시해요. 기존 카드를 삭제해도 완료된 전적은 유지돼요.</small>
+    <small>최근 20경기만 표시해요.</small>
    </section>}
   </>}
  </div>;

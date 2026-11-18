@@ -5,7 +5,7 @@ import GoCardFace from './GoCardFace.js';
 import GoCompletion from './GoCompletion.js';
 import {CARD_FACE} from '../lib/goCardFace.js';
 
-export function LockedOfficialCard({slot,hidden=false,unlockable=false}) {
+export function LockedOfficialCard({slot,hidden=false,unlockable=false,storePreview=false}) {
   return <svg className="s2-locked-card-svg" viewBox="0 0 166 265" role="img"
     aria-label={hidden?'HIDDEN · '+(unlockable?'해금 가능':'일반 4종 수집 후 해금'):`미보유 공식 멍카드 NO.${slot}`}>
     <image href={CARD_FACE.frame} x="0" y="0" width="166" height="265"/>
@@ -23,7 +23,7 @@ export function LockedOfficialCard({slot,hidden=false,unlockable=false}) {
         <text x="16" y={208+index*19} fontSize="10" fill="#727272">{label}</text>
         {Array.from({length:5},(_,i)=><image key={i} href={CARD_FACE.star}
           x={40+i*13.4} y={198+index*19} width="11.36" height="10.32"
-          style={{filter:'grayscale(1)',opacity:.65}}/>)}
+          style={storePreview?{filter:'grayscale(1)'}:{filter:'grayscale(1)',opacity:.65}}/>)}
       </g>)}
       <text x="16" y="247" fontSize="7" fill="#727272">바로나도</text>
       <text x="150" y="247" textAnchor="end" fontSize="7" fill="#181713">NO.{slot}</text>

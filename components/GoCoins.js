@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { subscribeGoCoinNotices, enqueueGoCoinNotice } from '../lib/goCoinNotices.js';
 
@@ -15,11 +16,14 @@ const TYPES = {
   visit_reversal: '방문 인증 승인 취소',
   store_purchase: '멍카드 상점 구매'
 };
-const FILTERS = [['all', '전체'], ['earn', '획득'], ['spend', '사용']];
-const dateLabel = value => new Intl.DateTimeFormat('ko-KR', {
-  timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit',
-  hour: '2-digit', minute: '2-digit'
-}).format(new Date(value));
+const FILTERS = [['all', '전체'], ['earn', '적립'], ['spend', '사용']];
+const dateLabel = value => {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Seoul', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+  }).formatToParts(new Date(value)).filter(part => part.type !== 'literal').map(part => [part.type,part.value]));
+  return `${parts.month}.${parts.day} ${parts.hour}:${parts.minute}`;
+};
 
 export function useGoCoins() {
   return useContext(CoinsContext);
@@ -108,21 +112,20 @@ export function GoCoinProvider({ member, children }) {
   }}>
     {children}
     {GO_STAGE1_UI_ENABLED && member?.id && historyOpen &&
-      <GoCoinHistory onClose={() => setHistoryOpen(false)} />}
+      <GoCoinHistory balance={walletLoaded ? state.balance : null} onClose={() => setHistoryOpen(false)} />}
     {GO_STAGE1_UI_ENABLED && notice && <div className="go-coin-notice" role="status" aria-live="polite">
       {notice.amount > 0 ? '+' : '−'}{Math.abs(notice.amount)}C
     </div>}
   </CoinsContext.Provider>;
 }
 
-function GoCoinHistory({ onClose }) {
+function GoCoinHistory({ onClose, balance }) {
   const [filter, setFilter] = useState('all');
   const [items, setItems] = useState([]);
   const [nextOffset, setNextOffset] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [expanded, setExpanded] = useState(null);
   const loadingRef = useRef(false);
   const sequence = useRef(0);
   const sentinel = useRef(null);
@@ -156,7 +159,6 @@ function GoCoinHistory({ onClose }) {
     sequence.current++;
     loadingRef.current = false;
     setItems([]);
-    setExpanded(null);
     setHasMore(false);
     setNextOffset(0);
     load(0, true);
@@ -184,12 +186,16 @@ function GoCoinHistory({ onClose }) {
 
   return <div className="go-coin-backdrop" role="presentation" onClick={onClose}>
     <section className="go-coin-sheet" role="dialog" aria-modal="true"
-      aria-label="멍코인 이용 내역" onClick={event => event.stopPropagation()}>
+      aria-label="멍코인 내역" onClick={event => event.stopPropagation()}>
+      <div className="go-coin-site-header"><strong>멍멍GO!</strong><div>{balance === null ? '멍코인 확인 중' : `${balance.toLocaleString('ko-KR')} 멍코인`} <span aria-hidden="true">│</span> <Link href="/go/store" onClick={onClose}>스토어</Link></div></div>
       <header className="go-coin-sheet-header">
-        <h2>멍코인 이용 내역</h2>
-        <button type="button" onClick={onClose} aria-label="이용 내역 닫기">×</button>
+        <button type="button" onClick={onClose} aria-label="멍코인 내역에서 돌아가기">← 돌아가기</button>
+        <h2>멍코인 내역</h2>
       </header>
-      <p className="go-coin-sheet-caption">최근 30일 동안의 멍코인 내역이에요.</p>
+      <div className="go-coin-balance" aria-label="보유 멍코인">
+        <span>보유 멍코인</span>
+        <strong>{balance === null ? '확인 중…' : `${balance.toLocaleString('ko-KR')} 멍코인`}</strong>
+      </div>
       <nav className="go-coin-filters" aria-label="멍코인 내역 필터">
         {FILTERS.map(([value, label]) =>
           <button key={value} type="button" aria-pressed={filter === value}
@@ -197,20 +203,16 @@ function GoCoinHistory({ onClose }) {
       </nav>
       <div className="go-coin-history-list">
         {items.map(item => <article key={item.id} className="go-coin-transaction">
-          <button type="button" aria-expanded={expanded === item.id}
-            onClick={() => setExpanded(expanded === item.id ? null : item.id)}>
-            <span><strong>{TYPES[item.event_type] || '멍코인 이용'}</strong>
+          <div className="go-coin-transaction-body">
+            <span><strong>{TYPES[item.event_type] || '멍코인 내역'}</strong>
               <small>{dateLabel(item.created_at)}</small></span>
             <b className={item.amount > 0 ? 'is-positive' : ''}>
-              {item.amount > 0 ? '+' : ''}{item.amount}C
+              {item.amount > 0 ? '+' : ''}{item.amount.toLocaleString('ko-KR')} 멍코인
             </b>
-          </button>
-          {expanded === item.id && <p className="go-coin-transaction-extra">
-            내역 구분: {item.amount > 0 ? '획득' : '사용'} · 기준일 {item.local_day}
-          </p>}
+          </div>
         </article>)}
         {items.length === 0 && !loading && !error &&
-          <p className="go-coin-empty">표시할 멍코인 내역이 없어요.</p>}
+          <p className="go-coin-empty">최근 30일 동안의 멍코인 내역이 없어요.</p>}
         {loading && <p className="go-coin-empty" role="status">불러오는 중…</p>}
         {error && <p className="go-coin-error" role="alert">{error}
           <button type="button" onClick={() => load(nextOffset, items.length === 0)}>다시 시도</button>

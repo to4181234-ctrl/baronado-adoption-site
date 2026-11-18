@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import GoVisitPanel from './GoVisitPanel.js';
+import GoFreeDraw from './GoFreeDraw.js';
 import { useGoSession } from './GoShell.js';
 import { useGoCoins } from './GoCoins.js';
 import {isQuestAvailable,visibleQuestRewards} from '../lib/goStage3Quests.js';
@@ -13,6 +14,7 @@ export default function GoQuests({ compact = false }) {
   const coins = useGoCoins();
   const [notice, setNotice] = useState('');
   const [visitOpen,setVisitOpen]=useState(false);
+  const [drawOpen,setDrawOpen]=useState(false);
   useEffect(()=>{if(!visitOpen)return;const onKey=e=>{if(e.key==='Escape')setVisitOpen(false)};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[visitOpen]);
   if (!coins?.enabled) return null;
 
@@ -33,7 +35,7 @@ export default function GoQuests({ compact = false }) {
   if(isQuestAvailable('draw',{draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE}))tasks.push({
     id:'draw',title:'랜덤 멍카드 뽑기',coins:10,
     caption:'아직 만나지 못한 멍카드를 뽑을지도?',
-    completed:Boolean(coins.daily?.drawQuestDone),href:'/go'
+    completed:Boolean(coins.daily?.drawQuestDone),href:'/go/quests'
   });
   if(isQuestAvailable('battle',{draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE}))tasks.push({
     id:'battle',title:'멍배틀 하기',coins:10,
@@ -62,8 +64,10 @@ export default function GoQuests({ compact = false }) {
       <div className="go-quest-items">
         {tasks.map(task => <article className={'go-quest-item' + (task.completed ? ' is-complete' : '')} key={task.id}>
           <div>
-            {task.completed
-              ? <button className="go-quest-title" type="button" onClick={()=>setNotice('오늘 이미 완료한 퀘스트예요.')}>{task.title} &gt;</button>
+            {task.id==='draw' && !compact
+              ? <button className="go-quest-title" type="button" onClick={()=>setDrawOpen(true)}>{task.title} &gt;</button>
+              : task.completed
+                ? <button className="go-quest-title" type="button" onClick={()=>setNotice('오늘 이미 완료한 퀘스트예요.')}>{task.title} &gt;</button>
               : task.id==='visit' && !compact
                 ? <button className="go-quest-title" type="button" onClick={()=>setVisitOpen(true)}>{task.title} &gt;</button>
                 : <Link className="go-quest-title" href={task.href} aria-label={task.id==='battle'?'랜덤 또는 친구 1:1 멍배틀, 오늘 첫 완료 시 10 멍코인':undefined}>{task.title} &gt;</Link>}
@@ -79,6 +83,7 @@ export default function GoQuests({ compact = false }) {
       <p>{ready ? '로그인하면 퀘스트를 시작할 수 있어요.' : '로그인 정보를 확인하고 있어요.'}</p>
       {ready && <button type="button" onClick={openAccount}>로그인하고 시작하기</button>}
     </div>}
+    {drawOpen&&!compact&&<GoFreeDraw onClose={()=>setDrawOpen(false)}/>}
     {visitOpen&&!compact&&<div className="go-visit-modal-backdrop" onClick={()=>setVisitOpen(false)}>
       <section className="go-visit-modal" role="dialog" aria-modal="true" aria-label="바로나도에 놀러왔개" onClick={e=>e.stopPropagation()}>
         <button className="go-visit-modal-close" type="button" aria-label="닫기" onClick={()=>setVisitOpen(false)}>×</button>
