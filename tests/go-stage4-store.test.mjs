@@ -27,7 +27,7 @@ test('200C global random forbids filters; 300C dog-specific forbids slot targeti
 });
 test('only unowned general cards for available and not-adopted dogs',()=>{
  const dogs=[
-  {dogId:dog,name:'깡지',available:true,adopted:false,
+  {dogId:dog,name:'깡지',available:true,adopted:false,publishedComplete:true,
     slots:[{slot:1,owned:true},{slot:2,owned:false},{slot:3,owned:false},{slot:4,owned:false},{slot:5,owned:false}]},
   {dogId:id,name:'버디',available:false,adopted:false,slots:[{slot:1,owned:false}]},
   {dogId:'33333333-3333-4333-8333-333333333333',name:'오레오',
@@ -36,6 +36,6 @@ test('only unowned general cards for available and not-adopted dogs',()=>{
  const items=availableStoreItems(dogs);
  assert.deepEqual(items.map(x=>x.slot),[2,3,4]);
  assert(items.every(x=>x.dogId===dog&&x.price===300));
- assert.deepEqual(availableStoreDogs(dogs),[{dogId:dog,name:'깡지',missing:3,collected:0,hiddenUnlocked:false,thumbnailUrl:null}]);
+ assert.deepEqual(availableStoreDogs(dogs),[{dogId:dog,name:'깡지',missing:3,collected:0,personalCount:0,hiddenUnlocked:false,hasAnyCard:false,thumbnailUrl:null}]);
 });
 
