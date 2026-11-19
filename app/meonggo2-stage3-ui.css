@@ -82,6 +82,10 @@
   background:#f8dc65!important;box-shadow:none!important;
 }
 
+/* Contain horizontal paint during a fight without modifying the other screens;
+   this prevents long ghost trails from growing the document scroll width. */
+.meong-battle-app.meong-battle-phase-fight{overflow-x:clip}
+
 /* Fight: keep collision, motion trails, flashes and haptics, but never
    translate the whole battle-versus container. That translated container
    could widen the scroll viewport while impact animation was running. */
