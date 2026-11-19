@@ -13,7 +13,7 @@ export default function GoDuplicateCompare({dog,duplicate,busy,error,onResolve,o
   imageUrl:owned?.imageUrl||'',battle:{power:owned?.power??1,charm:owned?.charm??1},status:'approved',capturedAt:owned?.acquiredAt||null,officialSlot:duplicate.slot};
  const proposed={...baseline,battle:{power:duplicate.proposedPower,charm:duplicate.proposedCharm}};
  return <div className="go-duplicate-overlay" role="presentation">
-  <section className="go-duplicate-screen" role="dialog" aria-modal="true" aria-label="중복 멍카드 비교">
+  <section className={'go-duplicate-screen'+(confirm?' is-confirm':'')} role="dialog" aria-modal="true" aria-label="중복 멍카드 비교">
    <button className="go-duplicate-close" type="button" onClick={onClose} disabled={busy} aria-label="중복 카드 창 닫기">×</button>
    {confirm?<>
     <h2>정말 이 카드로 선택하시겠어요?</h2>
