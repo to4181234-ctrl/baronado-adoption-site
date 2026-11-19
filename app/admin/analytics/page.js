@@ -148,7 +148,7 @@ function AnalyticsContent() {
     <SiteHeader />
     <section className="container stats-container">
       <div className="stats-page-heading">
-        <div><h1>방문 통계</h1><p>바로나도 홈페이지 방문과 강아지별 관심도를 확인합니다.</p></div>
+        <div><h1>홈페이지 통계</h1><p>바로나도 홈페이지 방문과 강아지별 관심도를 확인합니다.</p></div>
       </div>
       <div className="stats-periods" role="group" aria-label="통계 기간 선택">
         {PERIODS.map(item => <button type="button" key={item.value}
