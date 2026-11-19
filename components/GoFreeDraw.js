@@ -6,6 +6,7 @@ import GoPixelChoice from './GoPixelChoice.js';
 import GoOfficialDrawReveal from './GoOfficialDrawReveal.js';
 import GoDuplicateCompare from './GoDuplicateCompare.js';
 import GoSoundToggle from './GoSoundToggle.js';
+import {useGoSession} from './GoShell.js';
 import {enqueueGoCoinNotice} from '../lib/goCoinNotices.js';
 
 function displayCard(dog,slot){
@@ -14,9 +15,11 @@ function displayCard(dog,slot){
   imageUrl:original?.imageUrl||'',battle:{power:original?.power??1,charm:original?.charm??1},
   status:'approved',capturedAt:original?.acquiredAt||null,officialSlot:slot};
 }
-/** Free daily draw stays over the quest screen (Figma 558:479084 / 558:606067). */
+/** Daily free draws; entry location is the My Album screen (Figma 690:289241). */
 export default function GoFreeDraw({onClose}){
+ const {member}=useGoSession();
  const [catalog,setCatalog]=useState(null);
+ const requestRef=useRef(null);
  const sound=useRef(null);
  useEffect(()=>{sound.current=createGameAudio();return()=>{sound.current?.dispose();sound.current=null;};},[]);
  const [choice,setChoice]=useState(null);
@@ -46,19 +49,34 @@ export default function GoFreeDraw({onClose}){
   else setNoImage(true);
  }
  async function draw(){
-  if(busy||choice===null||catalog?.drawUsed)return;
+  if(busy||choice===null||catalog?.drawUsed||!member?.id)return;
   setBusy(true);setError('');
+  const storageKey='meonggo:free-pending-request:'+member.id;
   try{
-   const response=await fetch('/api/go/official',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'draw'})});
+   if(!requestRef.current){
+    try{requestRef.current=sessionStorage.getItem(storageKey);}catch{}
+   }
+   if(!requestRef.current){
+    requestRef.current=crypto.randomUUID();
+    try{sessionStorage.setItem(storageKey,requestRef.current);}catch{}
+   }
+   const response=await fetch('/api/go/official',{method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action:'draw',requestId:requestRef.current})});
    const data=await response.json();
-   if(!response.ok||!data.ok)throw Error(data.error||'무료 뽑기에 실패했어요.');
+   if(!response.ok||!data.ok){
+    if(response.status===409){requestRef.current=null;try{sessionStorage.removeItem(storageKey);}catch{}}
+    throw Error(data.error||'무료 뽑기에 실패했어요.');
+   }
+   requestRef.current=null;
+   try{sessionStorage.removeItem(storageKey);}catch{}
    if(Number.isInteger(data.coinsAdded)&&data.coinsAdded>0){
     enqueueGoCoinNotice(data.coinsAdded);
     window.dispatchEvent(new CustomEvent('go-coins-changed',{detail:{notified:true}}));
    }else window.dispatchEvent(new CustomEvent('go-coins-changed',{detail:{notified:false}}));
    const latest=await refresh();
    void sound.current?.play('discover');
-   if(data.requiresChoice){setDuplicate(latest.pendingDuplicate||{dogId:data.dogId,slot:data.slot,proposedPower:data.proposedPower,proposedCharm:data.proposedCharm});}
+   if(data.requiresChoice){setDuplicate(latest.pendingDuplicate||{choiceId:data.drawId,dogId:data.dogId,slot:data.slot,proposedPower:data.proposedPower,proposedCharm:data.proposedCharm});}
    else showCard(data,latest);
   }catch(e){setError(e.message)}finally{setBusy(false)}
  }
@@ -66,7 +84,7 @@ export default function GoFreeDraw({onClose}){
   if(!duplicate||busy)return;
   setBusy(true);setError('');
   try{
-   const response=await fetch('/api/go/official',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'resolve',replace})});
+   const response=await fetch('/api/go/official',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'resolve',choiceId:duplicate.choiceId,replace})});
    const data=await response.json();
    if(!response.ok||!data.ok)throw Error(data.error||'카드 선택을 저장하지 못했어요.');
    const previous=duplicate;
@@ -77,7 +95,7 @@ export default function GoFreeDraw({onClose}){
  }
  return <>
   <div className="go-free-draw-overlay" role="presentation" style={{display:duplicate||revealed?'none':undefined}}>
-   <section className="go-free-draw-screen" role="dialog" aria-modal="true" aria-label="하루 한 번 무료 멍카드 뽑기">
+   <section className="go-free-draw-screen" role="dialog" aria-modal="true" aria-label="하루 두 번 무료 멍카드 뽑기">
     <button className="go-free-draw-close" type="button" disabled={busy||Boolean(duplicate)} onClick={onClose} aria-label="닫기">×</button>
     <h2>멍멍GO!</h2>
     {catalog?.drawUsed&&!duplicate&&!revealed? <div className="go-free-draw-used" role="status">
@@ -108,7 +126,7 @@ export default function GoFreeDraw({onClose}){
      <Link href="/go" onClick={onClose}>내 도감에서 보기</Link></p>}
    </section>
   </div>
-  {duplicate&&<GoDuplicateCompare dog={catalog?.dogs?.find(d=>d.dogId===duplicate.dogId)} duplicate={duplicate} busy={busy} error={error} onResolve={resolve} onClose={onClose}/>}
+  {duplicate&&<GoDuplicateCompare dog={catalog?.dogs?.find(d=>d.dogId===duplicate.dogId)} duplicate={duplicate} busy={busy} error={error} onResolve={resolve} onClose={()=>resolve(false)}/>}
   {revealed&&<GoOfficialDrawReveal card={revealed} onClose={onClose}/>}
  </>;
 }
