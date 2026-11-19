@@ -20,8 +20,14 @@ export async function GET(request){
     .eq('member_id',member.id).eq('request_id',requestId).maybeSingle();
   if(result.error)throw result.error;
   const row=result.data;
+  const attempt=row?await db.from('go_draw_attempts').select('id,duplicate,resolved_at')
+    .eq('member_id',member.id).eq('source_type','store').eq('request_id',requestId)
+    .maybeSingle():{data:null,error:null};
+  if(attempt.error)throw attempt.error;
+  const pending=Boolean(attempt.data?.duplicate&&!attempt.data?.resolved_at);
   return Response.json(row?{ok:true,found:true,dogId:row.dog_id,slot:row.slot,
-    price:row.coins,mode:row.purchase_mode,createdAt:row.created_at}:{ok:true,found:false},{headers});
+    price:row.coins,mode:row.purchase_mode,createdAt:row.created_at,
+    requiresChoice:pending,choiceId:pending?attempt.data.id:null}:{ok:true,found:false},{headers});
  }catch{return goError('이전 구매 결과를 확인하지 못했어요.',500);}
 }
 export async function POST(request){
@@ -34,7 +40,7 @@ export async function POST(request){
  try{
   const db=adminDatabase();
   if(opts.dogId&&!await dogReleased(db,opts.dogId))return goError('아직 공개되지 않은 멍멍이예요.',409);
-  const {data,error}=await db.rpc('go_store_purchase',{
+  const {data,error}=await db.rpc('go_store_purchase_v2',{
     p_member:member.id,p_request:opts.requestId,p_mode:opts.mode,
     p_dog:opts.dogId,p_slot:opts.slot
   });
