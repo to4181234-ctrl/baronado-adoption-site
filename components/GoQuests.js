@@ -45,7 +45,7 @@ export default function GoQuests({ compact = false }) {
   ];
   if(isQuestAvailable('battle',{battle:BATTLE_AVAILABLE}))tasks.push({
     id:'battle',title:'멍배틀 하기',coins:10,
-    caption:'친구와 1:1 멍배틀을 하면 승패 상관없이 멍코인!',
+    caption:'랜덤·친구 배틀 첫 완료 +10C, 이후 승리할 때마다 +3C!',
     completed:Boolean(coins.daily?.battleQuestDone),href:'/go/battle'
   });
   // Free card drawing is not a coin quest; the quest list shows visit, care, battle.
