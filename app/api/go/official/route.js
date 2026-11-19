@@ -52,12 +52,10 @@ export async function GET(request){
   // Some historical drafts may point to an incomplete published version.
   // Keep those dogs out of the album until all five slots are configured.
   const released=await releasedDogs(db);
-  const completeSets=eligibleSets.filter(set=>{
-   if(!released.has(set.dog_id))return false;
-   const valid=assets.filter(a=>a.version_id===set.current_version&&
-     Number.isInteger(a.slot)&&a.slot>=1&&a.slot<=5&&a.title?.trim()&&a.display_path);
-   return new Set(valid.map(a=>a.slot)).size===5;
-  });
+  // The single release checker already validates all five image slots and the
+  // title rules (including published legacy artwork). Do not reapply a stricter
+  // duplicate rule here: that previously hid Oreo despite its registered art.
+  const completeSets=eligibleSets.filter(set=>released.has(set.dog_id));
   const viewable=[];
   for(const set of completeSets){
    for(const asset of assets){

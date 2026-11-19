@@ -53,3 +53,9 @@ test('existing dog care sprite switches between front, walking, snack, praise an
  assert.match(code,/release\?\.careUrl\?\.startsWith\('\/figma-v3\/'\)/);
  assert.match(code,/figmaSprite\(dog.name,pose\)/);
 });
+
+test('official catalog trusts the common release checker for legacy Oreo and does not hide it for empty original title',()=>{
+ const code=read('app/api/go/official/route.js');
+ assert.match(code,/completeSets=eligibleSets.filter\(set=>released.has\(set.dog_id\)\)/);
+ assert.doesNotMatch(code,/a\.title\?\.trim\(\)\&\&a\.display_path/);
+});
