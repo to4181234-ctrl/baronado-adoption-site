@@ -9,6 +9,7 @@ import GoDogAlbum from './GoDogAlbum.js';
 import GoCamera from './GoCamera.js';
 import GoCard from './GoCard.js';
 import GoAlbumBattleRecords from './GoAlbumBattleRecords.js';
+import GoFreeDraw from './GoFreeDraw.js';
 import {albumRoster,albumPreview,albumProgress} from '../lib/goAlbumRoster.js';
 import {koreaDay} from '../lib/goCoins.js';
 const EMPTY={counts:{},covers:{},progress:null,standing:null,ready:false};
@@ -22,6 +23,8 @@ function Album({initialDogId=null}){
  const [camera,setCamera]=useState(null),[collectConfirm,setCollectConfirm]=useState(false),[selection,setSelection]=useState(false),[selectedIds,setSelectedIds]=useState([]),[deleting,setDeleting]=useState(false);
  const [notice,setNotice]=useState(''),[showAdopted,setShowAdopted]=useState(false);
  const [questSeen,setQuestSeen]=useState(true);
+ const [freeDrawOpen,setFreeDrawOpen]=useState(false);
+ const [officialRefreshKey,setOfficialRefreshKey]=useState(0);
  const [officialDogs,setOfficialDogs]=useState([]),[officialLoaded,setOfficialLoaded]=useState(!STAGE2_ENABLED);
  const dogId=initialDogId;
  useEffect(()=>{try{setQuestSeen(localStorage.getItem('meonggo:quest-seen:'+koreaDay())==='1');}catch{setQuestSeen(false);}},[]);
@@ -39,7 +42,7 @@ function Album({initialDogId=null}){
   }).then(d=>{if(active){setOfficialDogs(d.dogs||[]);setOfficialLoaded(true);}})
    .catch(e=>{if(active){setOfficialDogs([]);setOfficialLoaded(false);setError(e.message);}});
   return()=>{active=false;};
- },[member?.id]);
+ },[member?.id,officialRefreshKey]);
  useEffect(()=>{reloadCards();},[reloadCards]);
  useEffect(()=>{setCardPage(0);setSelection(false);setSelectedIds([]);setShowAdopted(false);},[dogId,member?.id]);
  const personalCount=dogId?(collection.counts?.[dogId]||0):0;
@@ -74,6 +77,13 @@ function Album({initialDogId=null}){
    <Link href="/go" className="v3-return-link">← 내 도감으로 돌아가기</Link>
   </div>:<div className={'v3-album-home v3-album-figma '+(member?'v3-album-member':'v3-album-guest')}>
     <section className="v3-profile-head"><div className="v3-profile-avatar"><img className={!member?'v3-profile-anon-silhouette':undefined} src={member?figmaSprite(member.avatarDog||'구름',member.avatarDog?'front':'shadow'):'/figma-v3/album-shadow-buddy.svg'} alt={member?'프로필 캐릭터':'미획득 실루엣'}/></div><div>{member?<><h1>{member.nickname}</h1><p>멍기록가</p><small>{member.profileBio||'자기소개가 없습니다.'}</small><Link href="/go/profile"><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>프로필 수정</Link><button type="button" className="v3-profile-logout" onClick={logout}><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>로그아웃</button></>:<><h1 className="v3-anon-heading">멍기록가를 기다리는중!</h1><p>멍기록가</p><small className="v3-anon-lede">로그인하고 나만의 멍멍 도감 채우기</small><button type="button" className="v3-profile-login s1-login-primary" onClick={openAccount}><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>로그인하고 시작하기</button><Link className="s1-browse-first" href="/go/community">먼저 둘러보기 ›</Link></>}</div></section>
+    <div className="v3-home-free-shortcut v3-home-quest-shortcut">
+     <button type="button" onClick={()=>member?setFreeDrawOpen(true):openAccount()}>
+      <span className="v3-home-free-new">NEW</span>
+      <strong>랜덤 멍카드 뽑기 &gt;</strong>
+      <small>1일 2회 한정 무료</small>
+     </button>
+    </div>
     <div className="v3-home-quest-shortcut"><Link href="/go/quests" onClick={()=>{setQuestSeen(true);try{localStorage.setItem('meonggo:quest-seen:'+koreaDay(),'1');}catch{}}}>{!questSeen&&<span className="v3-home-quest-new">NEW</span>}<strong>오늘의 멍코인 퀘스트 보러가기 &gt;</strong><small>매일 자정에 업데이트!</small></Link></div>
     <section id="meonggo-album" className="v3-collection-section"><h2>내 도감</h2><div className="v3-progress-label">도감 수집 {officialLoaded?claimed:'—'} / {totalDogs}{member&&claimed===0?' (첫 도감을 기다리고 있어요)':''}</div><div className="v3-progress"><span style={{width:(officialLoaded?totalDogs?claimed/totalDogs*100:0:0)+'%'}}/></div>
      {officialLoaded&&orderedDogs.length===0&&<p className="v3-status">공식 멍카드 4종과 HIDDEN이 공개되면 도감에 멍멍이가 나타나요.</p>}
@@ -81,6 +91,7 @@ function Album({initialDogId=null}){
       {(moreDogs||showAdopted)&&<button type="button" className="v3-collection-expand" aria-expanded={showAdopted} onClick={()=>setShowAdopted(v=>!v)}>{showAdopted?'접기':'+더보기'}</button>}</section>
     <GoAlbumBattleRecords dogs={dogs} records={collection.battleRecords} member={member} ready={collection.ready}/>
   </div>}
+  {freeDrawOpen&&<GoFreeDraw onClose={()=>{setFreeDrawOpen(false);setOfficialRefreshKey(v=>v+1);}}/>}
   {notice&&<p className="v3-message" role="status">{notice}</p>}{error&&<p className="v3-error" role="alert">{error}</p>}
   {collectConfirm&&dog&&<div className="v3-discovery-backdrop v3-discovery-figma" role="presentation" onClick={()=>setCollectConfirm(false)}><section className="v3-discovery-modal v3-collection-confirm" role="dialog" aria-modal="true" aria-label="멍카드 수집 준비" onClick={e=>e.stopPropagation()}>
   <button className="v3-discovery-close" aria-label="닫기" onClick={()=>setCollectConfirm(false)}>×</button>
