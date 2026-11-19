@@ -41,13 +41,15 @@
 .friend-pvp-clock strong{font-size:16px;letter-spacing:.025em}
 .friend-pvp-ready-state{display:flex;gap:8px;margin-bottom:13px}
 .friend-pvp-ready-state span{flex:1;padding:9px 6px;text-align:center;font-size:11px;background:#f6f3eb;border:1px solid #ddd7c7}
+.friend-pvp-ready-state span.is-ready{background:#fade40;border-color:#e0c331;color:#181713}
 .friend-pvp-prepare>h2{font-size:14px!important;margin:15px 0!important}
 .friend-pvp-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:23px;row-gap:22px;margin:18px 0 22px}
 .friend-pvp-card{width:100%;border:0;background:#fff;padding:0;position:relative;color:#181713;text-align:center;display:flex;flex-direction:column;gap:5px;min-width:0}
-.friend-pvp-card.is-selected:after{content:'';position:absolute;left:0;top:0;width:100%;aspect-ratio:166/265;border:3px solid #fade40;z-index:2;pointer-events:none}
+.friend-pvp-card.is-selected:after{content:none}
 .friend-pvp-card .go-card-graphic{width:100%;height:auto;display:block;aspect-ratio:166/265}
 .friend-pvp-card span{display:block;font-size:10px;line-height:1.4;font-weight:700;overflow-wrap:anywhere}
 .friend-pvp-card small{display:block;font-size:10px;color:#777067}
+.friend-pvp-ready-action{display:block;width:100%;min-height:46px;margin:0!important;position:relative;z-index:2}
 .friend-pvp-prepare>.meong-battle-primary{margin:12px 0!important}
 .friend-pvp-ready-done{background:#fff5d0;text-align:center;padding:14px;border:1px solid #f0db8d}
 .friend-pvp-ready-done p{font-size:12px;line-height:1.7}
