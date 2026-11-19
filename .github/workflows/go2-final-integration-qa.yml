@@ -1,5 +1,8 @@
 name: MeongGO 2.0 final integration QA (isolated only)
 on:
+  push:
+    branches:
+      - fix/go2-content-gating-20261119
   workflow_dispatch:
 
 permissions:
