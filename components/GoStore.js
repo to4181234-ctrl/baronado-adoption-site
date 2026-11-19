@@ -10,7 +10,7 @@ import {useGoSession} from './GoShell.js';
 import {useGoCoins} from './GoCoins.js';
 import {enqueueGoCoinNotice} from '../lib/goCoinNotices.js';
 import {availableStoreItems,availableStoreDogs,STORE_PRICES} from '../lib/goStore.js';
-import {LockedOfficialCard} from './GoStage2OfficialCards.js';
+import {CARD_FACE} from '../lib/goCardFace.js';
 import {figmaSprite} from '../lib/goV3Game.js';
 
 const STAGE4=process.env.NEXT_PUBLIC_MEONGGO_STAGE4_STORE_ENABLED==='1';
@@ -29,6 +29,35 @@ function cardFor(dog,slot){
  return {dogName:dog?.name||'강아지',nickname:'바로나도',title:card?.title||'공식 멍카드',
   imageUrl:card?.imageUrl||'',battle:{power:card?.power??1,charm:card?.charm??1},
   status:'approved',capturedAt:card?.acquiredAt||null,officialSlot:slot};
+}
+/** Figma 692:289316 store product art: the existing approved pixel frame, exact
+ * Figma background fills, and the unaltered exported dog silhouette vector. */
+function StoreProductPreview({mode}){
+ const specific=mode==='specific';
+ return <svg className="s2-locked-card-svg s4-store-product-art" viewBox="0 0 166 265"
+  role="img" aria-label={specific?'지정 랜덤 멍카드 상품':'전체 랜덤 멍카드 상품'}>
+  <rect x="0" y="0" width="166" height="265" fill="#fff"/>
+  <rect x="16" y="28" width="134" height="134" fill={specific?'#dde9c2':'#fef4ba'}/>
+  <image href={CARD_FACE.frame} x="0" y="0" width="166" height="265"/>
+  <g fontFamily="MonaS12,sans-serif" fill="#181713">
+   <text x="16" y="23" fontSize="7">MEONG MEONG GO!</text>
+   {specific
+    ? <image href="/meonggo/store/specific-dog-silhouette-figma-692-289657.svg"
+       x="53.18" y="69.99" width="57.46" height="55.26"/>
+    : <text x="83" y="113" textAnchor="middle" fontSize="31.533" fontWeight="700" fill="#565656">?</text>}
+   <text x="16" y="181" fontSize="12.324" fontWeight="700" fill="#727272">??</text>
+   <rect x="112" y="169" width="38" height="14.6" rx="2" fill="#e1efd1" stroke="#171713" strokeWidth=".6"/>
+   <text x="131" y="179" textAnchor="middle" fontSize="7">?</text>
+   {['파워','애교'].map((name,index)=><g key={name}>
+    <text x="16" y={208+index*19} fontSize="10">{name}</text>
+    {Array.from({length:5},(_,i)=><image key={i} href={CARD_FACE.star}
+      x={40+i*13.4} y={198+index*19} width="11.36" height="10.32"
+      style={{filter:'grayscale(1)',opacity:.55}}/>)}
+   </g>)}
+   <text x="16" y="247" fontSize="7">바로나도</text>
+   <text x="150" y="247" textAnchor="end" fontSize="7">NO.1</text>
+  </g>
+ </svg>;
 }
 export default function GoStore(){
  const {member,ready,openAccount}=useGoSession();
@@ -184,14 +213,14 @@ export default function GoStore(){
    <div className="s4-store-choices" role="group" aria-label="구매 방식">
     <button type="button"
      onClick={()=>{setSelected({mode:'random'});setCollarChoice(null);setChoiceOpen(true);}}>
-      <LockedOfficialCard slot={1} storePreview/>
+      <StoreProductPreview mode="random"/>
       <strong>랜덤 카드 뽑기</strong>
       <small>랜덤으로 멍카드를<br/>뽑을 수 있다.</small>
       <b>60 멍코인</b>
     </button>
     <button type="button"
      onClick={()=>{setSelected({mode:'specific'});setPickerNotice('');setDogPickerOpen(true);}}>
-      <LockedOfficialCard slot={1} storePreview/>
+      <StoreProductPreview mode="specific"/>
       <strong>지정 랜덤 카드 뽑기</strong>
       <small>내가 지정한 멍멍이로<br/>랜덤 멍카드를 뽑을 수 있다.</small>
       <b>100 멍코인</b>
