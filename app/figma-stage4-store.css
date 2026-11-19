@@ -376,3 +376,6 @@
 .v3-go-site .s4-store-dog-choices .s4-store-dog-tile span{color:#171713;font:700 13px/1.4 'Galmuri11',sans-serif;}
 
 .v3-go-site .s4-store-dog-choices .s4-store-dog-tile,.v3-go-site .s4-store-dog-choices .s4-store-dog-tile *{color:#171713!important;}
+
+/* Reuse the published MeongGO album pixel thumbnail as an acquired-dog silhouette. */
+.v3-go-site .s4-store-dog-choices .s4-store-acquired-silhouette{filter:brightness(0);}

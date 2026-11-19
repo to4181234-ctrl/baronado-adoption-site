@@ -16,7 +16,14 @@ PSQL=(psql -X -h "$QA_DB_HOST" -d "$DB_NAME" -v ON_ERROR_STOP=1 -q)
 SERVER="$("${PSQL[@]}" -Atqc "SELECT coalesce(inet_server_addr()::text, 'local')")"
 case "$SERVER" in
   local|127.0.0.1|::1) ;;
-  *) echo "BLOCKED nonlocal resolved DB: $SERVER" >&2; exit 5 ;;
+  *)
+    # GitHub Actions' PostgreSQL service runs on a fresh, private Docker bridge.
+    # It exposes the ephemeral database solely through the required loopback host.
+    if [[ "${GITHUB_ACTIONS:-false}" != "true" || "$QA_DB_HOST" != "127.0.0.1" ||
+          ! "$SERVER" =~ ^172\.(1[6-9]|2[0-9]|3[01])\. ]]; then
+      echo "BLOCKED nonlocal resolved DB: $SERVER" >&2; exit 5
+    fi
+    ;;
 esac
 echo "QA database: $DB_NAME (local socket, synthetic records)"
 "${PSQL[@]}" -f tests/fixtures/go-integration-schema.sql

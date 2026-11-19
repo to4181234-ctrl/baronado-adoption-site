@@ -205,7 +205,8 @@ export default function GoStore(){
       <button type="button" key={dog.dogId} onClick={()=>{
        setSelected({mode:'specific',dogId:dog.dogId});setDogPickerOpen(false);
        setCollarChoice(null);setChoiceOpen(true);
-      }} className="s4-store-dog-tile"><img src={(dog.collected>0||dog.hiddenUnlocked)?figmaSprite(dog.name,'shadow'):'/figma-v3/album-empty-collar.png'}
+      }} className="s4-store-dog-tile"><img className={(dog.collected>0||dog.hiddenUnlocked)?'s4-store-acquired-silhouette':''}
+        src={(dog.collected>0||dog.hiddenUnlocked)?(dog.thumbnailUrl||figmaSprite(dog.name,'shadow')):'/figma-v3/album-empty-collar.png'}
         alt={dog.collected>0||dog.hiddenUnlocked?`${dog.name} 수집한 강아지 실루엣`:'미획득 강아지 - 모습 미공개'} />
         <span>{dog.name}</span><small>미보유 {dog.missing}종</small></button>)}</div>}
    </section>

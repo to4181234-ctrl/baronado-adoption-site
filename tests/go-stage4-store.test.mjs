@@ -36,6 +36,6 @@ test('only unowned general cards for available and not-adopted dogs',()=>{
  const items=availableStoreItems(dogs);
  assert.deepEqual(items.map(x=>x.slot),[2,3,4]);
  assert(items.every(x=>x.dogId===dog&&x.price===300));
- assert.deepEqual(availableStoreDogs(dogs),[{dogId:dog,name:'깡지',missing:3,collected:0,hiddenUnlocked:false}]);
+ assert.deepEqual(availableStoreDogs(dogs),[{dogId:dog,name:'깡지',missing:3,collected:0,hiddenUnlocked:false,thumbnailUrl:null}]);
 });
 
