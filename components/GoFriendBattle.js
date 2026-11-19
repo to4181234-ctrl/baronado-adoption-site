@@ -322,7 +322,7 @@ export default function GoFriendBattle(){
        <span>{page+1}</span>
        <button disabled={!owned.hasMore||busy} onClick={()=>setPage(p=>p+1)}>다음</button>
       </div>}
-      <button type="button" className="meong-battle-primary" disabled={busy||!room.mySelected||room.otherConnected===false}
+      <button type="button" className="meong-battle-primary" disabled={busy||!room.mySelected}
        onClick={()=>mutate({action:'ready',roomId:room.roomId})}>
        준비 완료 · 상대와 동시 공개</button>
      </>}
