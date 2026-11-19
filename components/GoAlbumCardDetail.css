@@ -127,3 +127,9 @@
  .go-album-reveal.is-hidden>.go-element-sparkles{display:none!important}
  .go-album-detail.is-hidden .go-album-hologram::before,.go-album-detail.is-hidden .go-album-hologram::after{animation:none!important;opacity:0!important}
 }
+
+/* Clip hologram sheen to Figma card's stepped silhouette; keep ambient particles outside. */
+.go-album-detail.is-hidden .go-album-detail-card .go-album-hologram{
+ -webkit-clip-path:polygon(9% 0,91% 0,91% 1%,94% 1%,94% 2%,97% 2%,97% 4%,100% 4%,100% 96%,97% 96%,97% 98%,94% 98%,94% 99%,91% 99%,91% 100%,9% 100%,9% 99%,6% 99%,6% 98%,3% 98%,3% 96%,0 96%,0 4%,3% 4%,3% 2%,6% 2%,6% 1%,9% 1%);
+ clip-path:polygon(9% 0,91% 0,91% 1%,94% 1%,94% 2%,97% 2%,97% 4%,100% 4%,100% 96%,97% 96%,97% 98%,94% 98%,94% 99%,91% 99%,91% 100%,9% 100%,9% 99%,6% 99%,6% 98%,3% 98%,3% 96%,0 96%,0 4%,3% 4%,3% 2%,6% 2%,6% 1%,9% 1%);
+}
