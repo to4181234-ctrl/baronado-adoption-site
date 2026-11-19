@@ -24,7 +24,7 @@ export async function GET(request){
   if(setsResult.error||dogsResult.error)throw Error('official catalog');
   const sets=setsResult.data||[];
   const dogMap=new Map((dogsResult.data||[]).map(d=>[d.id,d]));
-  const [ownedResult,hiddenResult,drawResult,customResult]=member?await Promise.all([
+  const [ownedResult,hiddenResult,drawResult,attemptsResult,pendingResult,customResult]=member?await Promise.all([
    db.from('go_official_owned').select('dog_id,slot,power,charm,acquired_at,seen_at')
     .eq('member_id',member.id),
    db.from('go_official_hidden').select('dog_id,power,charm,unlocked_at,seen_at')
@@ -32,9 +32,15 @@ export async function GET(request){
    db.from('go_official_daily_draws')
     .select('dog_id,slot,duplicate,proposed_power,proposed_charm,resolved_at,created_at')
     .eq('member_id',member.id).eq('local_day',day).maybeSingle(),
-    db.rpc('go_album_photo_counts',{p_member:member.id})
-  ]):[{data:[],error:null},{data:[],error:null},{data:null,error:null},{data:[],error:null}];
-  if(ownedResult.error||hiddenResult.error||drawResult.error||customResult.error)throw Error('owned catalog');
+   db.from('go_draw_attempts').select('id')
+    .eq('member_id',member.id).eq('source_type','free').eq('local_day',day),
+   db.from('go_draw_attempts').select('id,dog_id,slot,proposed_power,proposed_charm')
+    .eq('member_id',member.id).eq('duplicate',true).is('resolved_at',null)
+    .order('created_at',{ascending:false}).limit(1).maybeSingle(),
+   db.rpc('go_album_photo_counts',{p_member:member.id})
+  ]):[{data:[],error:null},{data:[],error:null},{data:null,error:null},
+    {data:[],error:null},{data:null,error:null},{data:[],error:null}];
+  if(ownedResult.error||hiddenResult.error||drawResult.error||attemptsResult.error||pendingResult.error||customResult.error)throw Error('owned catalog');
   const owned=ownedResult.data||[],hidden=hiddenResult.data||[];
    const customCounts=new Map((customResult.data||[]).map(c=>[c.dog_id,Number(c.photo_count)||0]));
   const ownedKeys=new Set(owned.map(o=>o.dog_id+':'+o.slot));
@@ -99,11 +105,13 @@ export async function GET(request){
       unlockedAt:special?.unlocked_at||null}
    };
   }).sort((a,b)=>Number(b.collected>0)-Number(a.collected>0)||a.name.localeCompare(b.name,'ko'));
-  const currentDraw=drawResult.data;
-  return json({day,drawUsed:Boolean(currentDraw),
-    pendingDuplicate:currentDraw?.duplicate&&!currentDraw?.resolved_at?{
-      dogId:currentDraw.dog_id,slot:currentDraw.slot,
-      proposedPower:currentDraw.proposed_power,proposedCharm:currentDraw.proposed_charm
+  const drawsToday=Number(Boolean(drawResult.data))+(attemptsResult.data||[]).length;
+  const pending=pendingResult.data;
+  return json({day,drawCount:drawsToday,drawLimit:2,drawsRemaining:Math.max(0,2-drawsToday),
+    drawUsed:drawsToday>=2,
+    pendingDuplicate:pending?{
+      choiceId:pending.id,dogId:pending.dog_id,slot:pending.slot,
+      proposedPower:pending.proposed_power,proposedCharm:pending.proposed_charm
     }:null,
     dogs:catalog});
  }catch{return goError('공식 멍카드 도감을 불러오지 못했어요.',500);}
@@ -114,10 +122,11 @@ export async function POST(request){
  const member=await goMember(request);if(!member)return goError('로그인이 필요해요.',401);
  let body;try{body=await request.json();}catch{return goError('요청을 확인해주세요.');}
  let rpc,params;
- if(body?.action==='draw'){
-  rpc='go_official_draw';params={p_member:member.id};
- }else if(body?.action==='resolve'&&typeof body.replace==='boolean'){
-  rpc='go_official_resolve_duplicate';params={p_member:member.id,p_replace:body.replace};
+ if(body?.action==='draw'&&validId(body.requestId)){
+  rpc='go_official_draw_v2';params={p_member:member.id,p_request:body.requestId};
+ }else if(body?.action==='resolve'&&typeof body.replace==='boolean'&&validId(body.choiceId)){
+  rpc='go_official_resolve_duplicate_v2';
+  params={p_member:member.id,p_attempt:body.choiceId,p_replace:body.replace};
  }else if(body?.action==='seen'&&validId(body.dogId)&&Number.isInteger(body.slot)&&
   body.slot>=1&&body.slot<=5){
   rpc='go_official_mark_seen';params={p_member:member.id,p_dog:body.dogId,p_slot:body.slot};
