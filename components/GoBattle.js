@@ -172,7 +172,7 @@ function Game(){
   {!ready?<p role="status">도감을 준비하고 있어요.</p>:!member?<section className="meong-battle-login"><h2>멍배틀을 시작해볼까요?</h2><p>내 멍카드를 고르고 다른 멍기록가와 배틀해보세요!</p><button onClick={()=>openAccount('battle')}>로그인하고 시작하기</button></section>:<>
   {phase==='choose'&&<>
    <h1>멍배틀</h1><p className="meong-battle-hint">배틀에 출전할 내 멍카드를 한 장 골라주세요!</p>
-   <button className="meong-battle-start-link" disabled={selected.length!==1||mutating} onClick={goOpponents}>상대 멍기록가 찾기 &gt;</button>
+   <button className="meong-battle-start-link" disabled={selected.length!==1||mutating} onClick={goOpponents}>이 카드로 멍배틀 시작하기 →</button>
    <div className="meong-battle-tabs" role="group" aria-label="출전 카드 종류">
     <button type="button" className={kind==='official'?'active':''} aria-pressed={kind==='official'} onClick={()=>{setKind('official');setPage(0);setSearched('');setQuery('');}}>멍카드</button>
     <button type="button" className={kind==='camera'?'active':''} aria-pressed={kind==='camera'} onClick={()=>{setKind('camera');setPage(0);setSearched('');setQuery('');}}>나만의 멍카드</button>

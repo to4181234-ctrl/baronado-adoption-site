@@ -170,3 +170,34 @@
 @media(prefers-reduced-motion:reduce){
  .go-album-reveal.is-hidden.is-idle .go-album-hologram::before{animation:none!important;opacity:0!important}
 }
+
+/* HIDDEN Classic A: the approved 17×17 SVG grid, unrotated white crosses,
+   sparse cream square flecks, same 28 delays/distances as the reviewed HTML. */
+.go-album-reveal.is-hidden .go-album-hidden-burst i{
+ position:absolute;left:50%;top:50%;display:block;
+ width:var(--ray-size,25px);height:var(--ray-size,25px);
+ background:transparent!important;box-shadow:none!important;
+ filter:none!important;clip-path:none!important;
+ transform-origin:center;
+ transform:rotate(var(--ray-angle)) translateY(-18px) scale(.2);
+ animation:go-hidden-pixel-fly 1.15s steps(9,end) var(--ray-delay,700ms) both;
+}
+.go-album-reveal.is-hidden .go-album-hidden-burst i:nth-child(3n),
+.go-album-reveal.is-hidden .go-album-hidden-burst i:nth-child(5n),
+.go-album-reveal.is-hidden .go-album-hidden-burst i:nth-child(4n){
+ background:transparent!important;box-shadow:none!important;filter:none!important;clip-path:none!important;
+ width:var(--ray-size,25px);height:var(--ray-size,25px);
+}
+.go-album-reveal.is-hidden .go-album-hidden-burst svg{
+ display:block;width:100%;height:100%;overflow:visible;
+ shape-rendering:crispEdges;image-rendering:pixelated;
+ transform-origin:center;transform:rotate(var(--ray-inverse));
+ filter:none;
+}
+/* HIDDEN excludes the older rotated attribute icons: only approved crosses. */
+.go-album-reveal.is-hidden>.go-element-sparkles{display:none!important}
+/* The single approved first beam continues to loop, not the busy secondary sweep. */
+.go-album-detail.is-hidden .go-album-hologram::after{animation:none!important;opacity:0!important}
+@media(prefers-reduced-motion:reduce){
+ .go-album-reveal.is-hidden .go-album-hidden-burst i{animation:none!important;display:none!important}
+}

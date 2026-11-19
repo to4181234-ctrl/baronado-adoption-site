@@ -45,12 +45,15 @@ test('hologram is visible on immediate opening, has pixel burst, and settles to 
  const css=read('components/GoAlbumCardDetail.css');
  for(const className of ['go-hidden-aura','go-hidden-pulse','go-hidden-flash','go-album-hidden-burst','go-album-hologram'])
   assert.ok(src.includes(className),className);
- assert.match(src,/Array\.from\(\{length:28\}/);
+ assert.match(src,/GoHiddenRetroBurst/);
+ assert.match(read('components/GoHiddenRetroBurst.js'),/Array\.from\(\{length:28\}/);
  for(const key of ['go-hidden-aura-bloom','go-hidden-pulse-ring','go-hidden-holo-primary','go-hidden-center-flash','go-hidden-pixel-fly','go-hidden-holo-idle'])
   assert.match(css,new RegExp('@keyframes '+key+'\\b'),key);
  assert.match(css,/go-hidden-holo-primary 5\.8s ease-in-out 0s infinite/);
  assert.match(css,/animation:go-cinematic-reveal 1s cubic-bezier\(\.16,\.8,\.23,1\) both/);
  assert.match(css,/go-album-hidden-burst i:nth-child\(4n\)/);
+ assert.match(read('components/GoHiddenRetroBurst.js'),/viewBox="0 0 17 17"/);
+ assert.match(css,/transform:rotate\(var\(--ray-inverse\)\)/);
  assert.match(src,/isHidden&&idle\?' is-idle':'/);
  assert.match(css,/prefers-reduced-motion:reduce/);
  assert.match(css,/animation:none!important/);

@@ -4,6 +4,7 @@ import {createPortal} from 'react-dom';
 import Link from 'next/link';
 import GoCardFace from './GoCardFace.js';
 import GoElementSparkles,{elementForCard} from './GoElementSparkles.js';
+import GoHiddenRetroBurst from './GoHiddenRetroBurst.js';
 import GoSoundButton from './GoSoundButton.js';
 import {vibrateHiddenUnlock} from '../lib/goBattleHaptics.js';
 import {createCompletionSound,COMPLETION_SOUND_KEY,completionSoundEnabled} from '../lib/goCompletionSound.js';
@@ -35,15 +36,7 @@ export default function GoAlbumCardDetail({card,onClose,official=false,preparedS
     <div key={reveal} className={'go-album-reveal'+(isHidden?' is-hidden':'')+(isHidden&&idle?' is-idle':'')} data-hidden-sequence={isHidden?'hologram-reveal-v2':undefined} aria-hidden="true">
      {isHidden&&<><span className="go-hidden-aura"/><span className="go-hidden-pulse"/><span className="go-hidden-flash"/></>}
      <GoElementSparkles element={elementForCard(card)} variant="cinematic"/>
-     {isHidden&&<div className="go-album-hidden-burst">
-      {Array.from({length:28},(_,i)=><i key={i} style={{
-       '--ray-angle':(i*360/28)+'deg',
-       '--ray-distance':(118+(i%6)*14)+'px',
-       '--ray-size':(14+(i%3)*5)+'px',
-       '--ray-dot-size':(4+(i%3)*2)+'px',
-       '--ray-delay':(640+(i%5)*56)+'ms'
-      }}/>)}
-     </div>}
+     {isHidden&&<GoHiddenRetroBurst/>}
      <div className="go-album-detail-card"><GoCardFace card={card}/>{isHidden&&<span className="go-album-hologram"/>}</div>
     </div>
    </div>

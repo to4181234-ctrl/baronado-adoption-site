@@ -371,3 +371,16 @@
  .v3-battle-entry .v3-pixel-panel{container-type:inline-size}
  .v3-battle-entry .v10-panel-canvas{transform:scale(calc(100cqw / 356px))}
 }
+
+/* Keep the original position; search-input shade and border, no extra copy. */
+.meong-battle-phase-choose .meong-battle-start-link{
+ display:inline-flex;align-items:center;justify-content:center;
+ width:auto;max-width:100%;min-height:44px;
+ margin:0 0 13px;padding:9px 14px;
+ background:#faf9f5;border:1px solid #e0e0d9;border-radius:4px;
+ color:#181713;font-size:14px!important;font-weight:700!important;
+ line-height:24px;letter-spacing:0!important;text-align:center;
+}
+.meong-battle-phase-choose .meong-battle-start-link:disabled{
+ opacity:.6;color:#817b70;cursor:not-allowed;
+}
