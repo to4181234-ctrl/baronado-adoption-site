@@ -111,7 +111,6 @@ function OfficialEditor(){
  const uploadedCount=draft?.assets.length??0;
  return <main className="site-shell v3-site v10-admin-cards"><SiteHeader/>
    <section className="v10-admin-content go-official-admin">
-    <Link className="v10-admin-back" href="/admin/menu">‹ 관리 메뉴</Link>
     <header className="v10-admin-heading"><p><Link href="/admin/go/pixels">돌보기·대표 썸네일 픽셀 등록 및 공개 관리 ›</Link></p>
     <h1>공식 멍카드 관리</h1>
       <p>사용자 제작 카드 관리와 별도로, 강아지별 공식 사진 4종 + HIDDEN 일러스트를 등록해요.</p></header>
