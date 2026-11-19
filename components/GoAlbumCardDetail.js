@@ -8,13 +8,13 @@ import GoSoundButton from './GoSoundButton.js';
 import {createCompletionSound,COMPLETION_SOUND_KEY,completionSoundEnabled} from '../lib/goCompletionSound.js';
 import './GoAlbumCardDetail.css';
 /** Figma 681:291113 (normal), 681:289438 (hidden), 681:291996 (custom). */
-export default function GoAlbumCardDetail({card,onClose,official=false}){
+export default function GoAlbumCardDetail({card,onClose,official=false,preparedSound=null}){
  const audio=useRef(null),[muted,setMuted]=useState(false),[reveal,setReveal]=useState(0);
  const close=useRef(null);
  useEffect(()=>{
   const previous=document.activeElement;const overflow=document.body.style.overflow;
   document.body.style.overflow='hidden';close.current?.focus({preventScroll:true});
-  const player=createCompletionSound();audio.current=player;
+  const player=preparedSound||createCompletionSound();audio.current=player;
   let on=true;try{on=completionSoundEnabled(localStorage.getItem(COMPLETION_SOUND_KEY));}catch{}
   setMuted(!on);if(on){player.prepare();player.play();}
   return()=>{player.dispose();audio.current=null;document.body.style.overflow=overflow;previous?.focus?.({preventScroll:true});};

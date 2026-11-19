@@ -36,7 +36,7 @@ test('official and HIDDEN cards support sorting and owner-only atomic bulk delet
 test('all personal album categories launch same approved Figma detail popup and sound',()=>{
  const component=read('components/GoAlbumCardDetail.js'),custom=read('components/GoDogAlbum.js'),official=read('components/GoStage2OfficialCards.js');
  assert.match(custom,/albumView=\{!selectionMode\}/);assert.match(official,/GoAlbumCardDetail official/);
- assert.match(component,/GoElementSparkles/);assert.match(component,/createCompletionSound/);
+ assert.match(component,/GoElementSparkles/);assert.match(component,/createCompletionSound/);assert.match(component,/preparedSound\|\|createCompletionSound/);assert.match(read('components/GoCard.js'),/onClick=\{openAlbumDetail\}/);assert.match(official,/prepareDetailSound\(\)/);
  assert.match(component,/모두의 도감에서 보기/);assert.match(component,/GoSoundButton/);
 });
 test('HIDDEN uses source Figma hologram pixel asset, not approximate gradient',()=>{

@@ -1,9 +1,10 @@
 'use client';
 
-import {useCallback,useEffect,useState} from 'react';
+import {useCallback,useEffect,useRef,useState} from 'react';
 import GoCardFace from './GoCardFace.js';
 import GoAlbumCardDetail from './GoAlbumCardDetail.js';
 import {CARD_FACE} from '../lib/goCardFace.js';
+import {createCompletionSound,completionSoundEnabled,COMPLETION_SOUND_KEY} from '../lib/goCompletionSound.js';
 
 export function LockedOfficialCard({slot,hidden=false,unlockable=false,storePreview=false}) {
   return <svg className="s2-locked-card-svg" viewBox="0 0 166 265" role="img"
@@ -49,6 +50,9 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
   const [selectedSlots,setSelectedSlots]=useState([]);
   const [sortOrder,setSortOrder]=useState('newest');
   const [confirmDelete,setConfirmDelete]=useState(false);
+  const detailSound=useRef(null);
+  useEffect(()=>()=>{detailSound.current?.dispose();},[]);
+  function prepareDetailSound(){const player=createCompletionSound();detailSound.current=player;let enabled=true;try{enabled=completionSoundEnabled(localStorage.getItem(COMPLETION_SOUND_KEY));}catch{}if(enabled)player.prepare();}
 
   const refresh=useCallback(async()=>{
     if(!FEATURE_ENABLED){setLoading(false);onCatalogLoaded?.(null);return;}
@@ -80,6 +84,7 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
     if(!member){openAccount();return;}
     const card=dog?.slots?.find(item=>item.slot===slot);
     if(!card?.owned)return;
+    prepareDetailSound();
     setOpened({slot,card});setError('');setHiddenJustUnlocked(false);
     if(card.new){
       try{await request({action:'seen',dogId,slot});await refresh();}
@@ -91,6 +96,7 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
     if(!member){openAccount();return;}
     if(!dog)return;
     if(dog.hidden?.unlocked){
+      prepareDetailSound();
       setOpened({slot:HIDDEN_SLOT,card:dog.hidden});setError('');
       if(dog.hidden.new){
         try{await request({action:'seen',dogId,slot:HIDDEN_SLOT});await refresh();}
@@ -100,12 +106,13 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
     }
     if(dog.collected!==NORMAL_COUNT||busy)return;
     setBusy(true);setError('');
+    prepareDetailSound();
     try{
       const outcome=await request({action:'unlockHidden',dogId});
       setHiddenJustUnlocked(Boolean(outcome.new));
       await refresh();
       setOpened({slot:HIDDEN_SLOT,card:null});
-    }catch(e){setError(e.message||'히든 카드 해금에 실패했어요.');}
+    }catch(e){detailSound.current?.dispose();detailSound.current=null;setError(e.message||'히든 카드 해금에 실패했어요.');}
     finally{setBusy(false);}
   }
 
@@ -198,11 +205,11 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
       </section>
     </div>}
     <p className="s2-official-help">{!dog?'':acquired?'히든 카드 해금 완료':unlockable?'일반 멍카드 4종을 모았어요. HIDDEN 카드를 눌러 해금하세요.':'일반 멍카드 4종을 모으면 HIDDEN 카드를 열 수 있어요.'}</p>
-    {hiddenJustUnlocked&&hiddenImage&&<GoAlbumCardDetail official
+    {hiddenJustUnlocked&&hiddenImage&&<GoAlbumCardDetail official preparedSound={detailSound.current}
       card={{...officialFace(HIDDEN_SLOT,hidden),status:'approved'}}
-      onClose={()=>{setOpened(null);setHiddenJustUnlocked(false);}}/>}
-    {opened&&openedData?.imageUrl&&!hiddenJustUnlocked&&<GoAlbumCardDetail official
+      onClose={()=>{setOpened(null);setHiddenJustUnlocked(false);detailSound.current=null;}}/>}
+    {opened&&openedData?.imageUrl&&!hiddenJustUnlocked&&<GoAlbumCardDetail official preparedSound={detailSound.current}
       card={{...officialFace(opened.slot,openedData),status:'approved'}}
-      onClose={()=>{setOpened(null);setHiddenJustUnlocked(false);}}/>}
+      onClose={()=>{setOpened(null);setHiddenJustUnlocked(false);detailSound.current=null;}}/>}
   </div>;
 }
