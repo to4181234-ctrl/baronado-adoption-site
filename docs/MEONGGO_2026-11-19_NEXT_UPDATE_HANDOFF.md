@@ -130,6 +130,19 @@
 - **운영 데이터 백업:** 신규 최신 백업을 만들거나 복원 검증하지 못함. 이미 존재하는 사전 업데이트 마이그레이션이나 메타데이터 체크섬을 백업으로 오해하지 말 것.
 - **운영 코드/DB 상태:** 일체 수정하지 않음. 아래 현황 보고와 구분하여 '1단계 완전 완료'라고 표시하지 말 것.
 
+## 2단계 검토용 개발 업데이트 — 2026-11-19
+
+**기능·SQL 초안은 개발 브랜치에 커밋했으나, 운영에는 미적용. 실제 DB·통합 테스트 미실시.**
+
+- 핵심 변경 내역과 검증 한계: `docs/MEONGGO_STAGE2_PROGRESS_20261119.md`.
+- 독립 검증 전 **절대 실행하지 않을 단일 SQL**: `docs/sql/MEONGGO_NEXT_ECONOMY_DRAFT.sql`.
+- 2단계 소스: `lib/goNextEconomyRules.js`, `lib/goStore.js`, `lib/goStage3Quests.js`, `components/GoCoins.js`, `components/GoFreeDraw.js`, `components/GoStore.js`, `components/GoQuests.js`, `app/api/go/official/route.js`, `app/api/go/store/route.js`, `app/api/go/coins/route.js`.
+- 테스트 추가: `tests/goNextEconomy.test.mjs`, `tests/goNextEconomyContract.test.mjs`.
+- 실행한 제한 검증: GitHub 순수 규칙 코드 14개 검사 통과, SQL/API 정적 확인 17개 통과, 비-JSX API JS 문법 검사 5개 통과. 실제 Next.js 빌드나 PostgreSQL 컴파일 테스트와 **동일시하지 말 것**.
+- 최신 확정된 시각 디자인(스토어 이미지, 목줄 10% 확대, 0.7/0.95s 뽑기, READY 이동 및 상태 박스, 카드 노란 선택 배경, 충돌 중 흔들림, 상대 보유 카드 수 제거)은 **3단계 구현 대기**.
+- **독립 테스트 DB는 유료 Supabase 비용을 사용자가 거절했으므로 미생성.** 운영 DB에 테스트 SQL을 실행해서 대체하지 말 것.
+- 다음 단계는 3단계 UI 구현 또는 무료 DB 실행 환경 확보 후 2단계 SQL 검증. 운영 배포는 별도 최종 승인 필요.
+
 ## F. 다음 작업자의 출발점
 
 1. 이 문서 및 사용자가 확정한 Figma 스크린샷을 먼저 읽는다.
