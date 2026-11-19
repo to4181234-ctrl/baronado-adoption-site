@@ -97,4 +97,4 @@
 
 /* 2026-11-19: selected card is the yellow visual indicator, never checkmark/선택. */
 .v3-go-site .v5-card-grid .go-bulk-check,.v3-go-site .v5-card-grid .go-bulk-check::after{display:none!important;content:none!important;}
-.v3-go-site .v5-card-grid .go-bulk-card-choice[aria-pressed='true'] .go-card{background:#f8dc65!important;box-shadow:inset 0 0 0 3px #c5a448!important;}
+.v3-go-site .v5-card-grid .go-bulk-card-choice[aria-pressed='true'] .go-card{background:#f8dc65!important;box-shadow:none!important;}
