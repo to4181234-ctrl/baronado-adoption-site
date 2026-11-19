@@ -34,9 +34,9 @@ test('specific store picker uses official OR personal ownership and includes a c
  const base={available:true,publishedComplete:true,adopted:false,thumbnailUrl:'sprite'};
  const cards=owned=>[1,2,3,4].map(slot=>({slot,owned}));
  const result=availableStoreDogs([
-  {...base,dogId:'1',name:'버디',collected:4,personalCount:0,slots:cards(true)},
-  {...base,dogId:'2',name:'뽀실',collected:0,personalCount:1,slots:cards(false)},
-  {...base,dogId:'3',name:'깡지',collected:0,personalCount:0,slots:cards(false)},
+  {...base,dogId:'1',name:'버디',collected:4,missing:0,personalCount:0,slots:cards(true)},
+  {...base,dogId:'2',name:'뽀실',collected:0,missing:4,personalCount:1,slots:cards(false)},
+  {...base,dogId:'3',name:'깡지',collected:0,missing:4,personalCount:0,slots:cards(false)},
   {...base,dogId:'4',name:'오레오',adopted:true,slots:cards(false)}
  ]);
  assert.equal(result.length,3);

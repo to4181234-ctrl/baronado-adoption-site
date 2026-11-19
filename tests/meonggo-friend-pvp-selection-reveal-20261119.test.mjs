@@ -3,23 +3,22 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 
-test('1:1 selected card gets the same visible 3px yellow border as random battle',()=>{
+test('1:1 uses the album yellow inner card background without gold rectangle',()=>{
  const css=read('components/GoFriendBattle.css');
- const random=read('components/GoBattle.css');
  const jsx=read('components/GoFriendBattle.js');
- assert.match(random,/is-picked:after\{content:"";position:absolute;inset:0;border:3px solid #fade40/);
- assert.match(css,/friend-pvp-card\.is-selected:after\{content:'';position:absolute;left:0;top:0;width:100%;aspect-ratio:166\/265;border:3px solid #fade40/);
- assert.doesNotMatch(css,/inset:-5px -5px 35px/);
+ const card=read('components/GoCardFace.js');
+ assert.match(css,/:after\{content:none\}/);
+ assert.match(card,/fill="#f8dc65"/);
  assert.match(jsx,/aria-pressed=\{selected\}/);
- assert.match(jsx,/selected=\{selectedKey\(room\.myCard\)===selectedKey\(card\)\}/);
+ assert.match(jsx,/GoCardFace card=\{face\(card\)\} selected=\{selected\}/);
 });
-
-test('1:1 duplicate selected-card summary is gone; ready status is still visible',()=>{
+test('card selection does not mark READY until explicit server confirmation',()=>{
  const jsx=read('components/GoFriendBattle.js'),css=read('components/GoFriendBattle.css');
  assert.doesNotMatch(jsx,/className="friend-pvp-current"/);
  assert.doesNotMatch(css,/\.friend-pvp-current/);
  assert.match(jsx,/friend-pvp-ready-state/);
- assert.match(jsx,/room\.mySelected\?'카드 선택 완료'/);
+ assert.match(jsx,/room\.myReady\?'✓ 준비 완료':'준비 전'/);
+ assert.doesNotMatch(jsx,/room\.mySelected\?'카드 선택 완료'/);
  assert.match(jsx,/onClick=\{\(\)=>mutate\(\{action:'ready',roomId:room\.roomId\}\)\}/);
 });
 

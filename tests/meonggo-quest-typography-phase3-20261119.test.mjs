@@ -9,9 +9,10 @@ test('Figma 558:466129: all quest captions use Galmuri11 Regular, 10px/15.5px an
  assert.equal((css.match(/\.go-quest-description\{/g)||[]).length,1,'only one canonical full-page caption rule');
 });
 
-test('all 4 quest captions map through one shared component class',()=>{
+test('remaining 3 coin-quest captions map through one shared component class',()=>{
  const jsx=read('components/GoQuests.js');
- for(const title of ['바로나도에 놀러왔개','멍멍이 만나러가기','랜덤 멍카드 뽑기','멍배틀 하기'])assert.ok(jsx.includes(title),title);
+ for(const title of ['바로나도에 놀러왔개','멍멍이 만나러가기','멍배틀 하기'])assert.ok(jsx.includes(title),title);
+ assert.doesNotMatch(jsx,/id: 'draw'/);
  assert.match(jsx,/tasks\.map\(task => <article[\s\S]*?<small className="go-quest-description">\{task\.caption\}<\/small>/);
  assert.equal((jsx.match(/className="go-quest-description"/g)||[]).length,1);
 });
