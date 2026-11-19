@@ -15,7 +15,7 @@ async function permitted(request,modify=false){
 const slug=(dog,kind)=>`${dog}/pixel/${kind}/${randomUUID()}.png`;
 async function load(db){
  const [dogs,pixels,sets,assets]=await Promise.all([
-  db.from('dogs').select('id,name,adopted').eq('category','adoption').order('name'),
+  db.from('dogs').select('id,name,adopted,created_at').eq('category','adoption').order('name'),
   db.from('go_dog_pixel_assets').select('dog_id,care_path,thumbnail_path,is_published,legacy_existing,updated_at'),
   db.from('go_official_sets').select('dog_id,current_version'),
   db.from('go_official_assets').select('version_id,slot,title,display_path')
@@ -26,7 +26,7 @@ async function load(db){
  const rows=(dogs.data||[]).map(d=>{
   const px=catalog.get(d.id)||{};const set=setMap.get(d.id);
   const slots=new Set((assets.data||[]).filter(a=>a.version_id===set?.current_version&&a.slot>=1&&a.slot<=5&&a.display_path&&(a.title?.trim()||px.legacy_existing)).map(a=>a.slot));
-  return {dogId:d.id,name:d.name,adopted:d.adopted,carePath:px.care_path||null,thumbnailPath:px.thumbnail_path||null,
+  return {dogId:d.id,name:d.name,adopted:d.adopted,createdAt:d.created_at||null,carePath:px.care_path||null,thumbnailPath:px.thumbnail_path||null,
    published:!!px.is_published,officialReady:slots.size===5,ready:!!px.is_published&&slots.size===5&&!!px.care_path&&!!px.thumbnail_path,updatedAt:px.updated_at||null};
  });
  const paths=rows.flatMap(row=>[row.carePath,row.thumbnailPath].filter(Boolean));

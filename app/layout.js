@@ -45,3 +45,4 @@ import './figma-stage5-battle.css';
 import './figma-prelaunch-quests.css';
 import './meonggo-stage1.css';
 import './figma-stage11-public-profile.css';
+import './meonggo2-pending-revisions.css';

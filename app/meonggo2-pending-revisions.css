@@ -1,0 +1,16 @@
+/* Approved MeongGO 2.0 corrections. Original Figma artwork and fonts remain unchanged. */
+.v3-go-site .v3-album-figma .v3-collection-tile.is-adopted{position:relative;background:#e5e5e5!important;color:#777!important;opacity:1}
+.v3-go-site .v3-album-figma .v3-collection-tile.is-adopted img{filter:grayscale(1) brightness(.9);opacity:.72}
+.v3-go-site .v3-album-figma .v3-collection-tile.is-adopted strong{color:#777}
+.v3-collection-adopted-label{font:400 9px/1.2 'Galmuri11',sans-serif;color:#858585;white-space:nowrap}
+.v3-go-site .v3-collection-expand{display:block;margin:12px 0 0;padding:4px 0;border:0;background:transparent;color:#929292;font:400 11px/1.4 'Galmuri11',sans-serif;text-align:left;cursor:pointer}
+.v3-go-site .v3-collection-expand:focus-visible{outline:2px solid #171713;outline-offset:3px}
+.go-pixel-admin-controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:20px 0}
+.go-pixel-admin-controls [role=group]{display:flex;flex-wrap:wrap;gap:6px}
+.go-pixel-admin-controls button,.go-pixel-admin-controls select{background:#fff;border:1px solid #ddd8cf;border-radius:7px;padding:9px 12px;font:500 13px/1.4 'Pretendard',sans-serif;color:#222;cursor:pointer}
+.go-pixel-admin-controls button[aria-pressed=true]{background:#f8df6d;border-color:#d4b944}
+.go-pixel-admin-controls label{display:flex;gap:8px;align-items:center;font:400 12px/1.5 'Pretendard',sans-serif;color:#666}
+.go-pixel-adoption-tag{display:inline-block;vertical-align:middle;margin-left:8px;padding:4px 7px;border-radius:5px;background:#f3f3f3;color:#777;font:500 11px/1.3 'Pretendard',sans-serif}
+.v3-go-site .go-quest-page .go-quest-item>div:first-child>small{font-family:'Galmuri11',sans-serif!important;font-size:11px!important;font-weight:400!important;line-height:1.45!important;letter-spacing:0!important;white-space:normal}
+.v3-go-site .go-quest-page .go-quest-item.is-complete small{color:#b5b5b5!important}
+@media(max-width:360px){.go-pixel-admin-controls{align-items:flex-start;flex-direction:column}}
