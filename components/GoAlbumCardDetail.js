@@ -6,6 +6,7 @@ import GoCardFace from './GoCardFace.js';
 import GoElementSparkles,{elementForCard} from './GoElementSparkles.js';
 import GoSoundButton from './GoSoundButton.js';
 import {vibrateHiddenUnlock} from '../lib/goBattleHaptics.js';
+import {HIDDEN_PIXEL_PARTICLES,HIDDEN_PIXEL_SPRITES} from '../lib/goHiddenPixelParticles.js';
 import {createCompletionSound,COMPLETION_SOUND_KEY,completionSoundEnabled} from '../lib/goCompletionSound.js';
 import './GoAlbumCardDetail.css';
 /** Figma 681:291113 (normal), 681:289438 (hidden), 681:291996 (custom). */
@@ -34,13 +35,18 @@ export default function GoAlbumCardDetail({card,onClose,official=false,preparedS
     <div key={reveal} className={'go-album-reveal'+(isHidden?' is-hidden':'')} data-hidden-sequence={isHidden?'hologram-reveal-v2':undefined} aria-hidden="true">
      {isHidden&&<><span className="go-hidden-aura"/><span className="go-hidden-pulse"/><span className="go-hidden-flash"/></>}
      <GoElementSparkles element={elementForCard(card)} variant="cinematic"/>
-     {isHidden&&<div className="go-album-hidden-burst">
-      {Array.from({length:28},(_,i)=><i key={i} style={{
-       '--ray-angle':(i*360/28)+'deg',
-       '--ray-distance':(118+(i%6)*14)+'px',
-       '--ray-size':(5+(i%3)*2)+'px',
-       '--ray-delay':(640+(i%5)*56)+'ms'
-      }}/>)}
+     {isHidden&&<div className="go-album-hidden-burst" data-particle-style="pixel-mix-b45-c35-a20">
+      {HIDDEN_PIXEL_PARTICLES.map(particle=><i key={particle.id} className={'go-hidden-pixel-'+particle.type} style={{
+       '--ray-angle':particle.angle,
+       '--ray-distance':particle.distance,
+       '--ray-size':particle.size,
+       '--ray-delay':particle.delay,
+       '--sparkle-glow':particle.colors[1]
+      }}>
+       <svg viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg" shapeRendering="crispEdges" focusable="false" aria-hidden="true">
+        {HIDDEN_PIXEL_SPRITES[particle.type].map((path,tone)=><path key={tone} d={path} fill={particle.colors[tone]}/>)}
+       </svg>
+      </i>)}
      </div>}
      <div className="go-album-detail-card"><GoCardFace card={card}/>{isHidden&&<span className="go-album-hologram"/>}</div>
     </div>
