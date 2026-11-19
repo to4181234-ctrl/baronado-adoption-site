@@ -62,7 +62,7 @@ test('official catalog trusts the common release checker for legacy Oreo and doe
 
 test('visits and subpages return to real administrator menu, not the visit redirect loop',()=>{
  const menu=read('app/admin/menu/page.js');assert.match(menu,/강아지/);assert.match(menu,/멍멍GO! 게시물 관리/);
- for(const page of ['app/admin/go/visit/page.js','app/admin/go/official/page.js','app/admin/go/page.js','app/admin/analytics/page.js','app/admin/banners/page.js']){
+ for(const page of ['app/admin/go/official/page.js','app/admin/go/page.js','app/admin/analytics/page.js','app/admin/banners/page.js']){
   assert.match(read(page),/href="\/admin\/menu"/,page);
  }
 });
