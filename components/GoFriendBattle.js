@@ -298,7 +298,7 @@ export default function GoFriendBattle(){
       <p>연결되면 양쪽 모두 카드를 다시 준비해야 해요. 지금은 코인과 전적이 기록되지 않아요.</p>
      </div>}
      <p className="friend-pvp-clock">준비 남은 시간: <strong>{Math.floor(remaining/60)}:{String(remaining%60).padStart(2,'0')}</strong></p>
-     <div className="friend-pvp-ready-state" aria-label="양측 준비 완료 상태">
+     <div className="friend-pvp-ready-state" aria-label="양측 준비 상태">
       <span className={room.myReady?'is-ready':''}>나 {room.myReady?'✓ 준비 완료':'준비 전'}</span>
       <span className={room.otherReady?'is-ready':''}>친구 {room.otherReady?'✓ 준비 완료':'준비 전'}</span>
      </div>
