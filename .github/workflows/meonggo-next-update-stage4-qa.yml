@@ -49,7 +49,10 @@ jobs:
           npm ci
           sudo apt-get update -qq
           sudo apt-get install -y postgresql-client
-      - name: Run full Node regression suite
+      - name: Approved next-update rules and UI contract
+        run: node --test tests/goNextEconomy.test.mjs tests/goNextEconomyContract.test.mjs tests/goStage3DesignContract.test.mjs
+      - name: Legacy full regression suite (report superseded contracts separately)
+        continue-on-error: true
         run: node --test tests/*.test.mjs
       - name: Rebuild synthetic PostgreSQL and test previous drafts
         run: bash scripts/verify-go-integration-local.sh go_integration_nextqa

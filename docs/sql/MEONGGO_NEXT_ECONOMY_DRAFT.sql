@@ -474,7 +474,7 @@ BEGIN
   RETURN jsonb_build_object('ok',true,'status','waiting-rematch');
  END IF;
  RETURN jsonb_build_object('ok',false,'error','지원하지 않는 대결 작업이에요.');
-END;$function$
+END;$function$;
 
 
 COMMIT;
