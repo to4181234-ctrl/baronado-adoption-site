@@ -18,7 +18,7 @@ done
 if [ "$ready" -ne 1 ]; then
  echo 'Local Next.js did not start successfully'; tail -80 "$log"; exit 1
 fi
-for path in /go /go/quests /go/battle '/go/battle?mode=random' '/go/battle?mode=friend'; do
+for path in /go /go/quests /go/battle '/go/battle?mode=random' '/go/battle?mode=friend' /admin/go/visit /admin/go /admin/go/stats /admin/dogs /admin/analytics; do
  status="$(curl --noproxy '*' --silent --output /dev/null --write-out '%{http_code}' "http://$HOST:$PORT$path")"
  if [ "$status" != 200 ]; then
   echo "HTTP smoke failed: $path returned $status"; tail -60 "$log"; exit 1
