@@ -27,13 +27,15 @@ function dbFixture(){
   go_official_hidden:[{member_id:member.id,dog_id:dog,power:5,charm:2,unlocked_at:'2026-11-18T03:00:00Z'}],
   dogs:[{id:dog,name:'뽀실'}],
   go_official_sets:[{dog_id:dog,current_version:'aaaa'}],
-  go_official_assets:[{version_id:'aaaa',slot:2,title:'평범한 공식 카드',display_path:'official/2.png'},{version_id:'aaaa',slot:5,title:'특별 HIDDEN',display_path:'official/5.png'}]
+  go_dog_pixel_assets:[{dog_id:dog,care_path:'care.png',thumbnail_path:'cover.png',is_published:true}],
+  go_official_assets:[...([1,3,4].map(slot=>({version_id:'aaaa',slot,title:'공식 카드 '+slot,display_path:'official/'+slot+'.png'}))),{version_id:'aaaa',slot:2,title:'평범한 공식 카드',display_path:'official/2.png'},{version_id:'aaaa',slot:5,title:'특별 HIDDEN',display_path:'official/5.png'}]
  };
  return {
   from(name){
    let rows=[...(data[name]||[])];
    const query={
     select(){return query;},
+    not(key,op,value){rows=rows.filter(r=>r[key]!==null);return query;},
     eq(key,value){rows=rows.filter(r=>r[key]===value);return query;},
     in(key,values){rows=rows.filter(r=>values.includes(r[key]));return query;},
     maybeSingle(){return Promise.resolve({data:rows[0]||null,error:null});},
