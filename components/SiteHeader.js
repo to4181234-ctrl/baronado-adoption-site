@@ -27,6 +27,7 @@ export default function SiteHeader({member=null,onLogout=null,onLogin=null}){
   {inAdmin&&<nav className="v10-admin-global-nav" aria-label="관리 기능 이동">
     {[
       ['/admin/go/visit','방문 인증'],
+      ['/admin/menu','관리 메뉴'],
       ['/admin/dogs?category=adoption','강아지 관리'],
       ['/admin/go','게시물 관리'],
       ['/admin/go/official','공식 멍카드'],

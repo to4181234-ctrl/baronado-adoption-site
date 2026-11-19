@@ -14,7 +14,7 @@ test('historical cards stay viewable in both own album and public archive despit
 test('administrator retains visit landing and navigation to every management area',()=>{
  const home=read('app/admin/page.js'),header=read('components/SiteHeader.js'),css=read('app/figma-stage10-final.css');
  assert.match(home,/redirect\('\/admin\/go\/visit'\)/);
- for(const link of ['/admin/go/visit','/admin/dogs?category=adoption','/admin/go','/admin/go/official','/admin/go/pixels','/admin/banners','/admin/analytics'])assert.ok(header.includes(link),link);
+ for(const link of ['/admin/go/visit','/admin/menu','/admin/dogs?category=adoption','/admin/go','/admin/go/official','/admin/go/pixels','/admin/banners','/admin/analytics'])assert.ok(header.includes(link),link);
  assert.match(css,/v10-admin-global-nav/);
 });
 test('existing approved Figma pixel assets exist for all original five dogs',()=>{
@@ -58,4 +58,11 @@ test('official catalog trusts the common release checker for legacy Oreo and doe
  const code=read('app/api/go/official/route.js');
  assert.match(code,/completeSets=eligibleSets.filter\(set=>released.has\(set.dog_id\)\)/);
  assert.doesNotMatch(code,/a\.title\?\.trim\(\)\&\&a\.display_path/);
+});
+
+test('visits and subpages return to real administrator menu, not the visit redirect loop',()=>{
+ const menu=read('app/admin/menu/page.js');assert.match(menu,/강아지/);assert.match(menu,/멍멍GO! 게시물 관리/);
+ for(const page of ['app/admin/go/visit/page.js','app/admin/go/official/page.js','app/admin/go/page.js','app/admin/analytics/page.js','app/admin/banners/page.js']){
+  assert.match(read(page),/href="\/admin\/menu"/,page);
+ }
 });

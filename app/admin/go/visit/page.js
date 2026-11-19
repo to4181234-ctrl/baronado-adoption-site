@@ -64,7 +64,7 @@ function VisitReview(){
   const rows=result.requests||[];
   return <main className="site-shell v3-site v10-admin-cards"><SiteHeader/>
     <section className="v10-admin-content">
-      <Link className="v10-admin-back" href="/admin">‹ 관리 메뉴</Link>
+      <Link className="v10-admin-back" href="/admin/menu">‹ 관리 메뉴</Link>
       <header className="v10-admin-heading"><h1>방문 인증 관리</h1>
         <p>현장에서 음료 구매를 확인한 후 멍코인 30C를 승인해 주세요.</p>
       </header>
