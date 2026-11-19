@@ -59,6 +59,10 @@ jobs:
       - name: Compile next-update economy draft ONLY in synthetic PostgreSQL
         run: |
           psql -X -h 127.0.0.1 -d go_integration_nextqa -v ON_ERROR_STOP=1 -f docs/sql/MEONGGO_NEXT_ECONOMY_DRAFT.sql
+      - name: Verify new economy SQL is repeatable and exercise isolated transactional flows
+        run: |
+          psql -X -h 127.0.0.1 -d go_integration_nextqa -v ON_ERROR_STOP=1 -f docs/sql/MEONGGO_NEXT_ECONOMY_DRAFT.sql
+          psql -X -h 127.0.0.1 -d go_integration_nextqa -v ON_ERROR_STOP=1 -f tests/fixtures/go-next-economy-assert.sql
       - name: Build Next.js with game feature flags enabled
         env:
           NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED: '1'
