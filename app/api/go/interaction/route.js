@@ -1,5 +1,6 @@
 import {dogReleased} from '../../../../lib/server/goDogRelease.js';
 import {GO_OFFICIAL_BUCKET} from '../../../../lib/goOfficial.js';
+import {pixelImageUrls} from '../../../../lib/server/goPixelUrls.js';
 import {interactionProcedure} from '../../../../lib/goStage3Quests.js';
 import {adminDatabase,validId} from '../../../../lib/server/adminData.js';
 import {goMember,goError,goMutationAllowed} from '../../../../lib/server/goAuth.js';
@@ -27,9 +28,9 @@ export async function GET(request){
   const daily=(history.data||[]).filter(x=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(x.created_at))===date);
   const pixel=await db.from('go_dog_pixel_assets').select('care_path').eq('dog_id',id).maybeSingle();
   if(pixel.error||!pixel.data?.care_path)throw Error('care sprite');
-  const signed=await db.storage.from(GO_OFFICIAL_BUCKET).createSignedUrl(pixel.data.care_path,1800);
-  if(signed.error)throw signed.error;
-  return Response.json({careUrl:signed.data?.signedUrl||null,level:affinity.data?.level||0,owned:Boolean(owned.data?.length||official.data?.length||hidden.data?.length),canInteract:true,actions:Object.fromEntries(actions.map(action=>{const rows=daily.filter(x=>x.action===action);return [action,{remaining:Math.max(0,2-rows.length),nextAt:rows.length&&Date.now()-new Date(rows[0].created_at).getTime()<1800000?new Date(new Date(rows[0].created_at).getTime()+1800000).toISOString():null}]}))},{headers:{'Cache-Control':'no-store'}});
+  const urls=await pixelImageUrls(db,GO_OFFICIAL_BUCKET,[pixel.data.care_path],1800);
+  if(!urls.get(pixel.data.care_path))throw Error('care sprite URL');
+  return Response.json({careUrl:urls.get(pixel.data.care_path),level:affinity.data?.level||0,owned:Boolean(owned.data?.length||official.data?.length||hidden.data?.length),canInteract:true,actions:Object.fromEntries(actions.map(action=>{const rows=daily.filter(x=>x.action===action);return [action,{remaining:Math.max(0,2-rows.length),nextAt:rows.length&&Date.now()-new Date(rows[0].created_at).getTime()<1800000?new Date(new Date(rows[0].created_at).getTime()+1800000).toISOString():null}]}))},{headers:{'Cache-Control':'no-store'}});
  }catch{return goError('교감 상태를 불러오지 못했어요.',500);}
 }
 export async function POST(request){

@@ -3,6 +3,7 @@ import { goError,goMember,goMutationAllowed } from '../../../../lib/server/goAut
 import { koreaDay } from '../../../../lib/goCoins.js';
 import { GO_OFFICIAL_BUCKET,goStage2ServerEnabled } from '../../../../lib/goOfficial.js';
 import {releasedDogs} from '../../../../lib/server/goDogRelease.js';
+import {pixelImageUrls} from '../../../../lib/server/goPixelUrls.js';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const headers={'Cache-Control':'no-store'};
@@ -74,10 +75,7 @@ export async function GET(request){
     {title:asset.title,imageUrl:signed.data?.[index]?.signedUrl||''}
   ]));
   const thumbnailPaths=completeSets.map(s=>released.get(s.dog_id)?.thumbnail_path).filter(Boolean);
-  const thumbnailSigned=thumbnailPaths.length?await db.storage.from(GO_OFFICIAL_BUCKET)
-    .createSignedUrls(thumbnailPaths,1800):{data:[],error:null};
-  if(thumbnailSigned.error)throw thumbnailSigned.error;
-  const thumbUrls=new Map(thumbnailPaths.map((path,index)=>[path,thumbnailSigned.data?.[index]?.signedUrl||'']));
+  const thumbUrls=await pixelImageUrls(db,GO_OFFICIAL_BUCKET,thumbnailPaths,1800);
   const photoThumbs=new Map(completeSets.map(s=>[s.dog_id,thumbUrls.get(released.get(s.dog_id)?.thumbnail_path)||'']));
   const catalog=completeSets.map(s=>{
    const dog=dogMap.get(s.dog_id);

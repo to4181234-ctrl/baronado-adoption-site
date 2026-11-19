@@ -3,6 +3,7 @@ import {randomUUID} from 'node:crypto';
 import {hasAdminSession,sameOrigin} from '../../../../../lib/server/adminSession.js';
 import {adminDatabase,validId} from '../../../../../lib/server/adminData.js';
 import {GO_OFFICIAL_BUCKET} from '../../../../../lib/goOfficial.js';
+import {pixelImageUrls} from '../../../../../lib/server/goPixelUrls.js';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const fail=(error,status=400)=>Response.json({error},{status,headers:{'Cache-Control':'no-store'}});
 const json=data=>Response.json(data,{headers:{'Cache-Control':'no-store'}});
@@ -15,7 +16,7 @@ const slug=(dog,kind)=>`${dog}/pixel/${kind}/${randomUUID()}.png`;
 async function load(db){
  const [dogs,pixels,sets,assets]=await Promise.all([
   db.from('dogs').select('id,name,adopted').eq('category','adoption').order('name'),
-  db.from('go_dog_pixel_assets').select('dog_id,care_path,thumbnail_path,is_published,updated_at'),
+  db.from('go_dog_pixel_assets').select('dog_id,care_path,thumbnail_path,is_published,legacy_existing,updated_at'),
   db.from('go_official_sets').select('dog_id,current_version'),
   db.from('go_official_assets').select('version_id,slot,title,display_path')
  ]);
@@ -24,14 +25,12 @@ async function load(db){
  const setMap=new Map((sets.data||[]).map(x=>[x.dog_id,x]));
  const rows=(dogs.data||[]).map(d=>{
   const px=catalog.get(d.id)||{};const set=setMap.get(d.id);
-  const slots=new Set((assets.data||[]).filter(a=>a.version_id===set?.current_version&&a.slot>=1&&a.slot<=5&&a.display_path&&a.title?.trim()).map(a=>a.slot));
+  const slots=new Set((assets.data||[]).filter(a=>a.version_id===set?.current_version&&a.slot>=1&&a.slot<=5&&a.display_path&&(a.title?.trim()||px.legacy_existing)).map(a=>a.slot));
   return {dogId:d.id,name:d.name,adopted:d.adopted,carePath:px.care_path||null,thumbnailPath:px.thumbnail_path||null,
    published:!!px.is_published,officialReady:slots.size===5,ready:!!px.is_published&&slots.size===5&&!!px.care_path&&!!px.thumbnail_path,updatedAt:px.updated_at||null};
  });
  const paths=rows.flatMap(row=>[row.carePath,row.thumbnailPath].filter(Boolean));
- const links=paths.length?await db.storage.from(GO_OFFICIAL_BUCKET).createSignedUrls(paths,1800):{data:[],error:null};
- if(links.error)throw links.error;
- const urls=new Map(paths.map((p,i)=>[p,links.data?.[i]?.signedUrl||'']));
+ const urls=await pixelImageUrls(db,GO_OFFICIAL_BUCKET,paths,1800);
  return rows.map(r=>({...r,careUrl:urls.get(r.carePath)||null,thumbnailUrl:urls.get(r.thumbnailPath)||null,carePath:undefined,thumbnailPath:undefined}));
 }
 export async function GET(request){const d=await permitted(request);if(d)return d;try{return json({dogs:await load(adminDatabase())});}catch(e){return fail(e.message,500);}}

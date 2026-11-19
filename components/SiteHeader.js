@@ -24,6 +24,18 @@ export default function SiteHeader({member=null,onLogout=null,onLogin=null}){
  : <span className="s1-store" aria-disabled="true" title="스토어는 후속 업데이트에서 열려요">스토어</span>}</div></>:
    <><Link className="v3-brand" href={inAdmin?'/admin':'/'}>{inAdmin?'바로나도 관리자':<img src="/figma-v3/baronado-wordmark.svg" width="47" height="9" alt="바로나도"/>}</Link>{inAdmin&&adminSession?.logout&&<button className="v10-admin-logout" onClick={adminSession.logout} disabled={adminSession.busy}>로그아웃</button>}<nav aria-label="주요 메뉴" className="v3-main-nav">{links.map(([href,label])=><Link key={href} href={href} aria-current={pathname===href?'page':undefined}>{label}</Link>)}</nav></>}
   </div>
+  {inAdmin&&<nav className="v10-admin-global-nav" aria-label="관리 기능 이동">
+    {[
+      ['/admin/go/visit','방문 인증'],
+      ['/admin/dogs?category=adoption','강아지 관리'],
+      ['/admin/go','게시물 관리'],
+      ['/admin/go/official','공식 멍카드'],
+      ['/admin/go/pixels','픽셀·공개 관리'],
+      ['/admin/banners','배너'],
+      ['/admin/analytics','통계']
+    ].map(([url,label])=><Link key={url} href={url}
+      aria-current={pathname===url.split('?')[0]?'page':undefined}>{label}</Link>)}
+   </nav>}
   {inGo&&<nav className="s1-go-nav" aria-label="멍멍GO 주요 메뉴">{[['/','바로나도 홈'],['/go','내 도감'],['/go/community','모두의 도감'],['/go/battle','멍배틀'],['/go/settings','설정/게임 안내']].map(([href,label],i)=>{const current=i===1?pathname==='/go'||/^\/go\/[0-9a-f-]{36}$/i.test(pathname):i===2?pathname.startsWith('/go/community')||pathname.startsWith('/go/posts')||pathname.startsWith('/go/recorders'):i===3?pathname.startsWith('/go/battle'):i===4?['/go/settings','/go/guide','/go/profile','/go/avatar','/go/withdraw'].includes(pathname):false;return <Link key={href} href={href} aria-current={current?'page':undefined}>{label}</Link>})}</nav>}
   {open&&<div className="v3-menu-scrim" onClick={()=>setOpen(false)} role="presentation"><nav className="v3-menu-drawer" aria-label="멍기록가 메뉴" onClick={e=>e.stopPropagation()}><div className="v3-menu-title">멍기록가 메뉴<button type="button" aria-label="메뉴 닫기" onClick={()=>setOpen(false)}>×</button></div>{links.map(([href,label])=><Link href={href} key={href} aria-current={pathname===href?'page':undefined} onClick={()=>setOpen(false)}>{label}</Link>)}</nav></div>}
  </header>;

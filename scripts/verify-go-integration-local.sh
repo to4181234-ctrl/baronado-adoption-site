@@ -67,3 +67,10 @@ for pass in first second; do
 done
 "${PSQL[@]}" -f tests/fixtures/go-release-gate-assert.sql
 echo "PASS: full 4+1 official + 2 pixel artwork release-gate, idempotent migrations and owner bulk deletion"
+for pass in first second; do
+ echo "Legacy original-sprite registration migration $pass"
+ "${PSQL[@]}" -f docs/sql/meonggo-recovery-original-sprites-20261119-DRAFT.sql
+done
+"${PSQL[@]}" -f tests/fixtures/go-recovery-legacy-assert.sql
+echo "PASS: recovered original sprites with legacy card-title compatibility and modern safeguards"
+

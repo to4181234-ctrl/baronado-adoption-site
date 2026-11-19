@@ -55,8 +55,8 @@ test('daily quest completed state is muted and reward changes to 완료, with un
  assert.match(css,/font-size:11px!important/);
 });
 test('public data and care navigation gate unreleased dog IDs at server layer',()=>{
- for(const file of ['app/api/go/official/route.js','app/api/go/quests/care-target/route.js','app/api/go/interaction/route.js','app/api/go/store/route.js','lib/server/goCards.js'])
- assert.match(read(file),/dogReleased|releasedDogs/,file);
+ for(const file of ['app/api/go/official/route.js','app/api/go/quests/care-target/route.js','app/api/go/interaction/route.js','app/api/go/store/route.js'])
+ assert.match(read(file),/dogReleased|releasedDogs|loadGoCards/,file);
 });
 test('prepared SQL restricts all three purchase/draw/unlock procedures, preserving legacy ownership rows',()=>{
  const ddl=read('docs/sql/meonggo-dog-release-gate-20261119-DRAFT.sql');

@@ -45,7 +45,7 @@ function Album({initialDogId=null}){
  // A dog cannot enter the album thumbnail list until all four official cards
  // and the HIDDEN asset are configured and the set has been published.
  const publishedDogs=STAGE2_ENABLED
-  ? [...new Set([...FIGMA_DOGS,...dogs.map(d=>d.name)])].filter(name=>{const d=dogs.find(x=>x.name===name);return d&&officialDogs.some(o=>o.dogId===d.id&&o.publishedComplete);})
+  ? [...new Set([...FIGMA_DOGS,...dogs.map(d=>d.name)])].filter(name=>{const d=dogs.find(x=>x.name===name);return d&&(officialDogs.some(o=>o.dogId===d.id&&o.publishedComplete)||Boolean(member&&(collection.counts?.[d.id]||0)>0));})
   : FIGMA_DOGS;
  const hasDogCards=id=>Boolean((collection.counts?.[id]||0)>0 || officialDogs.some(o=>o.dogId===id&&(o.collected>0||o.hidden?.unlocked)));
  const claimed=publishedDogs.filter(name=>{const d=dogs.find(x=>x.name===name);return Boolean(d&&member&&hasDogCards(d.id));}).length;
