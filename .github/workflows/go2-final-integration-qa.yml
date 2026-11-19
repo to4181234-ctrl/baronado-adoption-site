@@ -9,6 +9,7 @@ on:
       - work/meonggo2-quest-typography-phase3-20261119
       - work/meonggo2-pixel-poses-hidden-visit-20261119
       - work/meonggo2-friend-pvp-card-ready-reveal-20261119
+      - work/meonggo2-release-hidden-random-care-pvp-20261119
   workflow_dispatch:
 
 permissions:
