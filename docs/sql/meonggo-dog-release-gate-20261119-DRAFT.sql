@@ -26,7 +26,7 @@ RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $
    AND nullif(trim(a.title),'') IS NOT NULL AND nullif(a.display_path,'') IS NOT NULL)
  );
 $fn$;
-REVOKE ALL ON FUNCTION public.go_dog_release_ready(uuid) FROM public;
+REVOKE ALL ON FUNCTION public.go_dog_release_ready(uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.go_dog_release_ready(uuid) TO service_role;
 -- Transactional server gate for purchases and normal draw ownership. The API also
 -- filters all choices, preventing selecting a draft/unpublished dog in the UI.
@@ -38,6 +38,8 @@ BEGIN
  END IF;
  RETURN NEW;
 END $fn$;
+REVOKE ALL ON FUNCTION public.go_dog_official_release_guard() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.go_dog_official_release_guard() TO service_role;
 DROP TRIGGER IF EXISTS go_dog_release_guard_owned ON public.go_official_owned;
 CREATE TRIGGER go_dog_release_guard_owned BEFORE INSERT ON public.go_official_owned
  FOR EACH ROW EXECUTE FUNCTION public.go_dog_official_release_guard();

@@ -24,5 +24,5 @@ BEGIN
  IF deleted_count<>cardinality(normalized) THEN RAISE EXCEPTION 'ownership changed during delete'; END IF;
  RETURN jsonb_build_object('ok',true,'deletedSlots',to_jsonb(normalized));
 END $body$;
-REVOKE ALL ON FUNCTION public.go_official_bulk_delete(uuid,uuid,integer[]) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.go_official_bulk_delete(uuid,uuid,integer[]) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.go_official_bulk_delete(uuid,uuid,integer[]) TO service_role;

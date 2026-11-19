@@ -5,6 +5,8 @@ DECLARE
  dog uuid:='33333333-3333-4333-8333-333333333333';
  r jsonb;before_cards integer;
 BEGIN
+ IF has_function_privilege('anon','public.go_official_bulk_delete(uuid,uuid,integer[])','EXECUTE') OR has_function_privilege('authenticated','public.go_official_bulk_delete(uuid,uuid,integer[])','EXECUTE') OR NOT has_function_privilege('service_role','public.go_official_bulk_delete(uuid,uuid,integer[])','EXECUTE') THEN RAISE EXCEPTION 'Official bulk delete exposes privileged RPC to clients'; END IF;
+ IF has_function_privilege('anon','public.go_dog_release_ready(uuid)','EXECUTE') OR has_function_privilege('authenticated','public.go_dog_release_ready(uuid)','EXECUTE') THEN RAISE EXCEPTION 'Release gate helper is exposed to client roles'; END IF;
  IF public.go_dog_release_ready(dog) THEN RAISE EXCEPTION 'Unregistered pixels were accidentally public'; END IF;
  INSERT INTO public.go_dog_pixel_assets(dog_id,care_path,thumbnail_path,is_published)
  VALUES(dog,'qa/pixel/care.png',null,true);
