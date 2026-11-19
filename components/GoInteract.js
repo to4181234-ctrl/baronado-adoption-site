@@ -2,7 +2,6 @@
 import {useEffect,useRef,useState} from 'react';
 import {useParams,useRouter} from 'next/navigation';
 import {fetchDog} from '../lib/dogs.js';
-import {figmaSprite} from '../lib/goV3Game.js';
 import {getGoDialogue} from '../lib/goConfirmedDialogue.js';
 import {listenAudioSetting,createGameAudio,GAME_SOUND_KEY} from '../lib/goV3Audio.js';
 import GoShell,{useGoSession} from './GoShell.js';
@@ -81,14 +80,14 @@ function Interaction(){
   }catch(e){setError(e.message);setBusy(false);}
  }
  if(release===null)return <p className="v3-status">멍멍이 공개 상태를 확인하는 중…</p>;
- if(!release?.ready)return <div className="v3-interact-closed"><p>아직 멍멍GO에 공개되지 않은 멍멍이예요.</p><button type="button" onClick={()=>router.push('/go')}>내 도감으로 돌아가기</button></div>;
+ if(!release?.ready||!release.poseUrls||['front','side','feed','praise','play'].some(p=>!release.poseUrls[p]))return <div className="v3-interact-closed"><p>아직 멍멍GO에 공개되지 않은 멍멍이예요.</p><button type="button" onClick={()=>router.push('/go')}>내 도감으로 돌아가기</button></div>;
  return <div className="v3-interact v3-interact-figma">
   <div className="v3-interact-affinity">친밀도 <b>{status?.level||0} / 10</b></div>
   <button className="v3-interact-sound" aria-label={sound?'소리 끄기':'소리 켜기'} onClick={soundToggle}><img src={'/figma-v3/sound-'+(sound?'on':'off')+'.png'} alt=""/></button>
   <button className="v3-interact-close" aria-label="교감 닫기" onClick={()=>router.push('/go/'+id)}>×</button>
   <div className="v3-interact-machine">
    {['body-border','body-white','bezel-border','bezel-gray','screen-border','screen-white'].map(name=><img key={name} className={'v3-machine-layer v3-machine-'+name} src={'/figma-v3/machine-'+name+'.svg'} alt=""/>)}
-   <button className={'v3-interact-dog'+(walking?' is-walking':'')+(busy?' is-reacting':'')} onClick={bark} aria-label="강아지를 터치해 짖는 소리 듣기"><img src={(release?.careUrl?.startsWith('/figma-v3/')&&dog?.name)?figmaSprite(dog.name,pose):(release?.careUrl||status?.careUrl||figmaSprite(dog?.name||'뽀실',pose))} alt={dog?.name||'강아지'}/></button>
+   <button className={'v3-interact-dog'+(walking?' is-walking':'')+(busy?' is-reacting':'')} onClick={bark} aria-label="강아지를 터치해 짖는 소리 듣기"><img src={release.poseUrls?.[pose]} alt={dog?.name||'강아지'}/></button>
    <div className="v3-machine-dialog">
     {['dialog-bg','dialog-outer','dialog-inner'].map(name=><img key={name} className={'v3-machine-dialog-layer v3-machine-'+name} src={'/figma-v3/machine-'+name+'.svg'} alt=""/>)}
     <span onClick={()=>setVisibleNotice(notice)} aria-live="polite">{visibleNotice}</span>

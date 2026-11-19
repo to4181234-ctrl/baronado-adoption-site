@@ -74,3 +74,10 @@ done
 "${PSQL[@]}" -f tests/fixtures/go-recovery-legacy-assert.sql
 echo "PASS: recovered original sprites with legacy card-title compatibility and modern safeguards"
 
+
+# Six-pose pixel validation after legacy original-sprite registration.
+for pass in first second; do
+ echo "Six-pose migration $pass"
+ "${PSQL[@]}" -f docs/sql/meonggo-six-pixel-poses-20261119-DRAFT.sql
+done
+echo "PASS: six required pixel images; strict release gate; migration idempotency"
