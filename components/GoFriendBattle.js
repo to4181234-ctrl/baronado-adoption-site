@@ -62,7 +62,7 @@ export default function GoFriendBattle(){
  const [history,setHistory]=useState({stats:{wins:0,draws:0,losses:0},recent:[]});
  const [animation,setAnimation]=useState('idle'),[impact,setImpact]=useState(0);
  const [now,setNow]=useState(0),[soundOn,setSoundOn]=useState(false);
- const audio=useRef(null),motionTimers=useRef([]),mutating=useRef(false),polling=useRef(false);
+ const audio=useRef(null),motionTimers=useRef([]),mutating=useRef(false),polling=useRef(false),mutationEpoch=useRef(0);
  const autoJoined=useRef(false),lastAnimated=useRef('');
  const selectedKey=x=>x?x.kind+':'+x.cardId+':'+(x.slot||''):null;
 
@@ -106,6 +106,9 @@ export default function GoFriendBattle(){
  async function mutate(body,{silent=false}={}){
   if(mutating.current)return null;
   mutating.current=true;
+  // Ignore any in-flight poll that began before this action; otherwise it can
+  // replace a successful selection/READY with an older room snapshot.
+  mutationEpoch.current+=1;
   if(!silent){setBusy(true);setError('');setNotice('');}
   try{
    const d=await request(body);
@@ -132,9 +135,10 @@ export default function GoFriendBattle(){
   const sync=async()=>{
    if(document.visibilityState==='hidden'||mutating.current||polling.current||!active)return;
    polling.current=true;
+   const epoch=mutationEpoch.current;
    try{
     const result=await request({action:'sync',roomId});
-    if(active&&!mutating.current)applyResponse(result);
+    if(active&&!mutating.current&&epoch===mutationEpoch.current)applyResponse(result);
    }catch(e){if(active)setError(e.message);}
    finally{polling.current=false;}
   };
@@ -162,21 +166,37 @@ export default function GoFriendBattle(){
   const key=room.roomId+':'+room.round;
   if(lastAnimated.current===key)return;
   lastAnimated.current=key;
-  setAnimation('fight');setImpact(0);
-  audio.current?.startMusic();audio.current?.play('start');
   const timers=motionTimers.current;
+  // Same random-battle sequence: card selection (750 ms), flip (1220 ms),
+  // fully visible card (1700 ms), three-hit duel (2550 ms), then result.
+  // The SQL server has already committed the outcome before any animation.
+  const reveal={pick:750,flip:1220,shown:1700,fight:2550};
+  setAnimation('reveal');setRevealStage('shuffle');setImpact(0);
+  timers.push(window.setTimeout(()=>{
+    setRevealStage('selected');audio.current?.play('select');
+  },reveal.pick));
+  timers.push(window.setTimeout(()=>{
+    setRevealStage('flip');audio.current?.play('appear');
+  },reveal.flip));
+  timers.push(window.setTimeout(()=>{
+    setRevealStage('shown');audio.current?.play('ready');
+  },reveal.shown));
+  timers.push(window.setTimeout(()=>{
+    setAnimation('fight');setImpact(0);
+    audio.current?.startMusic();audio.current?.play('start');
+  },reveal.fight));
   for(const [level,at] of [[1,920],[2,1970],[3,3050]]){
    timers.push(window.setTimeout(()=>{
     setImpact(level);audio.current?.playImpact(level);vibrateBattleHit(level);
-   },at));
-   timers.push(window.setTimeout(()=>setImpact(0),at+260));
+   },reveal.fight+at));
+   timers.push(window.setTimeout(()=>setImpact(0),reveal.fight+at+260));
   }
   timers.push(window.setTimeout(()=>{
    setAnimation('result');setImpact(0);
    stopBattleVibration();audio.current?.stop();
    audio.current?.play(room.winner==='draw'?'draw':
     room.winner===room.role?'victory':'defeat');
-  },FRIEND_PVP_ANIMATION_MS));
+  },reveal.fight+FRIEND_PVP_ANIMATION_MS));
   getHistory();
   window.dispatchEvent(new CustomEvent('go-coins-changed',{detail:{notified:false}}));
   return()=>{timers.forEach(window.clearTimeout);motionTimers.current=[];stopBattleVibration();};
@@ -199,7 +219,7 @@ export default function GoFriendBattle(){
   roomSecondsRemaining(room.inviteExpiresAt,now):room?.status==='playing'?
   roomSecondsRemaining(room.readyDeadline,now):0;
  const activeStats=room?.myStats||history.stats;
- return <div className="meong-battle-app friend-pvp" data-pvp-stage="5">
+ return <div className={'meong-battle-app friend-pvp'+(room?.status==='completed'&&animation==='fight'?' meong-battle-phase-fight':'')} data-pvp-stage="5">
   <header className="friend-pvp-header">
    <h1>실시간 1:1 멍배틀</h1>
    <p className="meong-battle-hint">친구와 실시간으로 1:1 멍카드 배틀!</p>
@@ -269,11 +289,6 @@ export default function GoFriendBattle(){
       <span>나 {room.myReady?'✓ 준비 완료':room.mySelected?'카드 선택 완료':'카드 선택 전'}</span>
       <span>친구 {room.otherReady?'✓ 준비 완료':room.otherSelected?'카드 선택 완료':'카드 선택 전'}</span>
      </div>
-     {room.myCard&&<div className="friend-pvp-current">
-      <h2>선택한 멍카드</h2>
-      <div><GoCardFace card={face(room.myCard)}/>
-       <p>{room.myCard.dogName}<small>파워 {room.myCard.power} · 애교 {room.myCard.charm}</small></p></div>
-     </div>}
      {!room.myReady&&<>
       <h2>내 카드 한 장 선택하기</h2>
       <div className="meong-battle-tabs">
@@ -318,7 +333,22 @@ export default function GoFriendBattle(){
     </div>}
     {room.status==='completed'&&room.myCard&&room.otherCard&&
      <section className="friend-pvp-result" aria-live="polite">
-      {animation==='fight'?<>
+      {animation==='reveal'?<>
+       <h2>양쪽 멍카드 공개!</h2>
+       <div className="friend-pvp-reveal-pair" aria-label="양측 멍카드 공개 애니메이션">
+        {[room.role==='host'?room.myCard:room.otherCard,
+          room.role==='guest'?room.myCard:room.otherCard].map((card,i)=>
+         <div key={i} className={'meong-battle-reveal-scene is-'+revealStage}>
+          <div className="meong-battle-flip-card">
+           <div className="meong-battle-card-back" aria-hidden={revealStage==='shown'}>?</div>
+           <div className="meong-battle-reveal-face" aria-hidden={!['flip','shown'].includes(revealStage)}>
+            <GoCardFace card={face(card)}/>
+           </div>
+          </div>
+         </div>)}
+       </div>
+       <p>두 멍카드가 공개되면 바로 대결이 시작돼요.</p>
+      </>:animation==='fight'?<>
        <h2>두근두근, 멍배틀!</h2>
        <MatchAnimation state={room} impact={impact}/>
        <p>양쪽 출전 카드 공개!</p>

@@ -42,15 +42,9 @@
 .friend-pvp-ready-state{display:flex;gap:8px;margin-bottom:13px}
 .friend-pvp-ready-state span{flex:1;padding:9px 6px;text-align:center;font-size:11px;background:#f6f3eb;border:1px solid #ddd7c7}
 .friend-pvp-prepare>h2{font-size:14px!important;margin:15px 0!important}
-.friend-pvp-current{background:#fdf9e9;border:1px solid #e9dea7;padding:10px}
-.friend-pvp-current h2{font-size:12px!important;margin:0 0 8px!important}
-.friend-pvp-current>div{display:flex;align-items:center;gap:13px}
-.friend-pvp-current .go-card-graphic{width:65px;height:auto;flex:0 0 65px}
-.friend-pvp-current p{font-size:12px;font-weight:700}
-.friend-pvp-current small{display:block;margin-top:7px;font-size:10px;font-weight:400;color:#776b5e}
 .friend-pvp-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:23px;row-gap:22px;margin:18px 0 22px}
 .friend-pvp-card{width:100%;border:0;background:#fff;padding:0;position:relative;color:#181713;text-align:center;display:flex;flex-direction:column;gap:5px;min-width:0}
-.friend-pvp-card.is-selected:before{content:'';position:absolute;inset:-5px -5px 35px;border:2px solid #e3c02b;pointer-events:none}
+.friend-pvp-card.is-selected:after{content:'';position:absolute;inset:0;border:3px solid #fade40;z-index:2;pointer-events:none}
 .friend-pvp-card .go-card-graphic{width:100%;height:auto;display:block;aspect-ratio:166/265}
 .friend-pvp-card span{display:block;font-size:10px;line-height:1.4;font-weight:700;overflow-wrap:anywhere}
 .friend-pvp-card small{display:block;font-size:10px;color:#777067}
@@ -124,3 +118,23 @@
 .friend-pvp-sort{margin:0 0 17px!important;font:400 11px/18px 'MonaS12',sans-serif}
 .friend-pvp-sort button{padding:0;font:inherit}
 .friend-pvp-sort span{font:inherit;color:#888}
+
+/* Reuse the random battle's 750/1220/1700 ms flip sequence for both players.
+   The two cards remain concealed until the server reports both READY. */
+.friend-pvp-reveal-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:center;margin:6px 0 18px}
+.friend-pvp-reveal-pair .meong-battle-reveal-scene{height:275px;min-width:0;overflow:visible}
+.friend-pvp-reveal-pair .meong-battle-flip-card{width:calc(100% - 18px);max-width:158px;aspect-ratio:166/265}
+.friend-pvp-reveal-pair .go-card-graphic{width:100%;height:100%;display:block}
+.friend-pvp-reveal-pair .meong-battle-card-back{font-size:45px;box-shadow:inset 0 0 0 5px #fff3b2}
+@media(max-width:350px){
+ .friend-pvp-reveal-pair{gap:8px}
+ .friend-pvp-reveal-pair .meong-battle-reveal-scene{height:240px}
+}
+/* Fight uses the same phase-scoped sizing and 3-impact transform rules as random. */
+.friend-pvp.meong-battle-phase-fight .friend-pvp-result .meong-battle-versus{
+ --battle-duration:4280ms;gap:clamp(18px,8vw,41px);
+}
+.friend-pvp.meong-battle-phase-fight .friend-pvp-result .meong-battle-fighter{
+ max-width:calc((100% - 18px)/2);min-width:0;
+}
+.friend-pvp .friend-pvp-card.is-selected:focus-visible{outline:2px solid #181713;outline-offset:4px}
