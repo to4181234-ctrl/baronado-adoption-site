@@ -6,13 +6,14 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const mock=(sets,pixels,assets)=>({from(name){return {select(){return this;},not(){return this;},eq(){return Promise.resolve({data:{go_dog_pixel_assets:pixels}[name]||[],error:null});},then(resolve){resolve({data:({go_official_sets:sets,go_dog_pixel_assets:pixels,go_official_assets:assets})[name],error:null});}}}});
 const dog='11111111-1111-4111-8111-111111111111',ver='22222222-2222-4222-8222-222222222222';
 const sets=[{dog_id:dog,current_version:ver}];
-const pixels=[{dog_id:dog,care_path:'a/care.png',thumbnail_path:'a/thumb.png',is_published:true}];
+const pixels=[{dog_id:dog,care_path:'a/side.png',thumbnail_path:'a/thumb.png',front_path:'a/front.png',side_path:'a/side.png',feed_path:'a/feed.png',praise_path:'a/praise.png',play_path:'a/play.png',is_published:true}];
 const assets=Array.from({length:5},(_,i)=>({version_id:ver,slot:i+1,title:'카드 '+(i+1),display_path:'original-card-'+i}));
-test('release gate requires all five official slots, care and representative pixel files, and publish',async()=>{
+test('release gate requires all five official slots, six pixel roles, and publish',async()=>{
  assert.equal((await releasedDogs(mock(sets,pixels,assets))).has(dog),true);
  assert.equal((await releasedDogs(mock(sets,pixels,assets.slice(0,4)))).size,0);
- assert.equal((await releasedDogs(mock(sets,pixels.map(x=>({...x,care_path:null})),assets))).size,0);
+ assert.equal((await releasedDogs(mock(sets,pixels.map(x=>({...x,side_path:null})),assets))).size,0);
  assert.equal((await releasedDogs(mock(sets,pixels.map(x=>({...x,thumbnail_path:null})),assets))).size,0);
+ for(const role of ['front_path','side_path','feed_path','praise_path','play_path'])assert.equal((await releasedDogs(mock(sets,pixels.map(x=>({...x,[role]:null})),assets))).size,0,role);
  assert.equal((await releasedDogs(mock(sets,pixels.map(x=>({...x,is_published:false})),assets))).size,0);
  assert.equal((await releasedDogs(mock(sets,pixels,assets.map(x=>({...x,title:''}))))).size,0);
 });
@@ -20,7 +21,7 @@ test('new administrator pixel upload and release screens exist',()=>{
  const route=read('app/api/admin/go/pixels/route.js'),page=read('app/admin/go/pixels/page.js');
  assert.match(route,/hasAdminSession/);assert.match(route,/sameOrigin/);assert.match(route,/upload\(path,output/);
  assert.match(route,/is_published:false/);assert.match(route,/dog\.officialReady/);
- assert.match(page,/돌보기 픽셀 일러스트/);assert.match(page,/대표 썸네일 픽셀 일러스트/);assert.match(page,/공개/);
+ assert.match(page,/기본 정면 픽셀 일러스트/);assert.match(page,/대표 썸네일 픽셀 일러스트/);assert.match(page,/공개/);
 });
 test('admin landing shows visit certification; old dog edit menu preserved',()=>{
  const landing=read('app/admin/page.js'),dogs=read('app/admin/dogs/page.js');

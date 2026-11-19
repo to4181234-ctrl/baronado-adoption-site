@@ -52,8 +52,8 @@ test('SQL seed keeps history, only links original sprites and leaves new dogs su
 
 test('existing dog care sprite switches between front, walking, snack, praise and play poses',()=>{
  const code=read('components/GoInteract.js');
- assert.match(code,/release\?\.careUrl\?\.startsWith\('\/figma-v3\/'\)/);
- assert.match(code,/figmaSprite\(dog.name,pose\)/);
+ assert.match(code,/release\.poseUrls\?\.\[pose\]/);
+ assert.doesNotMatch(code,/figmaSprite\(dog.name,pose\)/);
 });
 
 test('official catalog trusts the common release checker for legacy Oreo and does not hide it for empty original title',()=>{
