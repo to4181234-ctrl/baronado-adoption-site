@@ -31,7 +31,7 @@ const resultSprite=card=>FIGMA_DOGS.includes(card?.dogName)?figmaSprite(card.dog
 function OwnedCard({card,selected,onClick}){
  return <button type="button" className={'friend-pvp-card'+(selected?' is-selected':'')}
   onClick={onClick} aria-pressed={selected}>
-   <GoCardFace card={face(card)}/>
+   <GoCardFace card={face(card)} selected={selected}/>
    <span>{card.dogName} · {card.title||'공식 멍카드'}</span>
    <small>파워 {card.power} · 애교 {card.charm}</small>
  </button>;
@@ -271,6 +271,12 @@ export default function GoFriendBattle(){
       onClick={()=>{if(window.confirm('대결방을 나갈까요? 준비 중인 라운드는 기록되지 않아요.'))
        mutate({action:'leave',roomId:room.roomId}).then(result=>{if(result)clearRoom();});}}>방 나가기</button>}
     </div>
+    {room.status==='playing'&&!room.myReady&&<button type="button"
+      className="meong-battle-primary friend-pvp-ready-action"
+      disabled={busy||!room.mySelected}
+      onClick={()=>mutate({action:'ready',roomId:room.roomId})}>
+      준비 완료 · 상대와 동시 공개
+    </button>}
     <div className="friend-pvp-participants">
      <div><span>나</span><b>{room.role==='host'?room.hostName:room.guestName}</b>
       <small>{formatPvpScore(room.myStats)}</small></div>
@@ -292,9 +298,9 @@ export default function GoFriendBattle(){
       <p>연결되면 양쪽 모두 카드를 다시 준비해야 해요. 지금은 코인과 전적이 기록되지 않아요.</p>
      </div>}
      <p className="friend-pvp-clock">준비 남은 시간: <strong>{Math.floor(remaining/60)}:{String(remaining%60).padStart(2,'0')}</strong></p>
-     <div className="friend-pvp-ready-state">
-      <span>나 {room.myReady?'✓ 준비 완료':room.mySelected?'카드 선택 완료':'카드 선택 전'}</span>
-      <span>친구 {room.otherReady?'✓ 준비 완료':room.otherSelected?'카드 선택 완료':'카드 선택 전'}</span>
+     <div className="friend-pvp-ready-state" aria-label="양측 준비 완료 상태">
+      <span className={room.myReady?'is-ready':''}>나 {room.myReady?'✓ 준비 완료':'준비 전'}</span>
+      <span className={room.otherReady?'is-ready':''}>친구 {room.otherReady?'✓ 준비 완료':'준비 전'}</span>
      </div>
      {!room.myReady&&<>
       <h2>내 카드 한 장 선택하기</h2>
@@ -327,9 +333,6 @@ export default function GoFriendBattle(){
        <span>{page+1}</span>
        <button disabled={!owned.hasMore||busy} onClick={()=>setPage(p=>p+1)}>다음</button>
       </div>}
-      <button type="button" className="meong-battle-primary" disabled={busy||!room.mySelected}
-       onClick={()=>mutate({action:'ready',roomId:room.roomId})}>
-       준비 완료 · 상대와 동시 공개</button>
      </>}
      {room.myReady&&<div className="friend-pvp-ready-done">
       <p>준비 완료! 친구가 준비하면 두 카드가 동시에 공개돼요.</p>
