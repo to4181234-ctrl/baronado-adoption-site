@@ -63,7 +63,7 @@ BEGIN
   'duplicate',v_owned,'requiresChoice',v_owned,'proposedPower',v_power,
   'proposedCharm',v_charm,'coinsAdded',10,'balance',v_wallet,
   'hiddenUnlocked',v_hidden);
-END;$function$
+END;$function$;
 
 
 
@@ -89,7 +89,7 @@ BEGIN
  ON CONFLICT(member_id,dog_id) DO NOTHING;
  GET DIAGNOSTICS v_inserted=ROW_COUNT;
  RETURN jsonb_build_object('ok',true,'unlocked',true,'new',v_inserted=1);
-END;$function$
+END;$function$;
 
 
 
@@ -171,7 +171,7 @@ BEGIN
  RETURN jsonb_build_object('ok',true,'replayed',false,
    'dogId',v_dog,'slot',v_slot,'power',v_power,'charm',v_charm,
    'coinsSpent',v_price,'price',v_price,'balance',v_balance);
-END;$function$
+END;$function$;
 
 
 COMMIT;
