@@ -29,10 +29,10 @@ test('care quest is 10C total for first interaction; one credited reward per day
  assert.equal(summarizeCareRewards(all,10).affinityAtCap,true);
 });
 test('no unreleased quest is displayed and no fictitious reward',()=>{
- assert.deepEqual(Object.keys(DAILY_QUESTS),['care','visit','draw','battle']);
+ assert.deepEqual(Object.keys(DAILY_QUESTS),['care','visit','battle']);
  assert.equal(visibleQuestRewards(),40);
- assert.equal(visibleQuestRewards({draw:true}),50);
- assert.equal(visibleQuestRewards({draw:true,battle:true}),60);
+ assert.equal(visibleQuestRewards({draw:true}),40);
+ assert.equal(visibleQuestRewards({draw:true,battle:true}),50);
  assert.equal(isQuestAvailable('draw'),false);
  assert.equal(isQuestAvailable('battle',{draw:true}),false);
  assert.equal(isQuestAvailable('battle',{draw:true,battle:true}),true);

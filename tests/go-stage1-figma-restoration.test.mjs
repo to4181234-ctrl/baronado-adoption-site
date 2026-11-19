@@ -9,8 +9,8 @@ const css = read('app/figma-stage4-store.css');
 
 // Structural regression tests. These are not a substitute for rendered Figma comparison.
 test('store uses only two original on-page product entry points', () => {
-  assert.match(store, /카드 랜덤 뽑기/);
-  assert.match(store, /카드 지정 랜덤 뽑기/);
+  assert.match(store, /랜덤 카드 뽑기/);
+  assert.match(store, /지정 랜덤 카드 뽑기/);
   assert.match(store, /setChoiceOpen\(true\)/);
   assert.match(store, /setDogPickerOpen\(true\)/);
   assert.doesNotMatch(store, /움직임 멈추기|움직임 재생|s4-store-draw\b|s4-store-wallet\b|s4-store-buy\b/);
@@ -59,7 +59,9 @@ test('store reuses the original unboxed discovery pixel choice appearance', () =
 
 test('store-only preview keeps full-opacity grayscale stars without changing album locked cards', () => {
   const card = read('components/GoStage2OfficialCards.js');
-  assert.match(store, /<LockedOfficialCard slot=\{1\} storePreview\/>/);
+  assert.match(store, /<StoreProductPreview mode="random"\/>/);
+  assert.match(store, /<StoreProductPreview mode="specific"\/>/);
+  assert.match(store, /opacity:\.55/);
   assert.match(card, /storePreview\?\{filter:'grayscale\(1\)'\}:\{filter:'grayscale\(1\)',opacity:\.?65\}/);
 });
 
