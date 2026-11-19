@@ -133,3 +133,18 @@
  -webkit-clip-path:polygon(9% 0,91% 0,91% 1%,94% 1%,94% 2%,97% 2%,97% 4%,100% 4%,100% 96%,97% 96%,97% 98%,94% 98%,94% 99%,91% 99%,91% 100%,9% 100%,9% 99%,6% 99%,6% 98%,3% 98%,3% 96%,0 96%,0 4%,3% 4%,3% 2%,6% 2%,6% 1%,9% 1%);
  clip-path:polygon(9% 0,91% 0,91% 1%,94% 1%,94% 2%,97% 2%,97% 4%,100% 4%,100% 96%,97% 96%,97% 98%,94% 98%,94% 99%,91% 99%,91% 100%,9% 100%,9% 99%,6% 99%,6% 98%,3% 98%,3% 96%,0 96%,0 4%,3% 4%,3% 2%,6% 2%,6% 1%,9% 1%);
 }
+
+/* Fix the bright straight turquoise bars outside the card while preserving soft halo/sparkles. */
+.go-album-reveal.is-hidden .go-hidden-pulse{
+ width:196px;height:313px;max-width:73%;
+ border:1px solid rgba(136,255,237,.8);
+ box-shadow:inset 0 0 8px rgba(159,247,255,.45);
+ -webkit-clip-path:polygon(9% 0,91% 0,91% 1%,94% 1%,94% 2%,97% 2%,97% 4%,100% 4%,100% 96%,97% 96%,97% 98%,94% 98%,94% 99%,91% 99%,91% 100%,9% 100%,9% 99%,6% 99%,6% 98%,3% 98%,3% 96%,0 96%,0 4%,3% 4%,3% 2%,6% 2%,6% 1%,9% 1%);clip-path:polygon(9% 0,91% 0,91% 1%,94% 1%,94% 2%,97% 2%,97% 4%,100% 4%,100% 96%,97% 96%,97% 98%,94% 98%,94% 99%,91% 99%,91% 100%,9% 100%,9% 99%,6% 99%,6% 98%,3% 98%,3% 96%,0 96%,0 4%,3% 4%,3% 2%,6% 2%,6% 1%,9% 1%);
+ animation:go-hidden-pulse-card-bounded 2.15s ease-out both;
+}
+@keyframes go-hidden-pulse-card-bounded{
+ 0%,28%{opacity:0;transform:scale(.78)}
+ 48%{opacity:.8;transform:scale(.91)}
+ 66%{opacity:.9;transform:scale(.99)}
+ 100%{opacity:0;transform:scale(1)}
+}
