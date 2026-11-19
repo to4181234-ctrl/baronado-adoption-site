@@ -27,13 +27,21 @@ export default function GoAlbumCardDetail({card,onClose,official=false,preparedS
  function keys(e){if(e.key==='Escape'){e.preventDefault();onClose();}}
  const link=official?null:card.status==='approved'&&card.id?'/go/posts/'+encodeURIComponent(card.id):null;
  return createPortal(<div className="go-album-detail-mask" role="presentation" onClick={onClose}>
-  <section role="dialog" aria-modal="true" aria-label={(card.title||card.dogName)+' 멍카드 상세 조회'} className={'go-album-detail'+(isHidden?' is-hidden':'')+(firstUnlock?' is-first-unlock':'')} onKeyDown={keys} onClick={e=>e.stopPropagation()}>
+  <section role="dialog" aria-modal="true" aria-label={(card.title||card.dogName)+' 멍카드 상세 조회'} className={'go-album-detail'+(isHidden?' is-hidden':'')} onKeyDown={keys} onClick={e=>e.stopPropagation()}>
    <button ref={close} type="button" className="go-album-detail-close" onClick={onClose} aria-label="닫기">×</button>
    <h2>{card.title||card.dogName}</h2>
    <div className="go-album-detail-stage" onClick={replay} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();replay();}}} role="button" tabIndex={0} aria-label="멍카드 등장 애니메이션 다시 재생">
-    <div key={reveal} className={'go-album-reveal'+(isHidden?' is-hidden':'')+(firstUnlock?' is-first-unlock':'')} aria-hidden="true">
+    <div key={reveal} className={'go-album-reveal'+(isHidden?' is-hidden':'')} data-hidden-sequence={isHidden?'hologram-reveal-v2':undefined} aria-hidden="true">
+     {isHidden&&<><span className="go-hidden-aura"/><span className="go-hidden-pulse"/><span className="go-hidden-flash"/></>}
      <GoElementSparkles element={elementForCard(card)} variant="cinematic"/>
-     {isHidden&&<div className="go-album-hidden-burst">{Array.from({length:12},(_,i)=><i key={i} style={{'--ray-angle':(i*30)+'deg'}}/>)}</div>}
+     {isHidden&&<div className="go-album-hidden-burst">
+      {Array.from({length:28},(_,i)=><i key={i} style={{
+       '--ray-angle':(i*360/28)+'deg',
+       '--ray-distance':(118+(i%6)*14)+'px',
+       '--ray-size':(5+(i%3)*2)+'px',
+       '--ray-delay':(640+(i%5)*56)+'ms'
+      }}/>)}
+     </div>}
      <div className="go-album-detail-card"><GoCardFace card={card}/>{isHidden&&<span className="go-album-hologram"/>}</div>
     </div>
    </div>
