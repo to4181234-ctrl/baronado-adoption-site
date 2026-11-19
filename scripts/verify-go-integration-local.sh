@@ -46,3 +46,17 @@ for pass in first second; do
 done
 "${PSQL[@]}" -f tests/fixtures/go-integration-assert.sql
 echo "PASS: source-correct 2→5 migration twice, original data preserved, cross-feature SQL flows"
+
+# 2026-11-19 release gate is tested *after* the baseline integration flows,
+# preserving the legacy fixture expectations before publication enforcement.
+for pass in first second; do
+  for migration in \
+    docs/sql/meonggo-dog-release-gate-20261119-DRAFT.sql \
+    docs/sql/meonggo-release-filtered-rpcs-20261119-DRAFT.sql \
+    docs/sql/official-card-bulk-delete-20261119-DRAFT.sql; do
+    echo "Dog-content-release migration $pass: $migration"
+    "${PSQL[@]}" -f "$migration"
+  done
+done
+"${PSQL[@]}" -f tests/fixtures/go-release-gate-assert.sql
+echo "PASS: full 4+1 official + 2 pixel artwork release-gate, idempotent migrations and owner bulk deletion"

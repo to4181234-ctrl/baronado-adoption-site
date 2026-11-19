@@ -2,6 +2,7 @@ import { adminDatabase, validId } from '../../../../lib/server/adminData.js';
 import { goError,goMember,goMutationAllowed } from '../../../../lib/server/goAuth.js';
 import { koreaDay } from '../../../../lib/goCoins.js';
 import { GO_OFFICIAL_BUCKET,goStage2ServerEnabled } from '../../../../lib/goOfficial.js';
+import {releasedDogs} from '../../../../lib/server/goDogRelease.js';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const headers={'Cache-Control':'no-store'};
@@ -47,8 +48,17 @@ export async function GET(request){
    if(result.error)throw result.error;
    assets=result.data||[];
   }
+  // Some historical drafts may point to an incomplete published version.
+  // Keep those dogs out of the album until all five slots are configured.
+  const released=await releasedDogs(db);
+  const completeSets=eligibleSets.filter(set=>{
+   if(!released.has(set.dog_id))return false;
+   const valid=assets.filter(a=>a.version_id===set.current_version&&
+     Number.isInteger(a.slot)&&a.slot>=1&&a.slot<=5&&a.title?.trim()&&a.display_path);
+   return new Set(valid.map(a=>a.slot)).size===5;
+  });
   const viewable=[];
-  for(const set of eligibleSets){
+  for(const set of completeSets){
    for(const asset of assets){
     if(asset.version_id!==set.current_version)continue;
     if(asset.slot===5?hiddenKeys.has(set.dog_id):ownedKeys.has(set.dog_id+':'+asset.slot)){
@@ -63,12 +73,19 @@ export async function GET(request){
     asset.dogId+':'+asset.slot,
     {title:asset.title,imageUrl:signed.data?.[index]?.signedUrl||''}
   ]));
-  const catalog=eligibleSets.map(s=>{
+  const thumbnailPaths=completeSets.map(s=>released.get(s.dog_id)?.thumbnail_path).filter(Boolean);
+  const thumbnailSigned=thumbnailPaths.length?await db.storage.from(GO_OFFICIAL_BUCKET)
+    .createSignedUrls(thumbnailPaths,1800):{data:[],error:null};
+  if(thumbnailSigned.error)throw thumbnailSigned.error;
+  const thumbUrls=new Map(thumbnailPaths.map((path,index)=>[path,thumbnailSigned.data?.[index]?.signedUrl||'']));
+  const photoThumbs=new Map(completeSets.map(s=>[s.dog_id,thumbUrls.get(released.get(s.dog_id)?.thumbnail_path)||'']));
+  const catalog=completeSets.map(s=>{
    const dog=dogMap.get(s.dog_id);
    const cards=owned.filter(x=>x.dog_id===s.dog_id);
    const special=hidden.find(x=>x.dog_id===s.dog_id);
    return {
-    dogId:s.dog_id,name:dog.name,adopted:dog.adopted,createdAt:dog.created_at,paused:s.paused,
+    dogId:s.dog_id,name:dog.name,adopted:dog.adopted,createdAt:dog.created_at,paused:s.paused,publishedComplete:true,thumbnailPathAvailable:true,
+    thumbnailUrl:photoThumbs.get(s.dog_id)||null,
     available:!dog.adopted&&!s.paused,
     collected:cards.length,missing:4-cards.length,
     slots:Array.from({length:4},(_,i)=>{
@@ -115,4 +132,21 @@ export async function POST(request){
   if(body.action==='seen')return json({ok:Boolean(data)},data?200:404);
   return json(data,data?.ok?200:409);
  }catch{return goError('공식 멍카드를 처리하지 못했어요.',500);}
+}
+
+/** Atomic ownership-checked bulk deletion of official/HIDDEN cards (not personal camera cards). */
+export async function DELETE(request){
+ if(!enabled())return goError('공식 멍카드를 준비 중이에요.',503);
+ const blocked=goMutationAllowed(request);if(blocked)return blocked;
+ const member=await goMember(request);if(!member)return goError('로그인이 필요해요.',401);
+ let body;try{body=await request.json();}catch{return goError('선택한 카드를 확인해주세요.');}
+ const slots=body?.slots;
+ if(!validId(body?.dogId)||!Array.isArray(slots)||slots.length<1||slots.length>5||
+   new Set(slots).size!==slots.length||slots.some(n=>!Number.isInteger(n)||n<1||n>5))
+   return goError('삭제할 공식 멍카드를 확인해주세요.');
+ try{
+  const {data,error}=await adminDatabase().rpc('go_official_bulk_delete',{p_member:member.id,p_dog:body.dogId,p_slots:slots});
+  if(error)throw error;
+  return json(data,data?.ok?200:409);
+ }catch{return goError('선택한 공식 멍카드를 삭제하지 못했어요.',500);}
 }

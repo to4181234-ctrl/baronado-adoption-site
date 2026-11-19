@@ -10,8 +10,15 @@ import {enqueueGoCoinNotice} from '../lib/goCoinNotices.js';
 const MOTIONS={snack:{name:'간식',pose:'feed',message:'냠냠! 맛있는 간식 고마워~',audio:'snack'},praise:{name:'칭찬',pose:'praise',message:'멍멍! 칭찬해줘서 신나요!',audio:'praise'},play:{name:'놀이',pose:'play',message:'같이 노니까 너무 신나요!',audio:'play'}};
 function Interaction(){
  const {id}=useParams(),router=useRouter(),{member,ready,openAccount}=useGoSession();
+ const [release,setRelease]=useState(null);
  const [dog,setDog]=useState(null),[status,setStatus]=useState(null),[pose,setPose]=useState('front'),[notice,setNotice]=useState(''),[visibleNotice,setVisibleNotice]=useState(''),[walking,setWalking]=useState(false),[busy,setBusy]=useState(false),[now,setNow]=useState(Date.now()),[sound,setSound]=useState(true),[error,setError]=useState('');
  const audio=useRef(null),timer=useRef(null),barks=useRef(0),typeTimer=useRef(null),interacted=useRef(false);
+ useEffect(()=>{let current=true;setRelease(null);
+  fetch('/api/go/dogs/assets?dogId='+encodeURIComponent(id),{cache:'no-store'})
+   .then(async r=>{const d=await r.json();return r.ok?d:{ready:false};})
+   .then(d=>{if(current)setRelease(d);}).catch(()=>{if(current)setRelease({ready:false});});
+  return()=>{current=false;};
+ },[id]);
  useEffect(()=>listenAudioSetting(setSound),[]);
  useEffect(()=>{const id=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(id);},[]);
  function remainingLabel(action){
@@ -73,13 +80,15 @@ function Interaction(){
    timer.current=setTimeout(()=>{setPose('front');setBusy(false);},2000);
   }catch(e){setError(e.message);setBusy(false);}
  }
+ if(release===null)return <p className="v3-status">멍멍이 공개 상태를 확인하는 중…</p>;
+ if(!release?.ready)return <div className="v3-interact-closed"><p>아직 멍멍GO에 공개되지 않은 멍멍이예요.</p><button type="button" onClick={()=>router.push('/go')}>내 도감으로 돌아가기</button></div>;
  return <div className="v3-interact v3-interact-figma">
   <div className="v3-interact-affinity">친밀도 <b>{status?.level||0} / 10</b></div>
   <button className="v3-interact-sound" aria-label={sound?'소리 끄기':'소리 켜기'} onClick={soundToggle}><img src={'/figma-v3/sound-'+(sound?'on':'off')+'.png'} alt=""/></button>
   <button className="v3-interact-close" aria-label="교감 닫기" onClick={()=>router.push('/go/'+id)}>×</button>
   <div className="v3-interact-machine">
    {['body-border','body-white','bezel-border','bezel-gray','screen-border','screen-white'].map(name=><img key={name} className={'v3-machine-layer v3-machine-'+name} src={'/figma-v3/machine-'+name+'.svg'} alt=""/>)}
-   <button className={'v3-interact-dog'+(walking?' is-walking':'')+(busy?' is-reacting':'')} onClick={bark} aria-label="강아지를 터치해 짖는 소리 듣기"><img src={figmaSprite(dog?.name||'뽀실',pose)} alt={dog?.name||'강아지'}/></button>
+   <button className={'v3-interact-dog'+(walking?' is-walking':'')+(busy?' is-reacting':'')} onClick={bark} aria-label="강아지를 터치해 짖는 소리 듣기"><img src={release?.careUrl||status?.careUrl||figmaSprite(dog?.name||'뽀실',pose)} alt={dog?.name||'강아지'}/></button>
    <div className="v3-machine-dialog">
     {['dialog-bg','dialog-outer','dialog-inner'].map(name=><img key={name} className={'v3-machine-dialog-layer v3-machine-'+name} src={'/figma-v3/machine-'+name+'.svg'} alt=""/>)}
     <span onClick={()=>setVisibleNotice(notice)} aria-live="polite">{visibleNotice}</span>

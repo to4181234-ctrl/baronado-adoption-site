@@ -4,6 +4,7 @@ import {loadBattleHistory} from '../../../../../lib/server/goBattleHistory.js';
 import {loadGoCards} from '../../../../../lib/server/goCards.js';
 import {FIGMA_DOGS,gameElement} from '../../../../../lib/goV3Game.js';
 import {GO_OFFICIAL_BUCKET} from '../../../../../lib/goOfficial.js';
+import {releasedDogs} from '../../../../../lib/server/goDogRelease.js';
 export const dynamic='force-dynamic';
 const headers={'Cache-Control':'private, no-store'};
 const fail=()=>goError('공개 프로필을 불러오지 못했어요.',500);
@@ -39,12 +40,13 @@ export async function GET(request,{params}){
    if(r.error)return fail();approved.push(...(r.data||[]));if((r.data||[]).length<500)break;
   }
   if(approved.length===100000)return fail();
-  const dogSet=new Set((dogsResult.data||[]).map(d=>d.id));
+  const published=await releasedDogs(db);
+  const dogSet=new Set((dogsResult.data||[]).filter(d=>published.has(d.id)).map(d=>d.id));
   const counts=new Map();
   for(const c of approved)if(dogSet.has(c.dog_id))counts.set(c.dog_id,(counts.get(c.dog_id)||0)+1);
   for(const c of official)if(dogSet.has(c.dog_id))counts.set(c.dog_id,(counts.get(c.dog_id)||0)+1);
   for(const c of hidden)if(dogSet.has(c.dog_id))counts.set(c.dog_id,(counts.get(c.dog_id)||0)+1);
-  const dogList=FIGMA_DOGS.map(name=>(dogsResult.data||[]).find(d=>d.name===name)).filter(Boolean)
+  const dogList=FIGMA_DOGS.map(name=>(dogsResult.data||[]).find(d=>d.name===name&&dogSet.has(d.id))).filter(Boolean)
    .map(d=>({id:d.id,name:d.name,element:gameElement(d.name),publicCount:counts.get(d.id)||0,
     officialCount:official.filter(o=>o.dog_id===d.id).length+hidden.filter(h=>h.dog_id===d.id).length,
     customCount:(counts.get(d.id)||0)-official.filter(o=>o.dog_id===d.id).length-hidden.filter(h=>h.dog_id===d.id).length}))

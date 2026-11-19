@@ -10,6 +10,7 @@ export default function GoCardFace({card}){
  return <svg className="go-card-graphic" viewBox="0 0 166 265" role="img" aria-label={`${title?title+' · ':''}${model.dogName} 카드 · ${missingScores?'능력치 미설정':`파워 ${model.power} · 애교 ${model.charm}`} · ${model.element} · ${model.author}`}>
   {title&&<title>{title}</title>}
   <defs><clipPath id={id+'name'}><rect x="16" y="166" width="94" height="23"/></clipPath><clipPath id={id+'author'}><rect x="16" y="237" width="84" height="14"/></clipPath></defs>
+  {special&&<image href="/figma-official/hidden-hologram-pixels-681-290128.png" x="0" y="0" width="166" height="265" preserveAspectRatio="none" style={{imageRendering:'pixelated'}}/>}
   <image href={CARD_FACE.frame} x="0" y="0" width="166" height="265"/>
   <g fontFamily="MonaS12, sans-serif" fill="#000">
    <text x="16" y="23" fontSize="7">MEONG MEONG GO!</text>

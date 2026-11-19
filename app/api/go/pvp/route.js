@@ -1,6 +1,7 @@
 import {normalizedPvpInvite} from '../../../../lib/goPvpInvite.js';
 import {adminDatabase,validId} from '../../../../lib/server/adminData.js';
 import {goError,goMember,goMutationAllowed} from '../../../../lib/server/goAuth.js';
+import {releasedDogs} from '../../../../lib/server/goDogRelease.js';
 
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
@@ -73,10 +74,12 @@ export async function GET(request){
   // Keep filters on the server so paging doesn't silently omit search matches.
   const q=(url.searchParams.get('q')||'').slice(0,40).replace(/[^가-힣a-zA-Z0-9 ]/g,'').trim();
   const ascending=url.searchParams.get('order')==='oldest';
+  const published=await releasedDogs(db),publishIds=[...published.keys()];
+  if(!publishIds.length)return json({kind,cards:[],total:0,hasMore:false});
   if(kind==='camera'){
    let ownQuery=db.from('go_cards')
     .select('id,dog_id,title,image_path,captured_at',{count:'exact'})
-    .eq('member_id',member.id).eq('status','approved');
+    .eq('member_id',member.id).eq('status','approved').in('dog_id',publishIds);
    if(q){
     const dogsMatching=await db.from('dogs').select('id').ilike('name','%'+q+'%');
     if(dogsMatching.error)throw dogsMatching.error;
@@ -130,7 +133,7 @@ export async function GET(request){
     .in('slot',[1,2,3,4,5]):{data:[],error:null};
   if(assets.error)throw assets.error;
   const assetMap=new Map((assets.data||[]).map(x=>[x.version_id+':'+x.slot,x]));
-  const visible=rows.map(x=>({row:x,asset:assetMap.get(versions.get(x.dog_id)+':'+x.slot)}))
+  const visible=rows.filter(x=>published.has(x.dog_id)).map(x=>({row:x,asset:assetMap.get(versions.get(x.dog_id)+':'+x.slot)}))
     .filter(x=>x.asset)
     .filter(x=>!q || (dogMap.get(x.row.dog_id)||'').includes(q) || x.asset.title?.includes(q));
   const filteredTotal=visible.length;
@@ -182,6 +185,16 @@ export async function POST(request){
     slot=body.slot;
    else if(kind==='official'||(body.slot!=null&&kind==='camera'))
     return error('공식 카드 번호를 확인해주세요.');
+   // Prevent selecting unreleased dogs even when ownership rows remain in DB.
+   const targetDog=kind==='official'?card:(await db.from('go_cards').select('dog_id').eq('id',card).eq('member_id',member.id).maybeSingle()).data?.dog_id;
+   if(!targetDog||!(await releasedDogs(db)).has(targetDog))return error('아직 공개되지 않은 강아지의 카드는 출전할 수 없어요.',409);
+  }
+  if(action==='ready'){
+   const s=await db.rpc('go_pvp_snapshot',{p_member:member.id,p_room:body.roomId});
+   if(s.error)throw s.error;
+   const available=await releasedDogs(db);
+   for(const c of [s.data?.myCard,s.data?.otherCard])if(c?.dogId&&!available.has(c.dogId))
+    return error('미공개 강아지의 카드로 배틀을 시작할 수 없어요.',409);
   }
   const {data,error:rpcError}=await db.rpc('go_pvp_action',{
    p_member:member.id,p_room:body.roomId,p_action:action,

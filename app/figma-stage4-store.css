@@ -369,3 +369,10 @@
 
 /* Keep existing failure feedback visible while its parent picker is hidden. */
 .go-duplicate-error{position:absolute;bottom:7px;left:16px;right:55px;margin:0;color:#b42318;font:400 10px/14px 'MonaS12',sans-serif;max-height:28px;overflow:auto}
+
+/* Album-identical dog portraits for designated draws (no arbitrary blue text). */
+.v3-go-site .s4-store-dog-choices .s4-store-dog-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#171713;text-decoration:none;gap:5px;}
+.v3-go-site .s4-store-dog-choices .s4-store-dog-tile img{width:94px;height:94px;max-width:100%;object-fit:contain;image-rendering:pixelated;}
+.v3-go-site .s4-store-dog-choices .s4-store-dog-tile span{color:#171713;font:700 13px/1.4 'Galmuri11',sans-serif;}
+
+.v3-go-site .s4-store-dog-choices .s4-store-dog-tile,.v3-go-site .s4-store-dog-choices .s4-store-dog-tile *{color:#171713!important;}

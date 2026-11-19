@@ -5,6 +5,7 @@ import { adminDatabase, validId } from '../../../../lib/server/adminData.js';
 import { goError, goMember, goMutationAllowed } from '../../../../lib/server/goAuth.js';
 import { loadGoCards } from '../../../../lib/server/goCards.js';
 import { parseBulkCardIds } from '../../../../lib/goBulkDelete.js';
+import {dogReleased} from '../../../../lib/server/goDogRelease.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -89,7 +90,7 @@ export async function POST(request) {
     const existing = await replay();
     if (existing) return existing;
     const { data: dog } = await db.from('dogs').select('id,category,adopted').eq('id', dogId).maybeSingle();
-    if (!dog || dog.category !== 'adoption' || dog.adopted) return goError('현재 기록할 수 없는 멍멍이예요.', 409);
+    if (!dog || dog.category !== 'adoption' || dog.adopted || !await dogReleased(db,dogId)) return goError('아직 멍멍GO에 공개되지 않은 멍멍이예요.', 409);
     const raw = Buffer.from(await file.arrayBuffer());
     const image = sharp(raw, { limitInputPixels: 4_000_000 });
     const meta = await image.metadata();

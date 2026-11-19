@@ -2,6 +2,7 @@ import {adminDatabase} from '../../../../lib/server/adminData.js';
 import {goMember,goError,goMutationAllowed} from '../../../../lib/server/goAuth.js';
 import {goStage2ServerEnabled} from '../../../../lib/goOfficial.js';
 import {parseStorePurchase,validStoreUuid} from '../../../../lib/goStore.js';
+import {dogReleased} from '../../../../lib/server/goDogRelease.js';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const headers={'Cache-Control':'no-store'};
@@ -31,7 +32,9 @@ export async function POST(request){
  let body;try{body=await request.json();}catch{return goError('구매 정보를 확인해주세요.');}
  let opts;try{opts=parseStorePurchase(body);}catch(e){return goError(e.message);}
  try{
-  const {data,error}=await adminDatabase().rpc('go_store_purchase',{
+  const db=adminDatabase();
+  if(opts.dogId&&!await dogReleased(db,opts.dogId))return goError('아직 공개되지 않은 멍멍이예요.',409);
+  const {data,error}=await db.rpc('go_store_purchase',{
     p_member:member.id,p_request:opts.requestId,p_mode:opts.mode,
     p_dog:opts.dogId,p_slot:opts.slot
   });

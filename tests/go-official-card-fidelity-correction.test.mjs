@@ -37,7 +37,7 @@ test('official API returns only unlocked HIDDEN title; no pre-unlock leak',()=>{
 test('NO.1–5 share the pixel frame and visible number while HIDDEN has no fake 0 rating',()=>{
  const album=read('components/GoStage2OfficialCards.js'),face=read('components/GoCardFace.js');
  assert.match(album,/GoCardFace card=\{officialFace\(HIDDEN_SLOT,hidden\)\}/);
- assert.match(album,/GoCompletion viewOnly/);
+ assert.match(album,/GoAlbumCardDetail official/);
  assert.match(album,/card=\{\{\.\.\.officialFace\(opened\.slot,openedData\)/);
  assert.match(album,/unknownScores:slot===HIDDEN_SLOT/);
  assert.doesNotMatch(album,/hiddenJustUnlocked&&<p>/);
@@ -69,7 +69,8 @@ test('approved hidden locked/pixel style is reused in private and public albums'
 test('card title visible in personal album and official popup',()=>{
  const album=read('components/GoStage2OfficialCards.js');
  assert.match(album,/s2-official-card-caption/);
- assert.match(album,/openedData\.title/);
+ assert.match(album,/card\?\.title/);
+ assert.match(read('components/GoAlbumCardDetail.js'),/card\.title\|\|card\.dogName/);
  assert.match(album,/card\.title/);
 });
 

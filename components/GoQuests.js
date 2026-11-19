@@ -93,7 +93,7 @@ export default function GoQuests({ compact = false }) {
             <small>{task.caption}</small>
           </div>
           <div className="go-quest-item-action">
-            <b>+{task.coins} 멍코인</b>
+            <b>{task.completed?'완료':`+${task.coins} 멍코인`}</b>
           </div>
         </article>)}
       </div>

@@ -130,3 +130,13 @@
 }
 .v3-go-site .go-quest-page .go-quest-item.is-complete .go-quest-title:hover{text-decoration:none}
 .v3-go-site .v3-collection-section#meonggo-album{scroll-margin-top:100px}
+
+/* 2026-11-19: All four quest captions use the same Figma typography. */
+.v3-go-site .go-quest-page .go-quest-item>div:first-child>small{font-family:'Galmuri11',sans-serif;font-size:11px;font-weight:400;line-height:1.45;letter-spacing:0;white-space:normal;}
+@media(max-width:360px){.v3-go-site .go-quest-page .go-quest-item>div:first-child>small{font-size:11px;line-height:1.45;}}
+
+/* Completed quests: stable hierarchy, muted title/body, replacement reward label. */
+.v3-go-site .go-quest-item.is-complete .go-quest-title{color:#999!important;cursor:default!important;}
+.v3-go-site .go-quest-item.is-complete small{color:#b5b5b5!important;}
+.v3-go-site .go-quest-item.is-complete .go-quest-item-action>b{color:#999!important;font-weight:500!important;}
+.v3-go-site .go-quest-item>div:first-child>small{font-family:'Galmuri11',sans-serif!important;font-size:11px!important;font-weight:400!important;line-height:1.45!important;}

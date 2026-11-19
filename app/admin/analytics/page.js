@@ -148,8 +148,8 @@ function AnalyticsContent() {
     <SiteHeader />
     <section className="container stats-container">
       <div className="admin-tabs">
-        <Link className="tab" href="/admin?category=adoption">가족을 찾아요</Link>
-        <Link className="tab" href="/admin?category=resident">상주견 소개</Link>
+        <Link className="tab" href="/admin/dogs?category=adoption">가족을 찾아요</Link>
+        <Link className="tab" href="/admin/dogs?category=resident">상주견 소개</Link>
         <Link className="tab active" href="/admin/analytics" aria-current="page">방문 통계</Link>
       </div>
       <Link href="/admin" className="back-link">게시글 관리로 돌아가기</Link>

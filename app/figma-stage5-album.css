@@ -94,3 +94,7 @@
 .v3-go-site .v5-dog-album :is(button,a):focus-visible{outline:2px solid #ae8a20;outline-offset:3px;}
 @media(max-width:359px){.v3-go-site .v5-album-toolbar{flex-wrap:wrap;height:auto;gap:5px 10px;}.v3-go-site .v5-album-toolbar .v5-sort-control{margin-left:auto;}.v3-go-site .v5-card-grid{column-gap:12px;}.v3-go-site .v5-album-rank p{white-space:normal;font-size:9px!important;}}
 @media(prefers-reduced-motion:reduce){.v3-go-site .v5-card-grid .go-card{transition:none!important;}}
+
+/* 2026-11-19: selected card is the yellow visual indicator, never checkmark/선택. */
+.v3-go-site .v5-card-grid .go-bulk-check,.v3-go-site .v5-card-grid .go-bulk-check::after{display:none!important;content:none!important;}
+.v3-go-site .v5-card-grid .go-bulk-card-choice[aria-pressed='true'] .go-card{background:#f8dc65!important;box-shadow:inset 0 0 0 3px #c5a448!important;}

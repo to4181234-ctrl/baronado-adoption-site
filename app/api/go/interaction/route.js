@@ -1,3 +1,5 @@
+import {dogReleased} from '../../../../lib/server/goDogRelease.js';
+import {GO_OFFICIAL_BUCKET} from '../../../../lib/goOfficial.js';
 import {interactionProcedure} from '../../../../lib/goStage3Quests.js';
 import {adminDatabase,validId} from '../../../../lib/server/adminData.js';
 import {goMember,goError,goMutationAllowed} from '../../../../lib/server/goAuth.js';
@@ -10,6 +12,7 @@ export async function GET(request){
  if(!validId(id))return goError('강아지 정보를 확인해주세요.');
  try{
   const db=adminDatabase();
+  if(!await dogReleased(db,id))return goError('아직 공개되지 않은 강아지예요.',404);
   const [affinity,history,owned,official,hidden,dog]=await Promise.all([
    db.from('go_affinity').select('level').eq('member_id',member.id).eq('dog_id',id).maybeSingle(),
    db.from('go_interactions').select('action,created_at').eq('member_id',member.id).eq('dog_id',id).gte('created_at',new Date(Date.now()-40*3600*1000).toISOString()).order('created_at',{ascending:false}),
@@ -22,7 +25,11 @@ export async function GET(request){
   if(!dog.data||dog.data.category!=='adoption')return goError('교감할 강아지를 찾지 못했어요.',404);
   const now=new Date(),date=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
   const daily=(history.data||[]).filter(x=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(x.created_at))===date);
-  return Response.json({level:affinity.data?.level||0,owned:Boolean(owned.data?.length||official.data?.length||hidden.data?.length),canInteract:true,actions:Object.fromEntries(actions.map(action=>{const rows=daily.filter(x=>x.action===action);return [action,{remaining:Math.max(0,2-rows.length),nextAt:rows.length&&Date.now()-new Date(rows[0].created_at).getTime()<1800000?new Date(new Date(rows[0].created_at).getTime()+1800000).toISOString():null}]}))},{headers:{'Cache-Control':'no-store'}});
+  const pixel=await db.from('go_dog_pixel_assets').select('care_path').eq('dog_id',id).maybeSingle();
+  if(pixel.error||!pixel.data?.care_path)throw Error('care sprite');
+  const signed=await db.storage.from(GO_OFFICIAL_BUCKET).createSignedUrl(pixel.data.care_path,1800);
+  if(signed.error)throw signed.error;
+  return Response.json({careUrl:signed.data?.signedUrl||null,level:affinity.data?.level||0,owned:Boolean(owned.data?.length||official.data?.length||hidden.data?.length),canInteract:true,actions:Object.fromEntries(actions.map(action=>{const rows=daily.filter(x=>x.action===action);return [action,{remaining:Math.max(0,2-rows.length),nextAt:rows.length&&Date.now()-new Date(rows[0].created_at).getTime()<1800000?new Date(new Date(rows[0].created_at).getTime()+1800000).toISOString():null}]}))},{headers:{'Cache-Control':'no-store'}});
  }catch{return goError('교감 상태를 불러오지 못했어요.',500);}
 }
 export async function POST(request){
@@ -30,7 +37,9 @@ export async function POST(request){
  const member=await goMember(request);if(!member)return goError('로그인이 필요해요.',401);
  let body;try{body=await request.json();}catch{return goError('요청을 확인해주세요.');}
  if(!validId(body?.dogId)||!actions.includes(body?.action))return goError('교감 정보를 확인해주세요.');
- try{const db=adminDatabase();const procedure=interactionProcedure(process.env.MEONGGO_STAGE1_COINS_ENABLED==='1');
+ try{const db=adminDatabase();
+  if(!await dogReleased(db,body.dogId))return goError('아직 공개되지 않은 강아지예요.',409);
+  const procedure=interactionProcedure(process.env.MEONGGO_STAGE1_COINS_ENABLED==='1');
   const r=await db.rpc(procedure,{p_member_id:member.id,p_dog_id:body.dogId,p_action:body.action});if(r.error)throw r.error;
   if(!r.data?.ok)return Response.json(r.data||{error:'교감할 수 없어요.'},{status:409,headers:{'Cache-Control':'no-store'}});
   return Response.json(r.data,{headers:{'Cache-Control':'no-store'}});

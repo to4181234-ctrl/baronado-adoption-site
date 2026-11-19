@@ -11,6 +11,7 @@ import {useGoCoins} from './GoCoins.js';
 import {enqueueGoCoinNotice} from '../lib/goCoinNotices.js';
 import {availableStoreItems,availableStoreDogs,STORE_PRICES} from '../lib/goStore.js';
 import {LockedOfficialCard} from './GoStage2OfficialCards.js';
+import {figmaSprite} from '../lib/goV3Game.js';
 
 const STAGE4=process.env.NEXT_PUBLIC_MEONGGO_STAGE4_STORE_ENABLED==='1';
 const STORE_ART='/meonggo/store/meonggo_store_loop.svg';
@@ -204,8 +205,9 @@ export default function GoStore(){
       <button type="button" key={dog.dogId} onClick={()=>{
        setSelected({mode:'specific',dogId:dog.dogId});setDogPickerOpen(false);
        setCollarChoice(null);setChoiceOpen(true);
-      }}>{dog.name}<small>미보유 {dog.missing}종</small></button>)}</div>}
-    <button type="button" className="s4-store-run" onClick={()=>setDogPickerOpen(false)}>도망간다</button>
+      }} className="s4-store-dog-tile"><img src={(dog.collected>0||dog.hiddenUnlocked)?figmaSprite(dog.name,'shadow'):'/figma-v3/album-empty-collar.png'}
+        alt={dog.collected>0||dog.hiddenUnlocked?`${dog.name} 수집한 강아지 실루엣`:'미획득 강아지 - 모습 미공개'} />
+        <span>{dog.name}</span><small>미보유 {dog.missing}종</small></button>)}</div>}
    </section>
   </div>}
   {choiceOpen&&<div className="s4-store-overlay" role="presentation" onClick={()=>setChoiceOpen(false)}>

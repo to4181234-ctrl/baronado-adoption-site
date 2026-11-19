@@ -4,6 +4,7 @@ import { goError, goMember, goMutationAllowed, scopedSignature } from '../../../
 import { loadGoCards } from '../../../../lib/server/goCards.js';
 import { battleScore } from '../../../../lib/goBattleRules.js';
 import {listOfficialBattleCards,getOfficialOwned,officialCardFace,parseBattleIdentity} from '../../../../lib/server/goBattleOfficial.js';
+import {releasedDogs} from '../../../../lib/server/goDogRelease.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -38,7 +39,7 @@ async function readOwned(db,memberId,ref){
  const own=await db.from('go_cards').select('id,dog_id,status,member_id')
   .eq('id',ref.id).eq('member_id',memberId).maybeSingle();
  if(own.error)throw own.error;
- if(!own.data||own.data.status!=='approved')return null;
+ if(!own.data||own.data.status!=='approved'||!(await releasedDogs(db)).has(own.data.dog_id))return null;
  const stats=await db.from('go_battle_card_stats').select('power,charm,element')
   .eq('card_id',ref.id).maybeSingle();
  if(stats.error)throw stats.error;
@@ -48,9 +49,13 @@ async function readOwned(db,memberId,ref){
 // and battle stats determine whether they can join a battle. No public/private flag.
 async function eligibleOpponents(db,member,ownDogId){
  const cards=[];
+ const published=await releasedDogs(db);
+ const publishIds=[...published.keys()];
+ if(!publishIds.length)return {cards:[],members:[]};
  let complete=false;
  for(let offset=0;offset<10000;offset+=500){
   let q=db.from('go_card_index').select('id,member_id,nickname,dog_id').eq('status','approved').neq('member_id',member.id).order('id').range(offset,offset+499);
+  q=q.in('dog_id',publishIds);
   if(ownDogId)q=q.neq('dog_id',ownDogId);
   const r=await q;if(r.error)throw r.error;
   cards.push(...(r.data||[]));if((r.data||[]).length<500){complete=true;break;}
@@ -70,6 +75,7 @@ async function eligibleOpponents(db,member,ownDogId){
    let q=db.from(table).select(slotFromRow?'member_id,dog_id,slot,power,charm':'member_id,dog_id,power,charm')
     .neq('member_id',member.id).order('member_id').order('dog_id');
    if(slotFromRow)q=q.order('slot');
+   q=q.in('dog_id',publishIds);
    q=q.range(offset,offset+499);
    if(ownDogId)q=q.neq('dog_id',ownDogId);
    const r=await q;if(r.error)throw r.error;
@@ -136,14 +142,18 @@ export async function GET(request) {
   const db=adminDatabase();
   // Count distinct eligible dogs without relying on one page of cards.
   // Two species are enough for the battle-eligibility decision.
+  const published=await releasedDogs(db);
+  const publishIds=[...published.keys()];
   let available=db.from('go_cards').select('dog_id').eq('status','approved');
+  if(!publishIds.length)return Response.json({...result,eligibleDogKinds:0,cards:[]},{headers:noCache});
+  available=available.in('dog_id',publishIds);
   if(mine)available=available.eq('member_id',member.id);
   const firstKind=await available.limit(1);
   if(firstKind.error)throw firstKind.error;
   let eligibleDogKinds=0;
   if(firstKind.data?.length){
    eligibleDogKinds=1;
-   let other=db.from('go_cards').select('dog_id').eq('status','approved').neq('dog_id',firstKind.data[0].dog_id);
+   let other=db.from('go_cards').select('dog_id').eq('status','approved').in('dog_id',publishIds).neq('dog_id',firstKind.data[0].dog_id);
    if(mine)other=other.eq('member_id',member.id);
    const secondKind=await other.limit(1);
    if(secondKind.error)throw secondKind.error;

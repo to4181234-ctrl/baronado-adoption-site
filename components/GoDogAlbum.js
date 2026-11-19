@@ -27,6 +27,7 @@ const STAGE2_ENABLED = process.env.NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED =
 export default function GoDogAlbum({ dogId }) {
   const { member, ready, openAccount } = useGoSession();
   const [dog, setDog] = useState(null);
+  const [release, setRelease] = useState(null);
   const [loadingDog, setLoadingDog] = useState(true);
   const [collection, setCollection] = useState(EMPTY_COLLECTION);
   const [cards, setCards] = useState([]);
@@ -62,6 +63,12 @@ export default function GoDogAlbum({ dogId }) {
     return () => { active = false; };
   }, [dogId]);
 
+  useEffect(()=>{let active=true;setRelease(null);
+   fetch('/api/go/dogs/assets?dogId='+encodeURIComponent(dogId),{cache:'no-store'})
+    .then(async r=>{const d=await r.json();if(!r.ok)return {ready:false};return d;})
+    .then(d=>{if(active)setRelease(d);}).catch(()=>{if(active)setRelease({ready:false});});
+   return()=>{active=false;};
+  },[dogId]);
   const refresh = useCallback(() => setRefreshCount(count => count + 1), []);
   useEffect(() => {
     let active = true;
@@ -168,11 +175,13 @@ export default function GoDogAlbum({ dogId }) {
 
   if (loadingDog || !ready) return <p className="v3-status" role="status">도감을 불러오는 중…</p>;
   if (!dog) return <p className="v3-error">도감을 찾지 못했어요.</p>;
+  if(STAGE2_ENABLED&&release===null)return <p className="v3-status">공개 정보를 확인하는 중…</p>;
+  if(STAGE2_ENABLED&&!release?.ready)return <p className="v5-empty-message">아직 멍멍GO에 공개되지 않은 멍멍이예요.</p>;
 
   const ownedCount = STAGE2_ENABLED ? (officialCount === null ? total : total + officialCount) : total;
   const summaryCount = STAGE2_ENABLED && officialCount === null ? '—' : String(ownedCount);
   const hasCards = Boolean(member && ownedCount > 0);
-  const dogImage = hasCards ? figmaSprite(dog.name, 'front') : (ALBUM_SHADOWS[dog.name] || figmaSprite(dog.name, 'shadow'));
+  const dogImage = hasCards ? (release?.thumbnailUrl||figmaSprite(dog.name,'front')) : (ALBUM_SHADOWS[dog.name] || figmaSprite(dog.name, 'shadow'));
   const ranking = hasCards ? albumRankPercent(collection.standing?.rank, collection.standing?.participants) : null;
   const maxPage = Math.max(1, Math.ceil(total / PER_PAGE));
   const deleteDogName = dog.name;
@@ -227,7 +236,7 @@ export default function GoDogAlbum({ dogId }) {
         : <>
           <div className="v5-card-grid">
             {cards.map(card => <GoCard key={card.id} card={card} member={member} onLogin={openAccount}
-              compact linkToPost={!selectionMode} selectMode={selectionMode} selected={selectedIds.includes(card.id)}
+              compact albumView={!selectionMode} selectMode={selectionMode} selected={selectedIds.includes(card.id)}
               onSelect={toggleSelected} onLongPress={!selectionMode ? () => startSelection(card.id) : undefined}
               onDelete={refresh} />)}
           </div>
