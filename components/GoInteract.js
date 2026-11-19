@@ -88,7 +88,7 @@ function Interaction(){
   <button className="v3-interact-close" aria-label="교감 닫기" onClick={()=>router.push('/go/'+id)}>×</button>
   <div className="v3-interact-machine">
    {['body-border','body-white','bezel-border','bezel-gray','screen-border','screen-white'].map(name=><img key={name} className={'v3-machine-layer v3-machine-'+name} src={'/figma-v3/machine-'+name+'.svg'} alt=""/>)}
-   <button className={'v3-interact-dog'+(walking?' is-walking':'')+(busy?' is-reacting':'')} onClick={bark} aria-label="강아지를 터치해 짖는 소리 듣기"><img src={release?.careUrl||status?.careUrl||figmaSprite(dog?.name||'뽀실',pose)} alt={dog?.name||'강아지'}/></button>
+   <button className={'v3-interact-dog'+(walking?' is-walking':'')+(busy?' is-reacting':'')} onClick={bark} aria-label="강아지를 터치해 짖는 소리 듣기"><img src={(release?.careUrl?.startsWith('/figma-v3/')&&dog?.name)?figmaSprite(dog.name,pose):(release?.careUrl||status?.careUrl||figmaSprite(dog?.name||'뽀실',pose))} alt={dog?.name||'강아지'}/></button>
    <div className="v3-machine-dialog">
     {['dialog-bg','dialog-outer','dialog-inner'].map(name=><img key={name} className={'v3-machine-dialog-layer v3-machine-'+name} src={'/figma-v3/machine-'+name+'.svg'} alt=""/>)}
     <span onClick={()=>setVisibleNotice(notice)} aria-live="polite">{visibleNotice}</span>

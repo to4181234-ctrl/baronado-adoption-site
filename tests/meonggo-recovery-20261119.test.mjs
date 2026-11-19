@@ -47,3 +47,9 @@ test('SQL seed keeps history, only links original sprites and leaves new dogs su
  assert.doesNotMatch(sql,/UPDATE public.go_coin_wallets/);
  const script=read('scripts/verify-go-integration-local.sh');assert.match(script,/go-recovery-legacy-assert.sql/);
 });
+
+test('existing dog care sprite switches between front, walking, snack, praise and play poses',()=>{
+ const code=read('components/GoInteract.js');
+ assert.match(code,/release\?\.careUrl\?\.startsWith\('\/figma-v3\/'\)/);
+ assert.match(code,/figmaSprite\(dog.name,pose\)/);
+});
