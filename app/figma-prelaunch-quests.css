@@ -135,3 +135,45 @@
 .v3-go-site .go-quest-item.is-complete small{color:#b5b5b5!important;}
 .v3-go-site .go-quest-item.is-complete .go-quest-item-action>b{color:#999!important;font-weight:500!important;}
 
+
+/* Rejected visit verification: independent auto-height flow avoids stacking
+   status, reason, retry timer, outside-hours notice and button at fixed y. */
+.go-visit-modal{height:auto;min-height:352px}
+.go-visit-dialog-content.is-rejected{
+ box-sizing:border-box;height:auto;min-height:415px;
+ display:flex;flex-direction:column;align-items:center;
+ padding:68px 18px 22px;overflow-wrap:anywhere;
+}
+.go-visit-dialog-content.is-rejected h2,
+.go-visit-dialog-content.is-rejected .go-visit-dialog-reward,
+.go-visit-dialog-content.is-rejected .go-visit-dialog-desc,
+.go-visit-dialog-content.is-rejected .go-visit-dialog-status,
+.go-visit-dialog-content.is-rejected .go-visit-dialog-sub,
+.go-visit-dialog-content.is-rejected .go-visit-dialog-submit,
+.go-visit-dialog-content.is-rejected .go-visit-dialog-error{
+ position:static;inset:auto;top:auto;left:auto;right:auto;bottom:auto;
+ width:auto;max-width:100%;height:auto;flex:none;
+}
+.go-visit-dialog-content.is-rejected h2{margin:0!important;line-height:30px!important}
+.go-visit-dialog-content.is-rejected .go-visit-dialog-reward{margin:8px 0 0!important;line-height:22px}
+.go-visit-dialog-content.is-rejected .go-visit-dialog-desc{margin:48px 0 0;min-width:0}
+.go-visit-dialog-content.is-rejected .go-visit-dialog-desc p{margin:0 0 5px}
+.go-visit-dialog-content.is-rejected .go-visit-dialog-status{
+ margin:13px 0 0!important;line-height:24px;white-space:normal
+}
+.go-visit-dialog-content.is-rejected .go-visit-dialog-rejection-reason{
+ display:block;margin:5px 0 0;line-height:16px;
+ color:#666;word-break:keep-all;overflow-wrap:anywhere
+}
+.go-visit-dialog-content.is-rejected .go-visit-dialog-submit{
+ width:235px;max-width:100%;min-height:45px;
+ margin:17px 0 0;padding:8px 12px
+}
+.go-visit-dialog-content.is-rejected .go-visit-dialog-sub:not(.go-visit-dialog-rejection-reason){
+ display:block;margin:11px 0 0;line-height:16px;
+}
+.go-visit-dialog-content.is-rejected .go-visit-dialog-error{margin:8px 0 0;line-height:15px}
+@media(max-width:330px){
+ .go-visit-dialog-content.is-rejected{padding-left:14px;padding-right:14px}
+ .go-visit-dialog-content.is-rejected .go-visit-dialog-submit{width:100%}
+}

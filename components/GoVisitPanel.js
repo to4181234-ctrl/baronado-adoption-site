@@ -82,7 +82,7 @@ export default function GoVisitPanel({ embedded=false }={}) {
   const todayDone = Boolean(coins.daily?.visitQuestDone);
   if(embedded) {
     const statusExpired=item?.status==='expired'||(item?.status==='pending'&&remain===0);
-    return <div className="go-visit-dialog-content">
+    return <div className={'go-visit-dialog-content'+(item?.status==='rejected'?' is-rejected':'')}>
       <h2>바로나도에 놀러왔개</h2>
       <p className="go-visit-dialog-reward">+30 멍코인</p>
       <div className="go-visit-dialog-desc">
@@ -100,7 +100,7 @@ export default function GoVisitPanel({ embedded=false }={}) {
         <button type="button" className="go-visit-dialog-submit" disabled>직원에게 인증 신청 보내기</button>
       </> : <>
         <p className="go-visit-dialog-status">{statusExpired?'인증 시간 종료':item?.status==='rejected'?'인증 반려':(!state?.canRequestNow&&state?'신청 시간 외':'')}</p>
-        {item?.status==='rejected'&&<small className="go-visit-dialog-sub">{VISIT_REJECTION_REASONS[item.rejectedReason]||'직원에게 확인해 주세요.'}</small>}
+        {item?.status==='rejected'&&<small className="go-visit-dialog-sub go-visit-dialog-rejection-reason" role="status">{VISIT_REJECTION_REASONS[item.rejectedReason]||'직원에게 확인해 주세요.'}</small>}
         <button type="button" className="go-visit-dialog-submit"
           disabled={!member||busy||loading||!state?.canRequestNow||waitForRetry>0}
           onClick={()=>{if(!member){openAccount();return}submit('request')}}>
