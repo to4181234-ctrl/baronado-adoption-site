@@ -191,9 +191,10 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
           disabled={(!acquired&&!unlockable)||busy||!dog||(acquired&&!hiddenImage)||selectionMode&&!acquired} onClick={()=>selectionMode?toggleSlot(HIDDEN_SLOT):openHidden()}>
           {acquired?(hiddenImage?<GoCardFace card={officialFace(HIDDEN_SLOT,hidden)}/>:<span className="s2-official-unavailable" role="status">HIDDEN 이미지를 불러오지 못했어요.</span>):
             <LockedOfficialCard slot={HIDDEN_SLOT} hidden unlockable={unlockable}/>}
-          {!selectionMode&&acquired&&hidden?.new&&<span className="s2-official-new">NEW</span>}
+          
         </button>
-        {acquired&&hidden?.title&&<small className="s2-official-card-caption">{hidden.title}</small>}
+        {!selectionMode&&((acquired&&hidden?.new)||unlockable)&&<span className="s2-official-hidden-new">NEW</span>}
+         {acquired&&hidden?.title&&<small className="s2-official-card-caption">{hidden.title}</small>}
       </div>
     </div>
     {confirmDelete&&<div className="v5-modal-backdrop" role="presentation" onClick={()=>!busy&&setConfirmDelete(false)}>
@@ -205,7 +206,7 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
       </section>
     </div>}
     <p className="s2-official-help">{!dog?'':acquired?'히든 카드 해금 완료':unlockable?'일반 멍카드 4종을 모았어요. HIDDEN 카드를 눌러 해금하세요.':'일반 멍카드 4종을 모으면 HIDDEN 카드를 열 수 있어요.'}</p>
-    {hiddenJustUnlocked&&hiddenImage&&<GoAlbumCardDetail official preparedSound={detailSound.current}
+    {hiddenJustUnlocked&&hiddenImage&&<GoAlbumCardDetail official firstUnlock preparedSound={detailSound.current}
       card={{...officialFace(HIDDEN_SLOT,hidden),status:'approved'}}
       onClose={()=>{setOpened(null);setHiddenJustUnlocked(false);detailSound.current=null;}}/>}
     {opened&&openedData?.imageUrl&&!hiddenJustUnlocked&&<GoAlbumCardDetail official preparedSound={detailSound.current}
