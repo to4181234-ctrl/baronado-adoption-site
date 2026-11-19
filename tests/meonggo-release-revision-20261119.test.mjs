@@ -45,7 +45,7 @@ test('HIDDEN uses source Figma hologram pixel asset, not approximate gradient',(
 });
 test('store picker exposes known dog silhouette, unrevealed dogs hidden, no arbitrary blue',()=>{
  const store=read('components/GoStore.js');const css=read('app/figma-stage4-store.css');
- assert.match(store,/dog.thumbnailUrl\|\|figmaSprite\(dog.name,'shadow'\)/);assert.match(store,/album-empty-collar\.png/);
+ assert.match(store,/dog.thumbnailUrl\|\|figmaSprite\(dog.name,'shadow'\)/);assert.match(store,/s4-store-dog-silhouette/);assert.doesNotMatch(store,/album-empty-collar\.png/);
  assert.doesNotMatch(store,/className="s4-store-run"/);assert.match(css,/color:#171713!important/);
 });
 test('daily quest completed state is muted and reward changes to 완료, with uniform body size',()=>{
