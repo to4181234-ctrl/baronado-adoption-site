@@ -3,11 +3,9 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {useRouter} from 'next/navigation';
 import GoVisitPanel from './GoVisitPanel.js';
-import GoFreeDraw from './GoFreeDraw.js';
 import { useGoSession } from './GoShell.js';
 import { useGoCoins } from './GoCoins.js';
 import {isQuestAvailable,visibleQuestRewards} from '../lib/goStage3Quests.js';
-const DRAW_AVAILABLE=process.env.NEXT_PUBLIC_MEONGGO_STAGE4_STORE_ENABLED==='1';
 const BATTLE_AVAILABLE=process.env.NEXT_PUBLIC_MEONGGO_STAGE5_PVP_ENABLED==='1';
 
 export default function GoQuests({ compact = false }) {
@@ -28,7 +26,6 @@ export default function GoQuests({ compact = false }) {
     finally{setCareBusy(false);}
   }
   const [visitOpen,setVisitOpen]=useState(false);
-  const [drawOpen,setDrawOpen]=useState(false);
   useEffect(()=>{if(!visitOpen)return;const onKey=e=>{if(e.key==='Escape')setVisitOpen(false)};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[visitOpen]);
   if (!coins?.enabled) return null;
 
@@ -46,17 +43,12 @@ export default function GoQuests({ compact = false }) {
       href: '/go/quests'
     }
   ];
-  if(isQuestAvailable('draw',{draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE}))tasks.push({
-    id:'draw',title:'랜덤 멍카드 뽑기',coins:10,
-    caption:'아직 만나지 못한 멍카드를 뽑을지도?',
-    completed:Boolean(coins.daily?.drawQuestDone),href:'/go/quests'
-  });
-  if(isQuestAvailable('battle',{draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE}))tasks.push({
+  if(isQuestAvailable('battle',{battle:BATTLE_AVAILABLE}))tasks.push({
     id:'battle',title:'멍배틀 하기',coins:10,
     caption:'친구와 1:1 멍배틀을 하면 승패 상관없이 멍코인!',
     completed:Boolean(coins.daily?.battleQuestDone),href:'/go/battle'
   });
-  // Figma 558:466129 keeps the visible order: visit, care, random draw, battle.
+  // Free card drawing is not a coin quest; the quest list shows visit, care, battle.
 
   const done = tasks.filter(item => item.completed).length;
   return <section className={'go-quest-section' + (compact ? ' go-quest-compact' : '')}
@@ -85,8 +77,6 @@ export default function GoQuests({ compact = false }) {
                 ? <span className="go-quest-title" aria-disabled="true">{task.title} &gt;</span>
                 : task.id==='care'
                   ? <button className="go-quest-title" type="button" onClick={goToCare} disabled={careBusy}>{careBusy?'멍멍이 찾는 중…':task.title+' >'}</button>
-                : task.id==='draw' && !compact
-                  ? <button className="go-quest-title" type="button" onClick={()=>setDrawOpen(true)}>{task.title} &gt;</button>
                   : task.id==='visit' && !compact
                     ? <button className="go-quest-title" type="button" onClick={()=>setVisitOpen(true)}>{task.title} &gt;</button>
                     : <Link className="go-quest-title" href={task.href} aria-label={task.id==='battle'?'랜덤 또는 친구 1:1 멍배틀, 오늘 첫 완료 시 10 멍코인':undefined}>{task.title} &gt;</Link>}
@@ -101,7 +91,6 @@ export default function GoQuests({ compact = false }) {
       <p>{ready ? '로그인하면 퀘스트를 시작할 수 있어요.' : '로그인 정보를 확인하고 있어요.'}</p>
       {ready && <button type="button" onClick={openAccount}>로그인하고 시작하기</button>}
     </div>}
-    {drawOpen&&!compact&&<GoFreeDraw onClose={()=>setDrawOpen(false)}/>}
     {visitOpen&&!compact&&<div className="go-visit-modal-backdrop" onClick={()=>setVisitOpen(false)}>
       <section className="go-visit-modal" role="dialog" aria-modal="true" aria-label="바로나도에 놀러왔개" onClick={e=>e.stopPropagation()}>
         <button className="go-visit-modal-close" type="button" aria-label="닫기" onClick={()=>setVisitOpen(false)}>×</button>
@@ -109,6 +98,6 @@ export default function GoQuests({ compact = false }) {
       </section>
     </div>}
     {compact && <Link className="go-quest-all-link" href="/go/quests">퀘스트 자세히 보기 ›</Link>}
-    {compact && <p className="go-quest-caption">오늘 이용 가능한 퀘스트 {tasks.length}종 · 퀘스트 완료 보상 최대 {visibleQuestRewards({draw:DRAW_AVAILABLE,battle:BATTLE_AVAILABLE})}C</p>}
+    {compact && <p className="go-quest-caption">오늘 이용 가능한 퀘스트 {tasks.length}종 · 퀘스트 완료 보상 최대 {visibleQuestRewards({battle:BATTLE_AVAILABLE})}C</p>}
   </section>;
 }
