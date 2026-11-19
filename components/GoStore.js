@@ -211,7 +211,7 @@ export default function GoStore(){
          src={dog.hasAnyCard?(dog.thumbnailUrl||figmaSprite(dog.name,'front')):(dog.thumbnailUrl||figmaSprite(dog.name,'shadow'))}
          alt={dog.hasAnyCard?dog.name:'아직 수집하지 못한 '+dog.name+' 실루엣'}/>
          <span>{dog.name}</span></button>)}</div>}
-     {pickerNotice&&<p role="status" className="s4-store-picker-notice">{pickerNotice}</p>
+     {pickerNotice&&<p role="status" className="s4-store-picker-notice">{pickerNotice}</p>}
    </section>
   </div>}
   {choiceOpen&&<div className="s4-store-overlay" role="presentation" onClick={()=>setChoiceOpen(false)}>
