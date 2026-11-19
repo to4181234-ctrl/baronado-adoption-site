@@ -12,18 +12,18 @@ test('KST midnight is used, never browser local day',()=>{
  assert.equal(koreaDay('2026-12-31T15:00:00.000Z'),'2027-01-01');
  assert.throws(()=>koreaDay('not-a-date'),RangeError);
 });
-test('care quest is 10C total for first interaction; at most 5x10 per day',()=>{
+test('care quest is 10C total for first interaction; one credited reward per day',()=>{
  assert.equal(GO_CARE_REWARD_COINS,10);
- assert.equal(GO_CARE_REWARD_DAILY_LIMIT,5);
+ assert.equal(GO_CARE_REWARD_DAILY_LIMIT,1);
  assert.equal(GO_CARE_QUEST_COINS,10);
  assert.equal(GO_VISIT_QUEST_COINS,30);
  assert.deepEqual(summarizeCareRewards([]),{
-   careRewardsToday:0,remainingCareRewards:5,firstCareQuestDone:false,
-   maxRewardPerDay:50,firstQuestCoins:10,affinityAtCap:false
+   careRewardsToday:0,remainingCareRewards:1,firstCareQuestDone:false,
+   maxRewardPerDay:10,firstQuestCoins:10,affinityAtCap:false
  });
  const all=['quest_care','care','care','care','care','care'];
  assert.equal(summarizeCareRewards(all).remainingCareRewards,0);
- assert.equal(summarizeCareRewards(all).careRewardsToday,5);
+ assert.equal(summarizeCareRewards(all).careRewardsToday,1);
  assert.equal(summarizeCareRewards(['quest_care']).careRewardsToday,1);
  assert.equal(summarizeCareRewards(all).firstCareQuestDone,true);
  assert.equal(summarizeCareRewards(all,10).affinityAtCap,true);

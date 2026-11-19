@@ -45,8 +45,8 @@ export async function GET(request) {
       balance: Number(wallet.data?.balance ?? 0),
       today,
       daily: {
-        // First completed care quest is itself one of the five daily rewards.
-        careRewards: entries.filter(row => row.event_type === 'care' || row.event_type === 'quest_care').length,
+        // First completed care quest is the only daily 10C care reward.
+        careRewards: Math.min(1,entries.filter(row => row.event_type === 'care' || row.event_type === 'quest_care').length),
         careQuestDone: entries.some(row => row.event_type === 'quest_care'),
         visitQuestDone: Boolean(visits.data?.length),
         drawQuestDone: entries.some(row => row.event_type === 'quest_draw'),

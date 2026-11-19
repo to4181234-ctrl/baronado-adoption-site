@@ -89,3 +89,12 @@ for pass in first second; do
 done
 "${PSQL[@]}" -f tests/fixtures/go-pvp-ready-reconnect-assert.sql
 echo "PASS: 10s heartbeat jitter retains READY; 20s disconnect resets; both explicit READY complete once"
+
+# New care cap is installed after older fixture assertions to preserve historical
+# coverage; it is applied twice and tested with fresh synthetic member activity.
+for pass in first second; do
+ echo "Once daily 10C care cap $pass"
+ "${PSQL[@]}" -f docs/sql/meonggo-care-once-10c-20261119-DRAFT.sql
+done
+"${PSQL[@]}" -f tests/fixtures/go-care-once-10c-assert.sql
+echo "PASS: first daily care 10C, subsequent same-dog and cross-dog care 0C"
