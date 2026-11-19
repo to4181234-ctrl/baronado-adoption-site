@@ -94,19 +94,27 @@ export default function GoStore(){
   return data;
  }
  async function showPurchased(data,wasRecovered=false){
-  clearRequest();setConfirm(false);setMessage('');
+  setConfirm(false);setMessage('');
   if(!wasRecovered&&data.coinsSpent>0)announceCoins(-data.coinsSpent);
   else announceCoins(0);
   const next=await refresh();
-  const purchased={...data,card:cardFor(next?.dogs?.find(d=>d.dogId===data.dogId),data.slot)};
+  if(!next)throw Error('구매 후 카드를 불러오지 못했어요.');
+  const pendingChoice=next.pendingDuplicate;
+  if(data.requiresChoice||pendingChoice){
+   if(!pendingChoice)throw Error('결제는 완료되었지만 중복 카드 비교를 아직 불러오지 못했어요.');
+   clearRequest();setDuplicate(pendingChoice);
+   return;
+  }
+  clearRequest();
+  const purchased={...data,card:cardFor(next.dogs?.find(d=>d.dogId===data.dogId),data.slot)};
   if(purchased.card.imageUrl)setRevealed(purchased.card);
   else setMessage('카드는 지급되었지만 이미지를 불러오지 못했어요. 내 도감에서 확인해주세요.');
  }
  async function buy(){
   if(!member){setConfirm(false);openAccount();return;}
   if(busy||pending||items.length===0)return;
-  if(selected.mode==='specific'&&(!selectedDog||selectedDog.missing===0)){
-   setError('미보유 공식 멍카드가 남아 있는 강아지를 선택해주세요.');setConfirm(false);return;
+  if(selected.mode==='specific'&&!selectedDog){
+   setError('지정할 멍멍이를 선택해주세요.');setConfirm(false);return;
   }
   const price=STORE_PRICES[selected.mode];
   if(balance===null||balance<price){setError('멍코인이 부족하거나 잔액을 확인하지 못했어요.');setConfirm(false);return;}
@@ -127,10 +135,10 @@ export default function GoStore(){
     const d=await r.json();
     if(!r.ok||!d.ok)throw Error(d.error||'이전 결제를 조회하지 못했어요.');
     if(d.found){
-     if(d.mode!==pending.mode || d.price!==STORE_PRICES[pending.mode] ||
+     if((d.mode&&d.mode!==pending.mode) ||
        (pending.mode==='specific' && d.dogId!==pending.dogId))
        throw Error('이전 거래의 구매 방식이 달라요. 관리자에게 문의해주세요.');
-     await showPurchased({dogId:d.dogId,slot:d.slot,price:d.price,coinsSpent:0},true);
+     await showPurchased({dogId:d.dogId,slot:d.slot,price:d.price,coinsSpent:0,requiresChoice:d.requiresChoice,choiceId:d.choiceId},true);
      return;
     }
     setMessage('이전 구매는 아직 확인되지 않았어요. 동일 요청 번호로 재시도할 수 있어요.');
@@ -143,7 +151,7 @@ export default function GoStore(){
   setBusy(true);setError('');
   try{
    const r=await fetch('/api/go/official',{method:'POST',
-    headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'resolve',replace})});
+    headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'resolve',choiceId:duplicate.choiceId,replace})});
    const data=await r.json();
    if(!r.ok||!data.ok)throw Error(data.error||'능력치를 저장하지 못했어요.');
    setDuplicate(null);
@@ -172,21 +180,21 @@ export default function GoStore(){
   {message&&<p role="status" className="s4-store-message">{message}</p>}
   {error&&<p role="alert" className="s4-store-error">{error} <button type="button" onClick={refresh}>다시 확인</button></p>}
   <section className="s4-store-products">
-   <header className="s4-store-screen-reader"><h2>멍카드 구매</h2><p>랜덤은 모든 강아지의 미보유 카드에서, 지정은 선택한 강아지의 미보유 카드에서 랜덤 뽑기예요.</p></header>
+   <header className="s4-store-screen-reader"><h2>멍카드 구매</h2><p>랜덤은 공개된 모든 강아지의 일반 카드에서, 지정은 선택한 강아지의 일반 카드에서 뽑아요. 중복 카드도 나올 수 있어요.</p></header>
    <div className="s4-store-choices" role="group" aria-label="구매 방식">
     <button type="button"
      onClick={()=>{setSelected({mode:'random'});setCollarChoice(null);setChoiceOpen(true);}}>
       <LockedOfficialCard slot={1} storePreview/>
-      <strong>카드 랜덤 뽑기</strong>
-      <small>미보유 카드중 랜덤으로<br/>멍카드를 뽑을 수 있다.</small>
-      <b>200 멍코인</b>
+      <strong>랜덤 카드 뽑기</strong>
+      <small>랜덤으로 멍카드를<br/>뽑을 수 있다.</small>
+      <b>60 멍코인</b>
     </button>
     <button type="button"
      onClick={()=>{setSelected({mode:'specific'});setPickerNotice('');setDogPickerOpen(true);}}>
       <LockedOfficialCard slot={1} storePreview/>
-      <strong>카드 지정 랜덤 뽑기</strong>
+      <strong>지정 랜덤 카드 뽑기</strong>
       <small>내가 지정한 멍멍이로<br/>랜덤 멍카드를 뽑을 수 있다.</small>
-      <b>300 멍코인</b>
+      <b>100 멍코인</b>
     </button>
    </div>
    {pending&&<aside className="s4-store-pending" role="status">
@@ -199,11 +207,10 @@ export default function GoStore(){
    <section role="dialog" aria-modal="true" aria-label="지정할 강아지 선택" onClick={e=>e.stopPropagation()}>
     <button className="s4-store-close" onClick={()=>setDogPickerOpen(false)} aria-label="닫기">×</button>
     <h2>어떤 멍멍이로 뽑을까요?</h2>
-    <p>선택한 멍멍이의 미보유 공식 카드 중 1장이 무작위로 나와요.</p>
+    <p>선택한 멍멍이의 일반 카드 중 한 장이 나와요. 이미 보유한 카드도 나올 수 있어요.</p>
     {dogOptions.length===0?<p>현재 선택 가능한 입양 전 강아지가 없어요.</p>:
       <div className="s4-store-dog-choices">{dogOptions.map(dog=>
        <button type="button" key={dog.dogId} onClick={()=>{
-        if(dog.missing===0){setPickerNotice('이미 모든 멍카드를 모았어요. 나만의 멍카드만 수집 가능해요');return;}
         setSelected({mode:'specific',dogId:dog.dogId});setDogPickerOpen(false);
         setPickerNotice('');setConfirm(true);
        }} className="s4-store-dog-tile" aria-label={dog.name+(dog.missing===0?' 공식 카드 4종 수집 완료':' 미보유 공식 카드 '+dog.missing+'종')}>
@@ -246,7 +253,7 @@ export default function GoStore(){
   </div>}
   {duplicate&&<GoDuplicateCompare
    dog={catalog.dogs.find(d=>d.dogId===duplicate.dogId)} duplicate={duplicate}
-   busy={busy} error={error} onResolve={resolveDuplicate} onClose={()=>setDuplicate(null)}/>}
+   busy={busy} error={error} onResolve={resolveDuplicate} onClose={()=>resolveDuplicate(false)}/>}
   {revealed&&revealed.imageUrl&&<GoOfficialDrawReveal card={revealed} onClose={()=>setRevealed(null)}/>}
  </article>;
 }
