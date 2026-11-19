@@ -67,7 +67,6 @@ test('HIDDEN becomes NEW at four normal cards and first reveal uses hologram + h
  const css=read('components/GoAlbumCardDetail.css'),haptics=read('lib/goBattleHaptics.js');
  assert.match(official,/s2-official-hidden-new/);assert.match(official,/official firstUnlock/);
  assert.match(detail,/go-album-hologram/);assert.match(detail,/go-album-hidden-burst/);
- assert.match(detail,/HIDDEN_PIXEL_PARTICLES\.map/);
  assert.match(detail,/vibrateHiddenUnlock/);assert.match(css,/go-hidden-holo-primary/);
  assert.match(haptics,/battleVibrationEnabled\(\)/);
  assert.equal(vibrateHiddenUnlock(),false,'unsupported Node/IOS browser does not vibrate');

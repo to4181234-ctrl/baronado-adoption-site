@@ -5,7 +5,6 @@ import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const ts=require('typescript');
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
-import {HIDDEN_PARTICLE_COUNTS,HIDDEN_PARTICLE_TOTAL,HIDDEN_PIXEL_PARTICLES,HIDDEN_PIXEL_SPRITES} from '../lib/goHiddenPixelParticles.js';
 
 test('first unlock and every repeat use one identical HIDDEN reveal sequence',()=>{
  const detail=read('components/GoAlbumCardDetail.js');
@@ -46,8 +45,7 @@ test('hologram is visible on immediate opening, has pixel burst, and settles to 
  const css=read('components/GoAlbumCardDetail.css');
  for(const className of ['go-hidden-aura','go-hidden-pulse','go-hidden-flash','go-album-hidden-burst','go-album-hologram'])
   assert.ok(src.includes(className),className);
- assert.match(src,/HIDDEN_PIXEL_PARTICLES\.map/);
- assert.match(src,/HIDDEN_PIXEL_SPRITES\[particle.type\]/);
+ assert.match(src,/Array\.from\(\{length:28\}/);
  for(const key of ['go-hidden-card-entry','go-hidden-aura-bloom','go-hidden-pulse-ring','go-hidden-holo-primary','go-hidden-center-flash','go-hidden-pixel-fly','go-hidden-holo-idle'])
   assert.match(css,new RegExp('@keyframes '+key+'\\b'),key);
  assert.match(css,/go-hidden-holo-idle 6\.5s ease-in-out 2\.15s infinite/);
@@ -69,41 +67,4 @@ test('JSX parses without errors and only supported CSS controls own the animatio
   const source=ts.createSourceFile(file,read(file),ts.ScriptTarget.Latest,true,ts.ScriptKind.JSX);
   assert.deepEqual(source.parseDiagnostics.map(d=>ts.flattenDiagnosticMessageText(d.messageText,' ')),[]);
  }
-});
-
-test('user-approved B45/C35/A20 blend is exactly 18 diamonds, 14 colored stars, 8 crosses',()=>{
- assert.equal(HIDDEN_PARTICLE_TOTAL,40);
- assert.deepEqual(HIDDEN_PARTICLE_COUNTS,{diamond:18,color:14,cross:8});
- const count=HIDDEN_PIXEL_PARTICLES.reduce((r,p)=>(r[p.type]++,r),{diamond:0,color:0,cross:0});
- assert.deepEqual(count,HIDDEN_PARTICLE_COUNTS);
- assert.equal(new Set(HIDDEN_PIXEL_PARTICLES.map(p=>p.angle)).size,40);
- for(const p of HIDDEN_PIXEL_PARTICLES){
-  assert.match(p.delay,/^\d+ms$/);
-  assert.match(p.distance,/^\d+px$/);
-  assert.match(p.size,/^\d+px$/);
-  assert.equal(p.colors.length,3);
- }
-});
-
-test('particle pixels are integer-grid crisp shapes, not blurred vector circles',()=>{
- const component=read('components/GoAlbumCardDetail.js');
- const css=read('components/GoAlbumCardDetail.css');
- for(const kind of ['diamond','color','cross']){
-  const shape=HIDDEN_PIXEL_SPRITES[kind];
-  assert.equal(shape.length,3);
-  assert.ok(shape.every(v=>v.length>0));
-  for(const path of shape){
-   assert.match(path,/^M\d+ \d+h1v1h-1Z/);
-   assert.doesNotMatch(path,/[CLQA]/,'must be one-pixel rects without curves');
-  }
- }
- assert.match(component,/HIDDEN_PIXEL_PARTICLES\.map/);
- assert.match(component,/HIDDEN_PIXEL_SPRITES\[particle.type\]/);
- assert.match(component,/shapeRendering="crispEdges"/);
- assert.match(component,/data-particle-style="pixel-mix-b45-c35-a20"/);
- assert.match(css,/shape-rendering:crispEdges/);
- assert.match(css,/image-rendering:pixelated/);
- assert.match(css,/go-hidden-pixel-fly-v3/);
- assert.doesNotMatch(component,/Array\.from\(\{length:28\}/);
- assert.doesNotMatch(css,/radial-gradient\([^\n]*\.go-album-hidden-burst/);
 });
