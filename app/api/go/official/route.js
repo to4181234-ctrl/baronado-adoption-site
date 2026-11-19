@@ -24,22 +24,24 @@ export async function GET(request){
   if(setsResult.error||dogsResult.error)throw Error('official catalog');
   const sets=setsResult.data||[];
   const dogMap=new Map((dogsResult.data||[]).map(d=>[d.id,d]));
-  const [ownedResult,hiddenResult,drawResult]=member?await Promise.all([
+  const [ownedResult,hiddenResult,drawResult,customResult]=member?await Promise.all([
    db.from('go_official_owned').select('dog_id,slot,power,charm,acquired_at,seen_at')
     .eq('member_id',member.id),
    db.from('go_official_hidden').select('dog_id,power,charm,unlocked_at,seen_at')
     .eq('member_id',member.id),
    db.from('go_official_daily_draws')
     .select('dog_id,slot,duplicate,proposed_power,proposed_charm,resolved_at,created_at')
-    .eq('member_id',member.id).eq('local_day',day).maybeSingle()
-  ]):[{data:[],error:null},{data:[],error:null},{data:null,error:null}];
-  if(ownedResult.error||hiddenResult.error||drawResult.error)throw Error('owned catalog');
+    .eq('member_id',member.id).eq('local_day',day).maybeSingle(),
+    db.rpc('go_album_photo_counts',{p_member:member.id})
+  ]):[{data:[],error:null},{data:[],error:null},{data:null,error:null},{data:[],error:null}];
+  if(ownedResult.error||hiddenResult.error||drawResult.error||customResult.error)throw Error('owned catalog');
   const owned=ownedResult.data||[],hidden=hiddenResult.data||[];
+   const customCounts=new Map((customResult.data||[]).map(c=>[c.dog_id,Number(c.photo_count)||0]));
   const ownedKeys=new Set(owned.map(o=>o.dog_id+':'+o.slot));
   const hiddenKeys=new Set(hidden.map(h=>h.dog_id));
   const eligibleSets=sets.filter(s=> {
     const dog=dogMap.get(s.dog_id);
-    return dog&&(!dog.adopted||owned.some(o=>o.dog_id===s.dog_id)||hiddenKeys.has(s.dog_id));
+    return dog&&(!dog.adopted||owned.some(o=>o.dog_id===s.dog_id)||hiddenKeys.has(s.dog_id)||(customCounts.get(s.dog_id)||0)>0);
   });
   const versionIds=eligibleSets.map(s=>s.current_version);
   let assets=[];
@@ -83,7 +85,7 @@ export async function GET(request){
     dogId:s.dog_id,name:dog.name,adopted:dog.adopted,createdAt:dog.created_at,paused:s.paused,publishedComplete:true,thumbnailPathAvailable:true,
     thumbnailUrl:photoThumbs.get(s.dog_id)||null,
     available:!dog.adopted&&!s.paused,
-    collected:cards.length,missing:4-cards.length,
+    collected:cards.length,personalCount:customCounts.get(s.dog_id)||0,missing:4-cards.length,
     slots:Array.from({length:4},(_,i)=>{
      const slot=i+1,own=cards.find(x=>x.slot===slot),asset=photoMap.get(s.dog_id+':'+slot);
      return {slot,owned:Boolean(own),title:own?asset?.title||'':'',

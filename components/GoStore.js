@@ -41,7 +41,7 @@ export default function GoStore(){
  const [error,setError]=useState(''),[message,setMessage]=useState('');
  const [selected,setSelected]=useState({mode:'random'}),[confirm,setConfirm]=useState(false);
  const [choiceOpen,setChoiceOpen]=useState(false),[collarChoice,setCollarChoice]=useState(null);
- const [dogPickerOpen,setDogPickerOpen]=useState(false);
+ const [dogPickerOpen,setDogPickerOpen]=useState(false),[pickerNotice,setPickerNotice]=useState('');
  const [pending,setPending]=useState(null);
  const [duplicate,setDuplicate]=useState(null);
  const [revealed,setRevealed]=useState(null);
@@ -105,7 +105,7 @@ export default function GoStore(){
  async function buy(){
   if(!member){setConfirm(false);openAccount();return;}
   if(busy||pending||items.length===0)return;
-  if(selected.mode==='specific'&&!selectedDog){
+  if(selected.mode==='specific'&&(!selectedDog||selectedDog.missing===0)){
    setError('미보유 공식 멍카드가 남아 있는 강아지를 선택해주세요.');setConfirm(false);return;
   }
   const price=STORE_PRICES[selected.mode];
@@ -182,7 +182,7 @@ export default function GoStore(){
       <b>200 멍코인</b>
     </button>
     <button type="button"
-     onClick={()=>{setSelected({mode:'specific'});setDogPickerOpen(true);}}>
+     onClick={()=>{setSelected({mode:'specific'});setPickerNotice('');setDogPickerOpen(true);}}>
       <LockedOfficialCard slot={1} storePreview/>
       <strong>카드 지정 랜덤 뽑기</strong>
       <small>내가 지정한 멍멍이로<br/>랜덤 멍카드를 뽑을 수 있다.</small>
@@ -200,15 +200,18 @@ export default function GoStore(){
     <button className="s4-store-close" onClick={()=>setDogPickerOpen(false)} aria-label="닫기">×</button>
     <h2>어떤 멍멍이로 뽑을까요?</h2>
     <p>선택한 멍멍이의 미보유 공식 카드 중 1장이 무작위로 나와요.</p>
-    {dogOptions.length===0?<p>지금 선택할 수 있는 미보유 공식 멍카드가 없어요.</p>:
-     <div className="s4-store-dog-choices">{dogOptions.map(dog=>
-      <button type="button" key={dog.dogId} onClick={()=>{
-       setSelected({mode:'specific',dogId:dog.dogId});setDogPickerOpen(false);
-       setCollarChoice(null);setChoiceOpen(true);
-      }} className="s4-store-dog-tile"><img className={(dog.collected>0||dog.hiddenUnlocked)?'s4-store-acquired-silhouette':''}
-        src={(dog.collected>0||dog.hiddenUnlocked)?(dog.thumbnailUrl||figmaSprite(dog.name,'shadow')):'/figma-v3/album-empty-collar.png'}
-        alt={dog.collected>0||dog.hiddenUnlocked?`${dog.name} 수집한 강아지 실루엣`:'미획득 강아지 - 모습 미공개'} />
-        <span>{dog.name}</span><small>미보유 {dog.missing}종</small></button>)}</div>}
+    {dogOptions.length===0?<p>현재 선택 가능한 입양 전 강아지가 없어요.</p>:
+      <div className="s4-store-dog-choices">{dogOptions.map(dog=>
+       <button type="button" key={dog.dogId} onClick={()=>{
+        if(dog.missing===0){setPickerNotice('이미 모든 멍카드를 모았어요. 나만의 멍카드만 수집 가능해요');return;}
+        setSelected({mode:'specific',dogId:dog.dogId});setDogPickerOpen(false);
+        setPickerNotice('');setConfirm(true);
+       }} className="s4-store-dog-tile" aria-label={dog.name+(dog.missing===0?' 공식 카드 4종 수집 완료':' 미보유 공식 카드 '+dog.missing+'종')}>
+        <img className={dog.hasAnyCard?'':'s4-store-dog-silhouette'}
+         src={dog.hasAnyCard?(dog.thumbnailUrl||figmaSprite(dog.name,'front')):(dog.thumbnailUrl||figmaSprite(dog.name,'shadow'))}
+         alt={dog.hasAnyCard?dog.name:'아직 수집하지 못한 '+dog.name+' 실루엣'}/>
+         <span>{dog.name}</span></button>)}</div>}
+     {pickerNotice&&<p role="status" className="s4-store-picker-notice">{pickerNotice}</p>
    </section>
   </div>}
   {choiceOpen&&<div className="s4-store-overlay" role="presentation" onClick={()=>setChoiceOpen(false)}>
