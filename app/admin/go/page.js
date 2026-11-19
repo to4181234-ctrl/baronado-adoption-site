@@ -30,7 +30,7 @@ function ReviewPage(){
  }
  function removeSelected(){if(selected.length&&window.confirm(`선택한 카드 ${selected.length}개를 완전히 삭제할까요? 삭제 후에는 복구할 수 없어요.`))mutate('DELETE',{ids:selected,status:view},'선택한 카드를 삭제했어요.');}
  return <main className="site-shell v3-site v10-admin-cards"><SiteHeader/><section className="v10-admin-content">
-  {active?<button className="v10-admin-back" onClick={()=>{setActiveId(null);setAction(null);setError('');}}>‹ 카드 목록</button>:showStats?<button className="v10-admin-back" onClick={()=>setShowStats(false)}>‹ 카드 목록</button>:<Link className="v10-admin-back" href="/admin/menu">‹ 관리 메뉴</Link>}
+  {active?<button className="v10-admin-back" onClick={()=>{setActiveId(null);setAction(null);setError('');}}>‹ 카드 목록</button>:showStats?<button className="v10-admin-back" onClick={()=>setShowStats(false)}>‹ 카드 목록</button>:null}
   <header className="v10-admin-heading"><h1>{active?'카드 게시물 상세':showStats?'카드 게시물 통계':'카드 게시물 관리'}</h1><p>{active?'사진·제목·신고 내용을 확인하고 처리해요.':showStats?'기간별 게시물과 좋아요를 확인해요.':'제목·작성자·강아지 이름으로 카드를 찾아요.'}</p></header>
   {error&&<p role="alert" className="v3-error">{error}</p>}{notice&&<p role="status">{notice}</p>}
   {showStats?<GoAdminStats/>:active?<article className="v10-admin-detail">
