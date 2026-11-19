@@ -9,6 +9,7 @@ import GoDogAlbum from './GoDogAlbum.js';
 import GoCamera from './GoCamera.js';
 import GoCard from './GoCard.js';
 import GoAlbumBattleRecords from './GoAlbumBattleRecords.js';
+import {albumRoster,albumPreview,albumProgress} from '../lib/goAlbumRoster.js';
 import {koreaDay} from '../lib/goCoins.js';
 const EMPTY={counts:{},covers:{},progress:null,standing:null,ready:false};
 const STAGE2_ENABLED=process.env.NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED==='1';
@@ -40,17 +41,15 @@ function Album({initialDogId=null}){
   return()=>{active=false;};
  },[member?.id]);
  useEffect(()=>{reloadCards();},[reloadCards]);
- useEffect(()=>{setCardPage(0);setSelection(false);setSelectedIds([]);},[dogId,member?.id]);
+ useEffect(()=>{setCardPage(0);setSelection(false);setSelectedIds([]);setShowAdopted(false);},[dogId,member?.id]);
  const count=dogId?(collection.counts?.[dogId]||0):0;
  // A dog cannot enter the album thumbnail list until all four official cards
  // and the HIDDEN asset are configured and the set has been published.
- const publishedDogs=STAGE2_ENABLED
-  ? [...new Set([...FIGMA_DOGS,...dogs.map(d=>d.name)])].filter(name=>{const d=dogs.find(x=>x.name===name);return d&&(officialDogs.some(o=>o.dogId===d.id&&o.publishedComplete)||Boolean(member&&(collection.counts?.[d.id]||0)>0));})
-  : FIGMA_DOGS;
- const hasDogCards=id=>Boolean((collection.counts?.[id]||0)>0 || officialDogs.some(o=>o.dogId===id&&(o.collected>0||o.hidden?.unlocked)));
- const claimed=publishedDogs.filter(name=>{const d=dogs.find(x=>x.name===name);return Boolean(d&&member&&hasDogCards(d.id));}).length;
- const totalDogs=publishedDogs.length;
- const orderedDogs=publishedDogs.slice().sort((a,b)=>{const da=dogs.find(x=>x.name===a),db=dogs.find(x=>x.name===b),oa=da&&member&&hasDogCards(da.id),ob=db&&member&&hasDogCards(db.id);return Number(Boolean(ob))-Number(Boolean(oa));});
+ const orderedDogs=STAGE2_ENABLED?albumRoster(dogs,officialDogs,collection.counts,Boolean(member)):
+  albumRoster(dogs.filter(d=>FIGMA_DOGS.includes(d.name)),[],collection.counts,Boolean(member));
+ const {collected:claimed,total:totalDogs}=albumProgress(orderedDogs);
+ const visibleDogs=albumPreview(orderedDogs,showAdopted);
+ const moreDogs=orderedDogs.length>visibleDogs.length;
  const figure=(name,unlocked=false,shadow=false)=>{
   const published=officialDogs.find(o=>o.name===name);
   return shadow||!unlocked?figmaSprite(name,'shadow'):(published?.thumbnailUrl||figmaSprite(name,'front'));
@@ -65,7 +64,7 @@ function Album({initialDogId=null}){
  function CardList(){return <><div className="v3-card-list">{ownCards.map(card=>selection?<GoCard key={card.id} card={card} member={member} onLogin={openAccount} compact previewStats selectMode selected={selectedIds.includes(card.id)} onSelect={toggle}/>:<GoCard key={card.id} card={card} member={member} onLogin={openAccount} compact previewStats linkToPost onDelete={()=>{reloadCards();reloadCollection();}}/>)}</div><div className="v3-pager"><button disabled={cardPage===0} onClick={()=>setCardPage(x=>x-1)}>〈</button><span>{cardPage+1} / {Math.max(1,Math.ceil(cardTotal/4))}</span><button disabled={(cardPage+1)*4>=cardTotal} onClick={()=>setCardPage(x=>x+1)}>〉</button></div></>;}
  return <>
   {dogId?<div className="v3-album-detail">
-   {dog?<><section className="v3-album-yellow"><div><h1>{dog.name} 도감</h1>{count>0&&<>{dog.adopted?<p>입양을 완료한 멍멍이예요.</p>:collection.standing?.rank&&collection.standing?.participants?<><p>{member?.nickname||'멍기록가'}님은 {dog.name} 멍기록가 중 상위 {Math.ceil(collection.standing.rank/collection.standing.participants*100)}% 입니다</p><small>보유 카드 수 기준 · 같은 수는 공동 순위</small></>:null}</>}<small>보유 카드 수 {count}장</small></div><div className="v3-album-dog-row">{count>0?<Link href={'/go/interact/'+dog.id} className="v3-album-avatar"><img src={figure(dog.name,true)} alt={dog.name}/><span>{dog.name} 만나러가기 ›</span></Link>:<div className="v3-album-avatar"><img src={figure(dog.name,false)} alt="미획득 실루엣"/><Link href={'/dogs/'+dog.id}>힌트 보러가기 ›</Link></div>}<div><h3>{dog.name}</h3><p>수집 카드<br/>{count}장</p><p>속성<br/><b>{count>0?`✦ ${gameElement(dog.name)}`:'미공개'}</b></p></div></div>{!dog.adopted&&<button className="v3-album-collect" onClick={()=>member?setCollectConfirm(true):openAccount()}>멍카드 수집하러가기 ›</button>}</section>
+   {dog?<><section className="v3-album-yellow"><div><h1>{dog.name} 도감</h1>{count>0&&<>{dog.adopted?<p>입양을 완료한 멍멍이예요.</p>:collection.standing?.rank&&collection.standing?.participants?<><p>{member?.nickname||'멍기록가'}님은 {dog.name} 멍기록가 중 상위 {Math.ceil(collection.standing.rank/collection.standing.participants*100)}% 입니다</p><small>보유 카드 수 기준 · 같은 수는 공동 순위</small></>:null}</>}<small>보유 카드 수 {count}장</small></div><div className="v3-album-dog-row">{count>0&&!dog.adopted?<Link href={'/go/interact/'+dog.id} className="v3-album-avatar"><img src={figure(dog.name,true)} alt={dog.name}/><span>{dog.name} 만나러가기 ›</span></Link>:<div className="v3-album-avatar"><img src={figure(dog.name,false)} alt="미획득 실루엣"/><Link href={'/dogs/'+dog.id}>힌트 보러가기 ›</Link></div>}<div><h3>{dog.name}</h3><p>수집 카드<br/>{count}장</p><p>속성<br/><b>{count>0?`✦ ${gameElement(dog.name)}`:'미공개'}</b></p></div></div>{!dog.adopted&&<button className="v3-album-collect" onClick={()=>member?setCollectConfirm(true):openAccount()}>멍카드 수집하러가기 ›</button>}</section>
    <div className="v3-album-cards"><div className="v3-section-bar"><h2>수집한 카드 ({cardTotal}장)</h2><select aria-label="카드 정렬" value={order} onChange={e=>{setCardPage(0);setOrder(e.target.value)}}><option value="newest">등록 순서 | 최신순</option><option value="oldest">등록 순서 | 오래된순</option></select></div>
     {member&&<div className="v3-manage"><button onClick={()=>{setSelection(v=>!v);setSelectedIds([]);}}>{selection?'선택 취소':'내 카드 관리'}</button>{selection&&<button disabled={!selectedIds.length||deleting} onClick={deleteSelected}>{deleting?'삭제 중…':'선택 '+selectedIds.length+'장 삭제'}</button>}</div>}
     {!member?<p className="v3-status" onClick={openAccount}>로그인하면 수집한 카드가 나타나요. <button onClick={openAccount}>로그인하기</button></p>:cardTotal?<CardList/>:<div className="v3-empty-collection">아직 수집한 카드가 없어요.<br/>힌트에서 {dog.name}의 이야기를 만나보세요.</div>}</div>
@@ -76,7 +75,8 @@ function Album({initialDogId=null}){
     <div className="v3-home-quest-shortcut"><Link href="/go/quests" onClick={()=>{setQuestSeen(true);try{localStorage.setItem('meonggo:quest-seen:'+koreaDay(),'1');}catch{}}}>{!questSeen&&<span className="v3-home-quest-new">NEW</span>}<strong>오늘의 멍코인 퀘스트 보러가기 &gt;</strong><small>매일 자정에 업데이트!</small></Link></div>
     <section id="meonggo-album" className="v3-collection-section"><h2>내 도감</h2><div className="v3-progress-label">도감 수집 {officialLoaded?claimed:'—'} / {totalDogs}{member&&claimed===0?' (첫 도감을 기다리고 있어요)':''}</div><div className="v3-progress"><span style={{width:(officialLoaded?totalDogs?claimed/totalDogs*100:0:0)+'%'}}/></div>
      {officialLoaded&&orderedDogs.length===0&&<p className="v3-status">공식 멍카드 4종과 HIDDEN이 공개되면 도감에 멍멍이가 나타나요.</p>}
-     <div className="v3-collection-grid">{orderedDogs.map(name=>{const d=dogs.find(x=>x.name===name),owned=Boolean(d&&member&&hasDogCards(d.id));return <Link href={d?'/go/'+d.id:'/go'} className={'v3-collection-tile'+(owned?' unlocked':'')} key={name}><img src={owned?figure(name,true):FIGMA_ALBUM_SHADOW[name]||figure(name,false)} alt={owned?name:'미획득 실루엣'}/><strong>{name}</strong></Link>})}</div></section>
+     <div className="v3-collection-grid">{visibleDogs.map(d=><Link href={'/go/'+d.id} className={'v3-collection-tile'+(d.owned?' unlocked':'')+(d.adopted?' is-adopted':'')} key={d.id}><img src={d.owned?figure(d.name,true):FIGMA_ALBUM_SHADOW[d.name]||figure(d.name,false)} alt={d.adopted?d.name+' 입양 완료':d.owned?d.name:'미획득 실루엣'}/><strong>{d.name}</strong>{d.adopted&&<span className="v3-collection-adopted-label">입양 완료</span>}</Link>)}</div>
+      {(moreDogs||showAdopted)&&<button type="button" className="v3-collection-expand" aria-expanded={showAdopted} onClick={()=>setShowAdopted(v=>!v)}>{showAdopted?'접기':'+더보기'}</button>}</section>
     <GoAlbumBattleRecords dogs={dogs} records={collection.battleRecords} member={member} ready={collection.ready}/>
   </div>}
   {notice&&<p className="v3-message" role="status">{notice}</p>}{error&&<p className="v3-error" role="alert">{error}</p>}

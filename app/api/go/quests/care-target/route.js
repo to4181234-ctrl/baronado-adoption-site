@@ -11,7 +11,7 @@ export async function GET(request){
  if(!member)return goError('로그인이 필요해요.',401);
  try{
   const db=adminDatabase();
-  const dogs=await db.from('dogs').select('id').eq('category','adoption');
+  const dogs=await db.from('dogs').select('id').eq('category','adoption').eq('adopted',false);
   if(dogs.error)throw Error('dog lookup');
   const released=await releasedDogs(db);
   const ids=[...new Set((dogs.data||[]).map(d=>d.id).filter(id=>released.has(id)))];

@@ -20,10 +20,11 @@ export async function GET(request){
    db.from('go_cards').select('id').eq('member_id',member.id).eq('dog_id',id).eq('status','approved').limit(1),
    db.from('go_official_owned').select('slot').eq('member_id',member.id).eq('dog_id',id).limit(1),
    db.from('go_official_hidden').select('dog_id').eq('member_id',member.id).eq('dog_id',id).limit(1),
-   db.from('dogs').select('id,category').eq('id',id).maybeSingle()
+   db.from('dogs').select('id,category,adopted').eq('id',id).maybeSingle()
   ]);
   if(affinity.error||history.error||owned.error||official.error||hidden.error||dog.error)throw Error();
   if(!dog.data||dog.data.category!=='adoption')return goError('교감할 강아지를 찾지 못했어요.',404);
+   if(dog.data.adopted)return goError('입양 완료한 강아지는 새로 돌볼 수 없어요. 기존 기록은 유지돼요.',409);
   const now=new Date(),date=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
   const daily=(history.data||[]).filter(x=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(x.created_at))===date);
   const pixel=await db.from('go_dog_pixel_assets').select('care_path').eq('dog_id',id).maybeSingle();
@@ -40,6 +41,9 @@ export async function POST(request){
  if(!validId(body?.dogId)||!actions.includes(body?.action))return goError('교감 정보를 확인해주세요.');
  try{const db=adminDatabase();
   if(!await dogReleased(db,body.dogId))return goError('아직 공개되지 않은 강아지예요.',409);
+   const dog=await db.from('dogs').select('adopted,category').eq('id',body.dogId).maybeSingle();
+   if(dog.error)throw dog.error;
+   if(!dog.data||dog.data.category!=='adoption'||dog.data.adopted)return goError('입양 완료 강아지는 새로 돌볼 수 없어요.',409);
   const procedure=interactionProcedure(process.env.MEONGGO_STAGE1_COINS_ENABLED==='1');
   const r=await db.rpc(procedure,{p_member_id:member.id,p_dog_id:body.dogId,p_action:body.action});if(r.error)throw r.error;
   if(!r.data?.ok)return Response.json(r.data||{error:'교감할 수 없어요.'},{status:409,headers:{'Cache-Control':'no-store'}});
