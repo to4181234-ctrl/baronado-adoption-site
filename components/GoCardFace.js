@@ -2,7 +2,7 @@
 import {useId} from 'react';
 import {CARD_FACE,cardFaceModel} from '../lib/goCardFace.js';
 /** Shared Figma card face for lists, detail, battle and exported PNG coordinates. */
-export default function GoCardFace({card}){
+export default function GoCardFace({card,selected=false}){
  const model=cardFaceModel(card),id=useId().replaceAll(':','');
  const special=card.officialSlot===5;
  const missingScores=Boolean(card.unknownScores)||special&&(card.battle?.power==null||card.battle?.charm==null);
@@ -10,6 +10,7 @@ export default function GoCardFace({card}){
  return <svg className="go-card-graphic" viewBox="0 0 166 265" role="img" aria-label={`${title?title+' · ':''}${model.dogName} 카드 · ${missingScores?'능력치 미설정':`파워 ${model.power} · 애교 ${model.charm}`} · ${model.element} · ${model.author}`}>
   {title&&<title>{title}</title>}
   <defs><clipPath id={id+'name'}><rect x="16" y="166" width="94" height="23"/></clipPath><clipPath id={id+'author'}><rect x="16" y="237" width="84" height="14"/></clipPath></defs>
+  {selected&&<path d="M11 4 H155 V7 H159 V11 H162 V254 H159 V258 H155 V261 H11 V258 H7 V254 H4 V11 H7 V7 H11 Z" fill="#f8dc65"/>}
   {special&&<image href="/figma-official/hidden-hologram-pixels-681-290128.png" x="0" y="0" width="166" height="265" preserveAspectRatio="none" style={{imageRendering:'pixelated'}}/>}
   <image href={CARD_FACE.frame} x="0" y="0" width="166" height="265"/>
   <g fontFamily="MonaS12, sans-serif" fill="#000">
