@@ -1,0 +1,12 @@
+/* Admin-only two-level navigation; Figma source artwork is unchanged. */
+.v3-header-admin .v10-admin-group-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;width:min(390px,calc(100% - 32px));box-sizing:border-box;margin:12px auto 4px}
+.v3-header-admin .v10-admin-group-switch a{display:flex;min-height:44px;min-width:0;align-items:center;justify-content:center;padding:9px 7px;box-sizing:border-box;border:1px solid #e6e4dc;border-radius:8px;background:#fff;color:#3c3b37;text-align:center;text-decoration:none;font:600 13px/1.4 'Pretendard',sans-serif;word-break:keep-all}
+.v3-header-admin .v10-admin-group-switch a[aria-current=page]{background:#fae04b;border-color:#d4b944;color:#201d15;font-weight:700}
+.v3-header-admin .v10-admin-group-switch a:focus-visible{outline:2px solid #9e791c;outline-offset:2px}
+.v3-header-admin .v10-admin-global-nav{margin-top:0;scrollbar-width:thin}
+.v3-header-admin .v10-admin-global-nav a[aria-current=page]{background:#fff3c2;border-color:#dac368}
+.v3-admin-list .v10-admin-dog-category{display:flex;gap:8px;align-items:center;margin:0 0 14px}
+.v3-admin-list .v10-admin-dog-category a{display:inline-flex;min-height:38px;align-items:center;padding:8px 17px;border:1px solid #e7e0d6;border-radius:7px;background:#fff;font:600 12px/1.35 'Pretendard',sans-serif;text-decoration:none;color:#484540;box-sizing:border-box}
+.v3-admin-list .v10-admin-dog-category a[aria-current=page]{background:#fff3c2;border-color:#dac368;color:#171713}
+.v10-admin-cards .go-statistics{margin:16px 0 24px}
+@media(max-width:350px){.v3-header-admin .v10-admin-group-switch a{font-size:12px;padding-inline:4px}}
