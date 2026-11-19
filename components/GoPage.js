@@ -26,6 +26,7 @@ function Album({initialDogId=null}){
  const [freeDrawOpen,setFreeDrawOpen]=useState(false);
  const [officialRefreshKey,setOfficialRefreshKey]=useState(0);
  const [officialDogs,setOfficialDogs]=useState([]),[officialLoaded,setOfficialLoaded]=useState(!STAGE2_ENABLED);
+ const [officialDraw,setOfficialDraw]=useState({day:null,drawCount:0,drawLimit:2});
  const dogId=initialDogId;
  useEffect(()=>{try{setQuestSeen(localStorage.getItem('meonggo:quest-seen:'+koreaDay())==='1');}catch{setQuestSeen(false);}},[]);
  const dog=dogs.find(x=>x.id===dogId)||null;
@@ -34,15 +35,24 @@ function Album({initialDogId=null}){
  const reloadCards=useCallback(()=>{if(!member){setOwnCards([]);return Promise.resolve();}const p=new URLSearchParams({mine:'1',page:String(cardPage),limit:'4',order});if(dogId)p.set('dog',dogId);return fetch('/api/go/cards?'+p,{cache:'no-store'}).then(r=>r.json()).then(data=>{if(data.error)throw Error(data.error);setOwnCards(data.cards||[]);setCardTotal(data.total||0);}).catch(e=>setError(e.message));},[member?.id,cardPage,order,dogId]);
  useEffect(()=>{reloadCollection();},[reloadCollection]);
  useEffect(()=>{
-  if(!STAGE2_ENABLED){setOfficialDogs([]);setOfficialLoaded(true);return;}
+  if(!STAGE2_ENABLED){setOfficialDogs([]);setOfficialLoaded(true);setOfficialDraw({day:null,drawCount:0,drawLimit:2});return;}
   let active=true;
   setOfficialLoaded(false);
   fetch('/api/go/official',{cache:'no-store'}).then(async r=>{
    const d=await r.json();if(!r.ok)throw Error(d.error||'공식 도감을 불러오지 못했어요.');return d;
-  }).then(d=>{if(active){setOfficialDogs(d.dogs||[]);setOfficialLoaded(true);}})
+  }).then(d=>{if(active){setOfficialDogs(d.dogs||[]);setOfficialDraw({day:d.day||null,drawCount:Number(d.drawCount)||0,drawLimit:Number(d.drawLimit)||2});setOfficialLoaded(true);}})
    .catch(e=>{if(active){setOfficialDogs([]);setOfficialLoaded(false);setError(e.message);}});
   return()=>{active=false;};
  },[member?.id,officialRefreshKey]);
+ // Server's Korea-local day controls daily NEW and usage, even across midnight without reloading.
+ useEffect(()=>{
+  if(!STAGE2_ENABLED)return;
+  const refreshAtNewDay=()=>{if(officialDraw.day&&officialDraw.day!==koreaDay())setOfficialRefreshKey(v=>v+1);};
+  const ticker=window.setInterval(refreshAtNewDay,30000);
+  window.addEventListener('focus',refreshAtNewDay);
+  return()=>{window.clearInterval(ticker);window.removeEventListener('focus',refreshAtNewDay);};
+ },[officialDraw.day]);
+ const freeDrawUsed=officialDraw.day===koreaDay()?Math.min(officialDraw.drawLimit,Math.max(0,officialDraw.drawCount)):0;
  useEffect(()=>{reloadCards();},[reloadCards]);
  useEffect(()=>{setCardPage(0);setSelection(false);setSelectedIds([]);setShowAdopted(false);},[dogId,member?.id]);
  const personalCount=dogId?(collection.counts?.[dogId]||0):0;
@@ -79,9 +89,9 @@ function Album({initialDogId=null}){
     <section className="v3-profile-head"><div className="v3-profile-avatar"><img className={!member?'v3-profile-anon-silhouette':undefined} src={member?figmaSprite(member.avatarDog||'구름',member.avatarDog?'front':'shadow'):'/figma-v3/album-shadow-buddy.svg'} alt={member?'프로필 캐릭터':'미획득 실루엣'}/></div><div>{member?<><h1>{member.nickname}</h1><p>멍기록가</p><small>{member.profileBio||'자기소개가 없습니다.'}</small><Link href="/go/profile"><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>프로필 수정</Link><button type="button" className="v3-profile-logout" onClick={logout}><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>로그아웃</button></>:<><h1 className="v3-anon-heading">멍기록가를 기다리는중!</h1><p>멍기록가</p><small className="v3-anon-lede">로그인하고 나만의 멍멍 도감 채우기</small><button type="button" className="v3-profile-login s1-login-primary" onClick={openAccount}><img className="v3-album-pixel-arrow" src="/figma-v3/album-login-arrow.svg" alt="" aria-hidden="true"/>로그인하고 시작하기</button><Link className="s1-browse-first" href="/go/community">먼저 둘러보기 ›</Link></>}</div></section>
     <div className="v3-home-free-shortcut v3-home-quest-shortcut">
      <button type="button" onClick={()=>member?setFreeDrawOpen(true):openAccount()}>
-      <span className="v3-home-free-new">NEW</span>
+      {officialLoaded&&(!member||(officialDraw.day===koreaDay()&&freeDrawUsed===0))&&<span className="v3-home-free-new">NEW</span>}
       <strong>랜덤 멍카드 뽑기 &gt;</strong>
-      <small>1일 2회 한정 무료</small>
+      <small>1일 2회 한정 무료 ({officialLoaded?freeDrawUsed:"–"}/{officialDraw.drawLimit})</small>
      </button>
     </div>
     <div className="v3-home-quest-shortcut"><Link href="/go/quests" onClick={()=>{setQuestSeen(true);try{localStorage.setItem('meonggo:quest-seen:'+koreaDay(),'1');}catch{}}}>{!questSeen&&<span className="v3-home-quest-new">NEW</span>}<strong>오늘의 멍코인 퀘스트 보러가기 &gt;</strong><small>매일 자정에 업데이트!</small></Link></div>
