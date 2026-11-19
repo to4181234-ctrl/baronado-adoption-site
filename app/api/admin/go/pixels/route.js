@@ -4,6 +4,7 @@ import {hasAdminSession,sameOrigin} from '../../../../../lib/server/adminSession
 import {adminDatabase,validId} from '../../../../../lib/server/adminData.js';
 import {GO_OFFICIAL_BUCKET} from '../../../../../lib/goOfficial.js';
 import {pixelImageUrls} from '../../../../../lib/server/goPixelUrls.js';
+import {GO_PIXEL_IMAGE_FIELDS,GO_PIXEL_REQUIRED_KINDS,missingGoPixelImages} from '../../../../../lib/goPixelAssets.js';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const fail=(error,status=400)=>Response.json({error},{status,headers:{'Cache-Control':'no-store'}});
 const json=data=>Response.json(data,{headers:{'Cache-Control':'no-store'}});
@@ -16,7 +17,7 @@ const slug=(dog,kind)=>`${dog}/pixel/${kind}/${randomUUID()}.png`;
 async function load(db){
  const [dogs,pixels,sets,assets]=await Promise.all([
   db.from('dogs').select('id,name,adopted,created_at').eq('category','adoption').order('name'),
-  db.from('go_dog_pixel_assets').select('dog_id,care_path,thumbnail_path,is_published,legacy_existing,updated_at'),
+  db.from('go_dog_pixel_assets').select('dog_id,care_path,thumbnail_path,front_path,side_path,feed_path,praise_path,play_path,is_published,legacy_existing,updated_at'),
   db.from('go_official_sets').select('dog_id,current_version'),
   db.from('go_official_assets').select('version_id,slot,title,display_path')
  ]);
@@ -26,19 +27,25 @@ async function load(db){
  const rows=(dogs.data||[]).map(d=>{
   const px=catalog.get(d.id)||{};const set=setMap.get(d.id);
   const slots=new Set((assets.data||[]).filter(a=>a.version_id===set?.current_version&&a.slot>=1&&a.slot<=5&&a.display_path&&(a.title?.trim()||px.legacy_existing)).map(a=>a.slot));
-  return {dogId:d.id,name:d.name,adopted:d.adopted,createdAt:d.created_at||null,carePath:px.care_path||null,thumbnailPath:px.thumbnail_path||null,
-   published:!!px.is_published,officialReady:slots.size===5,ready:!!px.is_published&&slots.size===5&&!!px.care_path&&!!px.thumbnail_path,updatedAt:px.updated_at||null};
+  const imagePaths=Object.fromEntries(GO_PIXEL_REQUIRED_KINDS.map(kind=>[kind,px[GO_PIXEL_IMAGE_FIELDS[kind]]||null]));
+  const missingKinds=missingGoPixelImages(px);
+  return {dogId:d.id,name:d.name,adopted:d.adopted,createdAt:d.created_at||null,imagePaths,missingKinds,
+    published:!!px.is_published,officialReady:slots.size===5,
+    ready:!!px.is_published&&slots.size===5&&missingKinds.length===0,updatedAt:px.updated_at||null};
  });
- const paths=rows.flatMap(row=>[row.carePath,row.thumbnailPath].filter(Boolean));
+ const paths=rows.flatMap(row=>Object.values(row.imagePaths).filter(Boolean));
  const urls=await pixelImageUrls(db,GO_OFFICIAL_BUCKET,paths,1800);
- return rows.map(r=>({...r,careUrl:urls.get(r.carePath)||null,thumbnailUrl:urls.get(r.thumbnailPath)||null,carePath:undefined,thumbnailPath:undefined}));
+ return rows.map(({imagePaths,...r})=>({
+  ...r,imageUrls:Object.fromEntries(GO_PIXEL_REQUIRED_KINDS.map(kind=>[kind,urls.get(imagePaths[kind])||null])),
+  thumbnailUrl:urls.get(imagePaths.thumbnail)||null
+ }));
 }
 export async function GET(request){const d=await permitted(request);if(d)return d;try{return json({dogs:await load(adminDatabase())});}catch(e){return fail(e.message,500);}}
 export async function PUT(request){
  const d=await permitted(request,true);if(d)return d;
  let form;try{form=await request.formData();}catch{return fail('업로드를 확인해주세요.');}
  const dogId=form.get('dogId'),kind=form.get('kind'),file=form.get('file');
- if(!validId(dogId)||!['care','thumbnail'].includes(kind)||!file||typeof file.arrayBuffer!=='function')return fail('강아지와 파일 항목을 확인해주세요.');
+ if(!validId(dogId)||!Object.hasOwn(GO_PIXEL_IMAGE_FIELDS,kind)||!file||typeof file.arrayBuffer!=='function')return fail('강아지와 파일 항목을 확인해주세요.');
  if(!['image/png','image/webp'].includes(file.type)||file.size<100||file.size>3*1024*1024)return fail('PNG/WEBP 픽셀 이미지를 3MB 이하로 올려주세요.');
  try{
   const bytes=Buffer.from(await file.arrayBuffer());const meta=await sharp(bytes,{limitInputPixels:9000000}).metadata();
@@ -49,10 +56,10 @@ export async function PUT(request){
   if(match.error||!match.data)return fail('등록되지 않은 보호 강아지예요.',404);
   const path=slug(dogId,kind);const uploaded=await db.storage.from(GO_OFFICIAL_BUCKET).upload(path,output,{upsert:false,contentType:'image/png'});
   if(uploaded.error)throw uploaded.error;
-  const key=kind==='care'?'care_path':'thumbnail_path';
+  const key=GO_PIXEL_IMAGE_FIELDS[kind];
   const existing=await db.from('go_dog_pixel_assets').select('dog_id').eq('dog_id',dogId).maybeSingle();
   if(existing.error)throw existing.error;
-  const values={[key]:path,is_published:false,updated_at:new Date().toISOString()};
+  const values={[key]:path,...(kind==='side'?{care_path:path}:{}),is_published:false,updated_at:new Date().toISOString()};
   const saved=existing.data
     ?await db.from('go_dog_pixel_assets').update(values).eq('dog_id',dogId)
     :await db.from('go_dog_pixel_assets').insert({dog_id:dogId,...values});
@@ -67,7 +74,8 @@ export async function POST(request){
  try{
   const db=adminDatabase();const list=await load(db);const dog=list.find(x=>x.dogId===body.dogId);
   if(!dog)return fail('강아지를 찾지 못했어요.',404);
-  if(body.published&&(!dog.officialReady||!dog.careUrl||!dog.thumbnailUrl))return fail('공식 카드 5종과 돌보기·대표 픽셀 일러스트를 모두 등록해야 공개할 수 있어요.',409);
+  if(body.published&&(!dog.officialReady||dog.missingKinds.length||GO_PIXEL_REQUIRED_KINDS.some(kind=>!dog.imageUrls[kind])))
+   return fail('공식 카드 5종과 픽셀 일러스트 6종을 모두 등록해야 공개할 수 있어요.',409);
   const {error}=await db.from('go_dog_pixel_assets').update({is_published:body.published,updated_at:new Date().toISOString()}).eq('dog_id',body.dogId);
   if(error)throw error;
   return json({ok:true,published:body.published});
