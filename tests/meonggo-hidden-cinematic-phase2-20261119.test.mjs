@@ -43,8 +43,9 @@ test('both opening and manual replay restart the same animation and approved sou
 test('hologram is visible on immediate opening, has pixel burst, and settles to a quiet looping shine',()=>{
  const src=read('components/GoAlbumCardDetail.js');
  const css=read('components/GoAlbumCardDetail.css');
- for(const className of ['go-hidden-aura','go-hidden-pulse','go-hidden-flash','go-album-hidden-burst','go-album-hologram'])
+ for(const className of ['go-hidden-aura','go-hidden-pulse','go-hidden-flash','go-album-hologram'])
   assert.ok(src.includes(className),className);
+ assert.match(read('components/GoHiddenRetroBurst.js'),/className="go-album-hidden-burst"/);
  assert.match(src,/GoHiddenRetroBurst/);
  assert.match(read('components/GoHiddenRetroBurst.js'),/Array\.from\(\{length:28\}/);
  for(const key of ['go-hidden-aura-bloom','go-hidden-pulse-ring','go-hidden-holo-primary','go-hidden-center-flash','go-hidden-pixel-fly','go-hidden-holo-idle'])
