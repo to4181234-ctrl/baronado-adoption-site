@@ -51,8 +51,7 @@ jobs:
           sudo apt-get install -y postgresql-client
       - name: Approved next-update rules and UI contract
         run: node --test tests/goNextEconomy.test.mjs tests/goNextEconomyContract.test.mjs tests/goStage3DesignContract.test.mjs
-      - name: Legacy full regression suite (report superseded contracts separately)
-        continue-on-error: true
+      - name: Full legacy and latest regression suite (failure blocks release)
         run: node --test tests/*.test.mjs
       - name: Rebuild synthetic PostgreSQL and test previous drafts
         run: bash scripts/verify-go-integration-local.sh go_integration_nextqa
@@ -63,6 +62,8 @@ jobs:
         run: |
           psql -X -h 127.0.0.1 -d go_integration_nextqa -v ON_ERROR_STOP=1 -f docs/sql/MEONGGO_NEXT_ECONOMY_DRAFT.sql
           psql -X -h 127.0.0.1 -d go_integration_nextqa -v ON_ERROR_STOP=1 -f tests/fixtures/go-next-economy-assert.sql
+      - name: Assert concurrent RPCs are idempotent with isolated local PostgreSQL
+        run: bash scripts/verify-go-next-economy-concurrency.sh go_integration_nextqa
       - name: Build Next.js with game feature flags enabled
         env:
           NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED: '1'
