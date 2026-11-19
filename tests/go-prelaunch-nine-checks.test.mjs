@@ -10,11 +10,12 @@ test('KST visit window: 09:00 included, 21:00 excluded, weekends same',()=>{
  assert.equal(isVisitRequestWindow(new Date('2026-11-16T23:59:59Z')),false);
  assert.equal(isVisitRequestWindow(new Date('2026-11-21T00:00:00Z')),true);
 });
-test('quest Figma 558:466129 keeps 4 distinct lines and header copy',()=>{
+test('latest quest page contains visit, care, battle only',()=>{
  const s=read('components/GoQuests.js');
  for(const title of ['바로나도에 놀러왔개','멍멍이 만나러가기',
- '랜덤 멍카드 뽑기','멍배틀 하기']) assert(s.includes(title),title);
+ '멍배틀 하기']) assert(s.includes(title),title);
  assert(s.indexOf("id: 'visit'")<s.indexOf("id: 'care'"));
+ assert.doesNotMatch(s,/id: 'draw'/);
  assert.match(s,/go-quest-title/);
  assert.match(s,/setVisitOpen\(true\)/);
 });

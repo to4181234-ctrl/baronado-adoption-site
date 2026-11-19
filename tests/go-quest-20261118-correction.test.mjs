@@ -5,13 +5,15 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '..');
 const file = name => fs.readFileSync(path.join(root,name),'utf8');
 
-test('home never instantiates unsolicited popup; free draw requires clicking quest',()=>{
+test('free draw opens on user click from album, not quest',()=>{
  const home=file('components/GoPage.js');
  const quests=file('components/GoQuests.js');
  assert.doesNotMatch(home,/<GoDiscovery\b/);
- assert.match(quests,/task\.id==='draw' && !compact[\s\S]*?onClick=\{\(\)=>setDrawOpen\(true\)\}/);
- assert.match(quests,/\{drawOpen&&!compact&&<GoFreeDraw/);
+ assert.match(home,/member\?setFreeDrawOpen\(true\):openAccount\(\)/);
+ assert.match(home,/freeDrawOpen&&<GoFreeDraw/);
+ assert.doesNotMatch(quests,/id: 'draw'/);
 });
+
 test('all completed quests have non-clickable text, before any button branch',()=>{
  const s=file('components/GoQuests.js');
  assert.match(s,/\{task\.completed\s*\? <span className="go-quest-title is-complete" aria-disabled="true">/);

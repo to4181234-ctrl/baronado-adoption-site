@@ -2,17 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const read=name=>readFileSync(new URL('../'+name,import.meta.url),'utf8');
-test('daily free draw is opened over quests rather than a /go redirect',()=>{
+test('daily free draw has an album entry, separate from coin quests',()=>{
+ const home=read('components/GoPage.js');
  const quests=read('components/GoQuests.js');
- assert.match(quests,/task\.id==='draw' && !compact/);
- assert.match(quests,/setDrawOpen\(true\)/);
- assert.match(quests,/<GoFreeDraw onClose=/);
+ assert.match(home,/setFreeDrawOpen\(true\)/);
+ assert.match(home,/<GoFreeDraw/);
+ assert.doesNotMatch(quests,/task\.id==='draw'/);
  const draw=read('components/GoFreeDraw.js');
- assert.match(draw,/choice===null\|\|busy/);
  assert.match(draw,/action:'draw'/);
- assert.match(draw,/drawUsed/);
  assert.match(draw,/pendingDuplicate/);
 });
+
 test('duplicate selection requires separate confirmed choice before server resolve',()=>{
  const source=read('components/GoDuplicateCompare.js');
  assert.match(source,/기존 카드 유지하기/);
