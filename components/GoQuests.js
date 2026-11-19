@@ -90,7 +90,7 @@ export default function GoQuests({ compact = false }) {
                   : task.id==='visit' && !compact
                     ? <button className="go-quest-title" type="button" onClick={()=>setVisitOpen(true)}>{task.title} &gt;</button>
                     : <Link className="go-quest-title" href={task.href} aria-label={task.id==='battle'?'랜덤 또는 친구 1:1 멍배틀, 오늘 첫 완료 시 10 멍코인':undefined}>{task.title} &gt;</Link>}
-            <small>{task.caption}</small>
+            <small className="go-quest-description">{task.caption}</small>
           </div>
           <div className="go-quest-item-action">
             <b>{task.completed?'완료':`+${task.coins} 멍코인`}</b>

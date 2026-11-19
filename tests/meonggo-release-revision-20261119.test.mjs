@@ -52,7 +52,8 @@ test('daily quest completed state is muted and reward changes to 완료, with un
  const js=read('components/GoQuests.js'),css=read('app/figma-prelaunch-quests.css');
  assert.match(js,/task.completed\?'완료'/);assert.match(js,/task\.completed \? ' is-complete'/);
  assert.match(css,/color:#999!important/);assert.match(css,/color:#b5b5b5!important/);
- assert.match(css,/font-size:11px!important/);
+ assert.match(css,/font:400 10px\/15\.5px 'Galmuri11',sans-serif/);
+  assert.match(js,/className="go-quest-description"/);
 });
 test('public data and care navigation gate unreleased dog IDs at server layer',()=>{
  for(const file of ['app/api/go/official/route.js','app/api/go/quests/care-target/route.js','app/api/go/interaction/route.js','app/api/go/store/route.js'])

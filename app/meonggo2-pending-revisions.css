@@ -11,8 +11,6 @@
 .go-pixel-admin-controls button[aria-pressed=true]{background:#f8df6d;border-color:#d4b944}
 .go-pixel-admin-controls label{display:flex;gap:8px;align-items:center;font:400 12px/1.5 'Pretendard',sans-serif;color:#666}
 .go-pixel-adoption-tag{display:inline-block;vertical-align:middle;margin-left:8px;padding:4px 7px;border-radius:5px;background:#f3f3f3;color:#777;font:500 11px/1.3 'Pretendard',sans-serif}
-.v3-go-site .go-quest-page .go-quest-item>div:first-child>small{font-family:'Galmuri11',sans-serif!important;font-size:11px!important;font-weight:400!important;line-height:1.45!important;letter-spacing:0!important;white-space:normal}
-.v3-go-site .go-quest-page .go-quest-item.is-complete small{color:#b5b5b5!important}
 @media(max-width:360px){.go-pixel-admin-controls{align-items:flex-start;flex-direction:column}}
 
 /* Approved Figma 3-column dog picker: any owned card reveals the colored dog. */

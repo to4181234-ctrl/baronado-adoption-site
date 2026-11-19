@@ -152,4 +152,4 @@
 .go-quest-item.is-complete .go-quest-title{color:#999!important;cursor:default;}
 .go-quest-item.is-complete small{color:#b5b5b5!important;}
 .go-quest-item.is-complete .go-quest-item-action>b{color:#999!important;}
-.go-quest-item>div:first-child>small{font-size:11px!important;line-height:1.45!important;}
+.go-quest-compact .go-quest-item>div:first-child>small{font-size:11px!important;line-height:1.45!important;}
