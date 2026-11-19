@@ -194,6 +194,20 @@ END; $$;
 REVOKE ALL ON FUNCTION public.go_official_draw_v2(uuid,uuid) FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.go_official_draw_v2(uuid,uuid) TO service_role;
 
+-- Deployment compatibility for an older browser still calling the one-argument RPC.
+-- Deterministic per-member/KST-day request UUID prevents duplicate free issues.
+CREATE OR REPLACE FUNCTION public.go_official_draw(
+ p_member uuid
+) RETURNS jsonb LANGUAGE plpgsql SET search_path TO public AS $
+DECLARE v_day date:=(now() AT TIME ZONE 'Asia/Seoul')::date;
+ v_hash text;v_request uuid;
+BEGIN
+ v_hash:=md5('legacy-free:'||p_member::text||':'||v_day::text);
+ v_request:=(substr(v_hash,1,8)||'-'||substr(v_hash,9,4)||'-'||
+  substr(v_hash,13,4)||'-'||substr(v_hash,17,4)||'-'||substr(v_hash,21,12))::uuid;
+ RETURN public.go_official_draw_v2(p_member,v_request);
+END; $;
+
 -- Resolve by a durable issued-attempt ID (not by today's date).
 -- A user-clicked close invokes p_replace=false. Network errors leave the choice pending.
 CREATE OR REPLACE FUNCTION public.go_official_resolve_duplicate_v2(
@@ -229,6 +243,22 @@ REVOKE ALL ON FUNCTION public.go_official_resolve_duplicate_v2(uuid,uuid,boolean
  FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.go_official_resolve_duplicate_v2(uuid,uuid,boolean) TO service_role;
 
+
+
+-- An in-flight older browser may call the original two-argument resolution RPC.
+-- Resolve the same oldest outstanding attempt without guessing from local-day.
+CREATE OR REPLACE FUNCTION public.go_official_resolve_duplicate(
+ p_member uuid,p_replace boolean
+) RETURNS jsonb LANGUAGE plpgsql SET search_path TO public AS $
+DECLARE v_attempt uuid;
+BEGIN
+ SELECT id INTO v_attempt FROM public.go_draw_attempts
+  WHERE member_id=p_member AND duplicate AND resolved_at IS NULL
+  ORDER BY created_at LIMIT 1;
+ IF v_attempt IS NULL THEN
+  RETURN jsonb_build_object('ok',false,'error','비교할 중복 카드가 없어요.'); END IF;
+ RETURN public.go_official_resolve_duplicate_v2(p_member,v_attempt,p_replace);
+END; $;
 
 -- Store v2: idempotent 60C / 100C purchases, 60% owned / 40% missing.
 -- Legacy 200C/300C receipt replays return their original prices without new debits.
