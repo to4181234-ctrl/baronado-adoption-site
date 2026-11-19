@@ -2,6 +2,8 @@
 import Link from 'next/link';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import GoCardFace from './GoCardFace.js';
+import GoElementSparkles,{elementForCard} from './GoElementSparkles.js';
+import {FIGMA_DOGS,figmaSprite} from '../lib/goV3Game.js';
 import {useGoSession} from './GoShell.js';
 import {createBattleSound,BATTLE_SOUND_KEY} from '../lib/goBattleSound.js';
 import {listenAudioSetting} from '../lib/goV3Audio.js';
@@ -24,6 +26,8 @@ const face=card=>({
  battle:{power:Number(card?.power)||0,charm:Number(card?.charm)||0}
 });
 const EMPTY={cards:[],total:0,hasMore:false};
+// Same result sprite mapping and pixel element sparkles as the random mode.
+const resultSprite=card=>FIGMA_DOGS.includes(card?.dogName)?figmaSprite(card.dogName,'front'):card?.imageUrl;
 function OwnedCard({card,selected,onClick}){
  return <button type="button" className={'friend-pvp-card'+(selected?' is-selected':'')}
   onClick={onClick} aria-pressed={selected}>
@@ -216,6 +220,7 @@ export default function GoFriendBattle(){
   window.location.origin+'/go/battle?room='+roomId:'';
  const opponent=room?(room.role==='host'?room.guestName:room.hostName):'';
  const winner=room?.winner;
+ const winningCard=winner&&winner!=='draw'?(winner===room?.role?room?.myCard:room?.otherCard):null;
  const outcome=friendPvpOutcome(winner,room?.role);
  const remaining=room?.status==='waiting'?
   roomSecondsRemaining(room.inviteExpiresAt,now):room?.status==='playing'?
@@ -362,6 +367,15 @@ export default function GoFriendBattle(){
        }}>결과 바로 보기</button>
       </>:<>
        <h2>{outcome==='win'?'승리!':outcome==='draw'?'무승부!':'아쉽게 패배!'}</h2>
+       <div className="meong-battle-result friend-pvp-result-hero">
+        <div className="meong-battle-winner">
+         {winningCard?<img src={resultSprite(winningCard)} alt={winningCard.dogName}/>:
+          <>{[room.myCard,room.otherCard].map((card,i)=><img key={i} src={resultSprite(card)} alt={card.dogName}/>)}</>}
+         <GoElementSparkles element={elementForCard(winningCard||room.myCard)}
+          secondElement={winningCard?null:elementForCard(room.otherCard)}
+          variant={winningCard?'result-loop':'result'}/>
+        </div>
+       </div>
        <div className="friend-pvp-result-cards">
         {[room.role==='host'?room.myCard:room.otherCard,
           room.role==='guest'?room.myCard:room.otherCard].map((card,i)=>

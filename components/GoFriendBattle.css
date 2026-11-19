@@ -138,3 +138,11 @@
  max-width:calc((100% - 18px)/2);min-width:0;
 }
 .friend-pvp .friend-pvp-card.is-selected:focus-visible{outline:2px solid #181713;outline-offset:4px}
+
+/* Random battle result parity: original puppy sprite + looping Figma pixel sparkle. */
+.friend-pvp-result-hero{margin:2px 0 18px}
+.friend-pvp-result-hero .meong-battle-winner{position:relative;height:184px}
+.friend-pvp-result-hero .meong-battle-winner img{
+ max-width:184px;max-height:184px;object-fit:contain;image-rendering:pixelated
+}
+.friend-pvp-result-hero .meong-battle-winner::before{display:none!important}

@@ -73,6 +73,19 @@ test('1:1 reveals both cards through random battle shuffle/pick/flip/show before
  assert.match(read('components/GoBattle.css'),/\.meong-battle-phase-fight \.meong-battle-fighter/);
 });
 
+test('winner sprite and looping pixel-element sparkle match the random battle result',()=>{
+ const pvp=read('components/GoFriendBattle.js'),random=read('components/GoBattle.js');
+ const css=read('components/GoFriendBattle.css');
+ assert.match(pvp,/const resultSprite=card=>/);
+ assert.match(pvp,/figmaSprite\(card\.dogName,'front'\)/);
+ assert.match(pvp,/meong-battle-result friend-pvp-result-hero/);
+ assert.match(pvp,/className="meong-battle-winner"/);
+ assert.match(pvp,/GoElementSparkles element=\{elementForCard\(winningCard\|\|room\.myCard\)\}/);
+ assert.match(pvp,/variant=\{winningCard\?'result-loop':'result'\}/);
+ assert.match(css,/friend-pvp-result-hero \.meong-battle-winner/);
+ assert.match(random,/variant=\{result\.winner==='draw'\?'result':'result-loop'\}/);
+});
+
 test('existing 3 impact beats, sounds, outcome and no pre-ready peer card leak remain',()=>{
  const pvp=read('components/GoFriendBattle.js'),api=read('app/api/go/pvp/route.js');
  assert.match(pvp,/\[\[1,920\],\[2,1970\],\[3,3050\]\]/);
