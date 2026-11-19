@@ -5,7 +5,7 @@ import { subscribeGoCoinNotices, enqueueGoCoinNotice } from '../lib/goCoinNotice
 
 export const GO_STAGE1_UI_ENABLED = process.env.NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED === '1';
 const CoinsContext = createContext(null);
-const EMPTY = { balance: 0, daily: { careRewards: 0, careQuestDone: false, visitQuestDone: false,drawQuestDone:false,battleQuestDone:false } };
+const EMPTY = { balance: 0, daily: { careRewards: 0, careQuestDone: false, visitQuestDone: false,battleQuestDone:false } };
 const TYPES = {
   admin_grant: '관리자 지급',
   care: '강아지 돌보기',
