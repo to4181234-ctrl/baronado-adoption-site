@@ -23,6 +23,25 @@ test('1:1 duplicate selected-card summary is gone; ready status is still visible
  assert.match(jsx,/onClick=\{\(\)=>mutate\(\{action:'ready',roomId:room\.roomId\}\)\}/);
 });
 
+test('READY button remains available when card chosen while peer heartbeat refreshes',()=>{
+ const jsx=read('components/GoFriendBattle.js');
+ assert.match(jsx,/disabled=\{busy\|\|!room\.mySelected\}/);
+ assert.doesNotMatch(jsx,/disabled=\{busy\|\|!room\.mySelected\|\|room\.otherConnected===false\}/);
+});
+
+test('server READY grace migration is local-tested and retains the 30s cancellation',()=>{
+ const sql=read('docs/sql/meonggo-friend-pvp-heartbeat-grace-20261119-DRAFT.sql');
+ const runner=read('scripts/verify-go-integration-local.sh');
+ const fixture=read('tests/fixtures/go-pvp-ready-reconnect-assert.sql');
+ assert.match(sql,/interval '15 seconds'/);
+ assert.doesNotMatch(sql,/interval '6 seconds'/);
+ assert.match(sql,/interval '30 seconds'/);
+ assert.match(runner,/go-pvp-ready-reconnect-assert\.sql/);
+ assert.match(fixture,/10s jitter incorrectly revoked host READY/);
+ assert.match(fixture,/20s true interruption failed to clear READY/);
+ assert.match(fixture,/both READY failed to finish match/);
+});
+
 test('an older background sync cannot override a newer select or READY response',()=>{
  const jsx=read('components/GoFriendBattle.js');
  assert.match(jsx,/mutationEpoch=useRef\(0\)/);

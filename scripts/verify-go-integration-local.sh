@@ -81,3 +81,11 @@ for pass in first second; do
  "${PSQL[@]}" -f docs/sql/meonggo-six-pixel-poses-20261119-DRAFT.sql
 done
 echo "PASS: six required pixel images; strict release gate; migration idempotency"
+
+# 1:1 PvP reconnection regression, isolated 10s jitter vs. 20s actual gap.
+for pass in first second; do
+ echo "Friend PvP heartbeat grace migration $pass"
+ "${PSQL[@]}" -f docs/sql/meonggo-friend-pvp-heartbeat-grace-20261119-DRAFT.sql
+done
+"${PSQL[@]}" -f tests/fixtures/go-pvp-ready-reconnect-assert.sql
+echo "PASS: 10s heartbeat jitter retains READY; 20s disconnect resets; both explicit READY complete once"
