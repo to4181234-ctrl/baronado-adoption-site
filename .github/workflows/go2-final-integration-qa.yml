@@ -8,6 +8,7 @@ on:
       - work/meonggo2-hidden-cinematic-phase2-20261119
       - work/meonggo2-quest-typography-phase3-20261119
       - work/meonggo2-pixel-poses-hidden-visit-20261119
+      - work/meonggo2-friend-pvp-card-ready-reveal-20261119
   workflow_dispatch:
 
 permissions:
