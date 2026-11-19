@@ -13,3 +13,19 @@
 .go-album-detail-footer .go-sound-toggle svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.5}
 @media(max-height:580px){.go-album-detail-mask{padding-top:15px}}
 @media(prefers-reduced-motion:reduce){.go-album-detail-card{animation:none}}
+
+/* HIDDEN-only hologram; keep original approved Figma card image intact. */
+.go-album-detail.is-hidden .go-album-detail-card{isolation:isolate}
+.go-album-detail.is-hidden .go-album-hologram{position:absolute;inset:0;z-index:4;pointer-events:none;mix-blend-mode:screen;background:linear-gradient(125deg,transparent 32%,rgba(112,242,224,.02) 38%,rgba(161,241,255,.75) 47%,rgba(255,185,241,.8) 52%,rgba(216,255,174,.55) 56%,transparent 66%);background-size:270% 270%;animation:go-hidden-holo-sweep 6.6s ease-in-out infinite}
+.go-album-reveal.is-first-unlock .go-album-detail-card{animation:go-hidden-card-reveal 1.7s cubic-bezier(.19,.85,.28,1) both}
+.go-album-reveal.is-first-unlock .go-album-hologram{animation:go-hidden-holo-first 1.7s cubic-bezier(.18,.9,.22,1) both!important}
+.go-album-reveal.is-first-unlock::after{content:'';position:absolute;inset:0;z-index:5;pointer-events:none;background:radial-gradient(circle,rgba(238,255,250,.85),transparent 65%);animation:go-hidden-flash 1.7s ease-out both}
+.go-album-hidden-burst{position:absolute;inset:0;z-index:4;pointer-events:none}
+.go-album-hidden-burst i{position:absolute;left:50%;top:50%;width:7px;height:7px;background:#b9f6ed;box-shadow:0 0 5px #e6fff9,0 0 9px #ffbff4;opacity:0;transform:rotate(var(--ray-angle)) translateY(-40px) scale(.2)}
+.go-album-reveal.is-first-unlock .go-album-hidden-burst i{animation:go-hidden-pixel-burst 1s ease-out .82s both}
+@keyframes go-hidden-card-reveal{0%{transform:scale(.77);opacity:.25;filter:grayscale(1)}29%{transform:scale(.91);opacity:.67;filter:grayscale(.85)}58%{transform:scale(1.055);opacity:1;filter:grayscale(0)}72%{transform:scale(.98)}100%{transform:scale(1);opacity:1;filter:none}}
+@keyframes go-hidden-holo-first{0%,9%{background-position:145% 135%;opacity:0}32%{opacity:.72}62%{background-position:25% 5%;opacity:1}88%,100%{background-position:0 -25%;opacity:.2}}
+@keyframes go-hidden-holo-sweep{0%,65%{background-position:145% 135%;opacity:0}76%{opacity:.65}89%{background-position:22% 2%;opacity:.7}100%{background-position:0 -25%;opacity:0}}
+@keyframes go-hidden-flash{0%,48%{opacity:0}60%{opacity:.65}72%,100%{opacity:0}}
+@keyframes go-hidden-pixel-burst{0%{transform:rotate(var(--ray-angle)) translateY(-40px) scale(.2);opacity:0}18%{opacity:1}100%{transform:rotate(var(--ray-angle)) translateY(-160px) scale(1);opacity:0}}
+@media(prefers-reduced-motion:reduce){.go-album-detail.is-hidden .go-album-hologram,.go-album-reveal.is-first-unlock .go-album-detail-card,.go-album-reveal.is-first-unlock::after,.go-album-reveal.is-first-unlock .go-album-hidden-burst i{animation:none!important}.go-album-hidden-burst{display:none}}
