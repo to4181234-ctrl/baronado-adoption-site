@@ -20,6 +20,7 @@ export default function GoFreeDraw({onClose}){
  const {member}=useGoSession();
  const [catalog,setCatalog]=useState(null);
  const requestRef=useRef(null);
+ const inFlightRef=useRef(false);
  const sound=useRef(null);
  useEffect(()=>{sound.current=createGameAudio();return()=>{sound.current?.dispose();sound.current=null;};},[]);
  const [choice,setChoice]=useState(null);
@@ -48,9 +49,10 @@ export default function GoFreeDraw({onClose}){
   if(card.imageUrl)setRevealed(card);
   else setNoImage(true);
  }
- async function draw(){
-  if(busy||choice===null||catalog?.drawUsed||!member?.id)return;
-  setBusy(true);setError('');
+ async function draw(index){
+  if(inFlightRef.current||busy||!Number.isInteger(index)||index<0||index>2||!catalog||catalog.drawUsed||!member?.id)return;
+  inFlightRef.current=true;
+  setChoice(index);setBusy(true);setError('');
   const storageKey='meonggo:free-pending-request:'+member.id;
   try{
    if(!requestRef.current){
@@ -78,7 +80,7 @@ export default function GoFreeDraw({onClose}){
    void sound.current?.play('discover');
    if(data.requiresChoice){setDuplicate(latest.pendingDuplicate||{choiceId:data.drawId,dogId:data.dogId,slot:data.slot,proposedPower:data.proposedPower,proposedCharm:data.proposedCharm});}
    else showCard(data,latest);
-  }catch(e){setError(e.message)}finally{setBusy(false)}
+  }catch(e){setError(e.message)}finally{inFlightRef.current=false;setBusy(false)}
  }
  async function resolve(replace){
   if(!duplicate||busy)return;
@@ -105,7 +107,7 @@ export default function GoFreeDraw({onClose}){
     </div>:<>
      <div className="go-free-draw-collars" aria-label="목줄 하나 선택">
       {[0,1,2].map(index=><button key={index} type="button" aria-pressed={choice===index} disabled={busy||Boolean(duplicate)}
-       onClick={()=>{setChoice(index);void sound.current?.play('collar');}} aria-label={'목줄 '+(index+1)+' 선택'}>
+       onClick={()=>{void sound.current?.play('collar');void draw(index);}} aria-label={'목줄 '+(index+1)+' 선택하고 무료 카드 뽑기'}>
        <img src="/figma-v3/collar.png" alt=""/>
       </button>)}
      </div>
@@ -115,7 +117,7 @@ export default function GoFreeDraw({onClose}){
       <img src="/figma-v3/discovery-dialog-inner.svg" alt=""/>
       <div className="go-free-draw-dialogue-content">
        <p>오늘의 멍멍이는 누구일까요?</p>
-       <GoPixelChoice initial disabled={choice===null||busy||!catalog||Boolean(duplicate)} onClick={draw}>하나 고른다</GoPixelChoice>
+       <p className="go-free-draw-instruction">세 개 중 하나를 클릭한다</p>
        <GoPixelChoice disabled={busy||Boolean(duplicate)} onClick={onClose}>도망간다</GoPixelChoice>
       </div>
      </div>
