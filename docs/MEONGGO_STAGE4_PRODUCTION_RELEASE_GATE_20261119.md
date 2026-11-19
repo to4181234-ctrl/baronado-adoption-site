@@ -1,5 +1,29 @@
 # 멍멍GO 2.0 4단계 운영 배포 게이트 — 2026-11-19
 
+## 2026-11-19 후속 확인: 사용자 로컬 백업 확보 (기존 배포 게이트 갱신)
+
+이하 기록은 사용자가 Windows PowerShell 출력으로 직접 확인·공유한 **로컬 백업 생성 증거**다. 본 GitHub 문서나 저장소에는 DB 원본, 이미지 파일, ZIP, 계정 비밀정보를 업로드하지 않았다.
+
+- 운영 프로젝트 ref: `reksykfnutjtfdotidua`; CLI v3.2.0 `db dump --remote` 실행 후 아래 4개 SQL 생성 확인:
+  - `roles.sql` 297 B
+  - `schema.sql` 164,140 B
+  - `data.sql` 1,028,455 B
+  - `auth_storage_data.sql` 122,616 B (`--schema auth,storage --data-only`)
+- Storage 객체별 로컬 파일 다운로드 결과:
+  - `dog-images` 82개
+  - `go-cards` 94개
+  - `go-official-cards` 50개
+  - 합계 226/226 (당시 운영 Storage 객체 총수와 일치)
+- 사용자 PC에서 `MeongGO_Backup_20261119.zip` 생성 후 `tar -tf ... | measure` 결과 **241개 ZIP 엔트리** 확인. 디렉터리 엔트리를 포함하는 수치이며 ZIP 내용의 모든 바이트 무결성 검증이나 실제 DB 복원 성공과는 구별한다.
+- `data.sql` 추출 시 `go_official_sets` / `go_official_versions` 간 순환 FK 복원 경고가 있었으므로 **복원 시 제약·트리거 처리와 검증 필수**.
+- 후속 읽기 전용 운영 점검: `go_members` 21명, `auth.users` 0명(이 서비스는 독립 회원 테이블 사용), `go_coin_transactions` 42건, `storage.objects` 226건. `go_draw_attempts`, `go_battle_reward_claims`는 현재 운영 DB에 존재하지 않음.
+- 별도 로컬 테스트 폴더 생성했고 사용자 PC Docker Engine 29.9.3 작동을 확인했으나 **SQL/Storage 독립 복원 및 실제 엔드투엔드 로컬 운영 검증은 미완료**.
+
+**게이트 현황**: 최신 운영 SQL+Storage 파일의 사용자 측 백업 확보 항목은 완료로 수정. 실제 복원 테스트, 운영 스키마/권한 호환 확인, 2계정 PvP/모바일 실측은 미완료. 그전까지 신규 경제 SQL 운영 적용 / 프로덕션 alias 전환 / `main` 통합은 보류. 백업 ZIP은 민감한 회원 정보 및 원본 사진을 포함할 수 있어 공개 GitHub 또는 퍼블릭 URL에 올리지 않는다.
+
+---
+
+
 ## 승인과 목표
 
 - 사용자가 2026-11-19 운영 배포를 요청함. 운영 대상은 Vercel `baronado-adoption-site-8sm2` (`prj_jc3UqgH4jR1lqAFHYRuClziq6DzY`).
