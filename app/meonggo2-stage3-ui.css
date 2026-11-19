@@ -1,0 +1,108 @@
+/* MeongGO 2.0 / Stage 3 approved visual corrections.
+ * New user decisions override the previous Figma values only where explicit. */
+
+/* Figma 690:289241: free draw has its own 110px section directly above
+   the existing daily-coin-quest section; preserve the original layout below. */
+.v3-go-site .v3-album-figma .v3-home-free-shortcut{
+  height:110px;
+}
+.v3-go-site .v3-album-figma .v3-home-free-shortcut>button{
+  position:relative;display:block;width:100%;min-height:64px;
+  margin:0;padding:0;border:0;background:transparent;box-shadow:none;
+  text-align:left;text-decoration:none;color:#181713;
+  font-family:'MonaS12',sans-serif;cursor:pointer;
+}
+.v3-go-site .v3-album-figma .v3-home-free-shortcut>button strong{
+  display:block;font:700 15.315852px/24px 'MonaS12',sans-serif;
+}
+.v3-go-site .v3-album-figma .v3-home-free-shortcut>button small{
+  display:block;margin-top:5px;font:400 11px/21px 'MonaS12',sans-serif;
+}
+.v3-go-site .v3-album-figma .v3-home-free-new{
+  position:absolute;left:0;top:-24px;color:#da0000;
+  font:700 15.315852px/24px 'MonaS12',sans-serif;
+}
+.v3-go-site .v3-album-figma .v3-home-free-shortcut>button:focus-visible{
+  outline:2px solid #181713;outline-offset:3px;
+}
+
+/* Figma 692:289316: preserve both 166x265 SVG cards, their origin
+   and typography. No font enlargement: approved price is 11px Bold. */
+.v3-go-site .s4-store-choices .s4-store-product-art{
+  display:block;max-width:100%;width:100%;height:auto;aspect-ratio:166/265;
+  flex:none;
+}
+.v3-go-site .s4-store-choices b{
+  font:700 11px/16.5px 'Galmuri11',sans-serif!important;
+}
+
+/* Collar choice: only the original source image grows ~10%.
+   No coloured selection background or border; keep focus-visible for keyboards. */
+.go-free-draw-collars>button,
+.s4-store-original-choice .s4-store-collars>button{
+  min-width:44px;min-height:44px;box-sizing:border-box;
+  border:0!important;background:transparent!important;
+}
+.go-free-draw-collars>button img,
+.s4-store-original-choice .s4-store-collars>button img{
+  transform:scale(1);transform-origin:center center;
+  transition:transform .16s steps(3,end);
+}
+.go-free-draw-collars>button[aria-pressed='true'] img,
+.s4-store-original-choice .s4-store-collars>button[aria-pressed='true'] img{
+  transform:scale(1.10);
+}
+
+/* Official draw: same existing steps, shorter motion and reveal timing. */
+.go-official-reveal-collar>.go-official-collar-image{
+  animation-duration:.7s!important;
+}
+.go-official-sparkles-top,.go-official-sparkles-bottom{
+  animation:meong-next-sparkle .7s steps(7,end) both;
+}
+@keyframes meong-next-sparkle{
+  0%{opacity:0;filter:brightness(.95)}
+  50%{opacity:1;filter:brightness(1.2)}
+  100%{opacity:1;filter:none}
+}
+
+/* Only READY makes an entire participant-state box yellow, not card selection. */
+.friend-pvp .friend-pvp-ready-state span.is-ready{
+  background:#fade40!important;border-color:#e0c331!important;color:#181713;
+}
+.friend-pvp .friend-pvp-ready-action{
+  display:block;width:100%;min-height:46px;
+  margin:0!important;
+}
+
+/* Card itself turns yellow while its approved black pixel border remains.
+   Do not outline the entire rectangular card in gold. */
+.friend-pvp .friend-pvp-card.is-selected::after{content:none!important}
+.v3-go-site .v5-card-grid .go-bulk-card-choice[aria-pressed='true'] .go-card{
+  background:#f8dc65!important;box-shadow:none!important;
+}
+
+/* Fight: keep collision, motion trails, flashes and haptics, but never
+   translate the whole battle-versus container. That translated container
+   could widen the scroll viewport while impact animation was running. */
+.meong-battle-phase-fight .meong-battle-versus:is(.is-impact-1,.is-impact-2,.is-impact-3){
+  animation:none!important;translate:none!important;
+}
+.meong-battle-phase-fight .meong-battle-versus.is-impact-1 .meong-battle-card.is-mini .go-card-graphic{
+  animation:meong-in-card-hit-small .13s ease-out both;
+}
+.meong-battle-phase-fight .meong-battle-versus.is-impact-2 .meong-battle-card.is-mini .go-card-graphic{
+  animation:meong-in-card-hit-medium .18s ease-out both;
+}
+.meong-battle-phase-fight .meong-battle-versus.is-impact-3 .meong-battle-card.is-mini .go-card-graphic{
+  animation:meong-in-card-hit-heavy .26s ease-out both;
+}
+@keyframes meong-in-card-hit-small{0%,100%{transform:none}40%{transform:translateX(2px)}75%{transform:translateX(-2px)}}
+@keyframes meong-in-card-hit-medium{0%,100%{transform:none}35%{transform:translateX(3px)}70%{transform:translateX(-3px)}}
+@keyframes meong-in-card-hit-heavy{0%,100%{transform:none}30%{transform:translate(4px,-1px)}70%{transform:translate(-4px,1px)}}
+@media(prefers-reduced-motion:reduce){
+ .go-free-draw-collars>button img,
+ .s4-store-original-choice .s4-store-collars>button img{transition:none!important}
+ .go-official-sparkles-top,.go-official-sparkles-bottom{animation:none!important}
+ .meong-battle-phase-fight .meong-battle-card.is-mini .go-card-graphic{animation:none!important;transform:none!important}
+}
