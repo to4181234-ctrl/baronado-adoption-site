@@ -72,6 +72,7 @@ export default function GoStore(){
  const [choiceOpen,setChoiceOpen]=useState(false),[collarChoice,setCollarChoice]=useState(null);
  const [dogPickerOpen,setDogPickerOpen]=useState(false),[pickerNotice,setPickerNotice]=useState('');
  const [pending,setPending]=useState(null);
+ const [recoveryNeeded,setRecoveryNeeded]=useState(false);
  const [duplicate,setDuplicate]=useState(null);
  const [revealed,setRevealed]=useState(null);
  const items=useMemo(()=>availableStoreItems(catalog.dogs),[catalog.dogs]);
@@ -98,8 +99,30 @@ export default function GoStore(){
   refresh();
   return()=>{catalogRequestRef.current++;};
  },[refresh]);
+ // Persisted purchases are looked up automatically; normal in-flight buys never show an error warning.
  useEffect(()=>{
-  setPending(member?.id?getKnownPending(member.id):null);
+  const known=member?.id?getKnownPending(member.id):null;
+  setPending(known);setRecoveryNeeded(false);
+  if(!known)return;
+  let active=true;
+  const reconcile=async()=>{
+   setBusy(true);
+   try{
+    const r=await fetch('/api/go/store?requestId='+encodeURIComponent(known.requestId),{cache:'no-store'});
+    const d=await r.json();
+    if(!r.ok||!d.ok)throw Error(d.error||'구매 결과를 확인하지 못했어요.');
+    if(!active)return;
+    if(!d.found){setRecoveryNeeded(true);return;}
+    if((d.mode&&d.mode!==known.mode)||(known.mode==='specific'&&d.dogId!==known.dogId))
+     throw Error('이전 구매와 요청 정보가 일치하지 않아요.');
+    await showPurchased({dogId:d.dogId,slot:d.slot,price:d.price,coinsSpent:0,
+      requiresChoice:d.requiresChoice,choiceId:d.choiceId},true);
+   }catch(e){
+    if(active){setRecoveryNeeded(true);setError(e.message||'이전 구매 확인에 실패했어요.');}
+   }finally{if(active)setBusy(false);}
+  };
+  void reconcile();
+  return()=>{active=false;};
  },[member?.id]);
  function announceCoins(delta){
   if(Number.isInteger(delta)&&delta!==0){
@@ -108,11 +131,11 @@ export default function GoStore(){
   }else window.dispatchEvent(new CustomEvent('go-coins-changed',{detail:{notified:false}}));
  }
  function cacheRequest(details){
-  setPending(details);
+  setRecoveryNeeded(false);setPending(details);
   if(member?.id)try{localStorage.setItem(keyFor(member.id),JSON.stringify(details));}catch{}
  }
  function clearRequest(){
-  setPending(null);
+  setRecoveryNeeded(false);setPending(null);
   if(member?.id)try{localStorage.removeItem(keyFor(member.id));}catch{}
  }
  async function storePost(details){
@@ -152,12 +175,26 @@ export default function GoStore(){
   cacheRequest(details);
   setBusy(true);setError('');setMessage('');
   try{await showPurchased(await storePost(details));}
-  catch(e){setConfirm(false);setError(e.message+' 이전 구매 결과 확인으로 중복 결제를 방지할 수 있어요.');}
+  catch(e){
+   setConfirm(false);
+   // Check the receipt first: a lost response can represent an already completed purchase.
+   try{
+    const r=await fetch('/api/go/store?requestId='+encodeURIComponent(details.requestId),{cache:'no-store'});
+    const d=await r.json();
+    if(r.ok&&d.ok&&d.found){
+     await showPurchased({dogId:d.dogId,slot:d.slot,price:d.price,coinsSpent:0,
+      requiresChoice:d.requiresChoice,choiceId:d.choiceId},true);
+     return;
+    }
+   }catch{}
+   setRecoveryNeeded(true);
+   setError(e.message+' 이전 구매 결과를 확인한 후 다시 시도해주세요.');
+  }
   finally{setBusy(false);}
  }
  async function recover(retry=false){
   if(!member||!pending||busy)return;
-  setBusy(true);setError('');
+  setBusy(true);setError('');setRecoveryNeeded(false);
   try{
    if(!retry){
     const r=await fetch('/api/go/store?requestId='+encodeURIComponent(pending.requestId),{cache:'no-store'});
@@ -171,8 +208,9 @@ export default function GoStore(){
      return;
     }
     setMessage('이전 구매는 아직 확인되지 않았어요. 동일 요청 번호로 재시도할 수 있어요.');
+    setRecoveryNeeded(true);
    }else await showPurchased(await storePost(pending));
-  }catch(e){setError(e.message);}
+  }catch(e){setRecoveryNeeded(true);setError(e.message);}
   finally{setBusy(false);}
  }
  async function resolveDuplicate(replace){
@@ -226,7 +264,7 @@ export default function GoStore(){
       <b>100 멍코인</b>
     </button>
    </div>
-   {pending&&<aside className="s4-store-pending" role="status">
+   {pending&&recoveryNeeded&&!busy&&<aside className="s4-store-pending" role="status">
     <p>확인되지 않은 이전 구매가 있어요. 새로운 구매 전 결과를 확인해주세요.</p>
     <button type="button" disabled={busy} onClick={()=>recover(false)}>이전 구매 결과 확인</button>
     <button type="button" disabled={busy} onClick={()=>recover(true)}>같은 요청으로 재시도</button>
@@ -257,14 +295,13 @@ export default function GoStore(){
     <h2>랜덤 뽑기</h2>
     <div className="s4-store-collars">{[0,1,2].map(i=>
       <button type="button" key={i} aria-label={'목줄 '+(i+1)+' 선택'}
-       aria-pressed={collarChoice===i} onClick={()=>{setCollarChoice(i);void sound.current?.play('collar');}}>
+       aria-pressed={collarChoice===i} disabled={busy||Boolean(pending)} onClick={()=>{if(busy||pending)return;setCollarChoice(i);void sound.current?.play('collar');setChoiceOpen(false);setConfirm(true);}}>
        <img src="/figma-v3/collar.png" alt="픽셀 목줄"/>
       </button>)}</div>
     <div className="s4-store-pixel-dialogue" aria-label="목줄 선택 안내"><img src="/figma-v3/discovery-dialog-bg.svg" alt=""/><img src="/figma-v3/discovery-dialog-outer.svg" alt=""/><img src="/figma-v3/discovery-dialog-inner.svg" alt=""/><p>오늘의 멍멍이는 누구일까요?</p></div>
     <GoSoundToggle className="s4-store-sound-icon"/>
     <div className="s4-store-collar-actions">
-     <GoPixelChoice initial disabled={collarChoice===null}
-       onClick={()=>{if(collarChoice===null)return;setChoiceOpen(false);setConfirm(true);}}>하나 고른다</GoPixelChoice>
+     <span className="s4-store-collar-guide">세 개 중 하나를 클릭한다</span>
      <GoPixelChoice onClick={()=>setChoiceOpen(false)}>도망간다</GoPixelChoice>
     </div>
    </section>
