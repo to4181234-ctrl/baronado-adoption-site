@@ -1,0 +1,73 @@
+name: MeongGO next update stage 4 isolated QA
+on:
+  push:
+    branches:
+      - work/meonggo2-next-update-staging-20261119
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: qa-only-local
+          POSTGRES_DB: go_integration_nextqa
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d go_integration_nextqa"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      QA_DB_HOST: 127.0.0.1
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+      PGPASSWORD: qa-only-local
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:3010
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: qa-not-a-real-key
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert isolated QA branch and loopback-only database
+        run: |
+          test "$GITHUB_REF_NAME" = "work/meonggo2-next-update-staging-20261119"
+          test "$QA_DB_HOST" = "127.0.0.1"
+          test "$NEXT_PUBLIC_SUPABASE_URL" = "http://127.0.0.1:3010"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked dependencies and PostgreSQL client
+        run: |
+          npm ci
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+      - name: Run full Node regression suite
+        run: node --test tests/*.test.mjs
+      - name: Rebuild synthetic PostgreSQL and test previous drafts
+        run: bash scripts/verify-go-integration-local.sh go_integration_nextqa
+      - name: Compile next-update economy draft ONLY in synthetic PostgreSQL
+        run: |
+          psql -X -h 127.0.0.1 -d go_integration_nextqa -v ON_ERROR_STOP=1 -f docs/sql/MEONGGO_NEXT_ECONOMY_DRAFT.sql
+      - name: Build Next.js with game feature flags enabled
+        env:
+          NEXT_PUBLIC_MEONGGO_STAGE1_COINS_ENABLED: '1'
+          MEONGGO_STAGE1_COINS_ENABLED: '1'
+          NEXT_PUBLIC_MEONGGO_STAGE2_OFFICIAL_ENABLED: '1'
+          MEONGGO_STAGE2_OFFICIAL_ENABLED: '1'
+          NEXT_PUBLIC_MEONGGO_STAGE4_STORE_ENABLED: '1'
+          MEONGGO_STAGE4_STORE_ENABLED: '1'
+          NEXT_PUBLIC_MEONGGO_STAGE5_PVP_ENABLED: '1'
+          MEONGGO_STAGE5_PVP_ENABLED: '1'
+        run: npm run build
+      - name: Smoke-check local Next.js routes
+        run: bash scripts/verify-go-http-smoke.sh
+      - name: Build Next.js with game feature flags disabled
+        run: npm run build
