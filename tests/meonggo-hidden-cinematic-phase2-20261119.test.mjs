@@ -46,7 +46,8 @@ test('hologram is visible on immediate opening, has pixel burst, and settles to 
  const css=read('components/GoAlbumCardDetail.css');
  for(const className of ['go-hidden-aura','go-hidden-pulse','go-hidden-flash','go-album-hidden-burst','go-album-hologram'])
   assert.ok(src.includes(className),className);
- assert.match(src,/Array\.from\(\{length:28\}/);
+ assert.match(src,/HIDDEN_PIXEL_PARTICLES\.map/);
+ assert.match(src,/HIDDEN_PIXEL_SPRITES\[particle.type\]/);
  for(const key of ['go-hidden-card-entry','go-hidden-aura-bloom','go-hidden-pulse-ring','go-hidden-holo-primary','go-hidden-center-flash','go-hidden-pixel-fly','go-hidden-holo-idle'])
   assert.match(css,new RegExp('@keyframes '+key+'\\b'),key);
  assert.match(css,/go-hidden-holo-idle 6\.5s ease-in-out 2\.15s infinite/);
