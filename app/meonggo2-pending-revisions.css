@@ -22,3 +22,6 @@
 .v3-go-site .s4-store-dog-choices .s4-store-dog-tile img.s4-store-dog-silhouette{filter:grayscale(1) brightness(0);opacity:.65}
 .v3-go-site .s4-store-dog-choices .s4-store-dog-tile span{font:700 12px/1.3 'Galmuri11',sans-serif;color:#171713}
 .s4-store-picker-notice{margin:12px 0 0;color:#171713;font:400 11px/1.55 'Galmuri11',sans-serif}
+
+/* Figma HIDDEN locked face remains original; newly unlockable slot gets red NEW below it. */
+.v3-go-site .s2-official-slot .s2-official-hidden-new{display:block;margin:0 auto;color:#f03b35;background:transparent;border:0;font:700 11px/1.2 'MonaS12',sans-serif;text-align:center}
