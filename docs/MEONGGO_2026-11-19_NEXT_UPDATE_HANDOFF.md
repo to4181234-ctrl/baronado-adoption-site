@@ -161,3 +161,13 @@
 3. 비용 승인 이후 독립 테스트 Supabase DB 생성 또는 운영과 완전히 분리된 다른 테스트 환경을 준비한다. 운영 데이터는 테스트에 사용하지 않는다.
 4. 개발 전에 단계2의 **마이그레이션 + API 버전 호환 설계**를 먼저 작성한다.
 5. 매 단계 완료 시 커밋 SHA, 변경 파일, 성공/실패 테스트, 아직 검증 안 된 항목을 이 문서에 누적한다.
+
+
+## 4단계 자동 QA 진행 결과 — 2026-11-19
+
+- 상세 문서: `docs/MEONGGO_STAGE4_PROGRESS_20261119.md`.
+- [성공 CI](https://github.com/to4181234-ctrl/baronado-adoption-site/actions/runs/44516418923): 최신 규칙·UI 17/17, 전체 테스트 266/266, 이전·새 SQL 합성 DB 반복 적용 및 실제 RPC 경제 흐름, 8+8+8 동시 요청, Next 빌드 flags ON/OFF 및 HTTP smoke 통과.
+- SQL DRAFT의 함수 달러 구분자 문법 오류 수정. 이전 가격·무료 추첨 위치·READY 선택 색깔을 기준으로 작성된 오래된 테스트 9개는 최신 사용자 확정안으로 갱신.
+- 테스트 CI는 모든 테스트 실패 시 실패 처리하며, 비용이 들지 않는 GitHub Actions 임시 PostgreSQL만 사용.
+- **실제 모바일 Safari, 2계정 실시간 PvP, 화면 흔들림·Figma 1px 렌더 대조, 운영 Supabase 호환, 최신 백업 복원 검증은 미완료.** 따라서 출시 가능 판정이 아님.
+- 사용자 최종 승인 전 production DB, Vercel 운영 배포, `main`, Figma 원본 변경 금지. 유료 Supabase 브랜치 생성 안 함.
