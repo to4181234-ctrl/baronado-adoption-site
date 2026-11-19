@@ -38,7 +38,7 @@ function BannerEditor(){
   if(mutating.current||!dirty)return;mutating.current=true;setBusy(true);setError('');
   try{const r=await fetch('/api/admin/banners/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids:banners.map(b=>b.id),enabledIds:banners.filter(b=>b.enabled).map(b=>b.id)})});const d=await r.json();if(!r.ok)throw Error(d.error);await reload();setNotice('순서·노출을 저장했어요.');}catch(e){setError(e.message);}finally{mutating.current=false;setBusy(false);}
  }
- return <main className="site-shell v3-site v3-admin-banner-page"><SiteHeader/><section className="v3-admin-banner-wrap"><Link className="v10-admin-back" href="/admin/menu">‹ 관리 메뉴</Link><header><h1>{editing?'배너 등록·수정':'상단 배너 관리'}</h1><p>{editing?'이미지와 연결 대상을 확인해 주세요.':'가족을 찾아요 목록의 배너를 관리해요.'}</p></header>
+ return <main className="site-shell v3-site v3-admin-banner-page"><SiteHeader/><section className="v3-admin-banner-wrap"><header><h1>{editing?'배너 등록·수정':'상단 배너 관리'}</h1><p>{editing?'이미지와 연결 대상을 확인해 주세요.':'가족을 찾아요 목록의 배너를 관리해요.'}</p></header>
  {error&&<p role="alert" className="v3-error">{error}</p>}{notice&&<p role="status">{notice}</p>}
  {editing?<form onSubmit={save} className="v3-admin-banner-editor">
   <Artwork banner={draft}/><input ref={uploadInput} hidden type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>upload(e.target.files?.[0])}/><button type="button" disabled={busy||uploading} onClick={()=>uploadInput.current?.click()}>{uploading?'이미지 업로드 중…':'배너 이미지 교체'}</button>
