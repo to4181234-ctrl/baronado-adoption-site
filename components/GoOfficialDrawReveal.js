@@ -2,6 +2,8 @@
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import GoCardFace from './GoCardFace.js';
+import GoElementSparkles,{elementForCard} from './GoElementSparkles.js';
+import './GoAlbumCardDetail.css';
 import GoSoundToggle from './GoSoundToggle.js';
 
 /** Figma 558:529529 → 558:593265: official draw animation and card reveal. */
@@ -31,7 +33,10 @@ export default function GoOfficialDrawReveal({card,onClose}){
     <button type="button" className="go-official-reveal-bottom" onClick={()=>setPhase('card')}>SKIP ›</button>
    </>:<>
     <h2>{card.dogName}{/[가-힣]$/.test(card.dogName||'')&&(card.dogName.charCodeAt(card.dogName.length-1)-0xAC00)%28!==0?'이':''}가 나타났다!</h2>
-    <div className="go-official-reveal-card"><GoCardFace card={card}/></div>
+    <div className="go-official-reveal-card go-album-reveal">
+     <GoElementSparkles element={elementForCard(card)} variant="cinematic"/>
+     <div className="go-album-detail-card go-official-reveal-face"><GoCardFace card={card}/></div>
+    </div>
     <Link className="go-official-reveal-bottom" href="/go" onClick={onClose}>내 도감에서 보기 ›</Link>
    </>}
    <GoSoundToggle className="go-official-reveal-sound"/>
