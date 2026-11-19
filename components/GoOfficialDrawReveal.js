@@ -9,7 +9,7 @@ export default function GoOfficialDrawReveal({card,onClose}){
  const [phase,setPhase]=useState('reveal');
  useEffect(()=>{
   if(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches){setPhase('card');return;}
-  const timeout=window.setTimeout(()=>setPhase('card'),1650);
+  const timeout=window.setTimeout(()=>setPhase('card'),950);
   return()=>window.clearTimeout(timeout);
  },[]);
  useEffect(()=>{
