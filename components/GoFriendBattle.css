@@ -44,7 +44,7 @@
 .friend-pvp-prepare>h2{font-size:14px!important;margin:15px 0!important}
 .friend-pvp-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:23px;row-gap:22px;margin:18px 0 22px}
 .friend-pvp-card{width:100%;border:0;background:#fff;padding:0;position:relative;color:#181713;text-align:center;display:flex;flex-direction:column;gap:5px;min-width:0}
-.friend-pvp-card.is-selected:after{content:'';position:absolute;inset:0;border:3px solid #fade40;z-index:2;pointer-events:none}
+.friend-pvp-card.is-selected:after{content:'';position:absolute;left:0;top:0;width:100%;aspect-ratio:166/265;border:3px solid #fade40;z-index:2;pointer-events:none}
 .friend-pvp-card .go-card-graphic{width:100%;height:auto;display:block;aspect-ratio:166/265}
 .friend-pvp-card span{display:block;font-size:10px;line-height:1.4;font-weight:700;overflow-wrap:anywhere}
 .friend-pvp-card small{display:block;font-size:10px;color:#777067}

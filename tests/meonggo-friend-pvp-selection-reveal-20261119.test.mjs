@@ -8,7 +8,7 @@ test('1:1 selected card gets the same visible 3px yellow border as random battle
  const random=read('components/GoBattle.css');
  const jsx=read('components/GoFriendBattle.js');
  assert.match(random,/is-picked:after\{content:"";position:absolute;inset:0;border:3px solid #fade40/);
- assert.match(css,/friend-pvp-card\.is-selected:after\{content:'';position:absolute;inset:0;border:3px solid #fade40/);
+ assert.match(css,/friend-pvp-card\.is-selected:after\{content:'';position:absolute;left:0;top:0;width:100%;aspect-ratio:166\/265;border:3px solid #fade40/);
  assert.doesNotMatch(css,/inset:-5px -5px 35px/);
  assert.match(jsx,/aria-pressed=\{selected\}/);
  assert.match(jsx,/selected=\{selectedKey\(room\.myCard\)===selectedKey\(card\)\}/);
@@ -37,6 +37,9 @@ test('1:1 reveals both cards through random battle shuffle/pick/flip/show before
  for(const when of ["pick:750","flip:1220","shown:1700","fight:2550"]){
   assert.ok(pvp.includes(when),when);assert.ok(random.includes(when),when);
  }
+ assert.match(pvp,/setAnimatedRound\(key\)/);
+ assert.match(pvp,/animatedRound!==room\.roomId\+':'\+room\.round/);
+ assert.match(pvp,/setRevealStage\('shuffle'\)/);
  assert.match(pvp,/setAnimation\('reveal'\)/);
  assert.match(pvp,/setRevealStage\('selected'\)/);
  assert.match(pvp,/setRevealStage\('flip'\)/);

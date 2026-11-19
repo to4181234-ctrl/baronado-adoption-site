@@ -61,6 +61,7 @@ export default function GoFriendBattle(){
  const [owned,setOwned]=useState(EMPTY),[loadingCards,setLoadingCards]=useState(false);
  const [history,setHistory]=useState({stats:{wins:0,draws:0,losses:0},recent:[]});
  const [animation,setAnimation]=useState('idle'),[impact,setImpact]=useState(0);
+ const [revealStage,setRevealStage]=useState('shuffle'),[animatedRound,setAnimatedRound]=useState('');
  const [now,setNow]=useState(0),[soundOn,setSoundOn]=useState(false);
  const audio=useRef(null),motionTimers=useRef([]),mutating=useRef(false),polling=useRef(false),mutationEpoch=useRef(0);
  const autoJoined=useRef(false),lastAnimated=useRef('');
@@ -166,6 +167,7 @@ export default function GoFriendBattle(){
   const key=room.roomId+':'+room.round;
   if(lastAnimated.current===key)return;
   lastAnimated.current=key;
+  setAnimatedRound(key);
   const timers=motionTimers.current;
   // Same random-battle sequence: card selection (750 ms), flip (1220 ms),
   // fully visible card (1700 ms), three-hit duel (2550 ms), then result.
@@ -202,7 +204,7 @@ export default function GoFriendBattle(){
   return()=>{timers.forEach(window.clearTimeout);motionTimers.current=[];stopBattleVibration();};
  },[room?.roomId,room?.round,room?.status]);
  function clearRoom(){
-  setRoom(null);setNotice('');setError('');setAnimation('idle');setImpact(0);
+  setRoom(null);setNotice('');setError('');setAnimation('idle');setImpact(0);setAnimatedRound('');
   window.history.replaceState(null,'','/go/battle');
   getHistory();
  }
@@ -333,7 +335,9 @@ export default function GoFriendBattle(){
     </div>}
     {room.status==='completed'&&room.myCard&&room.otherCard&&
      <section className="friend-pvp-result" aria-live="polite">
-      {animation==='reveal'?<>
+      {animatedRound!==room.roomId+':'+room.round||animation==='idle'?
+       <p role="status">양쪽 멍카드를 공개하는 중…</p>:
+       animation==='reveal'?<>
        <h2>양쪽 멍카드 공개!</h2>
        <div className="friend-pvp-reveal-pair" aria-label="양측 멍카드 공개 애니메이션">
         {[room.role==='host'?room.myCard:room.otherCard,
