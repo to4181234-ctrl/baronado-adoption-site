@@ -21,10 +21,11 @@ test('duplicate selection requires separate confirmed choice before server resol
  assert.match(source,/onResolve\(choice\)/);
  assert.match(source,/setConfirm\(false\)/);
 });
-test('store purchase goes directly to original result presentation when image exists',()=>{
+test('store purchase retains official card result until collar-reveal animation is initiated',()=>{
  const source=read('components/GoStore.js');
- assert.match(source,/if\(purchased\.card\.imageUrl\)/);
- assert.match(source,/<GoOfficialDrawReveal card=\{revealed\}/);
+ assert.match(source,/if\(card\.imageUrl\)setPurchaseOutcome\(\{type:'card',card\}\)/);
+ assert.match(source,/revealOpen&&<GoOfficialDrawReveal/);
+ assert.match(source,/setChoiceOpen\(false\);setRevealOpen\(true\)/);
  assert.doesNotMatch(source,/오늘의 멍카드!/);
 });
 test('coin history is a single full-screen ledger with balance and approved labels',()=>{
@@ -55,7 +56,8 @@ test('missing purchased image does not offer a broken replay popup',()=>{
  assert.match(store,/카드는 지급되었지만 이미지를 불러오지 못했어요/);
  assert.doesNotMatch(store,/카드 연출 보기/);
  assert.doesNotMatch(store,/SKIP · 내 도감에 저장됨/);
- assert.match(store,/if\(purchased\.card\.imageUrl\)setRevealed/);
+ assert.match(store,/if\(card\.imageUrl\)setPurchaseOutcome\(\{type:'card',card\}\)/);
+ assert.match(store,/type:'error',error:'카드는 지급되었지만 이미지를 불러오지 못했어요/);
 });
 
 test('store discards previous-account catalog, reveal and duplicate on account change',()=>{
