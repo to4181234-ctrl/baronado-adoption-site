@@ -37,6 +37,7 @@ export default function GoOfficialDrawReveal({card,onClose}){
      <GoElementSparkles element={elementForCard(card)} variant="cinematic"/>
      <div className="go-album-detail-card go-official-reveal-face"><GoCardFace card={card}/></div>
     </div>
+    {card.title&&<p className="go-official-reveal-caption">{card.title}</p>}
     <Link className="go-official-reveal-bottom" href="/go" onClick={onClose}>내 도감에서 보기 ›</Link>
    </>}
    <GoSoundToggle className="go-official-reveal-sound"/>
