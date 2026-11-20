@@ -37,9 +37,11 @@ test('adoption and resident dog editors share one canonical screen with own cate
 
 test('dedicated authenticated statistics page reuses existing MeongGO data and original controls',()=>{
  const page=read('app/admin/go/stats/page.js'),original=read('components/GoAdminStats.js');
+ const dashboard=read('components/GoAdminDashboard.js');
  assert.match(page,/AdminGuard/);
  assert.match(page,/SiteHeader/);
- assert.match(page,/GoAdminStats/);
+ assert.match(page,/GoAdminDashboard/);
+ assert.match(dashboard,/GoAdminStats/);
  assert.match(original,/\/api\/admin\/go\/stats/);
  for(const label of ['전체 게시물','공개 게시물','비공개 게시물','좋아요 합계','멍멍이별 게시물 수','좋아요가 많은 게시물'])
   assert.ok(original.includes(label),label);
