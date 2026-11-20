@@ -293,6 +293,10 @@ export default function GoStore(){
     <button type="button" disabled={busy} onClick={()=>recover(false)}>이전 구매 결과 확인</button>
     <button type="button" disabled={busy} onClick={()=>recover(true)}>같은 요청으로 재시도</button>
    </aside>}
+   {pending&&purchaseOutcome&&!choiceOpen&&!revealOpen&&!duplicate&&!revealed&&<aside className="s4-store-result-ready" role="status">
+    <p>구매한 멍카드의 결과를 아직 확인하지 않았어요.</p>
+    <button type="button" onClick={()=>{setCollarChoice(null);setChoiceOpen(true);}}>목줄 선택하고 결과 보기</button>
+   </aside>}
   </section>
   {dogPickerOpen&&<div className="s4-store-overlay" role="presentation" onClick={()=>setDogPickerOpen(false)}>
    <section role="dialog" aria-modal="true" aria-label="지정할 강아지 선택" onClick={e=>e.stopPropagation()}>
@@ -340,6 +344,25 @@ export default function GoStore(){
   {duplicate&&<GoDuplicateCompare
    dog={catalog.dogs.find(d=>d.dogId===duplicate.dogId)} duplicate={duplicate}
    busy={busy} error={error} onResolve={resolveDuplicate} onClose={()=>resolveDuplicate(false)}/>}
+  {revealOpen&&<GoOfficialDrawReveal
+   card={purchaseOutcome?.type==='card'?purchaseOutcome.card:null}
+   duplicate={purchaseOutcome?.type==='duplicate'?purchaseOutcome.duplicate:null}
+   error={revealError||(purchaseOutcome?.type==='error'?purchaseOutcome.error:'')}
+   busy={busy}
+   onDuplicate={()=>{
+    if(purchaseOutcome?.type!=='duplicate')return;
+    purchaseFlowRef.current=false;clearRequest();
+    setRevealOpen(false);setPurchaseOutcome(null);
+    setDuplicate(purchaseOutcome.duplicate);
+   }}
+   onClose={()=>{
+    if(purchaseOutcome){
+     purchaseFlowRef.current=false;clearRequest();
+     if(purchaseOutcome.type==='error')setMessage(purchaseOutcome.error);
+    }
+    setRevealOpen(false);setPurchaseOutcome(null);
+   }}
+  />}
   {revealed&&revealed.imageUrl&&<GoOfficialDrawReveal card={revealed} onClose={()=>setRevealed(null)}/>}
  </article>;
 }
