@@ -110,3 +110,60 @@
  .go-official-sparkles-top,.go-official-sparkles-bottom{animation:none!important}
  .meong-battle-phase-fight .meong-battle-card.is-mini .go-card-graphic{animation:none!important;transform:none!important}
 }
+
+
+/* MeongGO update 2026-11-20 — Figma pixel-dialogue-box 4 (698:163511).
+   This is a static hint: only the collar buttons respond to taps. */
+.go-collar-dialogue{
+ position:relative;width:285px;height:119px;max-width:100%;
+ font-family:'MonaS12',sans-serif;color:#000;pointer-events:none;user-select:none;
+}
+.go-collar-dialogue>img{display:block;position:absolute;max-width:none;object-fit:fill;image-rendering:pixelated}
+.go-collar-dialogue-bg,.go-collar-dialogue-outer{
+ top:1.3px;left:1.5px;width:calc(100% - 3px);height:calc(100% - 2.6px);
+}
+.go-collar-dialogue-inner{
+ top:7.76px;left:6px;width:calc(100% - 12px);height:calc(100% - 15.52px);
+}
+.go-collar-dialogue-question{
+ position:absolute;top:24px;left:23px;margin:0;white-space:nowrap;
+ font:400 13px/19.5px 'MonaS12',sans-serif;color:#000;
+}
+.go-collar-dialogue-option{
+ position:absolute;top:54px;left:23px;height:20px;display:flex;align-items:center;gap:8px;
+ white-space:nowrap;font:400 13px/19.5px 'MonaS12',sans-serif;color:#000;
+}
+.go-collar-dialogue-option img{display:block;width:9px;height:14px;object-fit:contain;image-rendering:pixelated}
+.go-free-draw-dialogue{
+ left:calc(50% - 142.5px);right:auto;top:306px;width:285px;height:119px;
+}
+.s4-store-original-choice>.go-collar-dialogue{
+ position:absolute;top:306px;left:calc(50% - 142.5px);
+}
+/* 1:1 PvP is the canonical selection appearance: yellow WITHIN the pixel card,
+   not a yellow outline, tile background, or separate tick/badge. */
+.meong-battle-phase-choose .meong-battle-card.is-picked{
+ outline:none!important;box-shadow:none!important;background:transparent!important;
+}
+.meong-battle-card.is-picked::after{content:none!important;display:none!important}
+.meong-battle-card.is-picked .meong-card-selected{display:none!important}
+.s2-official-grid .s2-official-card[aria-pressed='true'],
+.s2-official-grid .s2-official-hidden[aria-pressed='true']{
+ background:transparent!important;outline:none!important;box-shadow:none!important;
+}
+.s2-official-grid .s2-official-selected{display:none!important}
+.v3-go-site .v5-card-grid .go-bulk-card-choice[aria-pressed='true'] .go-card{
+ background:#fff!important;outline:0!important;box-shadow:none!important;border:0!important;
+}
+.v3-go-site .v5-card-grid .go-bulk-card-choice[aria-pressed='true']{
+ background:transparent!important;outline:0!important;box-shadow:none!important;
+}
+.v3-go-site .v5-card-grid .go-bulk-card-choice[aria-pressed='true'] .go-bulk-check{
+ display:none!important;
+}
+/* The title follows the card rather than being painted inside the SVG face. */
+.go-official-reveal-caption{
+ position:absolute;top:382px;left:28px;right:28px;margin:0;
+ font:400 11px/17px 'MonaS12',sans-serif;color:#777;
+ text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
