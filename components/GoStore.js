@@ -228,11 +228,12 @@ export default function GoStore(){
        (pending.mode==='specific' && d.dogId!==pending.dogId))
        throw Error('이전 거래의 구매 방식이 달라요. 관리자에게 문의해주세요.');
      await showPurchased({dogId:d.dogId,slot:d.slot,price:d.price,coinsSpent:0,requiresChoice:d.requiresChoice,choiceId:d.choiceId},true);
+     setCollarChoice(null);setChoiceOpen(true);
      return;
     }
     setMessage('이전 구매는 아직 확인되지 않았어요. 동일 요청 번호로 재시도할 수 있어요.');
     setRecoveryNeeded(true);
-   }else await showPurchased(await storePost(pending));
+   }else {await showPurchased(await storePost(pending));setCollarChoice(null);setChoiceOpen(true);}
   }catch(e){setRecoveryNeeded(true);setError(e.message);}
   finally{setBusy(false);}
  }
@@ -273,14 +274,14 @@ export default function GoStore(){
    <header className="s4-store-screen-reader"><h2>멍카드 구매</h2><p>랜덤은 공개된 모든 강아지의 일반 카드에서, 지정은 선택한 강아지의 일반 카드에서 뽑아요. 중복 카드도 나올 수 있어요.</p></header>
    <div className="s4-store-choices" role="group" aria-label="구매 방식">
     <button type="button"
-     onClick={()=>{setSelected({mode:'random'});setCollarChoice(null);setChoiceOpen(true);}}>
+     onClick={()=>{if(pending||busy)return;setSelected({mode:'random'});setCollarChoice(null);setConfirm(true);}}>
       <StoreProductPreview mode="random"/>
       <strong>랜덤 카드 뽑기</strong>
       <small>랜덤으로 멍카드를<br/>뽑을 수 있다.</small>
       <b>60 멍코인</b>
     </button>
     <button type="button"
-     onClick={()=>{setSelected({mode:'specific'});setPickerNotice('');setDogPickerOpen(true);}}>
+     onClick={()=>{if(pending||busy)return;setSelected({mode:'specific'});setPickerNotice('');setConfirm(true);}}>
       <StoreProductPreview mode="specific"/>
       <strong>지정 랜덤 카드 뽑기</strong>
       <small>내가 지정한 멍멍이로<br/>랜덤 멍카드를 뽑을 수 있다.</small>
@@ -297,12 +298,12 @@ export default function GoStore(){
    <section role="dialog" aria-modal="true" aria-label="지정할 강아지 선택" onClick={e=>e.stopPropagation()}>
     <button className="s4-store-close" onClick={()=>setDogPickerOpen(false)} aria-label="닫기">×</button>
     <h2>어떤 멍멍이로 뽑을까요?</h2>
-    <p>선택한 멍멍이의 일반 카드 중 한 장이 나와요. 이미 보유한 카드도 나올 수 있어요.</p>
+    <p>강아지를 선택하면 100 멍코인이 사용돼요. 이미 보유한 카드도 나올 수 있어요.</p>
     {dogOptions.length===0?<p>현재 선택 가능한 입양 전 강아지가 없어요.</p>:
       <div className="s4-store-dog-choices">{dogOptions.map(dog=>
        <button type="button" key={dog.dogId} onClick={()=>{
-        setSelected({mode:'specific',dogId:dog.dogId});setDogPickerOpen(false);
-        setPickerNotice('');setConfirm(true);
+        setSelected({mode:'specific',dogId:dog.dogId});setPickerNotice('');
+        void buy(dog.dogId);
        }} className="s4-store-dog-tile" aria-label={dog.name+(dog.missing===0?' 공식 카드 4종 수집 완료':' 미보유 공식 카드 '+dog.missing+'종')}>
         <img className={dog.hasAnyCard?'':'s4-store-dog-silhouette'}
          src={dog.hasAnyCard?(dog.thumbnailUrl||figmaSprite(dog.name,'front')):(dog.thumbnailUrl||figmaSprite(dog.name,'shadow'))}
@@ -318,7 +319,7 @@ export default function GoStore(){
     <h2>랜덤 뽑기</h2>
     <div className="s4-store-collars">{[0,1,2].map(i=>
       <button type="button" key={i} aria-label={'목줄 '+(i+1)+' 선택'}
-       aria-pressed={collarChoice===i} disabled={busy||Boolean(pending)} onClick={()=>{if(busy||pending)return;setCollarChoice(i);void sound.current?.play('collar');setChoiceOpen(false);setConfirm(true);}}>
+       aria-pressed={collarChoice===i} disabled={collarChoice!==null} onClick={()=>{if(collarChoice!==null)return;setCollarChoice(i);void sound.current?.play('collar');setChoiceOpen(false);setRevealOpen(true);}}>
        <img src="/figma-v3/collar.png" alt="픽셀 목줄"/>
       </button>)}</div>
     <GoCollarDialogue/>
@@ -331,7 +332,7 @@ export default function GoStore(){
     <button className="s4-store-close" onClick={()=>setConfirm(false)} aria-label="닫기">×</button>
     <p className="s4-store-confirm-question">{STORE_PRICES[selected.mode]} 멍코인을 사용하여<br/>구매하시겠습니까?</p>
     <div className="s4-store-confirm-answers">
-     <button type="button" disabled={busy} onClick={buy}>{busy?'처리 중…':'네'}</button>
+     <button type="button" disabled={busy||Boolean(pending)} onClick={()=>buy()}>{busy?'처리 중…':'네'}</button>
      <button type="button" disabled={busy} onClick={()=>setConfirm(false)}>아니오</button>
     </div>
    </section>
