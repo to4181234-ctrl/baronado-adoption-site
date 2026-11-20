@@ -82,7 +82,7 @@ export default function GoStore(){
  const [revealError,setRevealError]=useState('');
  const items=useMemo(()=>availableStoreItems(catalog.dogs),[catalog.dogs]);
  const dogOptions=useMemo(()=>availableStoreDogs(catalog.dogs),[catalog.dogs]);
- const selectedDog=dogOptions.find(i=>i.dogId===selected.dogId);
+
  const balance=coins?.walletLoaded?coins.balance:null;
  const refresh=useCallback(async()=>{
   const request=++catalogRequestRef.current;
@@ -180,7 +180,8 @@ export default function GoStore(){
    // Confirmation only: the selected dog controls the actual 100C debit.
    setConfirm(false);setDogPickerOpen(true);return;
   }
-  if(busy||pending||purchaseLockRef.current||items.length===0)return;
+  if(busy||pending||purchaseLockRef.current)return;
+  if(items.length===0){setError('현재 뽑을 수 있는 공식 멍카드가 없어요.');setConfirm(false);setDogPickerOpen(false);return;}
   if(selected.mode==='specific'&&!dogOptions.some(d=>d.dogId===dogId)){
    setError('선택한 멍멍이가 지금은 구매 대상이 아니에요.');setDogPickerOpen(false);return;
   }
