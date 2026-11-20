@@ -1,5 +1,6 @@
 import {hasAdminSession} from '../../../../../lib/server/adminSession.js';
 import {adminDatabase} from '../../../../../lib/server/adminData.js';
+import {excludeTestAccounts} from '../../../../../lib/server/goStatsExcludedAccounts.js';
 
 export const dynamic='force-dynamic';
 export const runtime='nodejs';
@@ -11,6 +12,17 @@ const kst=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',
 const dayOf=value=>{const p=Object.fromEntries(kst.formatToParts(new Date(value)).map(x=>[x.type,x.value]));return [p.year,p.month,p.day].join('-');};
 const number=value=>Number(value)||0;
 const unique=items=>new Set(items).size;
+// All account-owned records are excluded at query time, BEFORE pagination,
+// to keep dashboards, time series and totals in sync for future events.
+const MEMBER_COLUMNS={
+ go_members:'id',go_cards:'member_id',go_official_owned:'member_id',
+ go_official_hidden:'member_id',go_coin_transactions:'member_id',
+ go_coin_wallets:'member_id',go_official_purchases:'member_id',
+ go_draw_attempts:'member_id',go_official_daily_draws:'member_id',
+ go_battles:'member_id',go_pvp_records:'member_id',
+ go_interactions:'member_id',go_affinity:'member_id',
+ go_visit_requests:'member_id',go_likes:'member_id'
+};
 function addBy(items,key,value=()=>1){
  const grouped=new Map();
  for(const item of items)grouped.set(key(item),(grouped.get(key(item))||0)+value(item));
@@ -52,6 +64,9 @@ export async function GET(request){
  const db=adminDatabase();
  const load=(table,cols,field='created_at')=>allRows((offset,size)=>{
   let q=db.from(table).select(cols);
+  if(MEMBER_COLUMNS[table])q=excludeTestAccounts(q,MEMBER_COLUMNS[table]);
+  // A PvP match with a test participant must not count as a real-user match.
+  if(table==='go_pvp_records')q=excludeTestAccounts(q,'opponent_id');
   if(start&&field){q=q.gte(field,field==='local_day'?startDay:start).lt(field,field==='local_day'?dayOf(end):end);}
   return q.range(offset,offset+size-1);
  });
@@ -155,24 +170,28 @@ export async function GET(request){
    rows=addBy(care,c=>names.get(c.dog_id)||'기타 강아지').slice(0,12);
    note='호감도 기록은 현재 상태이며 기간별 누적 변화를 뜻하지 않습니다. 1:1 배틀은 참가자별 기록을 경기별로 합쳤습니다.';
   }else{
-   const [posts,likes,dogs]=await Promise.all([
+   const [posts,likes,dogs,allRealPosts]=await Promise.all([
     load('go_cards','id,dog_id,title,status,share_count,created_at'),
     load('go_likes','card_id,created_at'),
-    current('dogs','id,name,category')
+    current('dogs','id,name,category'),
+    current('go_cards','id')
    ]);
+   const eligiblePostIds=new Set(allRealPosts.map(p=>p.id));
+   // Exclude likes FROM test users and likes ON test users' posts.
+   const realLikes=likes.filter(l=>eligiblePostIds.has(l.card_id));
    const names=new Map(dogs.map(d=>[d.id,d.name]));
    cards=[
     {label:'기간 내 등록 게시물',value:posts.length,unit:'건'},
     {label:'공개 게시물',value:posts.filter(p=>p.status==='approved').length,unit:'건'},
     {label:'숨김·반려 게시물',value:posts.filter(p=>p.status!=='approved').length,unit:'건'},
-    {label:'기간 내 좋아요',value:likes.length,unit:'개'},
+    {label:'기간 내 좋아요',value:realLikes.length,unit:'개'},
     {label:'기간 내 게시물의 누적 공유',value:sums(posts,p=>p.share_count),unit:'회',detail:'게시물 등록 이후 누적 수치'}
    ];
    chart={title:'게시물 등록 추이',rows:chartFrom(posts,period,'created_at')};
    rows=addBy(posts,p=>names.get(p.dog_id)||'기타 강아지').slice(0,12);
    note='기간별 게시물 수는 등록일 기준, 좋아요 수는 누른 시점 기준입니다. 공유 수치는 해당 기간에 등록된 게시물의 현재 누적 수치입니다.';
   }
-  return Response.json({tab,period,today,cards,chart,rows,note},{headers:{'Cache-Control':'no-store'}});
+  return Response.json({tab,period,today,cards,chart,rows,note,excludedTestAccounts:3},{headers:{'Cache-Control':'no-store'}});
  }catch(e){
   console.error('MeongGO admin dashboard aggregate failed:',e?.code||e?.message||'unknown');
   return Response.json({error:'통계를 불러오지 못했어요.'},{status:503,headers:{'Cache-Control':'no-store'}});
