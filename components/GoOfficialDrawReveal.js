@@ -1,36 +1,49 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import GoCardFace from './GoCardFace.js';
 import GoElementSparkles,{elementForCard} from './GoElementSparkles.js';
 import './GoAlbumCardDetail.css';
 import GoSoundToggle from './GoSoundToggle.js';
 
-/** Figma 558:529529 → 558:593265: official draw animation and card reveal. */
-export default function GoOfficialDrawReveal({card,onClose}){
- const [phase,setPhase]=useState('reveal');
+/** Shared Figma reveal (558:529529 → 558:593265).
+ * Mount immediately on collar click. The 950ms intro and the server request
+ * run concurrently; never reveal a card until the server result is verified.
+ */
+export default function GoOfficialDrawReveal({card=null,duplicate=null,error='',busy=false,onDuplicate=null,onClose}){
+ const [introFinished,setIntroFinished]=useState(false);
+ const duplicateSent=useRef(false);
  useEffect(()=>{
-  if(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches){setPhase('card');return;}
-  const timeout=window.setTimeout(()=>setPhase('card'),950);
+  if(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches){setIntroFinished(true);return;}
+  const timeout=window.setTimeout(()=>setIntroFinished(true),950);
   return()=>window.clearTimeout(timeout);
  },[]);
  useEffect(()=>{
+  if(!introFinished||!duplicate||duplicateSent.current)return;
+  duplicateSent.current=true;
+  onDuplicate?.();
+ },[introFinished,duplicate,onDuplicate]);
+ const cardReady=introFinished&&Boolean(card?.imageUrl)&&!duplicate;
+ const pending=introFinished&&!cardReady&&!duplicate&&!error;
+ useEffect(()=>{
   const previous=document.body.style.overflow;document.body.style.overflow='hidden';
-  const onKey=event=>{if(event.key==='Escape')onClose()};
+  const onKey=event=>{if(event.key==='Escape'&&!busy&&!pending)onClose()};
   document.addEventListener('keydown',onKey);
   return()=>{document.body.style.overflow=previous;document.removeEventListener('keydown',onKey)};
- },[onClose]);
+ },[onClose,busy,pending]);
  return <div className="go-official-reveal-overlay" role="presentation">
-  <section className="go-official-reveal-screen" role="dialog" aria-modal="true" aria-label="멍카드 뽑기 결과">
-   <button type="button" className="go-official-reveal-close" onClick={onClose} aria-label="닫기">×</button>
-   {phase==='reveal'?<>
+  <section className="go-official-reveal-screen" role="dialog" aria-modal="true" aria-label="멍카드 뽑기 결과" aria-busy={busy||pending}>
+   <button type="button" className="go-official-reveal-close" disabled={busy||pending} onClick={onClose} aria-label="닫기">×</button>
+   {!cardReady?<>
     <h2>멍멍GO!</h2>
     <div className="go-official-reveal-collar" aria-hidden="true">
      <img className="go-official-sparkles-top" src="/figma-post/sparkle-top.svg" alt=""/>
      <img className="go-official-sparkles-bottom" src="/figma-post/sparkle-bottom.svg" alt=""/>
      <img className="go-official-collar-image" src="/figma-v3/collar.png" alt=""/>
     </div>
-    <button type="button" className="go-official-reveal-bottom" onClick={()=>setPhase('card')}>SKIP ›</button>
+    {error?<p className="go-official-reveal-status" role="alert">{error}</p>:
+     pending?<p className="go-official-reveal-status" role="status">멍카드 결과를 확인하고 있어요…</p>:
+     <button type="button" className="go-official-reveal-bottom" onClick={()=>setIntroFinished(true)}>SKIP ›</button>}
    </>:<>
     <h2>{card.dogName}{/[가-힣]$/.test(card.dogName||'')&&(card.dogName.charCodeAt(card.dogName.length-1)-0xAC00)%28!==0?'이':''}가 나타났다!</h2>
     <div className="go-official-reveal-card go-album-reveal">
