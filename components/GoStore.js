@@ -157,35 +157,50 @@ export default function GoStore(){
   setConfirm(false);setMessage('');
   if(!wasRecovered&&data.coinsSpent>0)announceCoins(-data.coinsSpent);
   else announceCoins(0);
+  // Keep the request ID until its card is actually revealed. A reload can
+  // restore the exact purchase without charging again.
   const next=await refresh();
   if(!next)throw Error('구매 후 카드를 불러오지 못했어요.');
   const pendingChoice=next.pendingDuplicate;
   if(data.requiresChoice||pendingChoice){
-   if(!pendingChoice)throw Error('결제는 완료되었지만 중복 카드 비교를 아직 불러오지 못했어요.');
-   clearRequest();setDuplicate(pendingChoice);
-   return;
+   const candidate=pendingChoice||(data.choiceId?{
+    choiceId:data.choiceId,dogId:data.dogId,slot:data.slot
+   }:null);
+   if(!candidate?.choiceId)throw Error('결제는 완료되었지만 중복 카드 비교를 아직 불러오지 못했어요.');
+   setPurchaseOutcome({type:'duplicate',duplicate:candidate});
+  }else{
+   const card=cardFor(next.dogs?.find(d=>d.dogId===data.dogId),data.slot);
+   if(card.imageUrl)setPurchaseOutcome({type:'card',card});
+   else setPurchaseOutcome({type:'error',error:'카드는 지급되었지만 이미지를 불러오지 못했어요. 내 도감에서 확인해주세요.'});
   }
-  clearRequest();
-  const purchased={...data,card:cardFor(next.dogs?.find(d=>d.dogId===data.dogId),data.slot)};
-  if(purchased.card.imageUrl)setRevealed(purchased.card);
-  else setMessage('카드는 지급되었지만 이미지를 불러오지 못했어요. 내 도감에서 확인해주세요.');
  }
- async function buy(){
+ async function buy(dogId=null){
   if(!member){setConfirm(false);openAccount();return;}
-  if(busy||pending||items.length===0)return;
-  if(selected.mode==='specific'&&!selectedDog){
-   setError('지정할 멍멍이를 선택해주세요.');setConfirm(false);return;
+  if(selected.mode==='specific'&&!dogId){
+   // Confirmation only: the selected dog controls the actual 100C debit.
+   setConfirm(false);setDogPickerOpen(true);return;
+  }
+  if(busy||pending||purchaseLockRef.current||items.length===0)return;
+  if(selected.mode==='specific'&&!dogOptions.some(d=>d.dogId===dogId)){
+   setError('선택한 멍멍이가 지금은 구매 대상이 아니에요.');setDogPickerOpen(false);return;
   }
   const price=STORE_PRICES[selected.mode];
-  if(balance===null||balance<price){setError('멍코인이 부족하거나 잔액을 확인하지 못했어요.');setConfirm(false);return;}
+  if(balance===null||balance<price){
+   setError('멍코인이 부족하거나 잔액을 확인하지 못했어요.');
+   setConfirm(false);setDogPickerOpen(false);return;
+  }
+  purchaseLockRef.current=true;
   const details={mode:selected.mode,requestId:crypto.randomUUID()};
-  if(selected.mode==='specific'){details.dogId=selected.dogId;}
+  if(selected.mode==='specific')details.dogId=dogId;
+  purchaseFlowRef.current=true;
   cacheRequest(details);
-  setBusy(true);setError('');setMessage('');
+  setBusy(true);setError('');setMessage('');setRevealError('');
+  setPurchaseOutcome(null);setRevealed(null);setCollarChoice(null);
+  setConfirm(false);setDogPickerOpen(false);setChoiceOpen(true);
   try{await showPurchased(await storePost(details));}
   catch(e){
-   setConfirm(false);
-   // Check the receipt first: a lost response can represent an already completed purchase.
+   // Response loss may still mean a committed purchase. Recover by the same
+   // request ID; never create a new ID until the old result is settled.
    try{
     const r=await fetch('/api/go/store?requestId='+encodeURIComponent(details.requestId),{cache:'no-store'});
     const d=await r.json();
@@ -196,9 +211,9 @@ export default function GoStore(){
     }
    }catch{}
    setRecoveryNeeded(true);
+   setRevealError(e.message+' 이전 구매 결과를 확인한 후 다시 시도해주세요.');
    setError(e.message+' 이전 구매 결과를 확인한 후 다시 시도해주세요.');
-  }
-  finally{setBusy(false);}
+  }finally{setBusy(false);purchaseLockRef.current=false;}
  }
  async function recover(retry=false){
   if(!member||!pending||busy)return;
