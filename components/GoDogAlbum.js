@@ -9,7 +9,7 @@ import { useGoSession } from './GoShell.js';
 import GoCard from './GoCard.js';
 import GoCamera from './GoCamera.js';
 import GoStage2OfficialCards from './GoStage2OfficialCards.js';
-import { ALBUM_PAGE_SIZE, ALBUM_SELECTION_LIMIT, changeAlbumSelection, lastAlbumPage, albumRankPercent, albumRankLabel } from '../lib/goAlbumSelection.js';
+import { ALBUM_PAGE_SIZE, ALBUM_SELECTION_LIMIT, changeAlbumSelection, lastAlbumPage, albumRankLabel } from '../lib/goAlbumSelection.js';
 
 const EMPTY_COLLECTION = { counts: {}, covers: {}, standing: null };
 const ALBUM_SHADOWS = {
