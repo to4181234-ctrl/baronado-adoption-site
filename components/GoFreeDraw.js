@@ -2,7 +2,7 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {createGameAudio} from '../lib/goV3Audio.js';
 import Link from 'next/link';
-import GoPixelChoice from './GoPixelChoice.js';
+import GoCollarDialogue from './GoCollarDialogue.js';
 import GoOfficialDrawReveal from './GoOfficialDrawReveal.js';
 import GoDuplicateCompare from './GoDuplicateCompare.js';
 import GoSoundToggle from './GoSoundToggle.js';
@@ -111,16 +111,7 @@ export default function GoFreeDraw({onClose}){
        <img src="/figma-v3/collar.png" alt=""/>
       </button>)}
      </div>
-     <div className="go-free-draw-dialogue">
-      <img src="/figma-v3/discovery-dialog-bg.svg" alt=""/>
-      <img src="/figma-v3/discovery-dialog-outer.svg" alt=""/>
-      <img src="/figma-v3/discovery-dialog-inner.svg" alt=""/>
-      <div className="go-free-draw-dialogue-content">
-       <p>오늘의 멍멍이는 누구일까요?</p>
-       <p className="go-free-draw-instruction">세 개 중 하나를 클릭한다</p>
-       <GoPixelChoice disabled={busy||Boolean(duplicate)} onClick={onClose}>도망간다</GoPixelChoice>
-      </div>
-     </div>
+     <div className="go-free-draw-dialogue"><GoCollarDialogue/></div>
      <GoSoundToggle className="go-free-draw-sound"/>
     </>}
     {error&&<p role="alert" className="go-free-draw-error">{error}</p>}
