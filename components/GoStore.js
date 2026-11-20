@@ -66,6 +66,8 @@ export default function GoStore(){
  const sound=useRef(null);
  useEffect(()=>{sound.current=createGameAudio();return()=>{sound.current?.dispose();sound.current=null;};},[]);
  const catalogRequestRef=useRef(0);
+ const purchaseFlowRef=useRef(false);
+ const purchaseLockRef=useRef(false);
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false);
  const [error,setError]=useState(''),[message,setMessage]=useState('');
  const [selected,setSelected]=useState({mode:'random'}),[confirm,setConfirm]=useState(false);
@@ -75,6 +77,9 @@ export default function GoStore(){
  const [recoveryNeeded,setRecoveryNeeded]=useState(false);
  const [duplicate,setDuplicate]=useState(null);
  const [revealed,setRevealed]=useState(null);
+ const [purchaseOutcome,setPurchaseOutcome]=useState(null);
+ const [revealOpen,setRevealOpen]=useState(false);
+ const [revealError,setRevealError]=useState('');
  const items=useMemo(()=>availableStoreItems(catalog.dogs),[catalog.dogs]);
  const dogOptions=useMemo(()=>availableStoreDogs(catalog.dogs),[catalog.dogs]);
  const selectedDog=dogOptions.find(i=>i.dogId===selected.dogId);
@@ -88,7 +93,7 @@ export default function GoStore(){
    if(!r.ok)throw Error(data.error||'공식 멍카드 목록을 불러오지 못했어요.');
    if(request!==catalogRequestRef.current)return null;
    setCatalog(data);
-   setDuplicate(data.pendingDuplicate||null);
+   if(!purchaseFlowRef.current)setDuplicate(data.pendingDuplicate||null);
    setError('');return data;
   }catch(e){if(request===catalogRequestRef.current)setError(e.message);return null;}
   finally{if(request===catalogRequestRef.current)setLoading(false);}
@@ -96,6 +101,7 @@ export default function GoStore(){
  useEffect(()=>{
   setCatalog(EMPTY);setDuplicate(null);setRevealed(null);setConfirm(false);
   setChoiceOpen(false);setDogPickerOpen(false);setLoading(true);
+   setPurchaseOutcome(null);setRevealOpen(false);setRevealError('');purchaseFlowRef.current=false;
   refresh();
   return()=>{catalogRequestRef.current++;};
  },[refresh]);
@@ -104,6 +110,7 @@ export default function GoStore(){
   const known=member?.id?getKnownPending(member.id):null;
   setPending(known);setRecoveryNeeded(false);
   if(!known)return;
+  purchaseFlowRef.current=true;
   let active=true;
   const reconcile=async()=>{
    setBusy(true);
@@ -117,6 +124,7 @@ export default function GoStore(){
      throw Error('이전 구매와 요청 정보가 일치하지 않아요.');
     await showPurchased({dogId:d.dogId,slot:d.slot,price:d.price,coinsSpent:0,
       requiresChoice:d.requiresChoice,choiceId:d.choiceId},true);
+    if(active){setCollarChoice(null);setChoiceOpen(true);}
    }catch(e){
     if(active){setRecoveryNeeded(true);setError(e.message||'이전 구매 확인에 실패했어요.');}
    }finally{if(active)setBusy(false);}
