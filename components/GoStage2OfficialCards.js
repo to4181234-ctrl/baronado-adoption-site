@@ -178,7 +178,7 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
           <button className="s2-official-card" type="button" onClick={()=>selectionMode?toggleSlot(card.slot):openCard(card.slot)}
             aria-pressed={selectionMode?selectedSlots.includes(card.slot):undefined}
             aria-label={`공식 멍카드 NO.${card.slot} ${card.title||''} ${selectionMode?'삭제 선택':'보기'}`}> 
-            <GoCardFace card={officialFace(card.slot,card)}/>
+            <GoCardFace card={officialFace(card.slot,card)} selected={selectionMode&&selectedSlots.includes(card.slot)}/>
             {!selectionMode&&card.new&&<span className="s2-official-new">NEW</span>}
           </button>
           {card.title&&<small className="s2-official-card-caption">{card.title}</small>}
@@ -189,7 +189,7 @@ export default function GoStage2OfficialCards({dogId,onCatalogLoaded}) {
           aria-pressed={selectionMode&&acquired?selectedSlots.includes(HIDDEN_SLOT):undefined}
           aria-label={acquired?'HIDDEN 카드 보기':unlockable?'HIDDEN 카드 해금':'미해금 HIDDEN 카드'}
           disabled={(!acquired&&!unlockable)||busy||!dog||(acquired&&!hiddenImage)||selectionMode&&!acquired} onClick={()=>selectionMode?toggleSlot(HIDDEN_SLOT):openHidden()}>
-          {acquired?(hiddenImage?<GoCardFace card={officialFace(HIDDEN_SLOT,hidden)}/>:<span className="s2-official-unavailable" role="status">HIDDEN 이미지를 불러오지 못했어요.</span>):
+          {acquired?(hiddenImage?<GoCardFace card={officialFace(HIDDEN_SLOT,hidden)} selected={selectionMode&&selectedSlots.includes(HIDDEN_SLOT)}/>:<span className="s2-official-unavailable" role="status">HIDDEN 이미지를 불러오지 못했어요.</span>):
             <LockedOfficialCard slot={HIDDEN_SLOT} hidden unlockable={unlockable}/>}
           
         </button>
