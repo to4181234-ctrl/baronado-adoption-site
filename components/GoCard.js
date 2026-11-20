@@ -30,7 +30,7 @@ export default function GoCard({card,member,onLogin,onDelete,onUpdated,onCollect
   finally{inFlight.current=false;setBusy(false);setBusyAction('');}
  }
  const face=<div className="go-card go-card-v3">
-  <GoCardFace card={current}/>
+  <GoCardFace card={current} selected={selectMode&&selected}/>
   {linkToPost&&<Link className="go-card-target" onPointerDown={beginHold} onPointerUp={endHold} onPointerCancel={endHold} onPointerLeave={endHold} onContextMenu={event=>{if(onLongPress)event.preventDefault();}} onClick={cardLinkClick} href={'/go/posts/'+current.id} aria-label={current.title+' 자세히 보기'}/>}
  </div>;
  if(selectMode)return <article className="go-card-entry go-bulk-card-entry"><button type="button" className="go-bulk-card-choice" aria-pressed={selected} aria-label={`${current.dogName} · ${current.title||'나의 카드'} ${selected?'선택 해제':'삭제 대상으로 선택'}`} onClick={()=>onSelect?.(current.id)}>{face}</button></article>;
