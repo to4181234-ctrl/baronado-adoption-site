@@ -9,7 +9,7 @@ import { useGoSession } from './GoShell.js';
 import GoCard from './GoCard.js';
 import GoCamera from './GoCamera.js';
 import GoStage2OfficialCards from './GoStage2OfficialCards.js';
-import { ALBUM_PAGE_SIZE, ALBUM_SELECTION_LIMIT, changeAlbumSelection, lastAlbumPage, albumRankPercent } from '../lib/goAlbumSelection.js';
+import { ALBUM_PAGE_SIZE, ALBUM_SELECTION_LIMIT, changeAlbumSelection, lastAlbumPage, albumRankPercent, albumRankLabel } from '../lib/goAlbumSelection.js';
 
 const EMPTY_COLLECTION = { counts: {}, covers: {}, standing: null };
 const ALBUM_SHADOWS = {
@@ -178,11 +178,11 @@ export default function GoDogAlbum({ dogId }) {
   if(STAGE2_ENABLED&&release===null)return <p className="v3-status">공개 정보를 확인하는 중…</p>;
   if(STAGE2_ENABLED&&!release?.ready)return <p className="v5-empty-message">아직 멍멍GO에 공개되지 않은 멍멍이예요.</p>;
 
-  const ownedCount = STAGE2_ENABLED ? (officialCount === null ? total : total + officialCount) : total;
+  const ownedCount = collection.standing?.collected??(STAGE2_ENABLED ? (officialCount === null ? total : total + officialCount) : total);
   const summaryCount = STAGE2_ENABLED && officialCount === null ? '—' : String(ownedCount);
   const hasCards = Boolean(member && ownedCount > 0);
   const dogImage = hasCards ? (release?.thumbnailUrl||figmaSprite(dog.name,'front')) : (ALBUM_SHADOWS[dog.name] || figmaSprite(dog.name, 'shadow'));
-  const ranking = hasCards ? albumRankPercent(collection.standing?.rank, collection.standing?.participants) : null;
+  const ranking = collection.standing?.collected ? albumRankLabel(collection.standing) : null;
   const maxPage = Math.max(1, Math.ceil(total / PER_PAGE));
   const deleteDogName = dog.name;
 
@@ -190,7 +190,7 @@ export default function GoDogAlbum({ dogId }) {
     <section className={'v5-album-yellow ' + (hasCards ? 'v5-has-cards' : 'v5-zero-cards')}>
       <h1>{dog.name} 도감</h1>
       {ranking !== null && <div className="v5-album-rank">
-        <p>{member?.nickname || '멍기록가'}님은 {dog.name} 멍기록가 중 상위 {ranking}% 입니다</p>
+        <p>{member?.nickname || '멍기록가'}님은 {dog.name} 멍기록가 중 {ranking}입니다</p>
         <small>보유 카드 수 기준 · 같은 수는 공동 순위</small>
       </div>}
       <div className="v5-album-dog-picture">
