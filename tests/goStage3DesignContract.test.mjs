@@ -65,7 +65,7 @@ test('collar scales only the selected original image, animations are 0.7 and 0.9
  assert.match(style,/\.go-free-draw-collars>button\[aria-pressed='true'\] img/);
  assert.match(style,/\.s4-store-original-choice \.s4-store-collars>button\[aria-pressed='true'\] img/);
  assert.match(style,/animation-duration:\.7s!important/);
- assert.match(reveal,/setTimeout\(\(\)=>setPhase\('card'\),950\)/);
+ assert.match(reveal,/setTimeout\(\(\)=>setIntroFinished\(true\),950\)/);
  assert.match(style,/prefers-reduced-motion:reduce/);
 });
 
