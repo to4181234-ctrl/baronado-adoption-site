@@ -18,7 +18,7 @@ const cardKey=c=>`${c?.kind||'camera'}:${c?.id||''}:${c?.slot||0}`;
 const emptyOpponents={members:[],total:0,hasMore:false};
 function BattleCard({card,selected,onSelect,disabled=false,mini=false}){
  return <button type="button" className={'meong-battle-card'+(selected?' is-picked':'')+(mini?' is-mini':'')} onClick={onSelect} disabled={disabled||!onSelect} aria-pressed={Boolean(selected)}>
-  <GoCardFace card={card}/>{selected&&<span className="meong-card-selected">✓</span>}
+  <GoCardFace card={card} selected={selected}/>
  </button>;
 }
 function Game(){
