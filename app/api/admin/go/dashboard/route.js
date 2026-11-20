@@ -8,7 +8,7 @@ const TABS=new Set(['overview','cards','coins','battle','community']);
 const PERIODS=new Set(['today','7d','30d','all']);
 const DAY=86400000;
 const kst=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'});
-const dayOf=value=>kst.format(new Date(value));
+const dayOf=value=>{const p=Object.fromEntries(kst.formatToParts(new Date(value)).map(x=>[x.type,x.value]));return [p.year,p.month,p.day].join('-');};
 const number=value=>Number(value)||0;
 const unique=items=>new Set(items).size;
 function addBy(items,key,value=()=>1){
