@@ -3,7 +3,7 @@ import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import Link from 'next/link';
 import GoOfficialDrawReveal from './GoOfficialDrawReveal.js';
 import GoDuplicateCompare from './GoDuplicateCompare.js';
-import GoPixelChoice from './GoPixelChoice.js';
+import GoCollarDialogue from './GoCollarDialogue.js';
 import GoSoundToggle from './GoSoundToggle.js';
 import {createGameAudio} from '../lib/goV3Audio.js';
 import {useGoSession} from './GoShell.js';
@@ -298,12 +298,8 @@ export default function GoStore(){
        aria-pressed={collarChoice===i} disabled={busy||Boolean(pending)} onClick={()=>{if(busy||pending)return;setCollarChoice(i);void sound.current?.play('collar');setChoiceOpen(false);setConfirm(true);}}>
        <img src="/figma-v3/collar.png" alt="픽셀 목줄"/>
       </button>)}</div>
-    <div className="s4-store-pixel-dialogue" aria-label="목줄 선택 안내"><img src="/figma-v3/discovery-dialog-bg.svg" alt=""/><img src="/figma-v3/discovery-dialog-outer.svg" alt=""/><img src="/figma-v3/discovery-dialog-inner.svg" alt=""/><p>오늘의 멍멍이는 누구일까요?</p></div>
+    <GoCollarDialogue/>
     <GoSoundToggle className="s4-store-sound-icon"/>
-    <div className="s4-store-collar-actions">
-     <span className="s4-store-collar-guide">세 개 중 하나를 클릭한다</span>
-     <GoPixelChoice onClick={()=>setChoiceOpen(false)}>도망간다</GoPixelChoice>
-    </div>
    </section>
   </div>}
   {confirm&&<div className="s4-store-overlay s4-store-confirm-overlay" role="presentation" onClick={()=>setConfirm(false)}>
