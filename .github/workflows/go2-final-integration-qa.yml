@@ -11,6 +11,7 @@ on:
       - work/meonggo2-friend-pvp-card-ready-reveal-20261119
       - work/meonggo2-release-hidden-random-care-pvp-20261119
       - work/meonggo2-ux-stats-20261120
+      - work/meonggo-stats-exclude-test-accounts-20261121
   workflow_dispatch:
 
 permissions:
