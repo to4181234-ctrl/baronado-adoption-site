@@ -21,6 +21,7 @@ export default function GoFreeDraw({onClose}){
  const [catalog,setCatalog]=useState(null);
  const requestRef=useRef(null);
  const inFlightRef=useRef(false);
+ const animationRef=useRef(false);
  const sound=useRef(null);
  useEffect(()=>{sound.current=createGameAudio();return()=>{sound.current?.dispose();sound.current=null;};},[]);
  const [choice,setChoice]=useState(null);
@@ -29,12 +30,15 @@ export default function GoFreeDraw({onClose}){
  const [duplicate,setDuplicate]=useState(null);
  const [revealed,setRevealed]=useState(null);
  const [noImage,setNoImage]=useState(false);
+ const [animationOpen,setAnimationOpen]=useState(false);
+ const [animationDuplicate,setAnimationDuplicate]=useState(null);
+ const [animationError,setAnimationError]=useState('');
  const refresh=useCallback(async()=>{
   const response=await fetch('/api/go/official',{cache:'no-store'});
   const data=await response.json();
   if(!response.ok)throw Error(data.error||'오늘의 멍카드를 확인하지 못했어요.');
   setCatalog(data);
-  if(data.pendingDuplicate)setDuplicate(data.pendingDuplicate);
+  if(data.pendingDuplicate&&!animationRef.current)setDuplicate(data.pendingDuplicate);
   return data;
  },[]);
  useEffect(()=>{let active=true;refresh().catch(e=>{if(active)setError(e.message)});return()=>{active=false}},[refresh]);
@@ -47,11 +51,14 @@ export default function GoFreeDraw({onClose}){
  function showCard(data,latest){
   const card=displayCard(latest?.dogs?.find(d=>d.dogId===data.dogId),data.slot);
   if(card.imageUrl)setRevealed(card);
-  else setNoImage(true);
+  else {setNoImage(true);setAnimationError('카드를 지급했지만 이미지를 불러올 수 없어요. 내 도감에서 확인해주세요.');}
  }
  async function draw(index){
   if(inFlightRef.current||busy||!Number.isInteger(index)||index<0||index>2||!catalog||catalog.drawUsed||!member?.id)return;
   inFlightRef.current=true;
+  animationRef.current=true;
+  setAnimationDuplicate(null);setAnimationError('');setRevealed(null);
+  setAnimationOpen(true);
   setChoice(index);setBusy(true);setError('');
   const storageKey='meonggo:free-pending-request:'+member.id;
   try{
@@ -78,9 +85,9 @@ export default function GoFreeDraw({onClose}){
    }else window.dispatchEvent(new CustomEvent('go-coins-changed',{detail:{notified:false}}));
    const latest=await refresh();
    void sound.current?.play('discover');
-   if(data.requiresChoice){setDuplicate(latest.pendingDuplicate||{choiceId:data.drawId,dogId:data.dogId,slot:data.slot,proposedPower:data.proposedPower,proposedCharm:data.proposedCharm});}
+   if(data.requiresChoice){setAnimationDuplicate(latest.pendingDuplicate||{choiceId:data.drawId,dogId:data.dogId,slot:data.slot,proposedPower:data.proposedPower,proposedCharm:data.proposedCharm});}
    else showCard(data,latest);
-  }catch(e){setError(e.message)}finally{inFlightRef.current=false;setBusy(false)}
+  }catch(e){setError(e.message);setAnimationError(e.message)}finally{inFlightRef.current=false;setBusy(false)}
  }
  async function resolve(replace){
   if(!duplicate||busy)return;
@@ -96,7 +103,7 @@ export default function GoFreeDraw({onClose}){
   }catch(e){setError(e.message)}finally{setBusy(false)}
  }
  return <>
-  <div className="go-free-draw-overlay" role="presentation" style={{display:duplicate||revealed?'none':undefined}}>
+  <div className="go-free-draw-overlay" role="presentation" style={{display:duplicate||animationOpen||revealed?'none':undefined}}>
    <section className="go-free-draw-screen" role="dialog" aria-modal="true" aria-label="하루 두 번 무료 멍카드 뽑기">
     <button className="go-free-draw-close" type="button" disabled={busy||Boolean(duplicate)} onClick={onClose} aria-label="닫기">×</button>
     <h2>멍멍GO!</h2>
@@ -120,6 +127,8 @@ export default function GoFreeDraw({onClose}){
    </section>
   </div>
   {duplicate&&<GoDuplicateCompare dog={catalog?.dogs?.find(d=>d.dogId===duplicate.dogId)} duplicate={duplicate} busy={busy} error={error} onResolve={resolve} onClose={()=>resolve(false)}/>}
-  {revealed&&<GoOfficialDrawReveal card={revealed} onClose={onClose}/>}
+  {(animationOpen||revealed)&&<GoOfficialDrawReveal card={revealed} duplicate={animationDuplicate} error={animationError} busy={busy}
+    onDuplicate={()=>{animationRef.current=false;setAnimationOpen(false);setDuplicate(animationDuplicate);setAnimationDuplicate(null);}}
+    onClose={onClose}/>}
  </>;
 }
