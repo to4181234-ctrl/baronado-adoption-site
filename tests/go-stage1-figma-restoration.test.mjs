@@ -16,14 +16,15 @@ test('store uses only two original on-page product entry points', () => {
   assert.doesNotMatch(store, /움직임 멈추기|움직임 재생|s4-store-draw\b|s4-store-wallet\b|s4-store-buy\b/);
 });
 
-test('store keeps original pixel collar-selection assets and choices', () => {
+test('store uses Figma original collar art and approved shared noninteractive prompt', () => {
+  const dialogue=read('components/GoCollarDialogue.js');
   assert.match(store, /className="s4-store-original-choice"/);
   assert.match(store, /figma-v3\/collar\.png/);
-  assert.match(store, /figma-v3\/discovery-dialog-bg\.svg/);
-  assert.match(store, /figma-v3\/discovery-dialog-outer\.svg/);
-  assert.match(store, /figma-v3\/discovery-dialog-inner\.svg/);
-  assert.match(store, /하나 고른다/);
-  assert.match(store, /도망간다/);
+  for(const asset of ['discovery-dialog-bg.svg','discovery-dialog-outer.svg','discovery-dialog-inner.svg','discovery-select-arrow.svg'])
+   assert.ok(dialogue.includes(asset),asset);
+  assert.match(dialogue,/세 개 중 하나를 고른다/);
+  assert.doesNotMatch(dialogue,/<button|onClick=/);
+  assert.doesNotMatch(store,/도망간다/);
   assert.match(css, /width:min\(345px,calc\(100vw - 24px\)\)/);
   assert.match(css, /height:min\(502px,calc\(100dvh - 24px\)\)/);
 });
@@ -41,9 +42,14 @@ test('store selection border is not shown in product tile CSS', () => {
 });
 
 
-test('initial pixel action retains full-strength Figma arrow while its click remains disabled', () => {
-  assert.match(store, /initial disabled=\{collarChoice===null\}/);
-  assert.match(css, /\.s4-store-original-choice \.s4-store-collar-actions \.v3-pixel-choice:disabled\{opacity:1\}/);
+test('Figma guidance arrow is decorative; only collar buttons perform an action', () => {
+  const dialogue=read('components/GoCollarDialogue.js');
+  const sharedStyle=read('app/meonggo2-stage3-ui.css');
+  assert.match(dialogue,/discovery-select-arrow/);
+  assert.match(dialogue,/aria-hidden="true"/);
+  assert.doesNotMatch(dialogue,/onClick=|<button/);
+  assert.match(sharedStyle,/pointer-events:none;user-select:none/);
+  assert.match(store,/setRevealOpen\(true\)/);
 });
 
 test('approved collar popup is anchored at Figma y=96 on 390px artboard', () => {
@@ -69,7 +75,7 @@ test('purchase confirmation matches approved Figma prompt and button order', () 
   assert.match(store, /s4-store-original-confirm/);
   assert.match(store, /멍코인을 사용하여<br\/>구매하시겠습니까\?/);
   const answers = store.slice(store.indexOf('className="s4-store-confirm-answers"'));
-  assert.ok(answers.indexOf("onClick={buy}") < answers.indexOf('onClick={()=>setConfirm(false)}'));
+  assert.ok(answers.indexOf("onClick={()=>buy()}") < answers.indexOf('onClick={()=>setConfirm(false)}'));
   assert.doesNotMatch(store, /정말 구매할까요\?|‘네’를 누르면 코인이 차감되고 카드가 지급돼요/);
   assert.match(css, /height:169px/);
   assert.match(css, /width:min\(331px,calc\(100vw - 24px\)\)/);
