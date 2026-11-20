@@ -87,11 +87,12 @@
  66%{opacity:.95;transform:scale(1.12)}
  100%{opacity:0;transform:scale(1.48)}
 }
+/* Preserve motion/timing and color; reduce the light-sweep layer by 20%. */
 @keyframes go-hidden-holo-primary{
  0%,12%{transform:translate3d(-30%,-220%,0) rotate(-32deg);opacity:0}
- 23%{opacity:.85}
- 49%{opacity:1}
- 70%{transform:translate3d(60%,310%,0) rotate(-32deg);opacity:.94}
+ 23%{opacity:.68}
+ 49%{opacity:.8}
+ 70%{transform:translate3d(60%,310%,0) rotate(-32deg);opacity:.752}
  85%,100%{transform:translate3d(80%,350%,0) rotate(-32deg);opacity:0}
 }
 @keyframes go-hidden-center-flash{
