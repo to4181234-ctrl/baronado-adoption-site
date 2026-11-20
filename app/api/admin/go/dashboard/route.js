@@ -1,6 +1,6 @@
 import {hasAdminSession} from '../../../../../lib/server/adminSession.js';
 import {adminDatabase} from '../../../../../lib/server/adminData.js';
-import {excludeTestAccounts} from '../../../../../lib/server/goStatsExcludedAccounts.js';
+import {excludeTestAccounts,TEST_ACCOUNT_IDS} from '../../../../../lib/server/goStatsExcludedAccounts.js';
 
 export const dynamic='force-dynamic';
 export const runtime='nodejs';
@@ -66,7 +66,7 @@ export async function GET(request){
   let q=db.from(table).select(cols);
   if(MEMBER_COLUMNS[table])q=excludeTestAccounts(q,MEMBER_COLUMNS[table]);
   // A PvP match with a test participant must not count as a real-user match.
-  if(table==='go_pvp_records')q=excludeTestAccounts(q,'opponent_id');
+  if(table==='go_pvp_records')q=q.or(`opponent_id.is.null,opponent_id.not.in.(${TEST_ACCOUNT_IDS.join(',')})`);
   if(start&&field){q=q.gte(field,field==='local_day'?startDay:start).lt(field,field==='local_day'?dayOf(end):end);}
   return q.range(offset,offset+size-1);
  });
