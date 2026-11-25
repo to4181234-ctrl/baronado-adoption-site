@@ -69,12 +69,14 @@ test('all-time manual admin grants automatically exclude new members, even after
   assert.equal(table,'go_coin_transactions');
   return {select(field){assert.equal(field,'member_id');return this;},
    eq(field,value){calls.push([field,value]);return this;},
+   gt(field,value){calls.push([field,value]);return this;},
    order(){return this;},
    range(from,to){return Promise.resolve({data:granted.slice(from,to+1),error:null});}};
  }};
  const excluded=await getExcludedStatsAccountIds(db);
  assert.equal(calls[0][0],'event_type');
  assert.equal(calls[0][1],'admin_grant');
+ assert.deepEqual(calls[1],['amount',0]);
  assert.equal(new Set(excluded).size,TEST_ACCOUNT_IDS.length+2);
  for(const id of TEST_ACCOUNT_IDS)assert.ok(excluded.includes(id));
  assert.ok(excluded.includes(granted[0].member_id));
@@ -87,7 +89,7 @@ test('all-time manual admin grants automatically exclude new members, even after
 
 test('manual-grant exclusions fail closed rather than silently counting grants after a query error',async()=>{
  const db={from(){return{
-  select(){return this;},eq(){return this;},order(){return this;},
+  select(){return this;},eq(){return this;},gt(){return this;},order(){return this;},
   range(){return Promise.resolve({data:null,error:{message:'network error'}});}
  };}};
  await assert.rejects(getExcludedStatsAccountIds(db));
