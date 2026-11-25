@@ -12,6 +12,7 @@ on:
       - work/meonggo2-release-hidden-random-care-pvp-20261119
       - work/meonggo2-ux-stats-20261120
       - work/meonggo-stats-exclude-test-accounts-20261121
+      - work/meonggo-admin-grant-exclusion-20261125
   workflow_dispatch:
 
 permissions:
