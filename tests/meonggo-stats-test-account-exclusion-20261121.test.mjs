@@ -69,6 +69,7 @@ test('all-time manual admin grants automatically exclude new members, even after
   assert.equal(table,'go_coin_transactions');
   return {select(field){assert.equal(field,'member_id');return this;},
    eq(field,value){calls.push([field,value]);return this;},
+   order(){return this;},
    range(from,to){return Promise.resolve({data:granted.slice(from,to+1),error:null});}};
  }};
  const excluded=await getExcludedStatsAccountIds(db);
@@ -86,7 +87,7 @@ test('all-time manual admin grants automatically exclude new members, even after
 
 test('manual-grant exclusions fail closed rather than silently counting grants after a query error',async()=>{
  const db={from(){return{
-  select(){return this;},eq(){return this;},
+  select(){return this;},eq(){return this;},order(){return this;},
   range(){return Promise.resolve({data:null,error:{message:'network error'}});}
  };}};
  await assert.rejects(getExcludedStatsAccountIds(db));
