@@ -1,7 +1,7 @@
 import {hasAdminSession} from '../../../../../lib/server/adminSession.js';
 import {adminDatabase} from '../../../../../lib/server/adminData.js';
 import {monthDate} from '../../../../../lib/goShared.js';
-import {excludeTestAccounts} from '../../../../../lib/server/goStatsExcludedAccounts.js';
+import {getExcludedStatsAccountIds,excludeStatsAccounts} from '../../../../../lib/server/goStatsExcludedAccounts.js';
 
 export const dynamic='force-dynamic';
 export const runtime='nodejs';
@@ -28,17 +28,18 @@ export async function GET(request){
   const [year,mm]=rawMonth?rawMonth.split('-').map(Number):[null,null];
   const end=month?new Date(Date.UTC(mm===12?year+1:year,mm===12?0:mm,1, -9)).toISOString():null;
   const db=adminDatabase();
+  const excludedMemberIds=await getExcludedStatsAccountIds(db);
   // The old RPC uses aggregate like_count and cannot remove likes made by
   // test accounts. Recompute the same legacy response read-only instead.
   const posts=await allRows((from,size)=>{
-   let q=excludeTestAccounts(db.from('go_card_index')
-    .select('id,dog_id,dog_name,title,nickname,status,created_at'),'member_id');
+   let q=excludeStatsAccounts(db.from('go_card_index')
+    .select('id,dog_id,dog_name,title,nickname,status,created_at'),'member_id',excludedMemberIds);
    if(start)q=q.gte('created_at',start).lt('created_at',end);
    return q.order('created_at',{ascending:false}).range(from,from+size-1);
   });
   const postIds=new Set(posts.map(p=>p.id));
   const likes=postIds.size?await allRows((from,size)=>
-   excludeTestAccounts(db.from('go_likes').select('card_id'),'member_id')
+   excludeStatsAccounts(db.from('go_likes').select('card_id'),'member_id',excludedMemberIds)
     .range(from,from+size-1)):[];
 
   const likesByPost=new Map();
