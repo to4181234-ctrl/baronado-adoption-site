@@ -1,6 +1,6 @@
 import {hasAdminSession} from '../../../../../lib/server/adminSession.js';
 import {adminDatabase} from '../../../../../lib/server/adminData.js';
-import {excludeTestAccounts,TEST_ACCOUNT_IDS} from '../../../../../lib/server/goStatsExcludedAccounts.js';
+import {getExcludedStatsAccountIds,excludeStatsAccounts} from '../../../../../lib/server/goStatsExcludedAccounts.js';
 
 export const dynamic='force-dynamic';
 export const runtime='nodejs';
@@ -62,16 +62,18 @@ export async function GET(request){
  const end=new Date(midnight+DAY).toISOString();
  const startDay=start?dayOf(start):null;
  const db=adminDatabase();
- const load=(table,cols,field='created_at')=>allRows((offset,size)=>{
+ try{
+  // Evaluate over ALL historical manual grants, not just the selected report period.
+  const excludedMemberIds=await getExcludedStatsAccountIds(db);
+  const load=(table,cols,field='created_at')=>allRows((offset,size)=>{
   let q=db.from(table).select(cols);
-  if(MEMBER_COLUMNS[table])q=excludeTestAccounts(q,MEMBER_COLUMNS[table]);
+  if(MEMBER_COLUMNS[table])q=excludeStatsAccounts(q,MEMBER_COLUMNS[table],excludedMemberIds);
   // A PvP match with a test participant must not count as a real-user match.
-  if(table==='go_pvp_records')q=q.or(`opponent_id.is.null,opponent_id.not.in.(${TEST_ACCOUNT_IDS.join(',')})`);
+  if(table==='go_pvp_records')q=q.or(`opponent_id.is.null,opponent_id.not.in.(${excludedMemberIds.join(',')})`);
   if(start&&field){q=q.gte(field,field==='local_day'?startDay:start).lt(field,field==='local_day'?dayOf(end):end);}
   return q.range(offset,offset+size-1);
  });
  const current=(table,cols)=>load(table,cols,null);
- try{
   let cards=[],chart={title:'',rows:[]},rows=[],note='';
   if(tab==='overview'){
    const [members,personal,official,hidden,coins,solo,pvp]=await Promise.all([
@@ -191,7 +193,7 @@ export async function GET(request){
    rows=addBy(posts,p=>names.get(p.dog_id)||'기타 강아지').slice(0,12);
    note='기간별 게시물 수는 등록일 기준, 좋아요 수는 누른 시점 기준입니다. 공유 수치는 해당 기간에 등록된 게시물의 현재 누적 수치입니다.';
   }
-  return Response.json({tab,period,today,cards,chart,rows,note,excludedTestAccounts:3},{headers:{'Cache-Control':'no-store'}});
+  return Response.json({tab,period,today,cards,chart,rows,note,excludedTestAccounts:excludedMemberIds.length},{headers:{'Cache-Control':'no-store'}});
  }catch(e){
   console.error('MeongGO admin dashboard aggregate failed:',e?.code||e?.message||'unknown');
   return Response.json({error:'통계를 불러오지 못했어요.'},{status:503,headers:{'Cache-Control':'no-store'}});
